@@ -1,9 +1,19 @@
+import { useRef, useEffect } from "react";
+
 interface ParticipantsInputProps {
     participants: string[];
     setParticipants: (newParticipants: string[] | ((prev: string[]) => string[])) => void;
 }
 
 export default function ParticipantsInput({participants, setParticipants}: ParticipantsInputProps) {
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+    useEffect(() => {
+        if (participants.length > 1) {
+            inputRefs.current[participants.length - 1]?.focus();
+        }
+    }, [participants.length]);
+
     return (
         <div>
             <div className="flex items-center justify-between mb-1">
@@ -24,6 +34,7 @@ export default function ParticipantsInput({participants, setParticipants}: Parti
               {participants.map((name, idx) => (
                 <input
                   key={idx}
+                  ref={el => { inputRefs.current[idx] = el || null; }}
                   type="text"
                   className="w-full px-4 py-2 rounded-lg border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-800 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
                   placeholder={`Participante ${idx + 1}`}

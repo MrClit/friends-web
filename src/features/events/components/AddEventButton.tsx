@@ -2,7 +2,7 @@ interface AddNewEventProps {
   onClick: () => void;
 }
 
-export default function AddNewEvent({ onClick }: AddNewEventProps) {
+export default function AddEventButton({ onClick }: AddNewEventProps) {
   return (
     <button
       type="button"
