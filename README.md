@@ -1,69 +1,98 @@
-# React + TypeScript + Vite
+# Friends Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a personal project built for learning and practice purposes. It is a web application for managing events and participants, developed with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Table of Contents
+- [Features](#features)
+- [Demo](#demo)
+- [Installation](#installation)
+- [Available Scripts](#available-scripts)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Linting & Formatting](#linting--formatting)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- ⚡️ Fast development with Vite
+- ⚛️ React + TypeScript
+- 🎨 TailwindCSS for styling
+- 🧩 Modular architecture (features, shared, pages)
+- 🛠️ Advanced ESLint setup for TypeScript and React
+- 📦 Scalable project structure
 
-## Expanding the ESLint configuration
+## Demo
+Coming soon.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Installation
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Clone the repository
+git clone <repo-url>
+cd friends-web
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Install dependencies
+pnpm install # or npm install or yarn install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Available Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm dev        # Start the development server
+pnpm build      # Build the app for production
+pnpm preview    # Preview the production build
+pnpm lint       # Lint the code
 ```
+
+## Project Structure
+
+```
+/ ├─ public/                # Static files
+  ├─ src/
+  │   ├─ assets/           # Images and resources
+  │   ├─ features/         # Domain modules (e.g. events)
+  │   │   └─ events/
+  │   │       ├─ components/   # Event components
+  │   │       ├─ store/        # Local event state
+  │   │       ├─ types.ts      # Event types
+  │   │       └─ utils.ts      # Utilities
+  │   ├─ pages/            # Main pages
+  │   ├─ shared/           # Reusable components and hooks
+  │   └─ main.tsx          # Entry point
+  ├─ index.html
+  ├─ package.json
+  ├─ tailwind.config.js
+  ├─ vite.config.ts
+  └─ ...
+```
+
+## Configuration
+- Environment variables: create a `.env` file if you need custom variables.
+- TailwindCSS: configuration in `tailwind.config.js`.
+- ESLint: rules in `eslint.config.js`.
+
+## Linting & Formatting
+
+```bash
+pnpm lint
+```
+
+You can extend the ESLint configuration for stricter rules and advanced React support (see examples in this README).
+
+## Testing
+Currently, no tests are configured. It is recommended to add [Vitest](https://vitest.dev/) or [Jest](https://jestjs.io/) for unit testing.
+
+## Contributing
+1. Fork the project
+2. Create a branch (`git checkout -b feature/new-feature`)
+3. Make your changes and commit (`git commit -am 'feat: new feature'`)
+4. Push to your branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
+
+## License
+[MIT](LICENSE)
+
+---
+
+> Project created with ❤️ using React, TypeScript, and Vite.

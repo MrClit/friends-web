@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EventsList, EventAddButton, NewEventModal } from '../features/events/components';
+import { EventsList, EventAddButton, EventFormModal } from '../features/events/components';
 import { Logo } from '../shared/components';
 
 export default function Home() {
@@ -9,9 +9,7 @@ export default function Home() {
       <Logo />
       <EventsList />
       <EventAddButton onClick={() => setModalOpen(true)} />
-      <NewEventModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <EventFormModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }
-
-// TODO - revisar scrolling cuando tengo tantos eventos que no caben en la pantalla

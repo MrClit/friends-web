@@ -7,6 +7,7 @@ interface EventFormProps {
   setParticipants: (newParticipants: string[] | ((prev: string[]) => string[])) => void;
   onSubmit: (e: React.FormEvent) => void;
   canSubmit: boolean;
+  mode?: 'edit' | 'create';
 }
 
 export default function EventForm({
@@ -16,6 +17,7 @@ export default function EventForm({
   setParticipants,
   onSubmit,
   canSubmit,
+  mode,
 }: EventFormProps) {
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
@@ -35,7 +37,7 @@ export default function EventForm({
         className="w-full py-2 rounded-lg bg-teal-500 hover:bg-teal-600 text-white font-bold text-lg transition"
         disabled={!canSubmit}
       >
-        Crear Evento
+        {mode === 'edit' ? 'Editar Evento' : 'Crear Evento'}
       </button>
     </form>
   );
