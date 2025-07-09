@@ -14,6 +14,7 @@ export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const event = useEventsStore(state => state.events.find(e => e.id === id));
   const removeEvent = useEventsStore(state => state.removeEvent);
+  const updateEvent = useEventsStore(state => state.updateEvent);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -26,6 +27,13 @@ export default function EventDetail() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleEditSubmit = ({ id, title, participants }: { id?: string; title: string; participants: string[] }) => {
+    if (id) {
+      updateEvent(id, title, participants.map(name => ({ name })));
+    }
+    setEditModalOpen(false);
   };
 
   if (!event) return <div className="text-center mt-10">Evento no encontrado</div>;
@@ -68,10 +76,7 @@ export default function EventDetail() {
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
         event={event}
-        onSubmit={() => {
-          // Aquí deberías actualizar el evento en el store
-          setEditModalOpen(false);
-        }}
+        onSubmit={handleEditSubmit}
       />
       <ConfirmDialog
         open={deleteDialogOpen}
