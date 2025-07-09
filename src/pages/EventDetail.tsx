@@ -9,6 +9,7 @@ import { useState } from 'react';
 import EventContextMenu from '../features/events/components/EventContextMenu';
 import EventFormModal from '../features/events/components/EventFormModal';
 import ConfirmDialog from '../shared/components/ConfirmDialog';
+import ExpenseModal from '../features/expenses/components/ExpenseModal';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,7 @@ export default function EventDetail() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -67,7 +69,7 @@ export default function EventDetail() {
       <button
         type="button"
         className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-3 rounded-full bg-teal-500 hover:bg-teal-600 text-white font-bold shadow-lg text-lg transition-all focus:outline-none focus:ring-2 focus:ring-teal-300 z-50"
-        // onClick={...} // Aquí irá la lógica para abrir el modal de añadir gasto
+        onClick={() => setExpenseModalOpen(true)}
       >
         <span className="text-2xl leading-none">+</span>
         Añadir Gasto
@@ -78,6 +80,7 @@ export default function EventDetail() {
         event={event}
         onSubmit={handleEditSubmit}
       />
+      <ExpenseModal open={expenseModalOpen} onClose={() => setExpenseModalOpen(false)} event={event} />
       <ConfirmDialog
         open={deleteDialogOpen}
         title="¿Borrar evento?"
