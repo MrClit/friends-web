@@ -1,4 +1,6 @@
 import { useRef, useEffect } from "react";
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface ParticipantsInputProps {
     participants: string[];
@@ -30,21 +32,38 @@ export default function ParticipantsInput({participants, setParticipants}: Parti
                 </svg>
               </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-4">
               {participants.map((name, idx) => (
-                <input
-                  key={idx}
-                  ref={el => { inputRefs.current[idx] = el || null; }}
-                  type="text"
-                  className="w-full px-4 py-2 rounded-lg border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-800 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                  placeholder={`Participante ${idx + 1}`}
-                  value={name}
-                  onChange={e => {
-                    const newList = [...participants];
-                    newList[idx] = e.target.value;
-                    setParticipants(newList);
-                  }}
-                />
+                <div key={idx} className="relative">
+                  <input
+                    ref={el => { inputRefs.current[idx] = el || null; }}
+                    type="text"
+                    className="block w-full px-4 py-2 rounded-lg border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-800 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400 pr-10"
+                    placeholder={`Participante ${idx + 1}`}
+                    value={name}
+                    onChange={e => {
+                      const newList = [...participants];
+                      newList[idx] = e.target.value;
+                      setParticipants(newList);
+                    }}
+                  />
+                  {participants.length > 1 && (
+                    <div className="absolute right-2 top-1.5">
+                      <IconButton
+                        aria-label="Eliminar participante"
+                        size="small"
+                        className="bg-white dark:bg-teal-900 shadow"
+                        style={{ top: 0 }}
+                        onClick={() => {
+                          const newList = participants.filter((_, i) => i !== idx);
+                          setParticipants(newList);
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
         </div>

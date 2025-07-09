@@ -29,9 +29,36 @@ export default function EventFormModal({
     }
   }, [open, event]);
 
-  if (!open) return null;
+  let isDirty = false;
+  if (open) {
+    if (!event) {
+      isDirty = Boolean(title.trim() || participants.some(p => p.trim()));
+    } else {
+      const originalTitle = event.title;
+      const originalParticipants = event.participants.map(p => p.name);
+      if (title.trim() !== originalTitle.trim()) isDirty = true;
+      else if (participants.length !== originalParticipants.length) isDirty = true;
+      else {
+        for (let i = 0; i < originalParticipants.length; i++) {
+          if ((participants[i] || '').trim() !== (originalParticipants[i] || '').trim()) {
+            isDirty = true;
+            break;
+          }
+        }
+        // Si hay más participantes nuevos al final
+        if (!isDirty) {
+          for (let i = originalParticipants.length; i < participants.length; i++) {
+            if ((participants[i] || '').trim()) {
+              isDirty = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
 
-  const isDirty = title.trim() || participants.some(p => p.trim());
+  if (!open) return null;
 
   const handleClose = () => {
     if (isDirty) {
