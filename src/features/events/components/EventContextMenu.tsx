@@ -20,11 +20,11 @@ export default function EventContextMenu({ anchorEl, open, onClose, onEdit, onDe
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
     >
-      <MenuItem onClick={() => { onClose(); onEdit && onEdit(); }}>
+      <MenuItem onClick={() => { onClose(); if (onEdit) { onEdit(); } }}>
         <EditIcon fontSize="small" className="mr-2" />
         Modificar
       </MenuItem>
-      <MenuItem onClick={() => { onClose(); onDelete && onDelete(); }}>
+      <MenuItem onClick={() => { onClose(); if (onDelete) { onDelete(); } }}>
         <DeleteIcon fontSize="small" className="mr-2" />
         Borrar
       </MenuItem>

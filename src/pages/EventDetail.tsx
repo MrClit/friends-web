@@ -8,13 +8,16 @@ import KPIBox from '../features/events/components/KPIBox';
 import { useState } from 'react';
 import EventContextMenu from '../features/events/components/EventContextMenu';
 import EventFormModal from '../features/events/components/EventFormModal';
+import ConfirmDialog from '../shared/components/ConfirmDialog';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const event = useEventsStore(state => state.events.find(e => e.id === id));
+  const removeEvent = useEventsStore(state => state.removeEvent);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -42,6 +45,7 @@ export default function EventDetail() {
           open={open}
           onClose={handleMenuClose}
           onEdit={() => setEditModalOpen(true)}
+          onDelete={() => setDeleteDialogOpen(true)}
         />
       </div>
       {/* KPIs */}
@@ -68,6 +72,19 @@ export default function EventDetail() {
           // Aquí deberías actualizar el evento en el store
           setEditModalOpen(false);
         }}
+      />
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        title="¿Borrar evento?"
+        message="Esta acción no se puede deshacer. ¿Seguro que quieres borrar este evento?"
+        confirmText="Borrar"
+        cancelText="Cancelar"
+        onConfirm={() => {
+          removeEvent(event.id);
+          setDeleteDialogOpen(false);
+          navigate('/');
+        }}
+        onCancel={() => setDeleteDialogOpen(false)}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import { generateId } from "../utils";
 interface EventsState {
   events: Event[];
   addEvent: (title: string, participants: { name: string }[]) => void;
+  removeEvent: (id: string) => void;
 }
 
 export const useEventsStore = create<EventsState>()(
@@ -25,6 +26,10 @@ export const useEventsStore = create<EventsState>()(
               })),
             },
           ],
+        })),
+      removeEvent: (id) =>
+        set((state) => ({
+          events: state.events.filter((e) => e.id !== id),
         })),
     }),
     {
