@@ -1,6 +1,6 @@
 # Friends Web
 
-This is a personal project built for learning and practice purposes. It is a web application for managing events and participants, developed with React, TypeScript, and Vite.
+This is a personal project built for learning and practice purposes. It is a web application for managing events, participants, and shared expenses, developed with React, TypeScript, and Vite.
 
 ## Table of Contents
 - [Features](#features)
@@ -21,6 +21,14 @@ This is a personal project built for learning and practice purposes. It is a web
 - 🧩 Modular architecture (features, shared, pages)
 - 🛠️ Advanced ESLint setup for TypeScript and React
 - 📦 Scalable project structure
+- 👫 Event management: create, edit, and delete events
+- 👥 Participant management within each event
+- 📊 Event detail page with KPIs and contextual menu (edit/delete)
+- ➕ Add, edit, and delete expenses (contributions, expenses, reimbursements) linked to events
+- 💸 Expense modal with dynamic form and participant selector
+- 🗃️ Persistent state for events and expenses using Zustand + LocalStorage
+- 🧩 Reusable and accessible modals and dialogs
+- 🌙 Dark mode support
 
 ## Demo
 Coming soon.
@@ -29,7 +37,7 @@ Coming soon.
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/MrClit/friends-web.git
 cd friends-web
 
 # Install dependencies
@@ -51,12 +59,16 @@ pnpm lint       # Lint the code
 / ├─ public/                # Static files
   ├─ src/
   │   ├─ assets/           # Images and resources
-  │   ├─ features/         # Domain modules (e.g. events)
-  │   │   └─ events/
-  │   │       ├─ components/   # Event components
-  │   │       ├─ store/        # Local event state
-  │   │       ├─ types.ts      # Event types
-  │   │       └─ utils.ts      # Utilities
+  │   ├─ features/         # Domain modules (e.g. events, expenses)
+  │   │   ├─ events/
+  │   │   │   ├─ components/   # Event components
+  │   │   │   ├─ store/        # Local event state
+  │   │   │   ├─ types.ts      # Event types
+  │   │   │   └─ utils.ts      # Utilities
+  │   │   └─ expenses/
+  │   │       ├─ components/   # Expense components
+  │   │       ├─ store/        # Local expense state
+  │   │       ├─ types.ts      # Expense types
   │   ├─ pages/            # Main pages
   │   ├─ shared/           # Reusable components and hooks
   │   └─ main.tsx          # Entry point

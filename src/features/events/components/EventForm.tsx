@@ -37,7 +37,7 @@ export default function EventForm({
         className="w-full py-2 rounded-lg bg-teal-500 hover:bg-teal-600 text-white font-bold text-lg transition"
         disabled={!canSubmit}
       >
-        {mode === 'edit' ? 'Editar Evento' : 'Crear Evento'}
+        {mode === 'edit' ? 'Actualizar Evento' : 'Crear Evento'}
       </button>
     </form>
   );

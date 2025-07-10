@@ -1,5 +1,6 @@
 import React from "react";
 import type { PaymentType } from '../types';
+import type { EventParticipant } from '../../events/types';
 
 interface TransactionFormProps {
   type: PaymentType;
@@ -11,7 +12,7 @@ interface TransactionFormProps {
   setDate: (v: string) => void;
   from: string;
   setFrom: (v: string) => void;
-  participants: { name: string }[];
+  participants: EventParticipant[];
   onSubmit: (e: React.FormEvent) => void;
 }
 

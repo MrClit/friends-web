@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Event } from "../types";
-import { generateId } from "../utils";
 
 interface EventsState {
   events: Event[];
@@ -19,10 +18,10 @@ export const useEventsStore = create<EventsState>()(
           events: [
             ...state.events,
             {
-              id: generateId(),
+              id: crypto.randomUUID(),
               title,
               participants: participants.map((p) => ({
-                id: generateId(),
+                id: crypto.randomUUID(),
                 name: p.name,
               })),
             },
