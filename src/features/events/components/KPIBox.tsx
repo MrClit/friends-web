@@ -1,13 +1,18 @@
 interface KPIBoxProps {
   label: string;
   value: number;
+  colorClass?: string; // Nueva prop para clases de color
 }
 
-export default function KPIBox({ label, value }: KPIBoxProps) {
+export default function KPIBox({ label, value, colorClass }: KPIBoxProps) {
   return (
-    <div className="bg-white dark:bg-teal-800 rounded-xl shadow p-4 flex flex-col items-center">
-      <span className="text-xs text-teal-400 mb-1 font-medium uppercase tracking-wide">{label}</span>
-      <span className="text-2xl font-bold text-teal-700 dark:text-teal-200">€ {value.toFixed(2)}</span>
+    <div className={`rounded-xl shadow p-4 flex flex-col items-center ${colorClass || 'bg-white dark:bg-teal-800'}`}>
+      <span className="text-xs mb-1 font-medium uppercase tracking-wide">
+        {label}
+      </span>
+      <span className="text-2xl font-bold">
+        € {value.toFixed(2)}
+      </span>
     </div>
   );
 }

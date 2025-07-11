@@ -1,12 +1,12 @@
-import { FaArrowDown, FaArrowUp, FaExchangeAlt } from 'react-icons/fa';
+import { FaHandHoldingUsd, FaWallet, FaHandshake } from 'react-icons/fa';
 import type { Transaction } from '../types';
 import type { PaymentType } from '../types';
 import type { JSX } from 'react/jsx-runtime';
 
 const ICONS: Record<PaymentType, JSX.Element> = {
-  contribution: <FaArrowDown className="text-green-500" />,
-  expense: <FaArrowUp className="text-red-500" />,
-  compensation: <FaExchangeAlt className="text-blue-500" />,
+  contribution: <FaHandHoldingUsd className="text-blue-800 dark:text-blue-200" />,
+  expense: <FaWallet className="text-red-800 dark:text-red-200" />,
+  compensation: <FaHandshake className="text-green-800 dark:text-green-200" />,
 };
 
 const PARTICIPANT_PREFIX: Record<PaymentType, string> = {
@@ -15,8 +15,14 @@ const PARTICIPANT_PREFIX: Record<PaymentType, string> = {
   compensation: 'Pagado a',
 };
 
+const TEXT_COLOR_CLASSES: Record<PaymentType, string> = {
+  contribution: 'text-blue-800 dark:text-blue-200',
+  expense: 'text-red-800 dark:text-red-200',
+  compensation: 'text-green-800 dark:text-green-200',
+};
+
 interface MovementsListProps {
-  expenses: Transaction[];
+  transactions: Transaction[];
 }
 
 function groupByDate(expenses: Transaction[]) {
@@ -35,9 +41,9 @@ function formatDateLong(dateStr: string) {
   });
 }
 
-export default function TransactionsList({ expenses }: MovementsListProps) {
+export default function TransactionsList({ transactions }: MovementsListProps) {
   // Ordenar por fecha descendente y agrupar
-  const grouped = groupByDate([...expenses].sort((a, b) => b.date.localeCompare(a.date)));
+  const grouped = groupByDate([...transactions].sort((a, b) => b.date.localeCompare(a.date)));
   const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
@@ -52,8 +58,11 @@ export default function TransactionsList({ expenses }: MovementsListProps) {
           </div>
           <ul className="flex flex-col gap-2">
             {grouped[date].map(mov => (
-              <li key={mov.id} className="flex items-center gap-3 bg-white dark:bg-teal-950 rounded-lg px-4 py-3 shadow-sm">
-                <span className="text-xl">
+              <li
+                key={mov.id}
+                className="flex items-center gap-3 bg-white dark:bg-teal-950 rounded-lg px-4 py-3 shadow-sm"
+              >
+                <span className={`text-xl ${TEXT_COLOR_CLASSES[mov.paymentType]}`}>
                   {ICONS[mov.paymentType]}
                 </span>
                 <div className="flex-1">
@@ -62,7 +71,7 @@ export default function TransactionsList({ expenses }: MovementsListProps) {
                     {PARTICIPANT_PREFIX[mov.paymentType]} {mov.payer}
                   </div>
                 </div>
-                <div className="font-bold text-lg tabular-nums">
+                <div className={`font-bold text-lg tabular-nums ${TEXT_COLOR_CLASSES[mov.paymentType]}`}>
                   {mov.amount.toFixed(2)} €
                 </div>
               </li>
