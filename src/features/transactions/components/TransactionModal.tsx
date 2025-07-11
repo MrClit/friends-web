@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import TransactionForm from './TransactionForm';
 import type { PaymentType } from '../types';
-import { useExpensesStore } from '../store/useExpensesStore';
+import { useTransactionsStore } from '../store/useExpensesStore';
 import type { Event } from '../../events/types';
 
-interface ExpenseModalProps {
+interface TransactionModalProps {
   open: boolean;
   onClose: () => void;
   event: Event;
@@ -16,13 +16,13 @@ const TRANSACTION_TYPES: { key: PaymentType; label: string }[] = [
   { key: 'compensation', label: 'Reembolso' },
 ];
 
-export default function ExpenseModal({ open, onClose, event }: ExpenseModalProps) {
+export default function TransactionModal({ open, onClose, event }: TransactionModalProps) {
   const [type, setType] = useState<PaymentType>('contribution');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [from, setFrom] = useState('');
-  const addExpense = useExpensesStore(state => state.addExpense);
+  const addExpense = useTransactionsStore(state => state.addExpense);
 
   useEffect(() => {
     if (!open) return;
@@ -67,7 +67,7 @@ export default function ExpenseModal({ open, onClose, event }: ExpenseModalProps
         style={{ borderRadius: '1.5rem 1.5rem 0 0' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">Añadir Gasto</h2>
+          <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">Añadir Transacción</h2>
           <button onClick={onClose} className="text-2xl text-teal-400 hover:text-teal-600">&times;</button>
         </div>
         {/* Selector de tipo de transacción */}

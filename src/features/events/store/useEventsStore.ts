@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Event } from "../types";
+import { useTransactionsStore } from '../../transactions/store/useExpensesStore';
 
 interface EventsState {
   events: Event[];
@@ -27,10 +28,15 @@ export const useEventsStore = create<EventsState>()(
             },
           ],
         })),
-      removeEvent: (id) =>
+      removeEvent: (id) => {
+        // Elimina los movimientos vinculados al evento
+        const deleteMovementsByEvent = useTransactionsStore.getState().deleteMovementsByEvent;
+        deleteMovementsByEvent(id);
+        // Elimina el evento
         set((state) => ({
           events: state.events.filter((e) => e.id !== id),
-        })),
+        }));
+      },
       updateEvent: (id, title, participants) =>
         set((state) => ({
           events: state.events.map((e) =>

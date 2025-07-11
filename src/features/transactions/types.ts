@@ -1,6 +1,6 @@
 export type PaymentType = 'contribution' | 'expense' | 'compensation';
 
-export interface Expense {
+export interface Transaction {
   id: string;
   title: string;
   paymentType: PaymentType;
