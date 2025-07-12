@@ -5,6 +5,8 @@ import type { JSX } from 'react/jsx-runtime';
 import type { Event } from '../../events/types';
 import TransactionModal from './TransactionModal';
 import { useState } from 'react';
+import { formatAmount } from '../../../shared/utils/formatAmount';
+import { formatDateLong } from '../../../shared/utils/formatDateLong';
 
 const ICONS: Record<PaymentType, JSX.Element> = {
   contribution: <FaHandHoldingUsd className="text-blue-800 dark:text-blue-200" />,
@@ -34,15 +36,6 @@ function groupByDate(expenses: Transaction[]) {
     (acc[exp.date] = acc[exp.date] || []).push(exp);
     return acc;
   }, {} as Record<string, Transaction[]>);
-}
-
-function formatDateLong(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('es-ES', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
 }
 
 export default function TransactionsList({ transactions, event }: TransactionsListProps) {
@@ -80,7 +73,7 @@ export default function TransactionsList({ transactions, event }: TransactionsLi
                     {PARTICIPANT_PREFIX[trx.paymentType]} {trx.payer}
                   </div>
                 </div>
-                <div className={`font-bold text-lg tabular-nums ${TEXT_COLOR_CLASSES[trx.paymentType]}`}>{trx.amount.toFixed(2)} €</div>
+                <div className={`font-bold text-lg tabular-nums ${TEXT_COLOR_CLASSES[trx.paymentType]}`}>{formatAmount(trx.amount)}</div>
               </li>
             ))}
           </ul>

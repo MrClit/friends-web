@@ -99,7 +99,7 @@ export default function EventFormModal({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30" onClick={handleClose}>
+      <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/30" onClick={handleClose}>
         <div
           className="w-full max-w-md bg-white dark:bg-teal-900 rounded-t-3xl p-6 shadow-lg animate-slideUp
             min-h-[50vh] max-h-[90vh] overflow-y-auto"

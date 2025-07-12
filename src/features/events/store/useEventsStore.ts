@@ -30,7 +30,7 @@ export const useEventsStore = create<EventsState>()(
         })),
       removeEvent: (id) => {
         // Elimina los movimientos vinculados al evento
-        const deleteMovementsByEvent = useTransactionsStore.getState().deleteMovementsByEvent;
+        const deleteMovementsByEvent = useTransactionsStore.getState().deleteTransactionsByEvent;
         deleteMovementsByEvent(id);
         // Elimina el evento
         set((state) => ({

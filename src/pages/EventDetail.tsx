@@ -24,7 +24,8 @@ export default function EventDetail() {
   
   const getTotalExpensesByEvent = useTransactionsStore(state => state.getTotalExpensesByEvent);
   const getTotalContributionsByEvent = useTransactionsStore(state => state.getTotalContributionsByEvent);
-  const getTotalCompensationsByEvent = useTransactionsStore(state => state.getTotalCompensationsByEvent);
+  const getPotBalanceByEvent = useTransactionsStore(state => state.getPotBalanceByEvent);
+  const getPendingToCompensateByEvent = useTransactionsStore(state => state.getPendingToCompensateByEvent);
   
   // Obtén todas las transacciones del store y filtra fuera del selector para evitar bucles
   const allTransactions = useTransactionsStore(state => state.transactions);
@@ -32,7 +33,8 @@ export default function EventDetail() {
   
   const totalExpenses = event ? getTotalExpensesByEvent(event.id) : 0;
   const totalContributions = event ? getTotalContributionsByEvent(event.id) : 0;
-  const totalCompensations = event ? getTotalCompensationsByEvent(event.id) : 0;
+  const potBalance = event ? getPotBalanceByEvent(event.id) : 0;
+  const pendingToCompensate = event ? getPendingToCompensateByEvent(event.id) : 0;
   
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -56,10 +58,6 @@ export default function EventDetail() {
     setEditModalOpen(false);
   };
 
-  // KPIs calculation
-  const potBalance = totalContributions - totalCompensations;
-  const pendingToPay = totalExpenses - totalCompensations;
-
   if (!event) return <div className="text-center mt-10">Evento no encontrado</div>;
 
   return (
@@ -68,7 +66,7 @@ export default function EventDetail() {
         <IconButton onClick={() => navigate('/') }>
           <ArrowBackIcon />
         </IconButton>
-        <h1 className="text-3xl font-bold text-center flex-1 truncate">{event.title}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-center flex-1 truncate">{event.title}</h1>
         <IconButton onClick={handleMenuClick}>
           <MoreVertIcon />
         </IconButton>
@@ -83,10 +81,34 @@ export default function EventDetail() {
       
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 w-full max-w-md mb-8">
-        <KPIBox label="Saldo del Bote" value={potBalance} colorClass="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" />
-        <KPIBox label="Contribución Total" value={totalContributions} colorClass="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" />
-        <KPIBox label="Gastos Totales" value={totalExpenses} colorClass="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" />
-        <KPIBox label="Pendiente de Pagar" value={pendingToPay} colorClass="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" />
+        <KPIBox
+          label="Saldo del Bote"
+          value={potBalance}
+          colorClass="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+          onClick={() => navigate(`/event/${event.id}/kpi/pot`)}
+          style={{ cursor: 'pointer' }}
+        />
+        <KPIBox
+          label="Contribución Total"
+          value={totalContributions}
+          colorClass="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+          onClick={() => navigate(`/event/${event.id}/kpi/contributions`)}
+          style={{ cursor: 'pointer' }}
+        />
+        <KPIBox
+          label="Gastos Totales"
+          value={totalExpenses}
+          colorClass="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+          onClick={() => navigate(`/event/${event.id}/kpi/expenses`)}
+          style={{ cursor: 'pointer' }}
+        />
+        <KPIBox
+          label="Pendiente de Pagar"
+          value={pendingToCompensate}
+          colorClass="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+          onClick={() => navigate(`/event/${event.id}/kpi/pending`)}
+          style={{ cursor: 'pointer' }}
+        />
       </div>
       
       {/* Lista de transacciones */}

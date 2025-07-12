@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 interface ParticipantsInputProps {
     participants: string[];
@@ -23,13 +24,11 @@ export default function ParticipantsInput({participants, setParticipants}: Parti
               <button
                 type="button"
                 aria-label="Añadir participante"
-                className={`ml-2 p-1 rounded-full bg-teal-100 dark:bg-teal-800 hover:bg-teal-200 dark:hover:bg-teal-700 text-teal-600 dark:text-teal-200 transition disabled:opacity-50`}
+                className={`ml-2 p-1 rounded-full hover:bg-teal-200 dark:hover:bg-teal-700 text-teal-600 dark:text-teal-200 transition disabled:opacity-50`}
                 onClick={() => setParticipants((p: string[]) => [...p, ""])}
                 disabled={participants[participants.length-1].trim() === ""}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
+                <PersonAddIcon fontSize="medium" />
               </button>
             </div>
             <div className="space-y-4">
