@@ -5,9 +5,9 @@ import type { Transaction } from '../types';
 interface TransactionsState {
   transactions: Transaction[];
   addExpense: (expense: Omit<Transaction, 'id'>) => void;
-  updateExpense: (id: string, data: Partial<Omit<Transaction, 'id'>>) => void;
-  removeExpense: (id: string) => void;
-  getExpensesByEvent: (eventId: string) => Transaction[];
+  updateTransaction: (id: string, data: Partial<Omit<Transaction, 'id'>>) => void;
+  removeTransaction: (id: string) => void;
+  getTransactionsByEvent: (eventId: string) => Transaction[];
   getTotalExpensesByEvent: (eventId: string) => number;
   getTotalContributionsByEvent: (eventId: string) => number;
   getTotalCompensationsByEvent: (eventId: string) => number;
@@ -25,17 +25,17 @@ export const useTransactionsStore = create<TransactionsState>()(
             { ...expense, id: crypto.randomUUID() },
           ],
         })),
-      updateExpense: (id, data) =>
+      updateTransaction: (id, data) =>
         set((state) => ({
           transactions: state.transactions.map((e) =>
             e.id === id ? { ...e, ...data } : e
           ),
         })),
-      removeExpense: (id) =>
+      removeTransaction: (id) =>
         set((state) => ({
           transactions: state.transactions.filter((e) => e.id !== id),
         })),
-      getExpensesByEvent: (eventId) =>
+      getTransactionsByEvent: (eventId) =>
         get().transactions.filter((e) => e.eventId === eventId),
       getTotalExpensesByEvent: (eventId) =>
         get()

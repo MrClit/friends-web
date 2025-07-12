@@ -11,7 +11,8 @@ import EventFormModal from '../features/events/components/EventFormModal';
 import ConfirmDialog from '../shared/components/ConfirmDialog';
 import TransactionModal from '../features/transactions/components/TransactionModal';
 import TransactionsList from '../features/transactions/components/TransactionsList';
-import { useTransactionsStore } from '../features/transactions/store/useExpensesStore';
+import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
+import FloatingActionButton from '../shared/components/FloatingActionButton';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
@@ -21,11 +22,13 @@ export default function EventDetail() {
   const updateEvent = useEventsStore(state => state.updateEvent);
   const removeEvent = useEventsStore(state => state.removeEvent);
   
-  const getExpensesByEvent = useTransactionsStore(state => state.getExpensesByEvent);
   const getTotalExpensesByEvent = useTransactionsStore(state => state.getTotalExpensesByEvent);
   const getTotalContributionsByEvent = useTransactionsStore(state => state.getTotalContributionsByEvent);
   const getTotalCompensationsByEvent = useTransactionsStore(state => state.getTotalCompensationsByEvent);
-  const expenses = event ? getExpensesByEvent(event.id) : [];
+  
+  // Obtén todas las transacciones del store y filtra fuera del selector para evitar bucles
+  const allTransactions = useTransactionsStore(state => state.transactions);
+  const transactions = event ? allTransactions.filter(e => e.eventId === event.id) : [];
   
   const totalExpenses = event ? getTotalExpensesByEvent(event.id) : 0;
   const totalContributions = event ? getTotalContributionsByEvent(event.id) : 0;
@@ -34,7 +37,7 @@ export default function EventDetail() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
   
   const open = Boolean(anchorEl);
 
@@ -87,23 +90,20 @@ export default function EventDetail() {
       </div>
       
       {/* Lista de transacciones */}
-      <TransactionsList transactions={expenses} />
+      <TransactionsList transactions={transactions} event={event}/>
       
-      <button
-        type="button"
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-3 rounded-full bg-teal-500 hover:bg-teal-600 text-white font-bold shadow-lg text-lg transition-all focus:outline-none focus:ring-2 focus:ring-teal-300 z-50"
-        onClick={() => setExpenseModalOpen(true)}
-      >
-        <span className="text-2xl leading-none">+</span>
-        Añadir Transacción
-      </button>
+      <FloatingActionButton
+        onClick={() => setTransactionModalOpen(true)}
+        label="Añadir Transacción"
+        icon={"+"}
+      />
       <EventFormModal
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
         event={event}
         onSubmit={handleEditSubmit}
       />
-      <TransactionModal open={expenseModalOpen} onClose={() => setExpenseModalOpen(false)} event={event} />
+      <TransactionModal open={transactionModalOpen} onClose={() => setTransactionModalOpen(false)} event={event} />
       <ConfirmDialog
         open={deleteDialogOpen}
         title="¿Borrar evento?"

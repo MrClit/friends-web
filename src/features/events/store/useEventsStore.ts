@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Event } from "../types";
-import { useTransactionsStore } from '../../transactions/store/useExpensesStore';
+import { useTransactionsStore } from '../../transactions/store/useTransactionsStore';
 
 interface EventsState {
   events: Event[];

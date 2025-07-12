@@ -2,6 +2,9 @@ import { FaHandHoldingUsd, FaWallet, FaHandshake } from 'react-icons/fa';
 import type { Transaction } from '../types';
 import type { PaymentType } from '../types';
 import type { JSX } from 'react/jsx-runtime';
+import type { Event } from '../../events/types';
+import TransactionModal from './TransactionModal';
+import { useState } from 'react';
 
 const ICONS: Record<PaymentType, JSX.Element> = {
   contribution: <FaHandHoldingUsd className="text-blue-800 dark:text-blue-200" />,
@@ -21,8 +24,9 @@ const TEXT_COLOR_CLASSES: Record<PaymentType, string> = {
   compensation: 'text-green-800 dark:text-green-200',
 };
 
-interface MovementsListProps {
+interface TransactionsListProps {
   transactions: Transaction[];
+  event: Event
 }
 
 function groupByDate(expenses: Transaction[]) {
@@ -41,7 +45,10 @@ function formatDateLong(dateStr: string) {
   });
 }
 
-export default function TransactionsList({ transactions }: MovementsListProps) {
+export default function TransactionsList({ transactions, event }: TransactionsListProps) {
+  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+
   // Ordenar por fecha descendente y agrupar
   const grouped = groupByDate([...transactions].sort((a, b) => b.date.localeCompare(a.date)));
   const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
@@ -57,28 +64,36 @@ export default function TransactionsList({ transactions }: MovementsListProps) {
             {formatDateLong(date)}
           </div>
           <ul className="flex flex-col gap-2">
-            {grouped[date].map(mov => (
+            {grouped[date].map(trx => (
               <li
-                key={mov.id}
-                className="flex items-center gap-3 bg-white dark:bg-teal-950 rounded-lg px-4 py-3 shadow-sm"
+                key={trx.id}
+                className="flex items-center gap-3 bg-white dark:bg-teal-950 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900 transition-colors"
+                onClick={() => {
+                  setSelectedTransaction(trx);
+                  setTransactionModalOpen(true);
+                }}
               >
-                <span className={`text-xl ${TEXT_COLOR_CLASSES[mov.paymentType]}`}>
-                  {ICONS[mov.paymentType]}
-                </span>
+                <span className={`text-xl ${TEXT_COLOR_CLASSES[trx.paymentType]}`}>{ICONS[trx.paymentType]}</span>
                 <div className="flex-1">
-                  <div className="font-semibold text-teal-900 dark:text-teal-100">{mov.title}</div>
+                  <div className="font-semibold text-teal-900 dark:text-teal-100">{trx.title}</div>
                   <div className="text-xs text-teal-500">
-                    {PARTICIPANT_PREFIX[mov.paymentType]} {mov.payer}
+                    {PARTICIPANT_PREFIX[trx.paymentType]} {trx.payer}
                   </div>
                 </div>
-                <div className={`font-bold text-lg tabular-nums ${TEXT_COLOR_CLASSES[mov.paymentType]}`}>
-                  {mov.amount.toFixed(2)} €
-                </div>
+                <div className={`font-bold text-lg tabular-nums ${TEXT_COLOR_CLASSES[trx.paymentType]}`}>{trx.amount.toFixed(2)} €</div>
               </li>
             ))}
           </ul>
         </div>
       ))}
+      <TransactionModal 
+        open={transactionModalOpen} 
+        onClose={() => {
+          setTransactionModalOpen(false);
+          setSelectedTransaction(null);
+        }} 
+        event={event}
+        transaction={selectedTransaction ?? undefined} />
     </div>
   );
 }

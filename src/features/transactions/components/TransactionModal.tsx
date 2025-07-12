@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import TransactionForm from './TransactionForm';
-import type { PaymentType } from '../types';
-import { useTransactionsStore } from '../store/useExpensesStore';
+import type { PaymentType, Transaction } from '../types';
+import { useTransactionsStore } from '../store/useTransactionsStore';
 import type { Event } from '../../events/types';
 
 interface TransactionModalProps {
   open: boolean;
   onClose: () => void;
   event: Event;
+  transaction?: Transaction // Optional for editing existing transactions
 }
 
 const TRANSACTION_TYPES: { key: PaymentType; label: string }[] = [
@@ -16,13 +17,14 @@ const TRANSACTION_TYPES: { key: PaymentType; label: string }[] = [
   { key: 'compensation', label: 'Reembolso' },
 ];
 
-export default function TransactionModal({ open, onClose, event }: TransactionModalProps) {
+export default function TransactionModal({ open, onClose, event, transaction }: TransactionModalProps) {
   const [type, setType] = useState<PaymentType>('contribution');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [from, setFrom] = useState('');
+  const [participant, setParticipant] = useState('');
   const addExpense = useTransactionsStore(state => state.addExpense);
+  const updateExpense = useTransactionsStore(state => state.updateTransaction);
 
   useEffect(() => {
     if (!open) return;
@@ -34,23 +36,41 @@ export default function TransactionModal({ open, onClose, event }: TransactionMo
   }, [open, onClose]);
 
   useEffect(() => {
-    if (open) {
+    if (transaction) {
+      setType(transaction.paymentType);
+      setTitle(transaction.title);
+      setAmount(transaction.amount.toString());
+      setDate(transaction.date);
+      setParticipant(transaction.payer || '');
+    } else {
       setType('contribution');
       setTitle('');
       setAmount('');
       setDate(new Date().toISOString().slice(0, 10));
-      setFrom('');
+      setParticipant('');
     }
-  }, [open]);
+  }, [transaction, open]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title || !amount || !date || !from) return;
+    if (!title || !amount || !date || !participant) return;
+    if (transaction) {
+      // Update existing transaction
+      updateExpense(transaction.id, {
+        title,
+        paymentType: type,
+        amount: parseFloat(amount),
+        payer: participant,
+        date,
+      });
+      onClose();
+      return;
+    }
     addExpense({
       title,
       paymentType: type,
       amount: parseFloat(amount),
-      payer: from,
+      payer: participant,
       date,
       eventId: event.id,
     });
@@ -92,8 +112,8 @@ export default function TransactionModal({ open, onClose, event }: TransactionMo
           setAmount={setAmount}
           date={date}
           setDate={setDate}
-          from={from}
-          setFrom={setFrom}
+          from={participant}
+          setFrom={setParticipant}
           participants={event.participants}
           onSubmit={handleSubmit}
         />
