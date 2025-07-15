@@ -70,7 +70,7 @@ export default function TransactionsList({ transactions, event }: TransactionsLi
                 <div className="flex-1">
                   <div className="font-semibold text-teal-900 dark:text-teal-100">{trx.title}</div>
                   <div className="text-xs text-teal-500">
-                    {PARTICIPANT_PREFIX[trx.paymentType]} {trx.payer}
+                    {PARTICIPANT_PREFIX[trx.paymentType]} {event.participants.find(p => p.id === trx.participantId)?.name || 'Participante desconocido'}
                   </div>
                 </div>
                 <div className={`font-bold text-lg tabular-nums ${TEXT_COLOR_CLASSES[trx.paymentType]}`}>{formatAmount(trx.amount)}</div>

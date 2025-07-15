@@ -5,7 +5,7 @@ export interface Transaction {
   title: string;
   paymentType: PaymentType;
   amount: number;
-  payer: string; // nombre del participante
+  participantId: string; // nombre del participante
   date: string; // formato ISO yyyy-mm-dd
   eventId: string;
 }

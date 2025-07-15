@@ -1,5 +1,6 @@
 // Tipos relacionados con eventos
 export interface EventParticipant {
+  id: string;
   name: string;
 }
 

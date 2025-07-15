@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useEventsStore } from "../store/useEventsStore";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog";
 import EventForm from "./EventForm";
-import type { Event } from '../types';
+import type { Event, EventParticipant } from '../types';
 
 interface EventFormModalProps {
   open: boolean;
   onClose: () => void;
   event?: Event; // Si se pasa, es edición
-  onSubmit?: (event: { id?: string; title: string; participants: string[] }) => void;
+  onSubmit?: (event: { id?: string; title: string; participants: EventParticipant[] }) => void;
 }
 
 export default function EventFormModal({
@@ -17,41 +17,42 @@ export default function EventFormModal({
   event,
   onSubmit,
 }: EventFormModalProps) {
-  const [participants, setParticipants] = useState<string[]>(['']);
   const [title, setTitle] = useState('');
+  const [participants, setParticipants] = useState<EventParticipant[]>([{ id: crypto.randomUUID(), name: '' }]);
   const [showConfirm, setShowConfirm] = useState(false);
   const addEvent = useEventsStore((state) => state.addEvent);
 
   useEffect(() => {
     if (open) {
       setTitle(event ? event.title : '');
-      setParticipants(event ? event.participants.map(p => p.name) : ['']);
+      setParticipants(event ? event.participants : [{ id: crypto.randomUUID(), name: '' }]);
     }
   }, [open, event]);
 
   let isDirty = false;
   if (open) {
     if (!event) {
-      isDirty = Boolean(title.trim() || participants.some(p => p.trim()));
+      // If creating a new event, check if title or any participant name is dirty
+      isDirty = Boolean(title.trim() || participants.some(p => p.name.trim()));
     } else {
       const originalTitle = event.title;
-      const originalParticipants = event.participants.map(p => p.name);
+      const originalParticipants = event.participants;
+      // Check if title have changed
       if (title.trim() !== originalTitle.trim()) isDirty = true;
+      // Check if the number of participants have changed
       else if (participants.length !== originalParticipants.length) isDirty = true;
       else {
-        for (let i = 0; i < originalParticipants.length; i++) {
-          if ((participants[i] || '').trim() !== (originalParticipants[i] || '').trim()) {
+        // Compare by id and name, regardless of order
+        for (const current of participants) {
+          const original = originalParticipants.find(p => p.id === current.id);
+          if (
+            !original ||
+            typeof current.name !== 'string' ||
+            typeof original.name !== 'string' ||
+            current.name.trim() !== original.name.trim()
+          ) {
             isDirty = true;
             break;
-          }
-        }
-        // Si hay más participantes nuevos al final
-        if (!isDirty) {
-          for (let i = originalParticipants.length; i < participants.length; i++) {
-            if ((participants[i] || '').trim()) {
-              isDirty = true;
-              break;
-            }
           }
         }
       }
@@ -64,8 +65,9 @@ export default function EventFormModal({
     if (isDirty) {
       setShowConfirm(true);
     } else {
+      // reset form state
       setTitle(event ? event.title : '');
-      setParticipants(event ? event.participants.map(p => p.name) : ['']);
+      setParticipants(event ? event.participants : [{ id: crypto.randomUUID(), name: '' }]);
       onClose();
     }
   };
@@ -73,7 +75,7 @@ export default function EventFormModal({
   const handleConfirmClose = () => {
     setShowConfirm(false);
     setTitle(event ? event.title : '');
-    setParticipants(event ? event.participants.map(p => p.name) : ['']);
+    setParticipants(event ? event.participants : [{ id: crypto.randomUUID(), name: '' }]);
     onClose();
   };
 
@@ -83,19 +85,19 @@ export default function EventFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanParticipants = participants.map(p => p.trim()).filter(Boolean);
+    const cleanParticipants = participants.map(p => ({ ...p, name: p.name.trim() })).filter(p => p.name);
     if (!title.trim() || cleanParticipants.length === 0) return;
     if (onSubmit) {
       onSubmit({ id: event?.id, title: title.trim(), participants: cleanParticipants });
     } else {
-      addEvent(title.trim(), cleanParticipants.map(name => ({ name })));
+      addEvent(title.trim(), cleanParticipants);
     }
     setTitle(event ? event.title : '');
-    setParticipants(event ? event.participants.map(p => p.name) : ['']);
+    setParticipants(event ? event.participants : [{ id: crypto.randomUUID(), name: '' }]);
     onClose();
   };
 
-  const canSubmit = !!title.trim() && participants.some(p => !!p.trim());
+  const canSubmit = !!title.trim() && participants.some(p => typeof p.name === 'string' && !!p.name.trim());
 
   return (
     <>

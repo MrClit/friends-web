@@ -11,7 +11,7 @@ interface TransactionFormProps {
   date: string;
   setDate: (v: string) => void;
   from: string;
-  setFrom: (v: string) => void;
+  setParticipantId: (v: string) => void;
   participants: EventParticipant[];
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -31,7 +31,7 @@ export default function TransactionForm({
   date,
   setDate,
   from,
-  setFrom,
+  setParticipantId,
   participants,
   onSubmit,
 }: TransactionFormProps) {
@@ -74,12 +74,12 @@ export default function TransactionForm({
         <select
           className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
           value={from}
-          onChange={e => setFrom(e.target.value)}
+          onChange={e => setParticipantId(e.target.value)}
           required
         >
           <option value="" disabled>Selecciona un participante</option>
           {participants.map(p => (
-            <option key={p.name} value={p.name}>{p.name}</option>
+            <option key={p.id} value={p.id}>{p.name}</option>
           ))}
         </select>
       </div>

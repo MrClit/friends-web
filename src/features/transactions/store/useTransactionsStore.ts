@@ -21,6 +21,7 @@ interface TransactionsState {
   getTotalContributionsByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   getPendingToCompensateByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   getBalanceByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
+  clearParticipantFromEventTransactions: (eventId: string, participantId: string) => void;
 }
 
 export const useTransactionsStore = create<TransactionsState>()(
@@ -85,21 +86,21 @@ export const useTransactionsStore = create<TransactionsState>()(
       getTotalExpensesByParticipant: (event) => {
         const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'expense');
         return event.participants.map(p => {
-          const total = txs.filter(t => t.payer === p.name).reduce((sum, t) => sum + t.amount, 0);
+          const total = txs.filter(t => t.participantId === p.id).reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
       },
       getTotalContributionsByParticipant: (event) => {
         const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'contribution');
         return event.participants.map(p => {
-          const total = txs.filter(t => t.payer === p.name).reduce((sum, t) => sum + t.amount, 0);
+          const total = txs.filter(t => t.participantId === p.id).reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
       },
       getPendingToCompensateByParticipant: (event) => {
         const expenses = get().getTotalExpensesByParticipant(event);
         const compensations = event.participants.map(p => {
-          const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'compensation' && e.payer === p.name);
+          const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'compensation' && e.participantId === p.id);
           const total = txs.reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
@@ -112,7 +113,7 @@ export const useTransactionsStore = create<TransactionsState>()(
         const contributions = get().getTotalContributionsByParticipant(event);
         const expenses = get().getTotalExpensesByParticipant(event);
         const compensations = event.participants.map(p => {
-          const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'compensation' && e.payer === p.name);
+          const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'compensation' && e.participantId === p.id);
           const total = txs.reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
@@ -120,7 +121,15 @@ export const useTransactionsStore = create<TransactionsState>()(
           participant: p,
           total: contributions[idx].total - expenses[idx].total - compensations[idx].total
         }));
-      }
+      },
+      clearParticipantFromEventTransactions: (eventId, participantId) =>
+        set((state) => ({
+          transactions: state.transactions.map((tx) =>
+            tx.eventId === eventId && tx.participantId === participantId
+              ? { ...tx, participantId: "" }
+              : tx
+          ),
+        })),
     }),
     {
       name: 'transactions-storage',

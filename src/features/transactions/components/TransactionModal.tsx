@@ -3,6 +3,8 @@ import TransactionForm from './TransactionForm';
 import type { PaymentType, Transaction } from '../types';
 import { useTransactionsStore } from '../store/useTransactionsStore';
 import type { Event } from '../../events/types';
+import TransactionTypeSelector from './TransactionTypeSelector';
+import ConfirmDialog from '../../../shared/components/ConfirmDialog';
 
 interface TransactionModalProps {
   open: boolean;
@@ -11,20 +13,16 @@ interface TransactionModalProps {
   transaction?: Transaction // Optional for editing existing transactions
 }
 
-const TRANSACTION_TYPES: { key: PaymentType; label: string }[] = [
-  { key: 'contribution', label: 'Contribución' },
-  { key: 'expense', label: 'Gasto' },
-  { key: 'compensation', label: 'Reembolso' },
-];
-
 export default function TransactionModal({ open, onClose, event, transaction }: TransactionModalProps) {
   const [type, setType] = useState<PaymentType>('contribution');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [participant, setParticipant] = useState('');
+  const [participantId, setParticipantId] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const addExpense = useTransactionsStore(state => state.addExpense);
   const updateExpense = useTransactionsStore(state => state.updateTransaction);
+  const removeTransaction = useTransactionsStore(state => state.removeTransaction);
 
   useEffect(() => {
     if (!open) return;
@@ -41,26 +39,26 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
       setTitle(transaction.title);
       setAmount(transaction.amount.toString());
       setDate(transaction.date);
-      setParticipant(transaction.payer || '');
+      setParticipantId(transaction.participantId || '');
     } else {
       setType('contribution');
       setTitle('');
       setAmount('');
       setDate(new Date().toISOString().slice(0, 10));
-      setParticipant('');
+      setParticipantId('');
     }
   }, [transaction, open]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title || !amount || !date || !participant) return;
+    if (!title || !amount || !date || !participantId) return;
     if (transaction) {
       // Update existing transaction
       updateExpense(transaction.id, {
         title,
         paymentType: type,
         amount: parseFloat(amount),
-        payer: participant,
+        participantId: participantId,
         date,
       });
       onClose();
@@ -70,11 +68,27 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
       title,
       paymentType: type,
       amount: parseFloat(amount),
-      payer: participant,
+      participantId: participantId,
       date,
       eventId: event.id,
     });
     onClose();
+  }
+
+  function handleDelete() {
+    setConfirmOpen(true);
+  }
+
+  function handleConfirmDelete() {
+    if (transaction) {
+      removeTransaction(transaction.id);
+      setConfirmOpen(false);
+      onClose();
+    }
+  }
+
+  function handleCancelDelete() {
+    setConfirmOpen(false);
   }
 
   if (!open) return null;
@@ -90,20 +104,9 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
           <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">Añadir Transacción</h2>
           <button onClick={onClose} className="text-2xl text-teal-400 hover:text-teal-600">&times;</button>
         </div>
-        {/* Selector de tipo de transacción */}
-        <div className="flex mb-6">
-          {TRANSACTION_TYPES.map(t => (
-            <button
-              key={t.key}
-              className={`flex-1 py-2 rounded-t-lg font-semibold transition-colors duration-150 ${type === t.key ? 'bg-teal-500 text-white' : 'bg-teal-100 dark:bg-teal-800 text-teal-700 dark:text-teal-200'}`}
-              onClick={() => setType(t.key)}
-              type="button"
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="flex mb-6 justify-center">
+          <TransactionTypeSelector value={type} onChange={setType} />
         </div>
-        {/* Formulario para cualquier tipo */}
         <TransactionForm
           type={type}
           title={title}
@@ -112,11 +115,30 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
           setAmount={setAmount}
           date={date}
           setDate={setDate}
-          from={participant}
-          setFrom={setParticipant}
+          from={participantId}
+          setParticipantId={setParticipantId}
           participants={event.participants}
           onSubmit={handleSubmit}
         />
+        {transaction && (
+          <>
+            <button
+              onClick={handleDelete}
+              className="mt-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white font-bold text-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-300"
+            >
+              Borrar
+            </button>
+            <ConfirmDialog
+              open={confirmOpen}
+              title="Eliminar transacción"
+              message="¿Seguro que quieres borrar esta transacción? Esta acción no se puede deshacer."
+              confirmText="Borrar"
+              cancelText="Cancelar"
+              onConfirm={handleConfirmDelete}
+              onCancel={handleCancelDelete}
+            />
+          </>
+        )}
       </div>
       <style>{`
         .animate-slideUp {

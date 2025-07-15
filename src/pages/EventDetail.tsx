@@ -13,6 +13,7 @@ import TransactionModal from '../features/transactions/components/TransactionMod
 import TransactionsList from '../features/transactions/components/TransactionsList';
 import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
 import FloatingActionButton from '../shared/components/FloatingActionButton';
+import type { EventParticipant } from '../features/events/types';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
@@ -51,9 +52,9 @@ export default function EventDetail() {
     setAnchorEl(null);
   };
 
-  const handleEditSubmit = ({ id, title, participants }: { id?: string; title: string; participants: string[] }) => {
+  const handleEditSubmit = ({ id, title, participants }: { id?: string; title: string; participants: EventParticipant[] }) => {
     if (id) {
-      updateEvent(id, title, participants.map(name => ({ name })));
+      updateEvent(id, title, participants);
     }
     setEditModalOpen(false);
   };

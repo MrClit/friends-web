@@ -2,10 +2,11 @@ import { useRef, useEffect } from "react";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import type { EventParticipant } from '../types';
 
 interface ParticipantsInputProps {
-    participants: string[];
-    setParticipants: (newParticipants: string[] | ((prev: string[]) => string[])) => void;
+    participants: EventParticipant[];
+    setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
 }
 
 export default function ParticipantsInput({participants, setParticipants}: ParticipantsInputProps) {
@@ -25,24 +26,26 @@ export default function ParticipantsInput({participants, setParticipants}: Parti
                 type="button"
                 aria-label="Añadir participante"
                 className={`ml-2 p-1 rounded-full hover:bg-teal-200 dark:hover:bg-teal-700 text-teal-600 dark:text-teal-200 transition disabled:opacity-50`}
-                onClick={() => setParticipants((p: string[]) => [...p, ""])}
-                disabled={participants[participants.length-1].trim() === ""}
+                onClick={() => setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: "" }])}
+                disabled={participants.length === 0 || typeof participants[participants.length-1]?.name !== 'string' || participants[participants.length-1]?.name.trim() === ""}
               >
                 <PersonAddIcon fontSize="medium" />
               </button>
             </div>
             <div className="space-y-4">
-              {participants.map((name, idx) => (
-                <div key={idx} className="relative">
+              {participants.map((participant, idx) => (
+                <div key={participant.id || idx} className="relative">
                   <input
+                    id={participant.id}
+                    name={participant.id}       
                     ref={el => { inputRefs.current[idx] = el || null; }}
                     type="text"
                     className="block w-full px-4 py-2 rounded-lg border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-800 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400 pr-10"
                     placeholder={`Participante ${idx + 1}`}
-                    value={name}
+                    value={participant.name}
                     onChange={e => {
                       const newList = [...participants];
-                      newList[idx] = e.target.value;
+                      newList[idx] = { ...participant, name: e.target.value };
                       setParticipants(newList);
                     }}
                   />
