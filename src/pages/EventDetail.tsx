@@ -14,10 +14,12 @@ import TransactionsList from '../features/transactions/components/TransactionsLi
 import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
 import FloatingActionButton from '../shared/components/FloatingActionButton';
 import type { EventParticipant } from '../features/events/types';
+import { useTranslation } from 'react-i18next';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const event = useEventsStore(state => state.events.find(e => e.id === id));
   const updateEvent = useEventsStore(state => state.updateEvent);
@@ -59,7 +61,7 @@ export default function EventDetail() {
     setEditModalOpen(false);
   };
 
-  if (!event) return <div className="text-center mt-10">Evento no encontrado</div>;
+  if (!event) return <div className="text-center mt-10">{t('eventDetail.notFound')}</div>;
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
@@ -79,45 +81,42 @@ export default function EventDetail() {
           onDelete={() => setDeleteDialogOpen(true)}
         />
       </div>
-      
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 w-full max-w-md mb-8">
         <KPIBox
-          label="Saldo del Bote"
+          label={t('eventDetail.kpi.pot')}
           value={potBalance}
           colorClass="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
           onClick={() => navigate(`/event/${event.id}/kpi/pot`)}
           style={{ cursor: 'pointer' }}
         />
         <KPIBox
-          label="Contribución Total"
+          label={t('eventDetail.kpi.contributions')}
           value={totalContributions}
           colorClass="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
           onClick={() => navigate(`/event/${event.id}/kpi/contributions`)}
           style={{ cursor: 'pointer' }}
         />
         <KPIBox
-          label="Gastos Totales"
+          label={t('eventDetail.kpi.expenses')}
           value={totalExpenses}
           colorClass="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
           onClick={() => navigate(`/event/${event.id}/kpi/expenses`)}
           style={{ cursor: 'pointer' }}
         />
         <KPIBox
-          label="Pendiente de Pagar"
+          label={t('eventDetail.kpi.pending')}
           value={pendingToCompensate}
           colorClass="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
           onClick={() => navigate(`/event/${event.id}/kpi/pending`)}
           style={{ cursor: 'pointer' }}
         />
       </div>
-      
       {/* Lista de transacciones */}
       <TransactionsList transactions={transactions} event={event}/>
-      
       <FloatingActionButton
         onClick={() => setTransactionModalOpen(true)}
-        label="Añadir Transacción"
+        label={t('eventDetail.addTransaction')}
         icon={"+"}
       />
       <EventFormModal
@@ -129,10 +128,10 @@ export default function EventDetail() {
       <TransactionModal open={transactionModalOpen} onClose={() => setTransactionModalOpen(false)} event={event} />
       <ConfirmDialog
         open={deleteDialogOpen}
-        title="¿Borrar evento?"
-        message="Esta acción no se puede deshacer. ¿Seguro que quieres borrar este evento?"
-        confirmText="Borrar"
-        cancelText="Cancelar"
+        title={t('eventDetail.deleteTitle')}
+        message={t('eventDetail.deleteMessage')}
+        confirmText={t('eventDetail.deleteConfirm')}
+        cancelText={t('eventDetail.deleteCancel')}
         onConfirm={() => {
           removeEvent(event.id);
           setDeleteDialogOpen(false);

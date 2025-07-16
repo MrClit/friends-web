@@ -1,0 +1,105 @@
+{
+  "home": {
+    "newEvent": "Nuevo Evento"
+  },
+  "eventsList": {
+    "noEvents": "No hay eventos aún.",
+    "title": "Eventos",
+    "participants_one": "1 participante",
+    "participants_other": "{{count}} participantes"
+  },
+  "eventFormModal": {
+    "editTitle": "Editar Evento",
+    "newTitle": "Nuevo Evento",
+    "discardEditTitle": "¿Descartar cambios?",
+    "discardNewTitle": "¿Descartar nuevo evento?",
+    "discardEditMessage": "Tienes cambios sin guardar. ¿Seguro que quieres cerrar el formulario?",
+    "discardNewMessage": "¿Seguro que quieres cerrar el formulario?",
+    "discard": "Descartar",
+    "cancel": "Cancelar"
+  },
+  "eventForm": {
+    "titleLabel": "Título",
+    "titlePlaceholder": "Nombre del evento",
+    "update": "Actualizar Evento",
+    "create": "Crear Evento"
+  },
+  "participantsInput": {
+    "label": "Participantes",
+    "addAria": "Añadir participante",
+    "placeholder": "Participante {{number}}",
+    "deleteAria": "Eliminar participante"
+  },
+  "eventDetail": {
+    "notFound": "Evento no encontrado",
+    "kpi": {
+      "pot": "Saldo del Bote",
+      "contributions": "Contribución Total",
+      "expenses": "Gastos Totales",
+      "pending": "Pendiente de Pagar"
+    },
+    "addTransaction": "Añadir Transacción",
+    "deleteTitle": "¿Borrar evento?",
+    "deleteMessage": "Esta acción no se puede deshacer. ¿Seguro que quieres borrar este evento?",
+    "deleteConfirm": "Borrar",
+    "deleteCancel": "Cancelar"
+  },
+  "eventContextMenu": {
+    "edit": "Modificar",
+    "delete": "Borrar"
+  },
+  "transactionsList": {
+    "noTransactions": "No hay movimientos aún.",
+    "participantPrefix": {
+      "contribution": "Recibido de",
+      "expense": "Pagado por",
+      "compensation": "Pagado a"
+    },
+    "unknownParticipant": "Participante desconocido"
+  },
+  "transactionModal": {
+    "addTitle": "Añadir Transacción",
+    "editTitle": "Editar Transacción",
+    "delete": "Borrar",
+    "deleteTitle": "Eliminar transacción",
+    "deleteMessage": "¿Seguro que quieres borrar esta transacción? Esta acción no se puede deshacer.",
+    "cancel": "Cancelar"
+  },
+  "transactionTypeSelector": {
+    "contribution": "Contribución",
+    "expense": "Gasto",
+    "compensation": "Reembolso"
+  },
+  "transactionForm": {
+    "titleLabel": "Título",
+    "amountLabel": "Importe",
+    "dateLabel": "Fecha",
+    "participantLabel": {
+      "contribution": "Recibido de",
+      "expense": "Pagado por",
+      "compensation": "Pagado a"
+    },
+    "participantPlaceholder": "Selecciona un participante",
+    "save": "Guardar"
+  },
+  "kpiDetail": {
+    "notFound": "KPI o evento no encontrado",
+    "kpi": {
+      "pot": "Saldo del Bote",
+      "contributions": "Contribución Total",
+      "expenses": "Gastos Totales",
+      "pending": "Pendiente de Pagar"
+    },
+    "participants": "Participantes",
+    "noteTitle": "Nota:",
+    "notePot": "Dinero disponible en el fondo común.",
+    "noteContributions": "Suma de aportaciones de cada participante.",
+    "noteExpenses": "Total gastado por cada participante.",
+    "notePending": "Cantidad que cada participante debe o le deben."
+  },
+  "confirmDialog": {
+    "title": "¿Estás seguro?",
+    "confirm": "Sí",
+    "cancel": "Cancelar"
+  }
+}

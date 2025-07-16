@@ -3,6 +3,7 @@ import { useEventsStore } from "../store/useEventsStore";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog";
 import EventForm from "./EventForm";
 import type { Event, EventParticipant } from '../types';
+import { useTranslation } from "react-i18next";
 
 interface EventFormModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ export default function EventFormModal({
   const [participants, setParticipants] = useState<EventParticipant[]>([{ id: crypto.randomUUID(), name: '' }]);
   const [showConfirm, setShowConfirm] = useState(false);
   const addEvent = useEventsStore((state) => state.addEvent);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open) {
@@ -109,7 +111,7 @@ export default function EventFormModal({
         >
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">
-              {event ? 'Editar Evento' : 'Nuevo Evento'}
+              {event ? t('eventFormModal.editTitle') : t('eventFormModal.newTitle')}
             </h2>
             <button onClick={handleClose} className="text-2xl text-teal-400 hover:text-teal-600">&times;</button>
           </div>
@@ -135,10 +137,10 @@ export default function EventFormModal({
       </div>
       <ConfirmDialog
         open={showConfirm}
-        title={event ? '¿Descartar cambios?' : '¿Descartar nuevo evento?'}
-        message={event ? 'Tienes cambios sin guardar. ¿Seguro que quieres cerrar el formulario?' : '¿Seguro que quieres cerrar el formulario?'}
-        confirmText="Descartar"
-        cancelText="Cancelar"
+        title={event ? t('eventFormModal.discardEditTitle') : t('eventFormModal.discardNewTitle')}
+        message={event ? t('eventFormModal.discardEditMessage') : t('eventFormModal.discardNewMessage')}
+        confirmText={t('eventFormModal.discard')}
+        cancelText={t('eventFormModal.cancel')}
         onConfirm={handleConfirmClose}
         onCancel={handleCancelClose}
       />

@@ -2,6 +2,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTranslation } from 'react-i18next';
 
 interface EventContextMenuProps {
   anchorEl: HTMLElement | null;
@@ -12,6 +13,7 @@ interface EventContextMenuProps {
 }
 
 export default function EventContextMenu({ anchorEl, open, onClose, onEdit, onDelete }: EventContextMenuProps) {
+  const { t } = useTranslation();
   return (
     <Menu
       anchorEl={anchorEl}
@@ -22,11 +24,11 @@ export default function EventContextMenu({ anchorEl, open, onClose, onEdit, onDe
     >
       <MenuItem onClick={() => { onClose(); if (onEdit) { onEdit(); } }}>
         <EditIcon fontSize="small" className="mr-2" />
-        Modificar
+        {t('eventContextMenu.edit')}
       </MenuItem>
       <MenuItem onClick={() => { onClose(); if (onDelete) { onDelete(); } }}>
         <DeleteIcon fontSize="small" className="mr-2" />
-        Borrar
+        {t('eventContextMenu.delete')}
       </MenuItem>
     </Menu>
   );

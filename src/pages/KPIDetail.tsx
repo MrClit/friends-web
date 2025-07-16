@@ -5,10 +5,12 @@ import KPIBox from '../features/events/components/KPIBox';
 import { useEventsStore } from '../features/events/store/useEventsStore';
 import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
 import { formatAmount } from '../shared/utils/formatAmount';
+import { useTranslation } from 'react-i18next';
 
 export default function KPIDetail() {
   const navigate = useNavigate();
   const { id, kpi } = useParams<{ id: string; kpi: KPIType }>();
+  const { t } = useTranslation();
 
   const event = useEventsStore(state => state.events.find(e => e.id === id));
 
@@ -24,29 +26,29 @@ export default function KPIDetail() {
 
   const KPI_CONFIG = {
     pot: {
-      label: 'Saldo del Bote',
+      label: t('kpiDetail.kpi.pot'),
       colorClass: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
       participantFn: getBalanceByParticipant,
     },
     contributions: {
-      label: 'Contribución Total',
+      label: t('kpiDetail.kpi.contributions'),
       colorClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
       participantFn: getTotalContributionsByParticipant,
     },
     expenses: {
-      label: 'Gastos Totales',
+      label: t('kpiDetail.kpi.expenses'),
       colorClass: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
       participantFn: getTotalExpensesByParticipant,
     },
     pending: {
-      label: 'Pendiente de Pagar',
+      label: t('kpiDetail.kpi.pending'),
       colorClass: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
       participantFn: getPendingToCompensateByParticipant,
     },
   } as const;
   type KPIType = keyof typeof KPI_CONFIG;
 
-  if (!event || !kpi || !(kpi in KPI_CONFIG)) return <div className="text-center mt-10">KPI o evento no encontrado</div>;
+  if (!event || !kpi || !(kpi in KPI_CONFIG)) return <div className="text-center mt-10">{t('kpiDetail.notFound')}</div>;
 
   // KPI values
   const totalExpenses = event ? getTotalExpensesByEvent(event.id) : 0;
@@ -86,7 +88,7 @@ export default function KPIDetail() {
 				/>
       </div>
       <div className="w-full max-w-md">
-        <h2 className="text-lg font-semibold mb-4 text-teal-700 dark:text-teal-100">Participantes</h2>
+        <h2 className="text-lg font-semibold mb-4 text-teal-700 dark:text-teal-100">{t('kpiDetail.participants')}</h2>
         <ul className="flex flex-col gap-2">
           {event.participants?.map((p, idx) => (
             <li key={p.name}
@@ -99,12 +101,12 @@ export default function KPIDetail() {
           ))}
         </ul>
         <div className="mt-6 text-xs text-teal-700 dark:text-teal-200 opacity-80">
-          <strong>Nota:</strong> <br />
+          <strong>{t('kpiDetail.noteTitle')}</strong> <br />
           <span className="block mt-1">
-            <span className="font-semibold">Saldo del Bote</span>: Dinero disponible en el fondo común.<br />
-            <span className="font-semibold">Contribución Total</span>: Suma de aportaciones de cada participante.<br />
-            <span className="font-semibold">Gastos Totales</span>: Total gastado por cada participante.<br />
-            <span className="font-semibold">Pendiente de Pagar</span>: Cantidad que cada participante debe o le deben.
+            <span className="font-semibold">{t('kpiDetail.kpi.pot')}</span>: {t('kpiDetail.notePot')}<br />
+            <span className="font-semibold">{t('kpiDetail.kpi.contributions')}</span>: {t('kpiDetail.noteContributions')}<br />
+            <span className="font-semibold">{t('kpiDetail.kpi.expenses')}</span>: {t('kpiDetail.noteExpenses')}<br />
+            <span className="font-semibold">{t('kpiDetail.kpi.pending')}</span>: {t('kpiDetail.notePending')}
           </span>
         </div>
       </div>

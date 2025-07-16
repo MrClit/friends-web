@@ -1,0 +1,105 @@
+{
+  "home": {
+    "newEvent": "New Event"
+  },
+  "eventsList": {
+    "noEvents": "No events yet.",
+    "title": "Events",
+    "participants_one": "1 participant",
+    "participants_other": "{{count}} participants"
+  },
+  "eventFormModal": {
+    "editTitle": "Edit Event",
+    "newTitle": "New Event",
+    "discardEditTitle": "Discard changes?",
+    "discardNewTitle": "Discard new event?",
+    "discardEditMessage": "You have unsaved changes. Are you sure you want to close the form?",
+    "discardNewMessage": "Are you sure you want to close the form?",
+    "discard": "Discard",
+    "cancel": "Cancel"
+  },
+  "eventForm": {
+    "titleLabel": "Title",
+    "titlePlaceholder": "Event name",
+    "update": "Update Event",
+    "create": "Create Event"
+  },
+  "participantsInput": {
+    "label": "Participants",
+    "addAria": "Add participant",
+    "placeholder": "Participant {{number}}",
+    "deleteAria": "Delete participant"
+  },
+  "eventDetail": {
+    "notFound": "Event not found",
+    "kpi": {
+      "pot": "Pot Balance",
+      "contributions": "Total Contribution",
+      "expenses": "Total Expenses",
+      "pending": "Pending to Pay"
+    },
+    "addTransaction": "Add Transaction",
+    "deleteTitle": "Delete event?",
+    "deleteMessage": "This action cannot be undone. Are you sure you want to delete this event?",
+    "deleteConfirm": "Delete",
+    "deleteCancel": "Cancel"
+  },
+  "eventContextMenu": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "transactionsList": {
+    "noTransactions": "No transactions yet.",
+    "participantPrefix": {
+      "contribution": "Received from",
+      "expense": "Paid by",
+      "compensation": "Paid to"
+    },
+    "unknownParticipant": "Unknown participant"
+  },
+  "transactionModal": {
+    "addTitle": "Add Transaction",
+    "editTitle": "Edit Transaction",
+    "delete": "Delete",
+    "deleteTitle": "Delete transaction",
+    "deleteMessage": "Are you sure you want to delete this transaction? This action cannot be undone.",
+    "cancel": "Cancel"
+  },
+  "transactionTypeSelector": {
+    "contribution": "Contribution",
+    "expense": "Expense",
+    "compensation": "Compensation"
+  },
+  "transactionForm": {
+    "titleLabel": "Title",
+    "amountLabel": "Amount",
+    "dateLabel": "Date",
+    "participantLabel": {
+      "contribution": "Received from",
+      "expense": "Paid by",
+      "compensation": "Paid to"
+    },
+    "participantPlaceholder": "Select a participant",
+    "save": "Save"
+  },
+  "kpiDetail": {
+    "notFound": "KPI or event not found",
+    "kpi": {
+      "pot": "Pot Balance",
+      "contributions": "Total Contribution",
+      "expenses": "Total Expenses",
+      "pending": "Pending to Pay"
+    },
+    "participants": "Participants",
+    "noteTitle": "Note:",
+    "notePot": "Money available in the common fund.",
+    "noteContributions": "Sum of contributions by each participant.",
+    "noteExpenses": "Total spent by each participant.",
+    "notePending": "Amount each participant owes or is owed."
+  },
+  "confirmDialog": {
+    "title": "Are you sure?",
+    "confirm": "Yes",
+    "cancel": "Cancel"
+  }
+}

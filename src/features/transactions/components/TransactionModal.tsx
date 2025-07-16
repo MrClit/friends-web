@@ -5,6 +5,7 @@ import { useTransactionsStore } from '../store/useTransactionsStore';
 import type { Event } from '../../events/types';
 import TransactionTypeSelector from './TransactionTypeSelector';
 import ConfirmDialog from '../../../shared/components/ConfirmDialog';
+import { useTranslation } from 'react-i18next';
 
 interface TransactionModalProps {
   open: boolean;
@@ -23,6 +24,7 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
   const addExpense = useTransactionsStore(state => state.addExpense);
   const updateExpense = useTransactionsStore(state => state.updateTransaction);
   const removeTransaction = useTransactionsStore(state => state.removeTransaction);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!open) return;
@@ -101,7 +103,7 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
         style={{ borderRadius: '1.5rem 1.5rem 0 0' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">Añadir Transacción</h2>
+          <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">{transaction ? t('transactionModal.editTitle') : t('transactionModal.addTitle')}</h2>
           <button onClick={onClose} className="text-2xl text-teal-400 hover:text-teal-600">&times;</button>
         </div>
         <div className="flex mb-6 justify-center">
@@ -126,14 +128,14 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
               onClick={handleDelete}
               className="mt-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white font-bold text-lg transition-all focus:outline-none focus:ring-2 focus:ring-red-300"
             >
-              Borrar
+              {t('transactionModal.delete')}
             </button>
             <ConfirmDialog
               open={confirmOpen}
-              title="Eliminar transacción"
-              message="¿Seguro que quieres borrar esta transacción? Esta acción no se puede deshacer."
-              confirmText="Borrar"
-              cancelText="Cancelar"
+              title={t('transactionModal.deleteTitle')}
+              message={t('transactionModal.deleteMessage')}
+              confirmText={t('transactionModal.delete')}
+              cancelText={t('transactionModal.cancel')}
               onConfirm={handleConfirmDelete}
               onCancel={handleCancelDelete}
             />
