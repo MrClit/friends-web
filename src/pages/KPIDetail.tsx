@@ -73,9 +73,9 @@ export default function KPIDetail() {
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
       <div className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
         <IconButton onClick={() => navigate(`/event/${event.id}`)}>
-          <ArrowBackIcon />
+          <ArrowBackIcon className="text-teal-900 dark:text-teal-100" />
         </IconButton>
-        <h1 className="text-2xl md:text-3xl font-bold text-center flex-1 truncate">{event.title}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-center flex-1 truncate text-teal-900 dark:text-teal-100">{event.title}</h1>
         <div className="w-10" />
       </div>
       <div className="w-full max-w-md mb-8">

@@ -10,7 +10,6 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/event/:id" element={<EventDetail />} />
         <Route path="/event/:id/kpi/:kpi" element={<KPIDetail />} />
-        {/* Aquí irán más rutas en el futuro */}
       </Routes>
     </BrowserRouter>
   );
