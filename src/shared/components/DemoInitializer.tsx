@@ -23,7 +23,7 @@ export default function DemoInitializer() {
         paymentType: tx.paymentType,
         amount: tx.amount,
         participantId: tx.participantId,
-        date: new Date().toISOString(),
+        date: tx.date,
         title: tx.title,
       });
     });
