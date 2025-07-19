@@ -22,7 +22,7 @@ export default function TransactionTypeSelector({ value, onChange }: Transaction
         {TRANSACTION_TYPES.map(tType => (
           <button
             key={tType.key}
-            className={`flex-1 flex items-center justify-center gap-2 px-2 py-2 rounded-full font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:z-10 text-xs sm:text-sm
+            className={`flex-1 flex  items-center justify-center gap-2 px-2 py-2 rounded-full font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:z-10 text-xs sm:text-sm
               ${value === tType.key
                 ? 'bg-white dark:bg-teal-600 text-teal-700 dark:text-white shadow-md scale-105'
                 : 'bg-transparent text-teal-500 dark:text-teal-200 hover:bg-teal-100 dark:hover:bg-teal-700'}`}
