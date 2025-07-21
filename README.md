@@ -1,6 +1,6 @@
 # Friends Web
 
-This is a personal project built for learning and practice purposes. It is a web application for managing events, participants, and shared expenses, developed with React, TypeScript, and Vite.
+This is a personal project to manage events, participants, and shared expenses. Built with React 19, TypeScript, Vite, Zustand, TailwindCSS, and MUI. Now includes multi-language support (i18n), dark mode, and a modular architecture.
 
 ## Table of Contents
 - [Features](#features)
@@ -16,19 +16,20 @@ This is a personal project built for learning and practice purposes. It is a web
 
 ## Features
 - ⚡️ Fast development with Vite
-- ⚛️ React + TypeScript
-- 🎨 TailwindCSS for styling
-- 🧩 Modular architecture (features, shared, pages)
+- ⚛️ React 19 + TypeScript
+- 🎨 TailwindCSS and MUI for UI
+- 🌐 Multi-language support (i18n) with translation files in `src/i18n/locales/`
+- 🧩 Modular architecture: features, shared, pages
 - 🛠️ Advanced ESLint setup for TypeScript and React
-- 📦 Scalable project structure
-- 👫 Event management: create, edit, and delete events
-- 👥 Participant management within each event
-- 📊 Event detail page with KPIs and contextual menu (edit/delete)
-- ➕ Add, edit, and delete expenses (contributions, expenses, reimbursements) linked to events
-- 💸 Expense modal with dynamic form and participant selector
-- 🗃️ Persistent state for events and expenses using Zustand + LocalStorage
-- 🧩 Reusable and accessible modals and dialogs
-- 🌙 Dark mode support
+- 📦 Scalable and maintainable structure
+- 👫 Event management: create, edit, delete
+- 👥 Participant management per event
+- 💸 Transaction management: contributions, expenses, and reimbursements linked to events
+- 📊 Event detail page with KPIs and contextual menu
+- ➕ Reusable and accessible forms and modals
+- 🗃️ Persistent state with Zustand + LocalStorage
+- 🌙 Dark mode support and theme selector
+- 🔄 Navigation with React Router DOM 7
 
 ## Demo
 Coming soon.
@@ -59,19 +60,23 @@ pnpm lint       # Lint the code
 / ├─ public/                # Static files
   ├─ src/
   │   ├─ assets/           # Images and resources
-  │   ├─ features/         # Domain modules (e.g. events, expenses)
+  │   ├─ features/         # Domain modules (events, transactions)
   │   │   ├─ events/
   │   │   │   ├─ components/   # Event components
   │   │   │   ├─ store/        # Local event state
   │   │   │   ├─ types.ts      # Event types
-  │   │   │   └─ utils.ts      # Utilities
-  │   │   └─ expenses/
-  │   │       ├─ components/   # Expense components
-  │   │       ├─ store/        # Local expense state
-  │   │       ├─ types.ts      # Expense types
+  │   │   ├─ transactions/
+  │   │   │   ├─ components/   # Transaction components
+  │   │   │   ├─ store/        # Local transaction state
+  │   │   │   ├─ types.ts      # Transaction types
+  │   ├─ i18n/             # Internationalization and translations
+  │   │   ├─ locales/      # Language files (es, en, ca)
   │   ├─ pages/            # Main pages
   │   ├─ shared/           # Reusable components and hooks
-  │   └─ main.tsx          # Entry point
+  │   │   ├─ components/   # E.g.: ConfirmDialog, DarkModeToggle, etc.
+  │   │   ├─ store/        # Global state (theme, etc.)
+  │   │   ├─ utils/        # Common utilities
+  │   └─ main.tsx         # Entry point
   ├─ index.html
   ├─ package.json
   ├─ tailwind.config.js
@@ -83,6 +88,7 @@ pnpm lint       # Lint the code
 - Environment variables: create a `.env` file if you need custom variables.
 - TailwindCSS: configuration in `tailwind.config.js`.
 - ESLint: rules in `eslint.config.js`.
+- Translations: add languages in `src/i18n/locales/`.
 
 ## Linting & Formatting
 
@@ -90,7 +96,7 @@ pnpm lint       # Lint the code
 pnpm lint
 ```
 
-You can extend the ESLint configuration for stricter rules and advanced React support (see examples in this README).
+You can extend the ESLint configuration for stricter rules and advanced React support.
 
 ## Testing
 Currently, no tests are configured. It is recommended to add [Vitest](https://vitest.dev/) or [Jest](https://jestjs.io/) for unit testing.
@@ -107,4 +113,4 @@ Currently, no tests are configured. It is recommended to add [Vitest](https://vi
 
 ---
 
-> Project created with ❤️ using React, TypeScript, and Vite.
+> Project created with ❤️ using React, TypeScript, Zustand, TailwindCSS, and Vite.
