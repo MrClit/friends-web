@@ -1,0 +1,105 @@
+{
+  "home": {
+    "newEvent": "Nou Esdeveniment"
+  },
+  "eventsList": {
+    "noEvents": "Encara no hi ha esdeveniments.",
+    "title": "Esdeveniments",
+    "participants_one": "1 participant",
+    "participants_other": "{{count}} participants"
+  },
+  "eventFormModal": {
+    "editTitle": "Edita l'esdeveniment",
+    "newTitle": "Nou Esdeveniment",
+    "discardEditTitle": "Descartar canvis?",
+    "discardNewTitle": "Descartar nou esdeveniment?",
+    "discardEditMessage": "Tens canvis sense desar. Segur que vols tancar el formulari?",
+    "discardNewMessage": "Segur que vols tancar el formulari?",
+    "discard": "Descartar",
+    "cancel": "Cancel·lar"
+  },
+  "eventForm": {
+    "titleLabel": "Títol",
+    "titlePlaceholder": "Nom de l'esdeveniment",
+    "update": "Actualitza l'esdeveniment",
+    "create": "Crea l'esdeveniment"
+  },
+  "participantsInput": {
+    "label": "Participants",
+    "addAria": "Afegeix participant",
+    "placeholder": "Participant {{number}}",
+    "deleteAria": "Elimina participant"
+  },
+  "eventDetail": {
+    "notFound": "Esdeveniment no trobat",
+    "kpi": {
+      "pot": "Saldo del Pot",
+      "contributions": "Contribució Total",
+      "expenses": "Despesa Total",
+      "pending": "Pendent de Pagar"
+    },
+    "addTransaction": "Afegir Transacció",
+    "deleteTitle": "Vols esborrar l'esdeveniment?",
+    "deleteMessage": "Aquesta acció no es pot desfer. Segur que vols esborrar aquest esdeveniment?",
+    "deleteConfirm": "Esborrar",
+    "deleteCancel": "Cancel·lar"
+  },
+  "eventContextMenu": {
+    "edit": "Modificar",
+    "delete": "Esborrar"
+  },
+  "transactionsList": {
+    "noTransactions": "Encara no hi ha moviments.",
+    "participantPrefix": {
+      "contribution": "Rebut de",
+      "expense": "Pagat per",
+      "compensation": "Pagat a"
+    },
+    "unknownParticipant": "Participant desconegut"
+  },
+  "transactionModal": {
+    "addTitle": "Afegir Transacció",
+    "editTitle": "Editar Transacció",
+    "delete": "Esborrar",
+    "deleteTitle": "Eliminar transacció",
+    "deleteMessage": "Segur que vols esborrar aquesta transacció? Aquesta acció no es pot desfer.",
+    "cancel": "Cancel·lar"
+  },
+  "transactionTypeSelector": {
+    "contribution": "Contribució",
+    "expense": "Despesa",
+    "compensation": "Reemborsament"
+  },
+  "transactionForm": {
+    "titleLabel": "Títol",
+    "amountLabel": "Import",
+    "dateLabel": "Data",
+    "participantLabel": {
+      "contribution": "Rebut de",
+      "expense": "Pagat per",
+      "compensation": "Pagat a"
+    },
+    "participantPlaceholder": "Selecciona un participant",
+    "save": "Desar"
+  },
+  "kpiDetail": {
+    "notFound": "KPI o esdeveniment no trobat",
+    "kpi": {
+      "pot": "Saldo del Pot",
+      "contributions": "Contribució Total",
+      "expenses": "Despesa Total",
+      "pending": "Pendent de Pagar"
+    },
+    "participants": "Participants",
+    "noteTitle": "Nota:",
+    "notePot": "Diners disponibles al fons comú.",
+    "noteContributions": "Suma d'aportacions de cada participant.",
+    "noteExpenses": "Total gastat per cada participant.",
+    "notePending": "Quantitat que cada participant deu o li deuen."
+  },
+  "confirmDialog": {
+    "title": "Estàs segur?",
+    "confirm": "Sí",
+    "cancel": "Cancel·lar"
+  }
+}
