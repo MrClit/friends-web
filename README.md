@@ -32,7 +32,9 @@ This is a personal project to manage events, participants, and shared expenses. 
 - 🔄 Navigation with React Router DOM 7
 
 ## Demo
-Coming soon.
+
+You can try the app live here:
+[https://mrclit.github.io/friends-web/](https://mrclit.github.io/friends-web/)
 
 ## Installation
 
