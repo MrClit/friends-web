@@ -109,7 +109,8 @@ Currently, no tests are configured. It is recommended to add [Vitest](https://vi
 5. Open a Pull Request
 
 ## License
-[MIT](LICENSE)
+
+This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
 
 ---
 
