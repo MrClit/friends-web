@@ -45,7 +45,7 @@ export default function TransactionsList({ transactions, event }: TransactionsLi
   const dates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="w-full max-w-md mb-8">
+    <div className="w-full max-w-2xl mb-8">
       {dates.length === 0 && (
         <div className="text-center text-teal-400 py-8">{t('transactionsList.noTransactions')}</div>
       )}
