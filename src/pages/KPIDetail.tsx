@@ -78,7 +78,7 @@ export default function KPIDetail() {
         <h1 className="text-2xl md:text-3xl font-bold text-center flex-1 truncate text-teal-900 dark:text-teal-100">{event.title}</h1>
         <div className="w-10" />
       </div>
-      <div className="w-full max-w-md mb-8">
+      <div className="w-full max-w-2xl mb-8">
         <KPIBox 
 					label={KPI_CONFIG[kpi].label} 
 					value={kpiValue} 
@@ -87,7 +87,7 @@ export default function KPIDetail() {
 					valueClassName='!text-4xl'
 				/>
       </div>
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-2xl">
         <h2 className="text-lg font-semibold mb-4 text-teal-700 dark:text-teal-100">{t('kpiDetail.participants')}</h2>
         <ul className="flex flex-col gap-2">
           {event.participants?.map((p, idx) => (

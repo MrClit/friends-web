@@ -82,7 +82,7 @@ export default function EventDetail() {
         />
       </div>
       {/* KPIs */}
-      <div className="grid grid-cols-2 gap-4 w-full max-w-md mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-2xl mb-8">
         <KPIBox
           label={t('eventDetail.kpi.pot')}
           value={potBalance}

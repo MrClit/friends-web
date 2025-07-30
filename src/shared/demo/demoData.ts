@@ -1,7 +1,7 @@
 import type { EventParticipant } from '../../features/events/types';
 import type { PaymentType } from '../../features/transactions/types';
 
-export const demoEventTitle = 'Fiestas Patronales';
+export const demoEventTitle = 'Fiestas Patronales (Demo)';
 export const demoParticipants: EventParticipant[] = [
   { name: 'Ana', id: 'ana' },
   { name: 'Luis', id: 'luis' },
