@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { IconButton } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { MdArrowBack } from 'react-icons/md';
 import KPIBox from '../features/events/components/KPIBox';
 import { useEventsStore } from '../features/events/store/useEventsStore';
 import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
@@ -72,9 +71,14 @@ export default function KPIDetail() {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
       <div className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
-        <IconButton onClick={() => navigate(`/event/${event.id}`)}>
-          <ArrowBackIcon className="text-teal-900 dark:text-teal-100" />
-        </IconButton>
+        <button 
+          type="button"
+          onClick={() => navigate(`/event/${event.id}`)}
+          className="p-2 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors"
+          aria-label="Volver"
+        >
+          <MdArrowBack className="text-teal-900 dark:text-teal-100 text-2xl" />
+        </button>
         <h1 className="text-2xl md:text-3xl font-bold text-center flex-1 truncate text-teal-900 dark:text-teal-100">{event.title}</h1>
         <div className="w-10" />
       </div>

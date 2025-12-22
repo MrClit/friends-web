@@ -1,7 +1,5 @@
 import { useRef, useEffect } from "react";
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { MdDelete, MdPersonAdd } from 'react-icons/md';
 import type { EventParticipant } from '../types';
 import { useTranslation } from "react-i18next";
 
@@ -31,7 +29,7 @@ export default function ParticipantsInput({participants, setParticipants}: Parti
                 onClick={() => setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: "" }])}
                 disabled={participants.length === 0 || typeof participants[participants.length-1]?.name !== 'string' || participants[participants.length-1]?.name.trim() === ""}
               >
-                <PersonAddIcon fontSize="medium" />
+                <MdPersonAdd className="text-2xl" />
               </button>
             </div>
             <div className="space-y-4">
@@ -53,18 +51,17 @@ export default function ParticipantsInput({participants, setParticipants}: Parti
                   />
                   {participants.length > 1 && (
                     <div className="absolute right-2 top-1.5">
-                      <IconButton
+                      <button
+                        type="button"
                         aria-label={t('participantsInput.deleteAria')}
-                        size="small"
-                        className="bg-white dark:bg-teal-900 shadow"
-                        style={{ top: 0 }}
+                        className="bg-white dark:bg-teal-900 shadow rounded p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                         onClick={() => {
                           const newList = participants.filter((_, i) => i !== idx);
                           setParticipants(newList);
                         }}
                       >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
+                        <MdDelete className="text-red-600 dark:text-red-400 text-lg" />
+                      </button>
                     </div>
                   )}
                 </div>
