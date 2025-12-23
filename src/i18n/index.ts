@@ -26,4 +26,20 @@ i18n
     },
   });
 
+// Map i18n language codes to locale codes for date/number formatting
+export const LOCALE_MAP: Record<string, string> = {
+  'es': 'es-ES',
+  'en': 'en-US',
+  'ca': 'ca-ES',
+};
+
+/**
+ * Get the current locale code for formatting dates and numbers
+ * @returns The locale code (e.g., 'es-ES', 'en-US', 'ca-ES')
+ */
+export function getCurrentLocale(): string {
+  const language = i18n.language || 'es';
+  return LOCALE_MAP[language] || 'es-ES';
+}
+
 export default i18n;
