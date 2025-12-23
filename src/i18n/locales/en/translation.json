@@ -55,6 +55,7 @@
       "expense": "Paid by",
       "compensation": "Paid to"
     },
+    "potLabel": "The Pot",
     "unknownParticipant": "Unknown participant"
   },
   "transactionModal": {
@@ -80,6 +81,7 @@
       "compensation": "Paid to"
     },
     "participantPlaceholder": "Select a participant",
+    "potOption": "POT (Common Fund)",
     "save": "Save"
   },
   "kpiDetail": {

@@ -2,6 +2,7 @@ import React from "react";
 import type { PaymentType } from '../types';
 import type { EventParticipant } from '../../events/types';
 import { useTranslation } from 'react-i18next';
+import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
 
 interface TransactionFormProps {
   type: PaymentType;
@@ -74,6 +75,9 @@ export default function TransactionForm({
           required
         >
           <option value="" disabled>{t('transactionForm.participantPlaceholder')}</option>
+          {type === 'expense' && (
+            <option value={POT_PARTICIPANT_ID}>{t('transactionForm.potOption')}</option>
+          )}
           {participants.map(p => (
             <option key={p.id} value={p.id}>{p.name}</option>
           ))}

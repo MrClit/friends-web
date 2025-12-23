@@ -55,6 +55,7 @@
       "expense": "Pagat per",
       "compensation": "Pagat a"
     },
+    "potLabel": "El Pot",
     "unknownParticipant": "Participant desconegut"
   },
   "transactionModal": {
@@ -80,6 +81,7 @@
       "compensation": "Pagat a"
     },
     "participantPlaceholder": "Selecciona un participant",
+    "potOption": "POT (Pot Comú)",
     "save": "Desar"
   },
   "kpiDetail": {

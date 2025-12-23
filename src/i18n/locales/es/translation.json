@@ -55,6 +55,7 @@
       "expense": "Pagado por",
       "compensation": "Pagado a"
     },
+    "potLabel": "El Bote",
     "unknownParticipant": "Participante desconocido"
   },
   "transactionModal": {
@@ -80,6 +81,7 @@
       "compensation": "Pagado a"
     },
     "participantPlaceholder": "Selecciona un participante",
+    "potOption": "BOTE (Bote Común)",
     "save": "Guardar"
   },
   "kpiDetail": {

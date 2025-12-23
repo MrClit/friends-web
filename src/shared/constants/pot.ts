@@ -1,0 +1,1 @@
+export const POT_PARTICIPANT_ID = '0';

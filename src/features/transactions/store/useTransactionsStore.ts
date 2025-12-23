@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Transaction } from '../types';
 import type { Event, EventParticipant } from '../../events/types';
+import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
 
 interface TransactionsState {
   transactions: Transaction[];
@@ -17,17 +18,26 @@ interface TransactionsState {
   getPotBalanceByEvent: (eventId: string) => number;
   getPendingToCompensateByEvent: (eventId: string) => number;
 
+  getTotalPotExpensesByEvent: (eventId: string) => number;
+  isPotExpense: (transaction: Transaction) => boolean;
+
   getTotalExpensesByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   getTotalContributionsByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   getPendingToCompensateByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   getBalanceByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   clearParticipantFromEventTransactions: (eventId: string, participantId: string) => void;
+
 }
 
 export const useTransactionsStore = create<TransactionsState>()(
   persist(
     (set, get) => ({
       transactions: [],
+      
+      // Helper para identificar gastos del bote
+      isPotExpense: (transaction) => 
+        transaction.paymentType === 'expense' && transaction.participantId === POT_PARTICIPANT_ID,
+      
       addExpense: (expense) =>
         set((state) => ({
           transactions: [
@@ -71,10 +81,19 @@ export const useTransactionsStore = create<TransactionsState>()(
             (e) => e.eventId === eventId && e.paymentType === 'compensation'
           )
           .reduce((sum, e) => sum + e.amount, 0),
+      getTotalPotExpensesByEvent: (eventId) =>
+        get()
+          .transactions.filter(
+            (e) => e.eventId === eventId && 
+                  e.paymentType === 'expense' && 
+                  e.participantId === POT_PARTICIPANT_ID
+          )
+          .reduce((sum, e) => sum + e.amount, 0),
       getPotBalanceByEvent: (eventId) => {
         const totalContributions = get().getTotalContributionsByEvent(eventId);
         const totalCompensations = get().getTotalCompensationsByEvent(eventId);
-        return totalContributions - totalCompensations;
+        const totalPotExpenses = get().getTotalPotExpensesByEvent(eventId);
+        return totalContributions - totalCompensations - totalPotExpenses;
       },
       getPendingToCompensateByEvent: (eventId) => {
         const totalExpenses = get().getTotalExpensesByEvent(eventId);
@@ -125,7 +144,9 @@ export const useTransactionsStore = create<TransactionsState>()(
       clearParticipantFromEventTransactions: (eventId, participantId) =>
         set((state) => ({
           transactions: state.transactions.map((tx) =>
-            tx.eventId === eventId && tx.participantId === participantId
+            tx.eventId === eventId && 
+            tx.participantId === participantId && 
+            participantId !== POT_PARTICIPANT_ID
               ? { ...tx, participantId: "" }
               : tx
           ),

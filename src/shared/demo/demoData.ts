@@ -1,5 +1,6 @@
 import type { EventParticipant } from '../../features/events/types';
 import type { PaymentType } from '../../features/transactions/types';
+import { POT_PARTICIPANT_ID } from '../constants/pot';
 
 export const demoEventTitle = 'Fiestas Patronales (Demo)';
 export const demoParticipants: EventParticipant[] = [
@@ -118,6 +119,34 @@ for (let day = 1; day <= 10; day++) {
       amount: 80,
       participantId: 'carlos',
       title: `Aportación de Carlos para varios días (días 1-4)`,
+      date: getDate(day),
+    });
+    // Gasto del bote: Alquiler del local
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 500,
+      participantId: POT_PARTICIPANT_ID,
+      title: 'Alquiler del local para las fiestas',
+      date: getDate(day),
+    });
+  }
+  if (day === 2) {
+    // Gasto del bote: Seguro
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 150,
+      participantId: POT_PARTICIPANT_ID,
+      title: 'Seguro de responsabilidad civil del evento',
+      date: getDate(day),
+    });
+  }
+  if (day === 5) {
+    // Gasto del bote: Decoración
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 80,
+      participantId: POT_PARTICIPANT_ID,
+      title: 'Decoración y carteles del evento',
       date: getDate(day),
     });
   }

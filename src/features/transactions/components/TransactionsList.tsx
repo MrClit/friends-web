@@ -1,4 +1,4 @@
-import { FaHandHoldingUsd, FaWallet, FaHandshake } from 'react-icons/fa';
+import { FaHandHoldingUsd, FaWallet, FaHandshake, FaPiggyBank } from 'react-icons/fa';
 import type { Transaction } from '../types';
 import type { PaymentType } from '../types';
 import type { JSX } from 'react/jsx-runtime';
@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { formatAmount } from '../../../shared/utils/formatAmount';
 import { formatDateLong } from '../../../shared/utils/formatDateLong';
 import { useTranslation } from 'react-i18next';
+import { useTransactionsStore } from '../store/useTransactionsStore';
 
 const ICONS: Record<PaymentType, JSX.Element> = {
   contribution: <FaHandHoldingUsd className="text-blue-800 dark:text-blue-200" />,
@@ -39,6 +40,7 @@ export default function TransactionsList({ transactions, event }: TransactionsLi
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const { t } = useTranslation();
+  const isPotExpense = useTransactionsStore(state => state.isPotExpense);
 
   // Ordenar por fecha descendente y agrupar
   const grouped = groupByDate([...transactions].sort((a, b) => b.date.localeCompare(a.date)));
@@ -64,14 +66,20 @@ export default function TransactionsList({ transactions, event }: TransactionsLi
                   setTransactionModalOpen(true);
                 }}
               >
-                <span className={`text-xl ${TEXT_COLOR_CLASSES[trx.paymentType]}`}>{ICONS[trx.paymentType]}</span>
+                <span className={`text-xl ${isPotExpense(trx) ? 'text-orange-800 dark:text-orange-200' : TEXT_COLOR_CLASSES[trx.paymentType]}`}>
+                  {isPotExpense(trx) ? <FaPiggyBank className="text-orange-800 dark:text-orange-200" /> : ICONS[trx.paymentType]}
+                </span>
                 <div className="flex-1">
                   <div className="font-semibold text-teal-900 dark:text-teal-100">{trx.title}</div>
                   <div className="text-xs text-teal-500">
-                    {t(`transactionsList.participantPrefix.${trx.paymentType}`)} {event.participants.find(p => p.id === trx.participantId)?.name || t('transactionsList.unknownParticipant')}
+                    {t(`transactionsList.participantPrefix.${trx.paymentType}`)}{' '}
+                    {isPotExpense(trx)
+                      ? t('transactionsList.potLabel')
+                      : (event.participants.find(p => p.id === trx.participantId)?.name || t('transactionsList.unknownParticipant'))
+                    }
                   </div>
                 </div>
-                <div className={`font-bold text-lg tabular-nums ${TEXT_COLOR_CLASSES[trx.paymentType]}`}>{formatAmount(trx.amount)}</div>
+                <div className={`font-bold text-lg tabular-nums ${isPotExpense(trx) ? 'text-orange-800 dark:text-orange-200' : TEXT_COLOR_CLASSES[trx.paymentType]}`}>{formatAmount(trx.amount)}</div>
               </li>
             ))}
           </ul>

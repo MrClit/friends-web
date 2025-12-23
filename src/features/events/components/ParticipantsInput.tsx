@@ -26,7 +26,7 @@ export default function ParticipantsInput({participants, setParticipants}: Parti
                 type="button"
                 aria-label={t('participantsInput.addAria')}
                 className={`ml-2 p-1 rounded-full hover:bg-teal-200 dark:hover:bg-teal-700 text-teal-600 dark:text-teal-200 transition disabled:opacity-50`}
-                onClick={() => setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: "" }])}
+                onClick={() => setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: "" }])} // UUID nunca será '0' (reservado para el Bote)
                 disabled={participants.length === 0 || typeof participants[participants.length-1]?.name !== 'string' || participants[participants.length-1]?.name.trim() === ""}
               >
                 <MdPersonAdd className="text-2xl" />
