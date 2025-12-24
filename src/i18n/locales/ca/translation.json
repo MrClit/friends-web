@@ -87,14 +87,14 @@
   "kpiDetail": {
     "notFound": "KPI o esdeveniment no trobat",
     "kpi": {
-      "pot": "Saldo del Pot",
+      "balance": "Saldo del Pot",
       "contributions": "Contribució Total",
       "expenses": "Despesa Total",
       "pending": "Pendent de Pagar"
     },
     "participants": "Participants",
     "noteTitle": "Nota:",
-    "notePot": "Diners disponibles al fons comú.",
+    "noteBalance": "Diners disponibles al fons comú.",
     "noteContributions": "Suma d'aportacions de cada participant.",
     "noteExpenses": "Total gastat per cada participant.",
     "notePending": "Quantitat que cada participant deu o li deuen."

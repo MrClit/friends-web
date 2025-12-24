@@ -87,14 +87,14 @@
   "kpiDetail": {
     "notFound": "KPI o evento no encontrado",
     "kpi": {
-      "pot": "Saldo del Bote",
+      "balance": "Saldo del Bote",
       "contributions": "Contribución Total",
       "expenses": "Gastos Totales",
       "pending": "Pendiente de Pagar"
     },
     "participants": "Participantes",
     "noteTitle": "Nota:",
-    "notePot": "Dinero disponible en el fondo común.",
+    "noteBalance": "Dinero disponible en el fondo común.",
     "noteContributions": "Suma de aportaciones de cada participante.",
     "noteExpenses": "Total gastado por cada participante.",
     "notePending": "Cantidad que cada participante debe o le deben."

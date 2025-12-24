@@ -20,6 +20,7 @@ interface TransactionsState {
 
   getTotalPotExpensesByEvent: (eventId: string) => number;
   isPotExpense: (transaction: Transaction) => boolean;
+  getPotExpensesData: (eventId: string) => { participantId: string; total: number } | null;
 
   getTotalExpensesByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   getTotalContributionsByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
@@ -89,11 +90,19 @@ export const useTransactionsStore = create<TransactionsState>()(
                   e.participantId === POT_PARTICIPANT_ID
           )
           .reduce((sum, e) => sum + e.amount, 0),
+      getPotExpensesData: (eventId) => {
+        const total = get().getTotalPotExpensesByEvent(eventId);
+        if (total === 0) return null;
+        return {
+          participantId: POT_PARTICIPANT_ID,
+          total
+        };
+      },
       getPotBalanceByEvent: (eventId) => {
         const totalContributions = get().getTotalContributionsByEvent(eventId);
         const totalCompensations = get().getTotalCompensationsByEvent(eventId);
-        const totalPotExpenses = get().getTotalPotExpensesByEvent(eventId);
-        return totalContributions - totalCompensations - totalPotExpenses;
+        const totalExpenses = get().getTotalExpensesByEvent(eventId);
+        return totalContributions - totalCompensations - totalExpenses;
       },
       getPendingToCompensateByEvent: (eventId) => {
         const totalExpenses = get().getTotalExpensesByEvent(eventId);

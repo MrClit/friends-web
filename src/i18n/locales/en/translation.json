@@ -87,14 +87,14 @@
   "kpiDetail": {
     "notFound": "KPI or event not found",
     "kpi": {
-      "pot": "Pot Balance",
+      "balance": "Pot Balance",
       "contributions": "Total Contribution",
       "expenses": "Total Expenses",
       "pending": "Pending to Pay"
     },
     "participants": "Participants",
     "noteTitle": "Note:",
-    "notePot": "Money available in the common fund.",
+    "noteBalance": "Money available in the common fund.",
     "noteContributions": "Sum of contributions by each participant.",
     "noteExpenses": "Total spent by each participant.",
     "notePending": "Amount each participant owes or is owed."

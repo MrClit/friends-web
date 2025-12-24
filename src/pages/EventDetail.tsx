@@ -73,7 +73,7 @@ export default function EventDetail() {
           label={t('eventDetail.kpi.pot')}
           value={potBalance}
           colorClass="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-          onClick={() => navigate(`/event/${event.id}/kpi/pot`)}
+          onClick={() => navigate(`/event/${event.id}/kpi/balance`)}
           style={{ cursor: 'pointer' }}
         />
         <KPIBox
