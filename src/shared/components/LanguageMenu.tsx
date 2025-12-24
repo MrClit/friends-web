@@ -1,4 +1,3 @@
-import React from 'react';
 import { MdLanguage } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import {

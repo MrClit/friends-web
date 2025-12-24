@@ -1,7 +1,4 @@
-import { FaHandHoldingUsd, FaWallet, FaHandshake, FaPiggyBank } from 'react-icons/fa';
 import type { Transaction } from '../types';
-import type { PaymentType } from '../types';
-import type { JSX } from 'react/jsx-runtime';
 import type { Event } from '../../events/types';
 import TransactionModal from './TransactionModal';
 import { useState } from 'react';
@@ -9,20 +6,7 @@ import { formatAmount } from '../../../shared/utils/formatAmount';
 import { formatDateLong } from '../../../shared/utils/formatDateLong';
 import { useTranslation } from 'react-i18next';
 import { useTransactionsStore } from '../store/useTransactionsStore';
-
-const ICONS: Record<PaymentType, JSX.Element> = {
-  contribution: <FaHandHoldingUsd className="text-blue-800 dark:text-blue-200" />,
-  expense: <FaWallet className="text-red-800 dark:text-red-200" />,
-  compensation: <FaHandshake className="text-green-800 dark:text-green-200" />,
-};
-
-// PARTICIPANT_PREFIX se traduce
-
-const TEXT_COLOR_CLASSES: Record<PaymentType, string> = {
-  contribution: 'text-blue-800 dark:text-blue-200',
-  expense: 'text-red-800 dark:text-red-200',
-  compensation: 'text-green-800 dark:text-green-200',
-};
+import { PAYMENT_TYPE_CONFIG, POT_CONFIG } from '../constants';
 
 interface TransactionsListProps {
   transactions: Transaction[];
@@ -66,8 +50,16 @@ export default function TransactionsList({ transactions, event }: TransactionsLi
                   setTransactionModalOpen(true);
                 }}
               >
-                <span className={`text-xl ${isPotExpense(trx) ? 'text-orange-800 dark:text-orange-200' : TEXT_COLOR_CLASSES[trx.paymentType]}`}>
-                  {isPotExpense(trx) ? <FaPiggyBank className="text-orange-800 dark:text-orange-200" /> : ICONS[trx.paymentType]}
+                <span className="text-xl">
+                  {isPotExpense(trx) ? (
+                    <POT_CONFIG.IconComponent className={POT_CONFIG.colorClass} />
+                  ) : (
+                    (() => {
+                      const config = PAYMENT_TYPE_CONFIG[trx.paymentType];
+                      const IconComponent = config.IconComponent;
+                      return <IconComponent className={config.colorStrong} />;
+                    })()
+                  )}
                 </span>
                 <div className="flex-1">
                   <div className="font-semibold text-teal-900 dark:text-teal-100">{trx.title}</div>
@@ -79,7 +71,7 @@ export default function TransactionsList({ transactions, event }: TransactionsLi
                     }
                   </div>
                 </div>
-                <div className={`font-bold text-lg tabular-nums ${isPotExpense(trx) ? 'text-orange-800 dark:text-orange-200' : TEXT_COLOR_CLASSES[trx.paymentType]}`}>{formatAmount(trx.amount)}</div>
+                <div className={`font-bold text-lg tabular-nums ${isPotExpense(trx) ? POT_CONFIG.colorClass : PAYMENT_TYPE_CONFIG[trx.paymentType].colorStrong}`}>{formatAmount(trx.amount)}</div>
               </li>
             ))}
           </ul>
