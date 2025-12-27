@@ -26,6 +26,7 @@ This is a personal project to manage events, participants, and shared expenses. 
 - 👥 Participant management per event
 - 💸 Transaction management: contributions, expenses, and reimbursements linked to events
 - 📊 Event detail page with KPIs and contextual menu
+- ⏬ **Infinite scroll** for transaction lists (date-based pagination)
 - ➕ Reusable and accessible forms and modals
 - 🗃️ Persistent state with Zustand + LocalStorage
 - 🌙 Dark mode support and theme selector
@@ -62,22 +63,28 @@ pnpm lint       # Lint the code
 / ├─ public/                # Static files
   ├─ src/
   │   ├─ assets/           # Images and resources
-  │   ├─ features/         # Domain modules (events, transactions)
+  │   ├─ features/         # Domain modules (events, transactions, kpi)
   │   │   ├─ events/
   │   │   │   ├─ components/   # Event components
-  │   │   │   ├─ store/        # Local event state
+  │   │   │   ├─ store/        # Local event state (with tests)
   │   │   │   ├─ types.ts      # Event types
+  │   │   ├─ kpi/
+  │   │   │   ├─ components/   # KPI detail components
+  │   │   │   ├─ types.ts      # KPI types
   │   │   ├─ transactions/
-  │   │   │   ├─ components/   # Transaction components
-  │   │   │   ├─ store/        # Local transaction state
+  │   │   │   ├─ components/   # Transaction components (with tests)
+  │   │   │   ├─ store/        # Local transaction state (with tests)
+  │   │   │   ├─ constants.ts  # Payment type configuration
   │   │   │   ├─ types.ts      # Transaction types
   │   ├─ i18n/             # Internationalization and translations
   │   │   ├─ locales/      # Language files (es, en, ca)
   │   ├─ pages/            # Main pages
   │   ├─ shared/           # Reusable components and hooks
   │   │   ├─ components/   # E.g.: ConfirmDialog, DarkModeToggle, etc.
+  │   │   ├─ hooks/        # Custom hooks (useInfiniteScroll)
   │   │   ├─ store/        # Global state (theme, etc.)
-  │   │   ├─ utils/        # Common utilities
+  │   │   ├─ utils/        # Common utilities (with tests)
+  │   │   ├─ demo/         # Demo data generator
   │   └─ main.tsx         # Entry point
   ├─ index.html
   ├─ package.json
@@ -101,7 +108,21 @@ pnpm lint
 You can extend the ESLint configuration for stricter rules and advanced React support.
 
 ## Testing
-Currently, no tests are configured. It is recommended to add [Vitest](https://vitest.dev/) or [Jest](https://jestjs.io/) for unit testing.
+
+This project uses [Vitest](https://vitest.dev/) with [@testing-library/react](https://testing-library.com/react) for unit and component testing.
+
+```bash
+pnpm test          # Run tests in watch mode
+pnpm test:run      # Run tests once
+pnpm test:ui       # Open Vitest UI
+pnpm test:coverage # Generate coverage report
+```
+
+**Current Test Coverage:**
+- ✅ 58 tests passing
+- Store tests (useEventsStore, useTransactionsStore)
+- Component tests (TransactionItem)
+- Utility tests (formatAmount, formatDateLong)
 
 ## Contributing
 1. Fork the project

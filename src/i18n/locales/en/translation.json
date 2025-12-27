@@ -56,7 +56,10 @@
       "compensation": "Paid to"
     },
     "potLabel": "The Pot",
-    "unknownParticipant": "Unknown participant"
+    "unknownParticipant": "Unknown participant",
+    "loadingMore": "Loading more transactions...",
+    "loadMore": "Load previous transactions",
+    "showingDates": "Showing {{loaded}} of {{total}} days"
   },
   "transactionModal": {
     "addTitle": "Add Transaction",

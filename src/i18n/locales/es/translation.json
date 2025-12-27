@@ -56,7 +56,10 @@
       "compensation": "Pagado a"
     },
     "potLabel": "El Bote",
-    "unknownParticipant": "Participante desconocido"
+    "unknownParticipant": "Participante desconocido",
+    "loadingMore": "Cargando más transacciones...",
+    "loadMore": "Cargar transacciones anteriores",
+    "showingDates": "Mostrando {{loaded}} de {{total}} días"
   },
   "transactionModal": {
     "addTitle": "Añadir Transacción",
