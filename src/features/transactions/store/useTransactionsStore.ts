@@ -29,6 +29,19 @@ interface TransactionsState {
   // ============================================================
   /** Returns all transactions for a specific event */
   getTransactionsByEvent: (eventId: string) => Transaction[];
+  /** Returns paginated transactions for an event (date-based chunking) */
+  getTransactionsByEventPaginated: (
+    eventId: string, 
+    numberOfDates?: number, 
+    offset?: number
+  ) => {
+    transactions: Transaction[];
+    hasMore: boolean;
+    totalDates: number;
+    loadedDates: number;
+  };
+  /** Returns total number of unique dates for an event */
+  getAvailableDatesCount: (eventId: string) => number;
 
   // ============================================================
   // HELPERS - POT UTILITIES
@@ -131,6 +144,40 @@ export const useTransactionsStore = create<TransactionsState>()(
       // ============================================================
       getTransactionsByEvent: (eventId) =>
         get().transactions.filter((e) => e.eventId === eventId),
+
+      getTransactionsByEventPaginated: (eventId, numberOfDates = 10, offset = 0) => {
+        const allTransactions = get()
+          .transactions
+          .filter((t) => t.eventId === eventId)
+          .sort((a, b) => b.date.localeCompare(a.date));
+
+        // Get unique dates sorted descending (most recent first)
+        const uniqueDates = Array.from(
+          new Set(allTransactions.map((t) => t.date))
+        ).sort((a, b) => b.localeCompare(a));
+
+        // Calculate pagination
+        const totalDates = uniqueDates.length;
+        const hasMore = offset + numberOfDates < totalDates;
+        const datesToLoad = uniqueDates.slice(offset, offset + numberOfDates);
+
+        // Filter transactions for those dates
+        const paginatedTransactions = allTransactions.filter((t) =>
+          datesToLoad.includes(t.date)
+        );
+
+        return {
+          transactions: paginatedTransactions,
+          hasMore,
+          totalDates,
+          loadedDates: datesToLoad.length,
+        };
+      },
+
+      getAvailableDatesCount: (eventId) => {
+        const transactions = get().transactions.filter((t) => t.eventId === eventId);
+        return new Set(transactions.map((t) => t.date)).size;
+      },
 
       // ============================================================
       // HELPERS - POT UTILITIES

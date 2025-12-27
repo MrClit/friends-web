@@ -28,10 +28,6 @@ export default function EventDetail() {
   const getPotBalanceByEvent = useTransactionsStore(state => state.getPotBalanceByEvent);
   const getPendingToCompensateByEvent = useTransactionsStore(state => state.getPendingToCompensateByEvent);
   
-  // Obtén todas las transacciones del store y filtra fuera del selector para evitar bucles
-  const allTransactions = useTransactionsStore(state => state.transactions);
-  const transactions = event ? allTransactions.filter(e => e.eventId === event.id) : [];
-  
   const totalExpenses = event ? getTotalExpensesByEvent(event.id) : 0;
   const totalContributions = event ? getTotalContributionsByEvent(event.id) : 0;
   const potBalance = event ? getPotBalanceByEvent(event.id) : 0;
@@ -99,7 +95,7 @@ export default function EventDetail() {
         />
       </div>
       {/* Lista de transacciones */}
-      <TransactionsList transactions={transactions} event={event}/>
+      <TransactionsList event={event} />
       <FloatingActionButton
         onClick={() => setTransactionModalOpen(true)}
         label={t('eventDetail.addTransaction')}
