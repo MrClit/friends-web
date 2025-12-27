@@ -32,156 +32,341 @@ export interface DemoTransaction {
 function getDate(day: number) {
   const base = new Date();
   base.setHours(12, 0, 0, 0);
-  base.setDate(base.getDate() - 10 + day);
+  base.setDate(base.getDate() - 20 + day);
   return base.toISOString().slice(0, 10);
 }
 
 export const demoTransactions: DemoTransaction[] = [];
 
-// Genera transacciones diarias para 10 días
-for (let day = 1; day <= 10; day++) {
-  // Pareja que cocina ese día
+// Genera transacciones realistas para 20 días de fiestas
+for (let day = 1; day <= 20; day++) {
+  // Pareja que cocina ese día (rotación)
   const pairIdx = (day - 1) % demoParticipants.length;
   const nextIdx = (pairIdx + 1) % demoParticipants.length;
   const pair = [demoParticipants[pairIdx], demoParticipants[nextIdx]];
 
-  // Gastos de compra de comida
-  demoTransactions.push({
-    paymentType: 'expense',
-    amount: 80,
-    participantId: pair[0].id,
-    title: `Compra de comida para el día ${day}`,
-    date: getDate(day),
-  });
-
-  // Gastos de bebida
-  demoTransactions.push({
-    paymentType: 'expense',
-    amount: 30,
-    participantId: pair[1].id,
-    title: `Compra de bebida para el día ${day}`,
-    date: getDate(day),
-  });
-
-  // Gastos de limpieza/menaje cada 5 días
-  if (day % 5 === 0) {
-    demoTransactions.push({
-      paymentType: 'expense',
-      amount: 40,
-      participantId: demoParticipants[(day + 2) % demoParticipants.length].id,
-      title: `Compra de material de limpieza y menaje (platos, vasos, cubiertos) día ${day}`,
-      date: getDate(day),
-    });
-  }
-
-  // Cena en restaurante cada 3 días
-  if (day % 3 === 0) {
-    demoTransactions.push({
-      paymentType: 'expense',
-      amount: 300,
-      participantId: demoParticipants[day % demoParticipants.length].id,
-      title: `Cena en restaurante día ${day}`,
-      date: getDate(day),
-    });
-  }
-
-  // Comida en local cocinada por la pareja
-  demoTransactions.push({
-    paymentType: 'expense',
-    amount: 120,
-    participantId: pair[0].id,
-    title: `Comida en local cocinada por ${pair[0].name} y ${pair[1].name} (día ${day})`,
-    date: getDate(day),
-  });
-
-  // Cada participante aporta 20€ ese día
-  demoParticipants.forEach((p) => {
-    demoTransactions.push({
-      paymentType: 'contribution',
-      amount: 20,
-      participantId: p.id,
-      title: `Aportación diaria de ${p.name} (día ${day})`,
-      date: getDate(day),
-    });
-  });
-
-  // Aportaciones de varios días para algunos participantes
+  // ==========================================
+  // DÍA 1: Inicio de fiestas - Gastos de setup
+  // ==========================================
   if (day === 1) {
-    demoTransactions.push({
-      paymentType: 'contribution',
-      amount: 100,
-      participantId: 'ana',
-      title: `Aportación de Ana para varios días (días 1-5)`,
-      date: getDate(day),
-    });
-    demoTransactions.push({
-      paymentType: 'contribution',
-      amount: 80,
-      participantId: 'carlos',
-      title: `Aportación de Carlos para varios días (días 1-4)`,
-      date: getDate(day),
-    });
     // Gasto del bote: Alquiler del local
     demoTransactions.push({
       paymentType: 'expense',
-      amount: 500,
+      amount: 800,
       participantId: POT_PARTICIPANT_ID,
-      title: 'Alquiler del local para las fiestas',
+      title: 'Alquiler del local para las fiestas (20 días)',
+      date: getDate(day),
+    });
+    // Gasto del bote: Seguro
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 200,
+      participantId: POT_PARTICIPANT_ID,
+      title: 'Seguro de responsabilidad civil',
+      date: getDate(day),
+    });
+    // Ana adelanta dinero para decoración
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 150,
+      participantId: 'ana',
+      title: 'Decoración, guirnaldas y carteles',
+      date: getDate(day),
+    });
+    // Carlos compra utensilios de cocina
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 180,
+      participantId: 'carlos',
+      title: 'Menaje de cocina (ollas, sartenes, cubiertos)',
+      date: getDate(day),
+    });
+    // Aportaciones iniciales generosas
+    demoTransactions.push({
+      paymentType: 'contribution',
+      amount: 150,
+      participantId: 'ana',
+      title: 'Aportación inicial de Ana',
+      date: getDate(day),
+    });
+    demoTransactions.push({
+      paymentType: 'contribution',
+      amount: 120,
+      participantId: 'carlos',
+      title: 'Aportación inicial de Carlos',
+      date: getDate(day),
+    });
+    demoTransactions.push({
+      paymentType: 'contribution',
+      amount: 100,
+      participantId: 'marta',
+      title: 'Aportación inicial de Marta',
       date: getDate(day),
     });
   }
-  if (day === 2) {
-    // Gasto del bote: Seguro
+
+  // ==========================================
+  // DÍA 3: Cena especial de bienvenida
+  // ==========================================
+  if (day === 3) {
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 380,
+      participantId: 'luis',
+      title: 'Cena de bienvenida en Restaurante La Peña',
+      date: getDate(day),
+    });
+    // Contribuciones adicionales para cubrir la cena
+    ['sofia', 'javi', 'elena'].forEach((id) => {
+      demoTransactions.push({
+        paymentType: 'contribution',
+        amount: 50,
+        participantId: id,
+        title: `Aportación extra de ${demoParticipants.find(p => p.id === id)?.name} para cena`,
+        date: getDate(day),
+      });
+    });
+  }
+
+  // ==========================================
+  // DÍA 5: Primer reembolso
+  // ==========================================
+  if (day === 5) {
+    demoTransactions.push({
+      paymentType: 'compensation',
+      amount: 80,
+      participantId: 'ana',
+      title: 'Reembolso parcial a Ana por adelanto de decoración',
+      date: getDate(day),
+    });
+    // Gasto del bote: Limpieza profesional
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 120,
+      participantId: POT_PARTICIPANT_ID,
+      title: 'Servicio de limpieza profesional semanal',
+      date: getDate(day),
+    });
+  }
+
+  // ==========================================
+  // DÍA 7: Excursión (día sin cocina)
+  // ==========================================
+  if (day === 7) {
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 450,
+      participantId: 'raul',
+      title: 'Excursión a la playa con paella incluida',
+      date: getDate(day),
+    });
+    // Solo algunas personas contribuyen ese día
+    ['ana', 'carlos', 'marta', 'luis', 'sofia', 'javi'].forEach((id) => {
+      demoTransactions.push({
+        paymentType: 'contribution',
+        amount: 35,
+        participantId: id,
+        title: `Aportación de ${demoParticipants.find(p => p.id === id)?.name} para excursión`,
+        date: getDate(day),
+      });
+    });
+  }
+
+  // ==========================================
+  // DÍA 10: Mitad de fiestas - Balance intermedio
+  // ==========================================
+  if (day === 10) {
+    // Reembolsos a quienes más han gastado
+    demoTransactions.push({
+      paymentType: 'compensation',
+      amount: 100,
+      participantId: 'carlos',
+      title: 'Reembolso a Carlos por menaje de cocina',
+      date: getDate(day),
+    });
+    demoTransactions.push({
+      paymentType: 'compensation',
+      amount: 70,
+      participantId: 'ana',
+      title: 'Reembolso complementario a Ana',
+      date: getDate(day),
+    });
+    // Gasto del bote: Reparación
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 85,
+      participantId: POT_PARTICIPANT_ID,
+      title: 'Reparación de nevera del local',
+      date: getDate(day),
+    });
+  }
+
+  // ==========================================
+  // DÍA 14: Cena especial temática
+  // ==========================================
+  if (day === 14) {
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 320,
+      participantId: 'lucia',
+      title: 'Cena temática años 80 con DJ',
+      date: getDate(day),
+    });
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 90,
+      participantId: 'pablo',
+      title: 'Disfraces y decoración temática',
+      date: getDate(day),
+    });
+  }
+
+  // ==========================================
+  // DÍA 17: Barbacoa especial
+  // ==========================================
+  if (day === 17) {
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 220,
+      participantId: 'david',
+      title: 'Barbacoa: carne, embutidos y parrillada',
+      date: getDate(day),
+    });
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 65,
+      participantId: 'sara',
+      title: 'Ensaladas y guarniciones para barbacoa',
+      date: getDate(day),
+    });
+  }
+
+  // ==========================================
+  // DÍA 20: Cierre de fiestas
+  // ==========================================
+  if (day === 20) {
+    // Gasto del bote: Limpieza final
     demoTransactions.push({
       paymentType: 'expense',
       amount: 150,
       participantId: POT_PARTICIPANT_ID,
-      title: 'Seguro de responsabilidad civil del evento',
+      title: 'Limpieza profunda y retirada de equipamiento',
       date: getDate(day),
     });
-  }
-  if (day === 5) {
-    // Gasto del bote: Decoración
+    // Última cena especial
     demoTransactions.push({
       paymentType: 'expense',
-      amount: 80,
-      participantId: POT_PARTICIPANT_ID,
-      title: 'Decoración y carteles del evento',
+      amount: 280,
+      participantId: 'miguel',
+      title: 'Cena de despedida en Restaurante El Mirador',
       date: getDate(day),
     });
-  }
-  if (day === 6) {
+    // Reembolsos finales
     demoTransactions.push({
-      paymentType: 'contribution',
-      amount: 120,
-      participantId: 'marta',
-      title: `Aportación de Marta para varios días (días 6-10)`,
+      paymentType: 'compensation',
+      amount: 95,
+      participantId: 'raul',
+      title: 'Reembolso final a Raúl por excursión',
       date: getDate(day),
     });
     demoTransactions.push({
-      paymentType: 'contribution',
+      paymentType: 'compensation',
       amount: 60,
       participantId: 'lucia',
-      title: `Aportación de Lucía para varios días (días 6-8)`,
+      title: 'Reembolso final a Lucía por cena temática',
       date: getDate(day),
     });
   }
 
-  // Reembolso del bote a algunos participantes
-  if (day === 10) {
+  // ==========================================
+  // GASTOS DIARIOS HABITUALES (todos los días)
+  // ==========================================
+  
+  // Compra de comida (varía según tipo de día)
+  const foodAmount = day % 7 === 0 ? 0 : (day % 3 === 0 ? 120 : 85); // Sin comida en día 7, más en días especiales
+  if (foodAmount > 0) {
     demoTransactions.push({
-      paymentType: 'compensation',
-      amount: 50,
-      participantId: 'javi',
-      title: `Reembolso del bote a Javi (final de fiestas)`,
+      paymentType: 'expense',
+      amount: foodAmount,
+      participantId: pair[0].id,
+      title: `Compra en supermercado: comida día ${day}`,
       date: getDate(day),
     });
+  }
+
+  // Bebidas (menos en día de excursión)
+  const drinkAmount = day === 7 ? 0 : (day % 5 === 0 ? 55 : 35);
+  if (drinkAmount > 0) {
     demoTransactions.push({
-      paymentType: 'compensation',
-      amount: 40,
-      participantId: 'sofia',
-      title: `Reembolso del bote a Sofía (final de fiestas)`,
+      paymentType: 'expense',
+      amount: drinkAmount,
+      participantId: pair[1].id,
+      title: `Bebidas y refrescos día ${day}`,
       date: getDate(day),
+    });
+  }
+
+  // Pan y desayuno diario
+  demoTransactions.push({
+    paymentType: 'expense',
+    amount: 18,
+    participantId: demoParticipants[(day + 2) % demoParticipants.length].id,
+    title: `Panadería: pan y bollería día ${day}`,
+    date: getDate(day),
+  });
+
+  // Limpieza básica (cada 3 días)
+  if (day % 3 === 0 && day !== 5 && day !== 20) {
+    demoTransactions.push({
+      paymentType: 'expense',
+      amount: 25,
+      participantId: demoParticipants[(day + 5) % demoParticipants.length].id,
+      title: `Productos de limpieza día ${day}`,
+      date: getDate(day),
+    });
+  }
+
+  // ==========================================
+  // APORTACIONES DIARIAS
+  // ==========================================
+  
+  // Estrategia: algunos aportan diariamente, otros semanalmente
+  if (day <= 7 || day > 14) {
+    // Grupo 1: Aportan casi todos los días (30€)
+    ['ana', 'carlos', 'marta', 'luis'].forEach((id) => {
+      demoTransactions.push({
+        paymentType: 'contribution',
+        amount: 30,
+        participantId: id,
+        title: `Aportación diaria de ${demoParticipants.find(p => p.id === id)?.name}`,
+        date: getDate(day),
+      });
+    });
+  }
+
+  if (day % 2 === 0) {
+    // Grupo 2: Aportan cada 2 días (50€)
+    ['sofia', 'javi', 'elena', 'raul'].forEach((id) => {
+      demoTransactions.push({
+        paymentType: 'contribution',
+        amount: 50,
+        participantId: id,
+        title: `Aportación de ${demoParticipants.find(p => p.id === id)?.name}`,
+        date: getDate(day),
+      });
+    });
+  }
+
+  if (day % 5 === 0) {
+    // Grupo 3: Aportan semanalmente (cantidades grandes)
+    ['lucia', 'pablo', 'sara', 'david', 'nuria', 'miguel', 'laura'].forEach((id) => {
+      demoTransactions.push({
+        paymentType: 'contribution',
+        amount: 120,
+        participantId: id,
+        title: `Aportación semanal de ${demoParticipants.find(p => p.id === id)?.name}`,
+        date: getDate(day),
+      });
     });
   }
 }
