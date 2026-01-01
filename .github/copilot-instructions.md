@@ -1,17 +1,686 @@
-# Friends Web - AI Coding Agent Instructions
+# Friends Monorepo - AI Coding Agent Instructions
 
-## Project Overview
-Friends Web is a React 19 + TypeScript app for managing shared expenses at events. Built with Vite, Zustand, TailwindCSS v4, and i18next. Uses HashRouter for GitHub Pages deployment.
+## 🏗️ Monorepo Overview
 
-### Package Manager
-- **Uses pnpm** (v10.27.0) as the package manager
-- Configured via `"packageManager": "pnpm@10.27.0"` in package.json
-- Lock file: `pnpm-lock.yaml` (committed to repository)
-- **Always use pnpm commands**: `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm test`
-- For running scripts: `pnpm <script>` (not `npm run <script>`)
-- For adding dependencies: `pnpm add <package>` or `pnpm add -D <package>`
+Friends is a **pnpm monorepo** for managing shared expenses at events. The project is organized into workspaces for scalability and code sharing.
 
-## Architecture Patterns
+### Project Structure
+```
+friends-web/
+├── apps/
+│   ├── frontend/          # @friends/frontend - React 19 app
+│   └── backend/           # @friends/backend - NestJS API (planned)
+├── packages/
+│   ├── shared-types/      # @friends/shared-types - Shared TypeScript types (planned)
+│   └── shared-utils/      # @friends/shared-utils - Shared utilities (planned)
+├── docs/                  # Documentation
+├── .github/
+│   └── workflows/         # CI/CD pipelines
+├── package.json           # Root package (friends-monorepo)
+└── pnpm-workspace.yaml    # Workspace configuration
+```
+
+### Package Manager (pnpm)
+- **Version**: v10.27.0
+- **Configuration**: `"packageManager": "pnpm@10.27.0"` in root package.json
+- **Lock file**: `pnpm-lock.yaml` (committed to repository)
+- **Workspace config**: `pnpm-workspace.yaml` defines workspaces in `apps/*` and `packages/*`
+
+### Working with Workspaces
+
+**Install dependencies:**
+```bash
+pnpm install              # Install all workspaces
+```
+
+**Run commands in specific workspace:**
+```bash
+pnpm --filter @friends/frontend dev
+pnpm --filter @friends/frontend test
+pnpm --filter @friends/backend start:dev
+```
+
+**Run commands in all workspaces:**
+```bash
+pnpm -r build            # Build all workspaces
+pnpm -r test             # Test all workspaces
+pnpm -r --parallel dev   # Run dev servers in parallel
+```
+
+**Add dependencies:**
+```bash
+# To specific workspace
+pnpm --filter @friends/frontend add react-query
+pnpm --filter @friends/backend add @nestjs/typeorm
+
+# To root (dev dependencies shared across all workspaces)
+pnpm add -D -w husky
+
+# Workspace dependencies (internal)
+pnpm --filter @friends/frontend add @friends/shared-types@workspace:*
+```
+
+### Monorepo Conventions
+
+**Naming:**
+- Workspaces use scoped names: `@friends/{workspace}`
+- Frontend: `@friends/frontend`
+- Backend: `@friends/backend`
+- Shared packages: `@friends/shared-*`
+
+**Imports between workspaces:**
+```typescript
+// Import from shared-types in frontend or backend
+import { Event, Transaction } from '@friends/shared-types';
+
+// Import from shared-utils
+import { formatCurrency } from '@friends/shared-utils';
+```
+
+**Path references:**
+- Use relative paths within a workspace: `import { cn } from '@/lib/utils'`
+- Use package names for cross-workspace: `import { Event } from '@friends/shared-types'`
+
+---
+
+## 📱 Frontend (@friends/frontend)
+
+Located in `apps/frontend/`. React 19 + TypeScript application for the UI.
+
+### Tech Stack
+- **Framework**: React 19
+- **Language**: TypeScript
+- **Build Tool**: Vite 7
+- **State Management**: Zustand (with LocalStorage persistence)
+- **Styling**: TailwindCSS v4 + @tailwindcss/vite
+- **UI Components**: Radix UI primitives
+- **Icons**: react-icons
+- **Routing**: React Router DOM 7 (HashRouter)
+- **i18n**: i18next + react-i18next (es, en, ca)
+- **Testing**: Vitest + Testing Library
+- **Linting**: ESLint 9 (flat config)
+
+### Frontend Development Workflow
+
+**From monorepo root:**
+```bash
+pnpm dev                 # Start frontend dev server
+pnpm build              # Build frontend
+pnpm test               # Run frontend tests
+pnpm lint               # Lint frontend
+```
+
+**From `apps/frontend/`:**
+```bash
+pnpm dev                # Dev server at localhost:5173/friends-web/
+pnpm build             # TypeScript check + Vite build
+pnpm preview           # Preview production build
+pnpm test              # Vitest watch mode
+pnpm test:run          # Vitest single run
+pnpm test:ui           # Vitest UI
+pnpm test:coverage     # Coverage report
+pnpm lint              # ESLint check
+```
+
+### Frontend Architecture
+
+**Feature-Based Organization:**
+```
+apps/frontend/src/features/{feature}/
+  ├─ components/       # Feature UI components
+  ├─ store/           # Feature Zustand store
+  ├─ types.ts         # Feature TypeScript types
+  ├─ constants.ts     # Feature constants (optional)
+  └─ index.ts         # Public API exports
+```
+
+- **Features**: `events`, `transactions`, `kpi`
+- **Barrel exports**: `import { EventsList } from '@/features/events'`
+- **Never import directly from store files** - use store hooks
+
+**State Management (Zustand + LocalStorage):**
+- All stores use Zustand with `persist` middleware for automatic localStorage sync
+- Store pattern: `apps/frontend/src/features/*/store/use*Store.ts`
+- Key stores: `useEventsStore`, `useTransactionsStore`, `useThemeStore`
+- **Critical**: When deleting an event, cascade delete transactions via `useTransactionsStore.getState().deleteTransactionsByEvent()`
+- **Participant removal**: Clear removed participants from transactions via `clearParticipantFromEventTransactions()`
+
+**Transaction System:**
+Three payment types:
+- `contribution`: Money added to event pot
+- `expense`: Money spent from pot by participant
+- `compensation`: Reimbursements to balance accounts
+
+Constants:
+- `PAYMENT_TYPES`: Array of all payment types
+- `PAYMENT_TYPE_CONFIG`: Centralized config with icons and color variants
+- `POT_CONFIG`: Special config for pot expenses (piggy bank icon, orange colors)
+
+**Pot System:**
+- `POT_PARTICIPANT_ID = '0'`: Special ID representing common pot
+- Pot can only make expenses (not contributions or compensations)
+- Pot expenses shown in KPI details with orange styling
+
+**KPI System:**
+- `KPIType`: `'balance' | 'contributions' | 'expenses' | 'pending'`
+- All KPIs computed per-event AND per-participant
+- Helper: `isPotExpense(transaction)` to check pot expenses
+
+**Internationalization (i18next):**
+- Languages: `en`, `es` (default), `ca`
+- Files: `apps/frontend/src/i18n/locales/{lang}/translation.json`
+- Key naming: `<feature>.<context>.<key>` (e.g., `events.form.title`)
+- Locale mapping: `'es'` → `'es-ES'`, `'en'` → `'en-US'`, `'ca'` → `'ca-ES'`
+- In components: `const { t } = useTranslation()` then `t('key.path')`
+- **Amount formatting**: Use `formatAmount(amount, currency = 'EUR', useGrouping = true)`
+- **Date formatting**: Use `formatDateLong(dateStr)` for locale-aware dates
+
+**Styling (TailwindCSS v4):**
+- Uses `@tailwindcss/vite` plugin (not PostCSS)
+- Utility helper: `cn()` from `@/lib/utils` (clsx + tailwind-merge)
+- Theme: Teal primary, dark mode support
+- Color conventions:
+  - Teal: Primary UI
+  - Blue: Contributions
+  - Red: Expenses
+  - Green: Balance/compensation
+  - Yellow: Pending amounts
+  - Orange: Pot expenses
+
+**Path Aliases:**
+```typescript
+"@": "apps/frontend/src"  // Configured in vite.config.ts
+```
+Use `@/` for internal imports: `import { cn } from '@/lib/utils'`
+
+**Routing (React Router DOM 7):**
+- Uses `HashRouter` (GitHub Pages compatibility)
+- Routes:
+  - `/` - Home (events list)
+  - `/event/:id` - Event detail
+  - `/event/:id/kpi/:kpi` - KPI drill-down
+- Navigation: `useNavigate()` hook
+- Route params: `useParams<{ id: string }>()`
+
+**Testing (Vitest + Testing Library):**
+- Setup: `apps/frontend/src/test/setup.ts` (mocks localStorage, jest-dom matchers)
+- Pattern: Co-locate tests (`*.test.ts` next to source)
+- Examples: `useEventsStore.test.ts`, `TransactionItem.test.tsx`
+- Current: 58 tests passing
+
+### Frontend Code Conventions
+
+**Naming:**
+- camelCase: variables, functions
+- PascalCase: components
+- useCamelCase: hooks
+
+**Components:**
+- Functional components with hooks only (no classes)
+- Default exports (not named exports)
+- UI Primitives: Radix UI in `apps/frontend/src/components/ui/`
+- Icons: react-icons (`FaHandHoldingUsd`, `FaWallet`, `FaHandshake`, `FaPiggyBank`, `MdArrowBack`)
+
+**Forms:**
+- Controlled components with validation
+- Use `required` attribute
+- Disable submit when invalid
+- Show loading/disabled states
+- Implement dirty state tracking for unsaved changes
+
+**Type Safety:**
+- No `any` types - use proper TypeScript
+- Types defined in feature `types.ts`
+- Export through feature `index.ts`
+- Share types across features when needed
+
+**Common Frontend Tasks:**
+
+1. **Add new feature:**
+   - Create `apps/frontend/src/features/{feature}/`
+   - Add `types.ts`, `store/use{Feature}Store.ts`, `components/`
+   - Create `constants.ts` if needed
+   - Export via `index.ts`
+   - Add translations for es, en, ca
+
+2. **Add translations:**
+   - Update all three locale files
+   - Use nesting: `feature.component.key`
+   - Support pluralization (`_one`, `_other`)
+
+3. **Create KPIs:**
+   - Add calculation to `useTransactionsStore`
+   - Update `KPIType` union
+   - Add KPI configuration
+   - Create UI component
+   - Add translations
+
+---
+
+## 🔧 Backend (@friends/backend) - Planned
+
+Located in `apps/backend/`. NestJS + TypeScript API.
+
+### Planned Tech Stack
+- **Framework**: NestJS 10+
+- **Language**: TypeScript
+- **Database**: PostgreSQL 15+
+- **ORM**: TypeORM
+- **Validation**: class-validator + class-transformer
+- **Auth**: Passport.js + JWT
+- **API Docs**: Swagger/OpenAPI
+- **Testing**: Jest + Supertest
+- **Configuration**: @nestjs/config
+
+### Backend Development Workflow (When Ready)
+
+**From monorepo root:**
+```bash
+pnpm dev:backend        # Start backend dev server
+pnpm build:backend      # Build backend
+```
+
+**From `apps/backend/`:**
+```bash
+pnpm start:dev          # Start in watch mode
+pnpm build             # Build for production
+pnpm start:prod        # Start production server
+pnpm test              # Run unit tests
+pnpm test:e2e          # Run E2E tests
+pnpm test:cov          # Generate coverage
+```
+
+### Planned Backend Architecture
+
+**Module Structure:**
+```
+apps/backend/src/modules/{module}/
+  ├─ {module}.controller.ts    # HTTP endpoints
+  ├─ {module}.service.ts       # Business logic
+  ├─ {module}.module.ts        # Module definition
+  ├─ entities/                 # TypeORM entities
+  │  └─ {module}.entity.ts
+  └─ dto/                      # Data Transfer Objects
+     ├─ create-{module}.dto.ts
+     └─ update-{module}.dto.ts
+```
+
+**Planned Modules:**
+- `events`: Event CRUD operations
+- `transactions`: Transaction management
+- `participants`: Participant management
+- `auth`: Authentication (JWT)
+
+**API Endpoints (Planned):**
+```
+# Events
+GET    /api/events
+POST   /api/events
+GET    /api/events/:id
+PATCH  /api/events/:id
+DELETE /api/events/:id
+
+# Transactions
+GET    /api/events/:eventId/transactions
+POST   /api/events/:eventId/transactions
+GET    /api/transactions/:id
+PATCH  /api/transactions/:id
+DELETE /api/transactions/:id
+
+# Participants
+GET    /api/events/:eventId/participants
+POST   /api/events/:eventId/participants
+DELETE /api/participants/:id
+
+# Auth (optional)
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/refresh
+GET    /api/auth/profile
+```
+
+**Database Schema (Planned):**
+```sql
+-- Events
+CREATE TABLE events (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(255) NOT NULL,
+  date DATE NOT NULL,
+  location VARCHAR(255),
+  participants TEXT[],
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Transactions
+CREATE TABLE transactions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  event_id UUID REFERENCES events(id) ON DELETE CASCADE,
+  participant_id VARCHAR(50) NOT NULL,
+  type VARCHAR(20) NOT NULL, -- 'contribution' | 'expense' | 'compensation'
+  amount DECIMAL(10, 2) NOT NULL,
+  concept VARCHAR(255),
+  date TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**Environment Variables (Planned):**
+```bash
+# Server
+PORT=3000
+NODE_ENV=development
+
+# Database
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=friends_db
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_EXPIRATION=1d
+
+# CORS
+CORS_ORIGIN=http://localhost:5173
+```
+
+### Backend Code Conventions (Planned)
+
+**Naming:**
+- camelCase: variables, functions, services
+- PascalCase: classes, DTOs, entities
+- kebab-case: file names (`events.controller.ts`)
+
+**DTOs:**
+- Use class-validator decorators
+- Create separate DTOs for create/update operations
+- Use `@ApiProperty()` for Swagger documentation
+
+**Services:**
+- Business logic only (no HTTP concerns)
+- Injectable with `@Injectable()`
+- Use dependency injection
+
+**Controllers:**
+- HTTP layer only (routing, request/response)
+- Use decorators: `@Get()`, `@Post()`, `@Patch()`, `@Delete()`
+- Use `@Body()`, `@Param()`, `@Query()` for inputs
+- Return DTOs or entities
+
+**Type Safety:**
+- Use TypeScript strict mode
+- Import types from `@friends/shared-types` when available
+- Define entities with TypeORM decorators
+
+---
+
+## 📦 Shared Packages
+
+### @friends/shared-types (Planned)
+
+Located in `packages/shared-types/`. Shared TypeScript types between frontend and backend.
+
+**Purpose:**
+- Single source of truth for data structures
+- Type safety across workspaces
+- Refactoring safety
+
+**Structure:**
+```
+packages/shared-types/src/
+├── event.types.ts          # Event, EventParticipant, CreateEventDto, UpdateEventDto
+├── transaction.types.ts    # Transaction, PaymentType, CreateTransactionDto
+├── kpi.types.ts           # KPIType, KPIConfig, EventKPIs
+├── common.types.ts        # ApiResponse, PaginatedResponse, ErrorResponse
+└── index.ts               # Barrel export
+```
+
+**Usage:**
+```typescript
+// In frontend or backend
+import { Event, Transaction, PaymentType } from '@friends/shared-types';
+
+const event: Event = {
+  id: '1',
+  name: 'Dinner',
+  date: '2026-01-01',
+  participants: [],
+};
+```
+
+**Migration Plan:**
+1. Create `packages/shared-types/` workspace
+2. Move types from `apps/frontend/src/features/*/types.ts`
+3. Add as dependency: `@friends/shared-types: "workspace:*"`
+4. Update imports in frontend
+5. Use same types in backend
+
+### @friends/shared-utils (Planned)
+
+Located in `packages/shared-utils/`. Shared utility functions.
+
+**Potential utilities:**
+- Currency formatting (if backend needs it)
+- Date utilities
+- Business logic validations
+- Shared constants
+
+---
+
+## 🔀 Cross-Cutting Concerns
+
+### TypeScript Configuration
+
+**Root `tsconfig.json`:**
+- Base configuration for all workspaces
+- Extends in workspace-specific tsconfig files
+
+**Workspace tsconfig:**
+- Frontend: `apps/frontend/tsconfig.json` (React-specific)
+- Backend: `apps/backend/tsconfig.json` (Node-specific)
+- Shared: `packages/*/tsconfig.json` (Library-specific)
+
+### Testing Strategy
+
+**Unit Tests:**
+- Frontend: Vitest + Testing Library
+- Backend: Jest + Supertest
+- Shared: Jest (when applicable)
+
+**E2E Tests (Planned):**
+- Integration tests between frontend and backend
+- Playwright or Cypress for full user flows
+
+**Test Commands:**
+```bash
+pnpm -r test:run        # Run all tests
+pnpm test               # Run frontend tests (from root)
+pnpm test:backend       # Run backend tests (when ready)
+```
+
+### Git Workflow
+
+**Branch Strategy:**
+- `main`: Production-ready code
+- `develop`: Development branch
+- `feature/*`: Feature branches
+- `fix/*`: Bug fix branches
+
+**Commit Convention:**
+- Use conventional commits
+- Format: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- Scopes: `frontend`, `backend`, `shared-types`, `monorepo`, `ci`
+
+Examples:
+```bash
+feat(frontend): add transaction filtering
+fix(backend): resolve database connection timeout
+docs(monorepo): update README with workspace structure
+chore(ci): update deployment workflow for monorepo
+```
+
+### CI/CD Pipelines
+
+**GitHub Actions Workflows:**
+
+**`.github/workflows/deploy.yml`** (Frontend deployment):
+- Trigger: Push to `main`
+- Jobs: build, deploy to GitHub Pages
+- Uses pnpm with workspace filtering
+
+**`.github/workflows/test.yml`** (Planned):
+- Trigger: Pull requests, push to `develop`
+- Jobs:
+  - Lint all workspaces
+  - Test frontend
+  - Test backend
+  - Type check shared-types
+
+**Deployment:**
+- Frontend: GitHub Pages (currently)
+- Backend: Railway, Render, or Vercel (planned)
+- Database: Managed PostgreSQL (planned)
+
+### Documentation
+
+**Structure:**
+- Root `README.md`: Monorepo overview
+- `apps/frontend/README.md`: Frontend-specific docs
+- `apps/backend/README.md`: Backend-specific docs
+- `packages/*/README.md`: Package API documentation
+- `docs/`: Extended documentation
+  - `MONOREPO_MIGRATION.md`: Migration guide
+  - `DEVELOPMENT.md`: Development setup
+  - `ARCHITECTURE.md`: Architecture decisions
+
+### Code Quality
+
+**Linting:**
+- Frontend: ESLint 9 (flat config)
+- Backend: ESLint with NestJS plugin (planned)
+- Shared: ESLint base config
+
+**Formatting:**
+- Prettier (optional, can be added to root)
+- Consistent across all workspaces
+
+**Type Checking:**
+```bash
+pnpm -r type-check      # Check all workspaces
+```
+
+### Environment Variables
+
+**Frontend (`apps/frontend/.env`):**
+```bash
+VITE_API_URL=http://localhost:3000
+```
+
+**Backend (`apps/backend/.env`):**
+```bash
+PORT=3000
+DATABASE_URL=postgresql://user:pass@localhost:5432/friends_db
+JWT_SECRET=secret
+CORS_ORIGIN=http://localhost:5173
+```
+
+---
+
+## 📝 Common Monorepo Tasks
+
+### Adding a New Workspace
+
+1. **Create directory:**
+   ```bash
+   mkdir -p apps/new-app
+   # or
+   mkdir -p packages/new-package
+   ```
+
+2. **Create `package.json`:**
+   ```json
+   {
+     "name": "@friends/new-app",
+     "version": "0.0.0",
+     "private": true
+   }
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
+
+4. **Add to documentation:**
+   - Update root README
+   - Create workspace README
+
+### Working Across Workspaces
+
+**Import shared types:**
+```typescript
+// Add dependency in workspace package.json
+{
+  "dependencies": {
+    "@friends/shared-types": "workspace:*"
+  }
+}
+
+// Import in code
+import { Event } from '@friends/shared-types';
+```
+
+**Develop with hot reload:**
+```bash
+# Terminal 1: Frontend dev server
+pnpm dev
+
+# Terminal 2: Backend dev server (when ready)
+pnpm dev:backend
+
+# Or run both
+pnpm -r --parallel dev
+```
+
+### Debugging Tips
+
+**Frontend:**
+- Use React DevTools browser extension
+- Zustand DevTools (already configured)
+- Vite's built-in error overlay
+
+**Backend (Planned):**
+- Use NestJS logger
+- VS Code debugger with `launch.json`
+- Attach to running process
+
+**Monorepo:**
+- Check workspace resolution: `pnpm list --depth 0`
+- Verify symlinks: `ls -la node_modules/@friends`
+- Clear cache: `pnpm store prune`
+
+---
+
+## 🎯 Next Steps for Implementation
+
+1. ✅ Migrate to monorepo structure
+2. ✅ Update documentation (READMEs)
+3. 🚧 Create `@friends/backend` with NestJS
+4. 🚧 Create `@friends/shared-types` package
+5. 🚧 Migrate frontend types to shared-types
+6. 🚧 Implement first API endpoints
+7. 🚧 Connect frontend to backend API
+8. 🚧 Add authentication
+9. 🚧 Deploy backend
+10. 🚧 Add E2E tests
+
+---
+
+**Last Updated:** January 1, 2026  
+**Monorepo Status:** Configured, Frontend Active, Backend Planned
 
 ### State Management (Zustand + LocalStorage Persistence)
 - **All stores use Zustand with `persist` middleware** for automatic localStorage sync
