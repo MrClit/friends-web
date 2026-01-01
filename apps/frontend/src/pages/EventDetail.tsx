@@ -1,18 +1,14 @@
-import { useParams } from 'react-router-dom';
-import { useEventsStore } from '../features/events/store/useEventsStore';
-import { MdArrowBack } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
-import KPIBox from '../features/events/components/KPIBox';
 import { useState } from 'react';
-import EventContextMenu from '../features/events/components/EventContextMenu';
-import EventFormModal from '../features/events/components/EventFormModal';
-import ConfirmDialog from '../shared/components/ConfirmDialog';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useEventsStore } from '../features/events/store/useEventsStore';
+import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
+import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
 import TransactionModal from '../features/transactions/components/TransactionModal';
 import TransactionsList from '../features/transactions/components/TransactionsList';
-import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
 import FloatingActionButton from '../shared/components/FloatingActionButton';
+import ConfirmDialog from '../shared/components/ConfirmDialog';
 import type { EventParticipant } from '../features/events/types';
-import { useTranslation } from 'react-i18next';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
@@ -44,56 +40,28 @@ export default function EventDetail() {
     setEditModalOpen(false);
   };
 
+  const handleBack = () => navigate('/');
+
   if (!event) return <div className="text-center mt-10">{t('eventDetail.notFound')}</div>;
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
-      <div className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="p-2 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors"
-          aria-label="Volver"
-        >
-          <MdArrowBack className="text-teal-900 dark:text-teal-100 text-2xl" />
-        </button>
-        <h1 className="text-2xl md:text-3xl font-bold text-center flex-1 truncate text-teal-900 dark:text-teal-100">{event.title}</h1>
-        <EventContextMenu
-          onEdit={() => setEditModalOpen(true)}
-          onDelete={() => setDeleteDialogOpen(true)}
-        />
-      </div>
-      {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-2xl mb-8">
-        <KPIBox
-          label={t('eventDetail.kpi.pot')}
-          value={potBalance}
-          colorClass="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-          onClick={() => navigate(`/event/${event.id}/kpi/balance`)}
-          style={{ cursor: 'pointer' }}
-        />
-        <KPIBox
-          label={t('eventDetail.kpi.contributions')}
-          value={totalContributions}
-          colorClass="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-          onClick={() => navigate(`/event/${event.id}/kpi/contributions`)}
-          style={{ cursor: 'pointer' }}
-        />
-        <KPIBox
-          label={t('eventDetail.kpi.expenses')}
-          value={totalExpenses}
-          colorClass="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-          onClick={() => navigate(`/event/${event.id}/kpi/expenses`)}
-          style={{ cursor: 'pointer' }}
-        />
-        <KPIBox
-          label={t('eventDetail.kpi.pending')}
-          value={pendingToCompensate}
-          colorClass="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-          onClick={() => navigate(`/event/${event.id}/kpi/pending`)}
-          style={{ cursor: 'pointer' }}
-        />
-      </div>
+      <EventDetailHeader
+        eventId={event.id}
+        eventTitle={event.title}
+        onBack={handleBack}
+        onEdit={() => setEditModalOpen(true)}
+        onDelete={() => setDeleteDialogOpen(true)}
+      />
+      
+      <EventKPIGrid
+        eventId={event.id}
+        potBalance={potBalance}
+        totalContributions={totalContributions}
+        totalExpenses={totalExpenses}
+        pendingToCompensate={pendingToCompensate}
+      />
+      
       {/* Lista de transacciones */}
       <TransactionsList event={event} />
       <FloatingActionButton

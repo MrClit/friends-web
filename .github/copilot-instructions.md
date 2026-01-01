@@ -3,6 +3,14 @@
 ## Project Overview
 Friends Web is a React 19 + TypeScript app for managing shared expenses at events. Built with Vite, Zustand, TailwindCSS v4, and i18next. Uses HashRouter for GitHub Pages deployment.
 
+### Package Manager
+- **Uses pnpm** (v10.27.0) as the package manager
+- Configured via `"packageManager": "pnpm@10.27.0"` in package.json
+- Lock file: `pnpm-lock.yaml` (committed to repository)
+- **Always use pnpm commands**: `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm test`
+- For running scripts: `pnpm <script>` (not `npm run <script>`)
+- For adding dependencies: `pnpm add <package>` or `pnpm add -D <package>`
+
 ## Architecture Patterns
 
 ### State Management (Zustand + LocalStorage Persistence)

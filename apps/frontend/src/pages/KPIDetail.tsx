@@ -1,12 +1,12 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEventsStore } from '../features/events/store/useEventsStore';
 import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
 import { formatAmount } from '../shared/utils/formatAmount';
 
-// Import from new kpi feature
+// Import from features
+import { EventDetailHeader } from '@/features/events';
 import { 
-  KPIDetailHeader, 
   KPIParticipantsList, 
   KPIExplanation 
 } from '@/features/kpi';
@@ -16,6 +16,7 @@ import KPIBox from '../features/events/components/KPIBox';
 
 export default function KPIDetail() {
   const { id, kpi } = useParams<{ id: string; kpi: KPIType }>();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const event = useEventsStore(state => state.events.find(e => e.id === id));
@@ -100,7 +101,11 @@ export default function KPIDetail() {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
-      <KPIDetailHeader eventId={event.id} eventTitle={event.title} />
+      <EventDetailHeader 
+        eventId={event.id} 
+        eventTitle={event.title}
+        onBack={() => navigate(`/event/${event.id}`)}
+      />
       
       <div className="w-full max-w-2xl mb-8">
         <KPIBox 
