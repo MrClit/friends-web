@@ -5,8 +5,8 @@ interface EventDetailHeaderProps {
   eventId: string;
   eventTitle: string;
   onBack: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export default function EventDetailHeader({
@@ -15,6 +15,8 @@ export default function EventDetailHeader({
   onEdit,
   onDelete,
 }: EventDetailHeaderProps) {
+  const showContextMenu = onEdit && onDelete;
+  
   return (
     <div className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
       <button
@@ -28,10 +30,14 @@ export default function EventDetailHeader({
       <h1 className="text-2xl md:text-3xl font-bold text-center flex-1 truncate text-teal-900 dark:text-teal-100">
         {eventTitle}
       </h1>
-      <EventContextMenu
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
+      {showContextMenu ? (
+        <EventContextMenu
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      ) : (
+        <div className="w-10" /> /* Spacer for centering */
+      )}
     </div>
   );
 }
