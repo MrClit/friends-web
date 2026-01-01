@@ -45,7 +45,7 @@ git clone https://github.com/MrClit/friends-web.git
 cd friends-web
 
 # Install dependencies
-pnpm install # or npm install or yarn install
+pnpm install
 ```
 
 ## Available Scripts
