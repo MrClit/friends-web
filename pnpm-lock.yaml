@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  apps/frontend:
     dependencies:
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.16
