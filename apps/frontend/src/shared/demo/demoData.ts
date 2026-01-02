@@ -122,7 +122,7 @@ for (let day = 1; day <= 20; day++) {
         paymentType: 'contribution',
         amount: 50,
         participantId: id,
-        title: `Aportación extra de ${demoParticipants.find(p => p.id === id)?.name} para cena`,
+        title: `Aportación extra de ${demoParticipants.find((p) => p.id === id)?.name} para cena`,
         date: getDate(day),
       });
     });
@@ -166,7 +166,7 @@ for (let day = 1; day <= 20; day++) {
         paymentType: 'contribution',
         amount: 35,
         participantId: id,
-        title: `Aportación de ${demoParticipants.find(p => p.id === id)?.name} para excursión`,
+        title: `Aportación de ${demoParticipants.find((p) => p.id === id)?.name} para excursión`,
         date: getDate(day),
       });
     });
@@ -281,9 +281,9 @@ for (let day = 1; day <= 20; day++) {
   // ==========================================
   // GASTOS DIARIOS HABITUALES (todos los días)
   // ==========================================
-  
+
   // Compra de comida (varía según tipo de día)
-  const foodAmount = day % 7 === 0 ? 0 : (day % 3 === 0 ? 120 : 85); // Sin comida en día 7, más en días especiales
+  const foodAmount = day % 7 === 0 ? 0 : day % 3 === 0 ? 120 : 85; // Sin comida en día 7, más en días especiales
   if (foodAmount > 0) {
     demoTransactions.push({
       paymentType: 'expense',
@@ -295,7 +295,7 @@ for (let day = 1; day <= 20; day++) {
   }
 
   // Bebidas (menos en día de excursión)
-  const drinkAmount = day === 7 ? 0 : (day % 5 === 0 ? 55 : 35);
+  const drinkAmount = day === 7 ? 0 : day % 5 === 0 ? 55 : 35;
   if (drinkAmount > 0) {
     demoTransactions.push({
       paymentType: 'expense',
@@ -329,7 +329,7 @@ for (let day = 1; day <= 20; day++) {
   // ==========================================
   // APORTACIONES DIARIAS
   // ==========================================
-  
+
   // Estrategia: algunos aportan diariamente, otros semanalmente
   if (day <= 7 || day > 14) {
     // Grupo 1: Aportan casi todos los días (30€)
@@ -338,7 +338,7 @@ for (let day = 1; day <= 20; day++) {
         paymentType: 'contribution',
         amount: 30,
         participantId: id,
-        title: `Aportación diaria de ${demoParticipants.find(p => p.id === id)?.name}`,
+        title: `Aportación diaria de ${demoParticipants.find((p) => p.id === id)?.name}`,
         date: getDate(day),
       });
     });
@@ -351,7 +351,7 @@ for (let day = 1; day <= 20; day++) {
         paymentType: 'contribution',
         amount: 50,
         participantId: id,
-        title: `Aportación de ${demoParticipants.find(p => p.id === id)?.name}`,
+        title: `Aportación de ${demoParticipants.find((p) => p.id === id)?.name}`,
         date: getDate(day),
       });
     });
@@ -364,7 +364,7 @@ for (let day = 1; day <= 20; day++) {
         paymentType: 'contribution',
         amount: 120,
         participantId: id,
-        title: `Aportación semanal de ${demoParticipants.find(p => p.id === id)?.name}`,
+        title: `Aportación semanal de ${demoParticipants.find((p) => p.id === id)?.name}`,
         date: getDate(day),
       });
     });

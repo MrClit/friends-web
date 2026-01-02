@@ -13,26 +13,26 @@ interface UseInfiniteScrollReturn {
 
 /**
  * Custom hook for implementing infinite scroll with IntersectionObserver
- * 
+ *
  * @param options - Configuration options
  * @param options.onLoadMore - Callback function to load more data
  * @param options.hasMore - Whether there is more data to load
  * @param options.threshold - Intersection threshold (0-1), defaults to 0.1
- * 
+ *
  * @returns Object with observerRef (attach to trigger element) and isLoading state
- * 
+ *
  * @example
  * ```tsx
  * const loadMore = useCallback(() => {
  *   setPage(prev => prev + 1);
  * }, []);
- * 
+ *
  * const { observerRef, isLoading } = useInfiniteScroll({
  *   onLoadMore: loadMore,
  *   hasMore: hasMoreData,
  *   threshold: 0.1,
  * });
- * 
+ *
  * return (
  *   <div>
  *     {items.map(item => <Item key={item.id} {...item} />)}
@@ -56,7 +56,7 @@ export function useInfiniteScroll({
   // Wrap onLoadMore in useCallback to prevent unnecessary effect triggers
   const handleLoadMore = useCallback(async () => {
     if (isLoading) return;
-    
+
     setIsLoading(true);
     try {
       await onLoadMore();
@@ -76,11 +76,11 @@ export function useInfiniteScroll({
           handleLoadMore();
         }
       },
-      { 
+      {
         threshold,
         // Optional: add rootMargin to trigger slightly before element is visible
         // rootMargin: '100px',
-      }
+      },
     );
 
     observer.observe(element);

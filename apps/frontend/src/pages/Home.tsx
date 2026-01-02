@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { EventsList, EventFormModal } from '../features/events/components';
 import { Logo } from '../shared/components';
 import FloatingActionButton from '../shared/components/FloatingActionButton';
@@ -19,7 +19,11 @@ export default function Home() {
         <LanguageMenu />
       </div>
       <EventsList />
-      <FloatingActionButton onClick={() => setModalOpen(true)} label={t('home.newEvent')} icon={"+"} />
+      <FloatingActionButton
+        onClick={() => setModalOpen(true)}
+        label={t('home.newEvent')}
+        icon={'+'}
+      />
       <EventFormModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );

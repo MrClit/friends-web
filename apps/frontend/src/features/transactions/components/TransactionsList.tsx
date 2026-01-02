@@ -13,10 +13,13 @@ interface TransactionsListProps {
 }
 
 function groupByDate(transactions: Transaction[]) {
-  return transactions.reduce((acc, tx) => {
-    (acc[tx.date] = acc[tx.date] || []).push(tx);
-    return acc;
-  }, {} as Record<string, Transaction[]>);
+  return transactions.reduce(
+    (acc, tx) => {
+      (acc[tx.date] = acc[tx.date] || []).push(tx);
+      return acc;
+    },
+    {} as Record<string, Transaction[]>,
+  );
 }
 
 export default function TransactionsList({ event }: TransactionsListProps) {
@@ -27,19 +30,19 @@ export default function TransactionsList({ event }: TransactionsListProps) {
 
   // Get paginated transactions from store
   const getTransactionsPaginated = useTransactionsStore(
-    (state) => state.getTransactionsByEventPaginated
+    (state) => state.getTransactionsByEventPaginated,
   );
 
   // Get paginated data with useMemo to avoid recalculations
   const { transactions, hasMore } = useMemo(
     () => getTransactionsPaginated(event.id, loadedDates, 0),
-    [event.id, loadedDates, getTransactionsPaginated]
+    [event.id, loadedDates, getTransactionsPaginated],
   );
 
   // Create participants map for O(1) lookup
   const participantsMap = useMemo(
     () => new Map(event.participants.map((p) => [p.id, p.name])),
-    [event.participants]
+    [event.participants],
   );
 
   // Infinite scroll handler
@@ -57,10 +60,7 @@ export default function TransactionsList({ event }: TransactionsListProps) {
 
   // Group transactions by date
   const grouped = useMemo(() => groupByDate(transactions), [transactions]);
-  const dates = useMemo(
-    () => Object.keys(grouped).sort((a, b) => b.localeCompare(a)),
-    [grouped]
-  );
+  const dates = useMemo(() => Object.keys(grouped).sort((a, b) => b.localeCompare(a)), [grouped]);
 
   // Handler for clicking on a transaction
   const handleTransactionClick = useCallback((transaction: Transaction) => {
@@ -77,9 +77,7 @@ export default function TransactionsList({ event }: TransactionsListProps) {
   return (
     <div className="w-full max-w-2xl mb-8">
       {dates.length === 0 && (
-        <div className="text-center text-teal-400 py-8">
-          {t('transactionsList.noTransactions')}
-        </div>
+        <div className="text-center text-teal-400 py-8">{t('transactionsList.noTransactions')}</div>
       )}
       {dates.map((date) => (
         <div key={date} className="mb-6">
@@ -104,7 +102,10 @@ export default function TransactionsList({ event }: TransactionsListProps) {
         <div ref={observerRef} className="py-4 text-center">
           {isLoading ? (
             <div className="flex justify-center items-center gap-2 text-teal-500">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500" aria-hidden="true"></div>
+              <div
+                className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"
+                aria-hidden="true"
+              ></div>
               <span>{t('transactionsList.loadingMore')}</span>
             </div>
           ) : (

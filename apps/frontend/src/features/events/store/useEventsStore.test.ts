@@ -53,9 +53,7 @@ describe('useEventsStore', () => {
 
   describe('updateEvent', () => {
     it('should update event title and participants', () => {
-      const initialParticipants: EventParticipant[] = [
-        { id: 'p1', name: 'Alice' },
-      ];
+      const initialParticipants: EventParticipant[] = [{ id: 'p1', name: 'Alice' }];
       const updatedParticipants: EventParticipant[] = [
         { id: 'p1', name: 'Alice' },
         { id: 'p2', name: 'Bob' },
@@ -86,7 +84,7 @@ describe('useEventsStore', () => {
     it('should remove an event by id', () => {
       useEventsStore.getState().addEvent('Event 1', []);
       useEventsStore.getState().addEvent('Event 2', []);
-      
+
       const eventId = useEventsStore.getState().events[0].id;
       useEventsStore.getState().removeEvent(eventId);
 
@@ -97,7 +95,7 @@ describe('useEventsStore', () => {
 
     it('should handle removing non-existent event', () => {
       useEventsStore.getState().addEvent('Event 1', []);
-      
+
       useEventsStore.getState().removeEvent('non-existent-id');
 
       const { events } = useEventsStore.getState();
@@ -107,16 +105,14 @@ describe('useEventsStore', () => {
 
   describe('persistence', () => {
     it('should persist events to localStorage', () => {
-      const participants: EventParticipant[] = [
-        { id: 'p1', name: 'Alice' },
-      ];
+      const participants: EventParticipant[] = [{ id: 'p1', name: 'Alice' }];
 
       useEventsStore.getState().addEvent('Test Event', participants);
 
       // Check localStorage was updated
       const stored = localStorage.getItem('events-storage');
       expect(stored).toBeTruthy();
-      
+
       const parsed = JSON.parse(stored!);
       expect(parsed.state.events).toHaveLength(1);
       expect(parsed.state.events[0].title).toBe('Test Event');

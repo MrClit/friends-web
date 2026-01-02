@@ -22,7 +22,7 @@ function TransactionItem({ transaction, onClick, participantsMap }: TransactionI
   const isPotExpense = useTransactionsStore((state) => state.isPotExpense);
 
   const isPot = isPotExpense(transaction);
-  
+
   // Determine icon to display
   const icon = isPot ? (
     <POT_CONFIG.IconComponent className={POT_CONFIG.colorClass} />
@@ -36,8 +36,8 @@ function TransactionItem({ transaction, onClick, participantsMap }: TransactionI
     : participantsMap.get(transaction.participantId) || t('transactionsList.unknownParticipant');
 
   // Determine amount color class
-  const amountColorClass = isPot 
-    ? POT_CONFIG.colorClass 
+  const amountColorClass = isPot
+    ? POT_CONFIG.colorClass
     : PAYMENT_TYPE_CONFIG[transaction.paymentType].colorStrong;
 
   return (
@@ -55,12 +55,9 @@ function TransactionItem({ transaction, onClick, participantsMap }: TransactionI
         {icon}
       </span>
       <div className="flex-1">
-        <div className="font-semibold text-teal-900 dark:text-teal-100">
-          {transaction.title}
-        </div>
+        <div className="font-semibold text-teal-900 dark:text-teal-100">{transaction.title}</div>
         <div className="text-xs text-teal-500">
-          {t(`transactionsList.participantPrefix.${transaction.paymentType}`)}{' '}
-          {participantName}
+          {t(`transactionsList.participantPrefix.${transaction.paymentType}`)} {participantName}
         </div>
       </div>
       <div className={`font-bold text-lg tabular-nums ${amountColorClass}`}>

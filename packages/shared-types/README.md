@@ -193,7 +193,7 @@ function createTransaction(data: CreateTransactionDto): Promise<Transaction> {
   return fetch('/api/transactions', {
     method: 'POST',
     body: JSON.stringify(data),
-  }).then(res => res.json());
+  }).then((res) => res.json());
 }
 ```
 
@@ -211,10 +211,7 @@ export class EventsController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateEventDto: UpdateEventDto,
-  ): Promise<Event> {
+  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto): Promise<Event> {
     return this.eventsService.update(id, updateEventDto);
   }
 }
@@ -237,6 +234,7 @@ export class EventsService {
 ## 📋 Package Configuration
 
 **`package.json`:**
+
 ```json
 {
   "name": "@friends/shared-types",
@@ -257,6 +255,7 @@ export class EventsService {
 ```
 
 **`tsconfig.json`:**
+
 ```json
 {
   "compilerOptions": {
@@ -277,6 +276,7 @@ export class EventsService {
 ## 🎨 Best Practices
 
 ### 1. Keep Types Pure
+
 ```typescript
 // ✅ Good - Pure type definition
 export interface Event {
@@ -293,6 +293,7 @@ export interface Event {
 ```
 
 ### 2. Use DTOs for API Boundaries
+
 ```typescript
 // ✅ Separate types for creation vs. entity
 export interface CreateEventDto {
@@ -307,6 +308,7 @@ export interface Event extends CreateEventDto {
 ```
 
 ### 3. Leverage TypeScript Utilities
+
 ```typescript
 // Partial for updates
 export type UpdateEventDto = Partial<CreateEventDto>;
@@ -319,11 +321,12 @@ export type EventSummary = Pick<Event, 'id' | 'name' | 'date'>;
 ```
 
 ### 4. Document Complex Types
+
 ```typescript
 /**
  * Represents a financial transaction in an event.
- * 
- * @property type - The transaction type: contribution (money in), 
+ *
+ * @property type - The transaction type: contribution (money in),
  *                  expense (money out), or compensation (balancing)
  * @property amount - Amount in cents (to avoid floating point issues)
  */
@@ -338,11 +341,13 @@ export interface Transaction {
 ## 🔄 Migration from Frontend Types
 
 When creating this package, migrate types from:
+
 - `apps/frontend/src/features/events/types.ts`
 - `apps/frontend/src/features/transactions/types.ts`
 - `apps/frontend/src/features/kpi/types.ts`
 
 Then update frontend imports:
+
 ```typescript
 // Before
 import { Event } from '@/features/events/types';

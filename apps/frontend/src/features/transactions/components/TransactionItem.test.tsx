@@ -55,7 +55,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       expect(screen.getByText('Monthly contribution')).toBeInTheDocument();
@@ -79,7 +79,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       expect(screen.getByText('Groceries')).toBeInTheDocument();
@@ -103,7 +103,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       expect(screen.getByText('Reimbursement')).toBeInTheDocument();
@@ -113,9 +113,9 @@ describe('TransactionItem', () => {
 
     it('should show "El Bote" for pot expenses', () => {
       // Setup mock for isPotExpense
-      useTransactionsStore.setState({ 
+      useTransactionsStore.setState({
         transactions: [],
-        isPotExpense: (tx: Transaction) => tx.participantId === '0' && tx.paymentType === 'expense'
+        isPotExpense: (tx: Transaction) => tx.participantId === '0' && tx.paymentType === 'expense',
       });
 
       const potTransaction: Transaction = {
@@ -133,7 +133,7 @@ describe('TransactionItem', () => {
           transaction={potTransaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       expect(screen.getByText('Venue rental')).toBeInTheDocument();
@@ -157,7 +157,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       expect(screen.getByText(/Participante desconocido/)).toBeInTheDocument();
@@ -182,7 +182,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       const item = screen.getByRole('button');
@@ -208,7 +208,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       const item = screen.getByRole('button');
@@ -235,7 +235,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       const item = screen.getByRole('button');
@@ -264,7 +264,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       expect(screen.getByRole('button')).toBeInTheDocument();
@@ -286,7 +286,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       const item = screen.getByRole('button');
@@ -309,7 +309,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       const item = screen.getByRole('button');
@@ -332,7 +332,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       const iconSpan = container.querySelector('span.text-xl');
@@ -359,7 +359,7 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       const firstText = screen.getByText('Test');
@@ -370,11 +370,11 @@ describe('TransactionItem', () => {
           transaction={transaction}
           participantsMap={participantsMap}
           onClick={mockOnClick}
-        />
+        />,
       );
 
       const secondText = screen.getByText('Test');
-      
+
       // If memoized correctly, the component shouldn't re-render
       // In reality, this is hard to test without implementation details
       // The real benefit is seen in profiling, not unit tests

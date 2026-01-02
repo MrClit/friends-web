@@ -1,7 +1,7 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import EventDetail from "./pages/EventDetail";
-import KPIDetail from "./pages/KPIDetail";
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import EventDetail from './pages/EventDetail';
+import KPIDetail from './pages/KPIDetail';
 
 export default function App() {
   return (

@@ -31,9 +31,9 @@ interface TransactionsState {
   getTransactionsByEvent: (eventId: string) => Transaction[];
   /** Returns paginated transactions for an event (date-based chunking) */
   getTransactionsByEventPaginated: (
-    eventId: string, 
-    numberOfDates?: number, 
-    offset?: number
+    eventId: string,
+    numberOfDates?: number,
+    offset?: number,
   ) => {
     transactions: Transaction[];
     hasMore: boolean;
@@ -62,12 +62,12 @@ interface TransactionsState {
   getTotalCompensationsByEvent: (eventId: string) => number;
   /** Total pot expenses in an event (only expenses made by the pot) */
   getTotalPotExpensesByEvent: (eventId: string) => number;
-  /** 
+  /**
    * Pot balance for an event
    * Formula: contributions - compensations - all expenses (participant + pot)
    */
   getPotBalanceByEvent: (eventId: string) => number;
-  /** 
+  /**
    * Pending to compensate in an event (what participants spent and haven't been reimbursed)
    * Formula: participant expenses - compensations (excludes pot expenses)
    */
@@ -77,15 +77,21 @@ interface TransactionsState {
   // AGGREGATIONS - BY PARTICIPANT (returns array of participant data)
   // ============================================================
   /** Total expenses per participant (excludes pot expenses) */
-  getTotalExpensesByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
+  getTotalExpensesByParticipant: (
+    event: Event,
+  ) => { participant: EventParticipant; total: number }[];
   /** Total contributions per participant */
-  getTotalContributionsByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
-  /** 
+  getTotalContributionsByParticipant: (
+    event: Event,
+  ) => { participant: EventParticipant; total: number }[];
+  /**
    * Pending to compensate per participant
    * Formula: participant expenses - compensations (excludes pot expenses)
    */
-  getPendingToCompensateByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
-  /** 
+  getPendingToCompensateByParticipant: (
+    event: Event,
+  ) => { participant: EventParticipant; total: number }[];
+  /**
    * Balance per participant
    * Formula: contributions - expenses - compensations
    */
@@ -105,17 +111,12 @@ export const useTransactionsStore = create<TransactionsState>()(
       // ============================================================
       addExpense: (expense) =>
         set((state) => ({
-          transactions: [
-            ...state.transactions,
-            { ...expense, id: crypto.randomUUID() },
-          ],
+          transactions: [...state.transactions, { ...expense, id: crypto.randomUUID() }],
         })),
 
       updateTransaction: (id, data) =>
         set((state) => ({
-          transactions: state.transactions.map((e) =>
-            e.id === id ? { ...e, ...data } : e
-          ),
+          transactions: state.transactions.map((e) => (e.id === id ? { ...e, ...data } : e)),
         })),
 
       removeTransaction: (id) =>
@@ -131,30 +132,28 @@ export const useTransactionsStore = create<TransactionsState>()(
       clearParticipantFromEventTransactions: (eventId, participantId) =>
         set((state) => ({
           transactions: state.transactions.map((tx) =>
-            tx.eventId === eventId && 
-            tx.participantId === participantId && 
+            tx.eventId === eventId &&
+            tx.participantId === participantId &&
             participantId !== POT_PARTICIPANT_ID
-              ? { ...tx, participantId: "" }
-              : tx
+              ? { ...tx, participantId: '' }
+              : tx,
           ),
         })),
 
       // ============================================================
       // QUERY OPERATIONS
       // ============================================================
-      getTransactionsByEvent: (eventId) =>
-        get().transactions.filter((e) => e.eventId === eventId),
+      getTransactionsByEvent: (eventId) => get().transactions.filter((e) => e.eventId === eventId),
 
       getTransactionsByEventPaginated: (eventId, numberOfDates = 10, offset = 0) => {
         const allTransactions = get()
-          .transactions
-          .filter((t) => t.eventId === eventId)
+          .transactions.filter((t) => t.eventId === eventId)
           .sort((a, b) => b.date.localeCompare(a.date));
 
         // Get unique dates sorted descending (most recent first)
-        const uniqueDates = Array.from(
-          new Set(allTransactions.map((t) => t.date))
-        ).sort((a, b) => b.localeCompare(a));
+        const uniqueDates = Array.from(new Set(allTransactions.map((t) => t.date))).sort((a, b) =>
+          b.localeCompare(a),
+        );
 
         // Calculate pagination
         const totalDates = uniqueDates.length;
@@ -162,9 +161,7 @@ export const useTransactionsStore = create<TransactionsState>()(
         const datesToLoad = uniqueDates.slice(offset, offset + numberOfDates);
 
         // Filter transactions for those dates
-        const paginatedTransactions = allTransactions.filter((t) =>
-          datesToLoad.includes(t.date)
-        );
+        const paginatedTransactions = allTransactions.filter((t) => datesToLoad.includes(t.date));
 
         return {
           transactions: paginatedTransactions,
@@ -182,7 +179,7 @@ export const useTransactionsStore = create<TransactionsState>()(
       // ============================================================
       // HELPERS - POT UTILITIES
       // ============================================================
-      isPotExpense: (transaction) => 
+      isPotExpense: (transaction) =>
         transaction.paymentType === 'expense' && transaction.participantId === POT_PARTICIPANT_ID,
 
       getPotExpensesData: (eventId) => {
@@ -190,7 +187,7 @@ export const useTransactionsStore = create<TransactionsState>()(
         if (total === 0) return null;
         return {
           participantId: POT_PARTICIPANT_ID,
-          total
+          total,
         };
       },
 
@@ -199,31 +196,26 @@ export const useTransactionsStore = create<TransactionsState>()(
       // ============================================================
       getTotalExpensesByEvent: (eventId) =>
         get()
-          .transactions.filter(
-            (e) => e.eventId === eventId && e.paymentType === 'expense'
-          )
+          .transactions.filter((e) => e.eventId === eventId && e.paymentType === 'expense')
           .reduce((sum, e) => sum + e.amount, 0),
 
       getTotalContributionsByEvent: (eventId) =>
         get()
-          .transactions.filter(
-            (e) => e.eventId === eventId && e.paymentType === 'contribution'
-          )
+          .transactions.filter((e) => e.eventId === eventId && e.paymentType === 'contribution')
           .reduce((sum, e) => sum + e.amount, 0),
 
       getTotalCompensationsByEvent: (eventId) =>
         get()
-          .transactions.filter(
-            (e) => e.eventId === eventId && e.paymentType === 'compensation'
-          )
+          .transactions.filter((e) => e.eventId === eventId && e.paymentType === 'compensation')
           .reduce((sum, e) => sum + e.amount, 0),
 
       getTotalPotExpensesByEvent: (eventId) =>
         get()
           .transactions.filter(
-            (e) => e.eventId === eventId && 
-                  e.paymentType === 'expense' && 
-                  e.participantId === POT_PARTICIPANT_ID
+            (e) =>
+              e.eventId === eventId &&
+              e.paymentType === 'expense' &&
+              e.participantId === POT_PARTICIPANT_ID,
           )
           .reduce((sum, e) => sum + e.amount, 0),
 
@@ -235,7 +227,8 @@ export const useTransactionsStore = create<TransactionsState>()(
       },
 
       getPendingToCompensateByEvent: (eventId) => {
-        const totalExpenses = get().getTotalExpensesByEvent(eventId) - get().getTotalPotExpensesByEvent(eventId);
+        const totalExpenses =
+          get().getTotalExpensesByEvent(eventId) - get().getTotalPotExpensesByEvent(eventId);
         const totalCompensations = get().getTotalCompensationsByEvent(eventId);
         return totalExpenses - totalCompensations;
       },
@@ -244,50 +237,68 @@ export const useTransactionsStore = create<TransactionsState>()(
       // AGGREGATIONS - BY PARTICIPANT
       // ============================================================
       getTotalExpensesByParticipant: (event) => {
-        const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'expense');
-        return event.participants.map(p => {
-          const total = txs.filter(t => t.participantId === p.id).reduce((sum, t) => sum + t.amount, 0);
+        const txs = get().transactions.filter(
+          (e) => e.eventId === event.id && e.paymentType === 'expense',
+        );
+        return event.participants.map((p) => {
+          const total = txs
+            .filter((t) => t.participantId === p.id)
+            .reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
       },
 
       getTotalContributionsByParticipant: (event) => {
-        const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'contribution');
-        return event.participants.map(p => {
-          const total = txs.filter(t => t.participantId === p.id).reduce((sum, t) => sum + t.amount, 0);
+        const txs = get().transactions.filter(
+          (e) => e.eventId === event.id && e.paymentType === 'contribution',
+        );
+        return event.participants.map((p) => {
+          const total = txs
+            .filter((t) => t.participantId === p.id)
+            .reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
       },
 
       getPendingToCompensateByParticipant: (event) => {
         const expenses = get().getTotalExpensesByParticipant(event);
-        const compensations = event.participants.map(p => {
-          const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'compensation' && e.participantId === p.id);
+        const compensations = event.participants.map((p) => {
+          const txs = get().transactions.filter(
+            (e) =>
+              e.eventId === event.id &&
+              e.paymentType === 'compensation' &&
+              e.participantId === p.id,
+          );
           const total = txs.reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
         return event.participants.map((p, idx) => ({
           participant: p,
-          total: expenses[idx].total - compensations[idx].total
+          total: expenses[idx].total - compensations[idx].total,
         }));
       },
 
       getBalanceByParticipant: (event) => {
         const contributions = get().getTotalContributionsByParticipant(event);
         const expenses = get().getTotalExpensesByParticipant(event);
-        const compensations = event.participants.map(p => {
-          const txs = get().transactions.filter(e => e.eventId === event.id && e.paymentType === 'compensation' && e.participantId === p.id);
+        const compensations = event.participants.map((p) => {
+          const txs = get().transactions.filter(
+            (e) =>
+              e.eventId === event.id &&
+              e.paymentType === 'compensation' &&
+              e.participantId === p.id,
+          );
           const total = txs.reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
         return event.participants.map((p, idx) => ({
           participant: p,
-          total: contributions[idx].total - expenses[idx].total - compensations[idx].total
+          total: contributions[idx].total - expenses[idx].total - compensations[idx].total,
         }));
       },
     }),
     {
       name: 'transactions-storage',
-    }
-  )
+    },
+  ),
 );

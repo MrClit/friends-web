@@ -27,12 +27,19 @@ export default function ConfirmDialog({
   const resolvedCancel = cancelText ?? t('confirmDialog.cancel');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+      onClick={onCancel}
+    >
       <div
         className="w-full max-w-sm bg-white dark:bg-teal-900 rounded-2xl p-6 shadow-lg animate-slideUp"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
-        {resolvedTitle && <h3 className="text-lg font-bold text-teal-700 dark:text-teal-100 mb-2">{resolvedTitle}</h3>}
+        {resolvedTitle && (
+          <h3 className="text-lg font-bold text-teal-700 dark:text-teal-100 mb-2">
+            {resolvedTitle}
+          </h3>
+        )}
         <p className="text-teal-800 dark:text-teal-100 mb-6">{message}</p>
         <div className="flex justify-end gap-3">
           <button

@@ -14,26 +14,38 @@ export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  
-  const event = useEventsStore(state => state.events.find(e => e.id === id));
-  const updateEvent = useEventsStore(state => state.updateEvent);
-  const removeEvent = useEventsStore(state => state.removeEvent);
-  
-  const getTotalExpensesByEvent = useTransactionsStore(state => state.getTotalExpensesByEvent);
-  const getTotalContributionsByEvent = useTransactionsStore(state => state.getTotalContributionsByEvent);
-  const getPotBalanceByEvent = useTransactionsStore(state => state.getPotBalanceByEvent);
-  const getPendingToCompensateByEvent = useTransactionsStore(state => state.getPendingToCompensateByEvent);
-  
+
+  const event = useEventsStore((state) => state.events.find((e) => e.id === id));
+  const updateEvent = useEventsStore((state) => state.updateEvent);
+  const removeEvent = useEventsStore((state) => state.removeEvent);
+
+  const getTotalExpensesByEvent = useTransactionsStore((state) => state.getTotalExpensesByEvent);
+  const getTotalContributionsByEvent = useTransactionsStore(
+    (state) => state.getTotalContributionsByEvent,
+  );
+  const getPotBalanceByEvent = useTransactionsStore((state) => state.getPotBalanceByEvent);
+  const getPendingToCompensateByEvent = useTransactionsStore(
+    (state) => state.getPendingToCompensateByEvent,
+  );
+
   const totalExpenses = event ? getTotalExpensesByEvent(event.id) : 0;
   const totalContributions = event ? getTotalContributionsByEvent(event.id) : 0;
   const potBalance = event ? getPotBalanceByEvent(event.id) : 0;
   const pendingToCompensate = event ? getPendingToCompensateByEvent(event.id) : 0;
-  
+
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
 
-  const handleEditSubmit = ({ id, title, participants }: { id?: string; title: string; participants: EventParticipant[] }) => {
+  const handleEditSubmit = ({
+    id,
+    title,
+    participants,
+  }: {
+    id?: string;
+    title: string;
+    participants: EventParticipant[];
+  }) => {
     if (id) {
       updateEvent(id, title, participants);
     }
@@ -53,7 +65,7 @@ export default function EventDetail() {
         onEdit={() => setEditModalOpen(true)}
         onDelete={() => setDeleteDialogOpen(true)}
       />
-      
+
       <EventKPIGrid
         eventId={event.id}
         potBalance={potBalance}
@@ -61,13 +73,13 @@ export default function EventDetail() {
         totalExpenses={totalExpenses}
         pendingToCompensate={pendingToCompensate}
       />
-      
+
       {/* Lista de transacciones */}
       <TransactionsList event={event} />
       <FloatingActionButton
         onClick={() => setTransactionModalOpen(true)}
         label={t('eventDetail.addTransaction')}
-        icon={"+"}
+        icon={'+'}
       />
       <EventFormModal
         open={editModalOpen}
@@ -75,7 +87,11 @@ export default function EventDetail() {
         event={event}
         onSubmit={handleEditSubmit}
       />
-      <TransactionModal open={transactionModalOpen} onClose={() => setTransactionModalOpen(false)} event={event} />
+      <TransactionModal
+        open={transactionModalOpen}
+        onClose={() => setTransactionModalOpen(false)}
+        event={event}
+      />
       <ConfirmDialog
         open={deleteDialogOpen}
         title={t('eventDetail.deleteTitle')}

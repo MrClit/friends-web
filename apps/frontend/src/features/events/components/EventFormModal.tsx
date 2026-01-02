@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { useEventsStore } from "../store/useEventsStore";
-import ConfirmDialog from "../../../shared/components/ConfirmDialog";
-import EventForm from "./EventForm";
+import { useEffect, useState } from 'react';
+import { useEventsStore } from '../store/useEventsStore';
+import ConfirmDialog from '../../../shared/components/ConfirmDialog';
+import EventForm from './EventForm';
 import type { Event, EventParticipant } from '../types';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
 interface EventFormModalProps {
   open: boolean;
@@ -12,14 +12,11 @@ interface EventFormModalProps {
   onSubmit?: (event: { id?: string; title: string; participants: EventParticipant[] }) => void;
 }
 
-export default function EventFormModal({
-  open,
-  onClose,
-  event,
-  onSubmit,
-}: EventFormModalProps) {
+export default function EventFormModal({ open, onClose, event, onSubmit }: EventFormModalProps) {
   const [title, setTitle] = useState('');
-  const [participants, setParticipants] = useState<EventParticipant[]>([{ id: crypto.randomUUID(), name: '' }]);
+  const [participants, setParticipants] = useState<EventParticipant[]>([
+    { id: crypto.randomUUID(), name: '' },
+  ]);
   const [showConfirm, setShowConfirm] = useState(false);
   const addEvent = useEventsStore((state) => state.addEvent);
   const { t } = useTranslation();
@@ -35,7 +32,7 @@ export default function EventFormModal({
   if (open) {
     if (!event) {
       // If creating a new event, check if title or any participant name is dirty
-      isDirty = Boolean(title.trim() || participants.some(p => p.name.trim()));
+      isDirty = Boolean(title.trim() || participants.some((p) => p.name.trim()));
     } else {
       const originalTitle = event.title;
       const originalParticipants = event.participants;
@@ -46,7 +43,7 @@ export default function EventFormModal({
       else {
         // Compare by id and name, regardless of order
         for (const current of participants) {
-          const original = originalParticipants.find(p => p.id === current.id);
+          const original = originalParticipants.find((p) => p.id === current.id);
           if (
             !original ||
             typeof current.name !== 'string' ||
@@ -87,7 +84,9 @@ export default function EventFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanParticipants = participants.map(p => ({ ...p, name: p.name.trim() })).filter(p => p.name);
+    const cleanParticipants = participants
+      .map((p) => ({ ...p, name: p.name.trim() }))
+      .filter((p) => p.name);
     if (!title.trim() || cleanParticipants.length === 0) return;
     if (onSubmit) {
       onSubmit({ id: event?.id, title: title.trim(), participants: cleanParticipants });
@@ -99,21 +98,27 @@ export default function EventFormModal({
     onClose();
   };
 
-  const canSubmit = !!title.trim() && participants.some(p => typeof p.name === 'string' && !!p.name.trim());
+  const canSubmit =
+    !!title.trim() && participants.some((p) => typeof p.name === 'string' && !!p.name.trim());
 
   return (
     <>
-      <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/30" onClick={handleClose}>
+      <div
+        className="fixed inset-0 z-20 flex items-end justify-center bg-black/30"
+        onClick={handleClose}
+      >
         <div
           className="w-full max-w-md bg-white dark:bg-teal-900 rounded-t-3xl p-6 shadow-lg animate-slideUp
             min-h-[50vh] max-h-[90vh] overflow-y-auto"
-          onClick={e => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">
               {event ? t('eventFormModal.editTitle') : t('eventFormModal.newTitle')}
             </h2>
-            <button onClick={handleClose} className="text-2xl text-teal-400 hover:text-teal-600">&times;</button>
+            <button onClick={handleClose} className="text-2xl text-teal-400 hover:text-teal-600">
+              &times;
+            </button>
           </div>
           <EventForm
             title={title}
@@ -138,7 +143,9 @@ export default function EventFormModal({
       <ConfirmDialog
         open={showConfirm}
         title={event ? t('eventFormModal.discardEditTitle') : t('eventFormModal.discardNewTitle')}
-        message={event ? t('eventFormModal.discardEditMessage') : t('eventFormModal.discardNewMessage')}
+        message={
+          event ? t('eventFormModal.discardEditMessage') : t('eventFormModal.discardNewMessage')
+        }
         confirmText={t('eventFormModal.discard')}
         cancelText={t('eventFormModal.cancel')}
         onConfirm={handleConfirmClose}

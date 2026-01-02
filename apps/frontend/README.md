@@ -5,6 +5,7 @@
 This is the frontend workspace of the Friends monorepo. Built with Vite, Zustand, TailwindCSS v4, and i18next for multi-language support.
 
 ## Table of Contents
+
 - [Tech Stack](#tech-stack)
 - [Features](#features)
 - [Demo](#demo)
@@ -147,6 +148,7 @@ src/
 ### Architecture Patterns
 
 **Feature-Based Organization:**
+
 ```
 features/{feature}/
 ├─ components/     # Feature UI components
@@ -157,33 +159,42 @@ features/{feature}/
 ```
 
 **State Management:**
+
 - All stores use Zustand with `persist` middleware for LocalStorage sync
 - Pattern: `src/features/*/store/use*Store.ts`
 - Key stores: `useEventsStore`, `useTransactionsStore`, `useThemeStore`
 
 **Path Aliases:**
+
 - `@/*` → `src/*` (configured in `vite.config.ts`)
 - Example: `import { cn } from '@/lib/utils'`
 
 ## Configuration
 
 ### Environment Variables
+
 Create a `.env` file if you need custom variables:
+
 ```bash
 VITE_API_URL=http://localhost:3000
 ```
 
 ### TailwindCSS
+
 Configuration in `tailwind.config.js`. Uses TailwindCSS v4 with `@tailwindcss/vite` plugin.
 
 ### ESLint
+
 Rules in `eslint.config.js` (flat config format). Plugins:
+
 - `@typescript-eslint`
 - `react-hooks`
 - `react-refresh`
 
 ### Translations
+
 Add languages in `src/i18n/locales/{lang}/translation.json`. Currently supports:
+
 - `es` (Spanish - default)
 - `en` (English)
 - `ca` (Catalan)
@@ -202,12 +213,14 @@ pnpm test:coverage # Coverage report
 ```
 
 **Test Pattern:**
+
 - Co-locate tests with code (`*.test.ts` next to source)
 - Store tests: `useEventsStore.test.ts`, `useTransactionsStore.pagination.test.ts`
 - Component tests: `TransactionItem.test.tsx`
 - Utility tests: `formatAmount.test.ts`, `formatDateLong.test.ts`
 
 **Current Coverage:**
+
 - ✅ 58 tests passing
 - Store tests (events, transactions)
 - Component tests (UI interactions)

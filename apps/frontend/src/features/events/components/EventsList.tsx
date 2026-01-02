@@ -1,6 +1,6 @@
-import { useEventsStore } from "../store/useEventsStore";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useEventsStore } from '../store/useEventsStore';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function EventsList() {
   const events = useEventsStore((state) => state.events);
@@ -12,7 +12,9 @@ export default function EventsList() {
 
   return (
     <div className="w-full max-w-2xl mt-8">
-      <h2 className="text-xl font-semibold mb-4 text-teal-700 dark:text-teal-200">{t('eventsList.title')}</h2>
+      <h2 className="text-xl font-semibold mb-4 text-teal-700 dark:text-teal-200">
+        {t('eventsList.title')}
+      </h2>
       <ul className="space-y-3">
         {events.map((event) => (
           <li key={event.id}>

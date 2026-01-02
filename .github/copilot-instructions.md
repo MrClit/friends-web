@@ -262,9 +262,9 @@ Use `@/` for internal imports: `import { cn } from '@/lib/utils'`
 Located in `apps/backend/`. NestJS + TypeScript API.
 
 ### Planned Tech Stack
-- **Framework**: NestJS 10+
+- **Framework**: NestJS 11
 - **Language**: TypeScript
-- **Database**: PostgreSQL 15+
+- **Database**: PostgreSQL 17
 - **ORM**: TypeORM
 - **Validation**: class-validator + class-transformer
 - **Auth**: Passport.js + JWT
@@ -386,33 +386,385 @@ JWT_EXPIRATION=1d
 CORS_ORIGIN=http://localhost:5173
 ```
 
-### Backend Code Conventions (Planned)
+### Backend Best Practices
 
-**Naming:**
+**Naming Conventions:**
 - camelCase: variables, functions, services
 - PascalCase: classes, DTOs, entities
 - kebab-case: file names (`events.controller.ts`)
 
-**DTOs:**
-- Use class-validator decorators
+**Architecture & Structure:**
+- Follow NestJS modular architecture (one module per feature)
+- Keep modules loosely coupled and highly cohesive
+- Use dependency injection for all dependencies
+- Separate business logic (services) from HTTP layer (controllers)
+- Use repository pattern for database access
+- Apply SOLID principles
+
+**Controllers & Services:**
+```typescript
+// ✅ Controllers: HTTP layer only (routing, request/response)
+@Controller('api/events')
+export class EventsController {
+  constructor(private readonly eventsService: EventsService) {}
+
+  @Get()
+  async findAll() {
+    return this.eventsService.findAll();
+  }
+
+  @Post()
+  async create(@Body() dto: CreateEventDto) {
+    return this.eventsService.create(dto);
+  }
+}
+
+// ✅ Services: Business logic only (no HTTP concerns)
+@Injectable()
+export class EventsService {
+  constructor(
+    @InjectRepository(Event)
+    private readonly eventRepository: Repository<Event>,
+  ) {}
+
+  async findAll() {
+    return this.eventRepository.find();
+  }
+}
+
+// ❌ Bad: Business logic in controller
+@Controller('api/events')
+export class EventsController {
+  @Post()
+  async create(@Body() dto: CreateEventDto) {
+    // ❌ Don't do database operations in controllers
+    return this.eventRepository.save(dto);
+  }
+}
+```
+
+**DTOs & Validation:**
+- Use `class-validator` decorators on all DTOs
 - Create separate DTOs for create/update operations
 - Use `@ApiProperty()` for Swagger documentation
+- Apply `ValidationPipe` globally with `transform: true` and `whitelist: true`
+- Use `@Transform()` for data transformation (dates, numbers, etc.)
+- Validate UUIDs with `@IsUUID()`, emails with `@IsEmail()`, etc.
 
-**Services:**
-- Business logic only (no HTTP concerns)
-- Injectable with `@Injectable()`
-- Use dependency injection
+```typescript
+// ✅ Good: Validated DTO
+export class CreateEventDto {
+  @ApiProperty({ description: 'Event name', maxLength: 255 })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  name: string;
 
-**Controllers:**
-- HTTP layer only (routing, request/response)
-- Use decorators: `@Get()`, `@Post()`, `@Patch()`, `@Delete()`
-- Use `@Body()`, `@Param()`, `@Query()` for inputs
-- Return DTOs or entities
+  @ApiProperty({ description: 'Event date', type: String, format: 'date' })
+  @IsDateString()
+  date: string;
+
+  @ApiProperty({ description: 'List of participants', type: [String] })
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  participants: string[];
+}
+```
 
 **Type Safety:**
 - Use TypeScript strict mode
 - Import types from `@friends/shared-types` when available
 - Define entities with TypeORM decorators
+- Never use `any` type
+
+**Error Handling:**
+- Use built-in HTTP exceptions: `NotFoundException`, `BadRequestException`, `UnauthorizedException`, etc.
+- Create custom exceptions when needed (extend `HttpException`)
+- Use exception filters for global error handling
+- Never expose sensitive information in error messages
+- Log errors with context for debugging
+
+```typescript
+// ✅ Good: Specific exception
+if (!event) {
+  throw new NotFoundException(`Event with ID ${id} not found`);
+}
+
+// ❌ Bad: Generic error
+throw new Error('Not found');
+```
+
+**Validation & Transformation:**
+- Use `class-validator` decorators on all DTOs
+- Apply `ValidationPipe` globally with `transform: true` and `whitelist: true`
+- Use `@Transform()` for data transformation (dates, numbers, etc.)
+- Validate UUIDs with `@IsUUID()`, emails with `@IsEmail()`, etc.
+- Create custom validators for complex business rules
+
+```typescript
+// ✅ Good: Validated DTO
+export class CreateEventDto {
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  name: string;
+
+  @IsDateString()
+  date: string;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  participants: string[];
+}
+```
+- **Authentication**: Use Passport.js with JWT strategy
+- **Authorization**: Implement guards for role-based access control
+- **CORS**: Configure whitelist of allowed origins (no `*` in production)
+- **Rate Limiting**: Use `@nestjs/throttler` to prevent abuse
+- **Helmet**: Add security headers with `helmet` middleware
+- **Validation**: Always validate and sanitize user inputs
+- **SQL Injection**: Use parameterized queries (TypeORM handles this)
+- **Secrets**: Never commit secrets (use environment variables)
+- **Password Hashing**: Use `bcrypt` with salt rounds >= 10
+
+```typescript
+// ✅ Good: Secure configuration
+app.enableCors({
+  origin: ['https://mrclit.github.io'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+});
+
+// ❌ Bad: Insecure
+app.enableCors({ origin: '*' });
+```
+
+**Database (TypeORM):**
+- Define entities with proper decorators and relationships
+- Use migrations for schema changes (never `synchronize: true` in production)
+- Use transactions for multi-step operations
+- Implement soft deletes when needed (`@DeleteDateColumn()`)
+- Use indexes for frequently queried columns
+- Avoid N+1 queries (use `relations` or `QueryBuilder`)
+- Use UUIDs for primary keys (`@PrimaryGeneratedColumn('uuid')`)
+- Always handle unique constraint violations
+
+```typescript
+// ✅ Good: Entity definition
+@Entity('events')
+export class Event {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ length: 255 })
+  @Index()
+  name: string;
+
+  @Column('date')
+  date: Date;
+
+  @OneToMany(() => Transaction, transaction => transaction.event, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  transactions: Transaction[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+// ✅ Good: Using transactions
+await this.dataSource.transaction(async (manager) => {
+  await manager.save(event);
+  await manager.save(transactions);
+});
+```
+
+**Testing:**
+- Write unit tests for services (business logic)
+- Write E2E tests for controllers (API endpoints)
+- Mock external dependencies (repositories, other services)
+- Use descriptive test names: `should return 404 when event not found`
+- Follow AAA pattern: Arrange, Act, Assert
+- Use `Test.createTestingModule()` for dependency injection in tests
+- Aim for >80% code coverage on critical paths
+
+```typescript
+// ✅ Good: Unit test structure
+describe('EventsService', () => {
+  let service: EventsService;
+  let repository: Repository<Event>;
+
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        EventsService,
+        {
+          provide: getRepositoryToken(Event),
+          useValue: mockRepository,
+        },
+      ],
+    }).compile();
+
+    service = module.get<EventsService>(EventsService);
+    repository = module.get(getRepositoryToken(Event));
+  });
+
+  describe('findOne', () => {
+    it('should return an event when found', async () => {
+      // Arrange
+      const mockEvent = { id: '1', name: 'Test' };
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockEvent);
+
+      // Act
+      const result = await service.findOne('1');
+
+      // Assert
+      expect(result).toEqual(mockEvent);
+    });
+
+    it('should throw NotFoundException when event not found', async () => {
+      // Arrange
+      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.findOne('999')).rejects.toThrow(NotFoundException);
+    });
+  });
+});
+```
+
+**Logging & Monitoring:**
+- Use built-in Logger or integrate Winston/Pino
+- Log levels: `error`, `warn`, `log`, `debug`, `verbose`
+- Include context in logs (module name, operation, user ID)
+- Never log sensitive data (passwords, tokens, personal info)
+- Use correlation IDs for request tracing
+- Monitor performance metrics (response times, error rates)
+
+```typescript
+// ✅ Good: Contextual logging
+@Injectable()
+export class EventsService {
+  private readonly logger = new Logger(EventsService.name);
+
+  async create(dto: CreateEventDto) {
+    this.logger.log(`Creating event: ${dto.name}`);
+    try {
+      const event = await this.repository.save(dto);
+      this.logger.log(`Event created successfully: ${event.id}`);
+      return event;
+    } catch (error) {
+      this.logger.error(`Failed to create event: ${error.message}`, error.stack);
+      throw error;
+    }
+  }
+}
+```
+
+**API Design:**
+- Follow REST conventions (GET, POST, PATCH, DELETE)
+- Use plural resource names: `/api/events`, `/api/transactions`
+- Use HTTP status codes correctly:
+  - `200 OK`: Successful GET/PATCH
+  - `201 Created`: Successful POST
+  - `204 No Content`: Successful DELETE
+  - `400 Bad Request`: Validation error
+  - `401 Unauthorized`: Authentication required
+  - `403 Forbidden`: Insufficient permissions
+  - `404 Not Found`: Resource doesn't exist
+  - `500 Internal Server Error`: Unexpected error
+- Version API: `/api/v1/events` (when breaking changes expected)
+- Use pagination for list endpoints (`@Query('page')`, `@Query('limit')`)
+- Document API with Swagger (`@ApiTags`, `@ApiOperation`, `@ApiResponse`)
+- Return consistent response structure
+
+```typescript
+// ✅ Good: RESTful controller
+@Controller('api/events')
+@ApiTags('events')
+export class EventsController {
+  @Get()
+  @ApiOperation({ summary: 'Get all events' })
+  @ApiResponse({ status: 200, description: 'Events retrieved successfully' })
+  async findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.eventsService.findAll(page, limit);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new event' })
+  @ApiResponse({ status: 201, description: 'Event created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
+  async create(@Body() dto: CreateEventDto) {
+    return this.eventsService.create(dto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update an event' })
+  @ApiResponse({ status: 200, description: 'Event updated successfully' })
+  @ApiResponse({ status: 404, description: 'Event not found' })
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateEventDto,
+  ) {
+    return this.eventsService.update(id, dto);
+  }
+}
+```
+
+**Performance:**
+- Use database indexes on frequently queried columns
+- Implement caching for expensive operations (`@nestjs/cache-manager`)
+- Use pagination for large datasets
+- Avoid loading unnecessary relations (use `select` or `QueryBuilder`)
+- Use connection pooling for database connections
+- Implement compression middleware (`compression`)
+- Profile slow queries and optimize them
+
+**Configuration:**
+- Use `@nestjs/config` for environment variables
+- Validate configuration schema on startup
+- Never hardcode values (URLs, ports, secrets)
+- Use different configs for dev/staging/production
+- Keep `.env` file in `.gitignore`
+
+```typescript
+// ✅ Good: Configuration module
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        NODE_ENV: Joi.string().valid('development', 'production', 'test'),
+        PORT: Joi.number().default(3000),
+        DATABASE_URL: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+      }),
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+**Common Pitfalls to Avoid:**
+- ❌ Mixing business logic in controllers
+- ❌ Not validating DTOs
+- ❌ Exposing internal errors to clients
+- ❌ Using `synchronize: true` in production
+- ❌ Not handling promise rejections
+- ❌ Circular dependencies between modules
+- ❌ Forgetting to add `@Injectable()` decorator
+- ❌ Not using transactions for multi-step operations
+- ❌ Hardcoding configuration values
+- ❌ Not implementing pagination for lists
 
 ---
 
@@ -542,7 +894,7 @@ chore(ci): update deployment workflow for monorepo
 **Deployment:**
 - Frontend: GitHub Pages (currently)
 - Backend: Railway, Render, or Vercel (planned)
-- Database: Managed PostgreSQL (planned)
+- Database: Managed PostgreSQL 17 (planned)
 
 ### Documentation
 

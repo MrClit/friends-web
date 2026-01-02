@@ -1,17 +1,13 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { Event, EventParticipant } from "../types";
-import { useTransactionsStore } from "../../transactions/store/useTransactionsStore";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { Event, EventParticipant } from '../types';
+import { useTransactionsStore } from '../../transactions/store/useTransactionsStore';
 
 interface EventsState {
   events: Event[];
   addEvent: (title: string, participants: EventParticipant[]) => void;
   removeEvent: (id: string) => void;
-  updateEvent: (
-    id: string,
-    title: string,
-    participants: EventParticipant[]
-  ) => void;
+  updateEvent: (id: string, title: string, participants: EventParticipant[]) => void;
 }
 
 export const useEventsStore = create<EventsState>()(
@@ -30,8 +26,7 @@ export const useEventsStore = create<EventsState>()(
           ],
         })),
       removeEvent: (id) => {
-        const deleteTransactionsByEvent =
-          useTransactionsStore.getState().deleteTransactionsByEvent;
+        const deleteTransactionsByEvent = useTransactionsStore.getState().deleteTransactionsByEvent;
         deleteTransactionsByEvent(id);
 
         set((state) => ({
@@ -45,7 +40,8 @@ export const useEventsStore = create<EventsState>()(
             const oldIds = oldEvent.participants.map((p) => p.id);
             const newIds = participants.map((p) => p.id);
             const removedIds = oldIds.filter((oid) => !newIds.includes(oid));
-            const clearParticipant = useTransactionsStore.getState().clearParticipantFromEventTransactions;
+            const clearParticipant =
+              useTransactionsStore.getState().clearParticipantFromEventTransactions;
             removedIds.forEach((pid) => {
               clearParticipant(id, pid);
             });
@@ -58,13 +54,13 @@ export const useEventsStore = create<EventsState>()(
                     title,
                     participants,
                   }
-                : e
+                : e,
             ),
           };
         }),
     }),
     {
-      name: "events-storage",
-    }
-  )
+      name: 'events-storage',
+    },
+  ),
 );

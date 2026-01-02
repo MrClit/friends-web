@@ -14,7 +14,7 @@ interface EventContextMenuProps {
 
 export default function EventContextMenu({ onEdit, onDelete }: EventContextMenuProps) {
   const { t } = useTranslation();
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -27,19 +27,23 @@ export default function EventContextMenu({ onEdit, onDelete }: EventContextMenuP
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-white dark:bg-teal-900">
-        <DropdownMenuItem 
-          onClick={() => { 
-            if (onEdit) { onEdit(); } 
-          }} 
+        <DropdownMenuItem
+          onClick={() => {
+            if (onEdit) {
+              onEdit();
+            }
+          }}
           className="hover:bg-teal-100 dark:hover:bg-teal-800 cursor-pointer"
         >
           <MdEdit className="mr-2 text-teal-900 dark:text-teal-100" />
           {t('eventContextMenu.edit')}
         </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => { 
-            if (onDelete) { onDelete(); } 
-          }} 
+        <DropdownMenuItem
+          onClick={() => {
+            if (onDelete) {
+              onDelete();
+            }
+          }}
           className="hover:bg-red-100 dark:hover:bg-red-900 cursor-pointer"
         >
           <MdDelete className="mr-2 text-red-700 dark:text-red-400" />

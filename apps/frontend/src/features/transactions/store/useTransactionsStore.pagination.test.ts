@@ -31,7 +31,9 @@ describe('useTransactionsStore - Pagination', () => {
       });
 
       // Request first 3 dates
-      const result = useTransactionsStore.getState().getTransactionsByEventPaginated(testEventId, 3, 0);
+      const result = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated(testEventId, 3, 0);
 
       expect(result.transactions).toHaveLength(3);
       expect(result.totalDates).toBe(5);
@@ -56,7 +58,9 @@ describe('useTransactionsStore - Pagination', () => {
         });
       }
 
-      const result = useTransactionsStore.getState().getTransactionsByEventPaginated(testEventId, 5, 0);
+      const result = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated(testEventId, 5, 0);
 
       expect(result.hasMore).toBe(true);
       expect(result.totalDates).toBe(10);
@@ -77,7 +81,9 @@ describe('useTransactionsStore - Pagination', () => {
       }
 
       // Request 5 dates but only 3 exist
-      const result = useTransactionsStore.getState().getTransactionsByEventPaginated(testEventId, 5, 0);
+      const result = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated(testEventId, 5, 0);
 
       expect(result.hasMore).toBe(false);
       expect(result.totalDates).toBe(3);
@@ -98,13 +104,17 @@ describe('useTransactionsStore - Pagination', () => {
       }
 
       // First page: offset 0, load 5 dates
-      const page1 = useTransactionsStore.getState().getTransactionsByEventPaginated(testEventId, 5, 0);
+      const page1 = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated(testEventId, 5, 0);
       expect(page1.loadedDates).toBe(5);
       expect(page1.hasMore).toBe(true);
       expect(page1.transactions[0].date).toBe('2025-01-10'); // Most recent
 
       // Second page: offset 5, load 5 more dates
-      const page2 = useTransactionsStore.getState().getTransactionsByEventPaginated(testEventId, 5, 5);
+      const page2 = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated(testEventId, 5, 5);
       expect(page2.loadedDates).toBe(5);
       expect(page2.hasMore).toBe(false);
       expect(page2.transactions[0].date).toBe('2025-01-05'); // Older dates
@@ -135,7 +145,9 @@ describe('useTransactionsStore - Pagination', () => {
       });
 
       // Load first date (should include all 3 transactions from that date)
-      const result = useTransactionsStore.getState().getTransactionsByEventPaginated(testEventId, 1, 0);
+      const result = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated(testEventId, 1, 0);
 
       expect(result.loadedDates).toBe(1);
       expect(result.transactions).toHaveLength(3); // All 3 from the same date
@@ -163,7 +175,9 @@ describe('useTransactionsStore - Pagination', () => {
         date: '2025-01-05',
       });
 
-      const result = useTransactionsStore.getState().getTransactionsByEventPaginated(testEventId, 10, 0);
+      const result = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated(testEventId, 10, 0);
 
       expect(result.transactions).toHaveLength(1);
       expect(result.transactions[0].title).toBe('Event 1 Transaction');
@@ -171,7 +185,9 @@ describe('useTransactionsStore - Pagination', () => {
     });
 
     it('should return empty result for event with no transactions', () => {
-      const result = useTransactionsStore.getState().getTransactionsByEventPaginated('non-existent-event', 10, 0);
+      const result = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated('non-existent-event', 10, 0);
 
       expect(result.transactions).toHaveLength(0);
       expect(result.hasMore).toBe(false);
@@ -213,7 +229,9 @@ describe('useTransactionsStore - Pagination', () => {
         });
       });
 
-      const result = useTransactionsStore.getState().getTransactionsByEventPaginated(testEventId, 5, 0);
+      const result = useTransactionsStore
+        .getState()
+        .getTransactionsByEventPaginated(testEventId, 5, 0);
 
       // Should be sorted descending (newest first)
       expect(result.transactions[0].date).toBe('2025-01-05');

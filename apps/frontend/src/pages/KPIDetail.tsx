@@ -6,10 +6,7 @@ import { formatAmount } from '../shared/utils/formatAmount';
 
 // Import from features
 import { EventDetailHeader } from '@/features/events';
-import { 
-  KPIParticipantsList, 
-  KPIExplanation 
-} from '@/features/kpi';
+import { KPIParticipantsList, KPIExplanation } from '@/features/kpi';
 import type { KPIType } from '@/features/kpi';
 
 import KPIBox from '../features/events/components/KPIBox';
@@ -19,19 +16,29 @@ export default function KPIDetail() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const event = useEventsStore(state => state.events.find(e => e.id === id));
+  const event = useEventsStore((state) => state.events.find((e) => e.id === id));
 
   // Store methods
-  const getTotalExpensesByEvent = useTransactionsStore(state => state.getTotalExpensesByEvent);
-  const getTotalContributionsByEvent = useTransactionsStore(state => state.getTotalContributionsByEvent);
-  const getPotBalanceByEvent = useTransactionsStore(state => state.getPotBalanceByEvent);
-  const getPendingToCompensateByEvent = useTransactionsStore(state => state.getPendingToCompensateByEvent);
-  
-  const getTotalExpensesByParticipant = useTransactionsStore(state => state.getTotalExpensesByParticipant);
-  const getTotalContributionsByParticipant = useTransactionsStore(state => state.getTotalContributionsByParticipant);
-  const getPendingToCompensateByParticipant = useTransactionsStore(state => state.getPendingToCompensateByParticipant);
-  const getBalanceByParticipant = useTransactionsStore(state => state.getBalanceByParticipant);
-  const getPotExpensesData = useTransactionsStore(state => state.getPotExpensesData);
+  const getTotalExpensesByEvent = useTransactionsStore((state) => state.getTotalExpensesByEvent);
+  const getTotalContributionsByEvent = useTransactionsStore(
+    (state) => state.getTotalContributionsByEvent,
+  );
+  const getPotBalanceByEvent = useTransactionsStore((state) => state.getPotBalanceByEvent);
+  const getPendingToCompensateByEvent = useTransactionsStore(
+    (state) => state.getPendingToCompensateByEvent,
+  );
+
+  const getTotalExpensesByParticipant = useTransactionsStore(
+    (state) => state.getTotalExpensesByParticipant,
+  );
+  const getTotalContributionsByParticipant = useTransactionsStore(
+    (state) => state.getTotalContributionsByParticipant,
+  );
+  const getPendingToCompensateByParticipant = useTransactionsStore(
+    (state) => state.getPendingToCompensateByParticipant,
+  );
+  const getBalanceByParticipant = useTransactionsStore((state) => state.getBalanceByParticipant);
+  const getPotExpensesData = useTransactionsStore((state) => state.getPotExpensesData);
 
   // KPI Configuration
   const KPI_CONFIG = {
@@ -79,7 +86,7 @@ export default function KPIDetail() {
 
   // Build participants list
   const participantsData = KPI_CONFIG[kpi].participantFn(event);
-  const items = participantsData.map(p => ({
+  const items = participantsData.map((p) => ({
     id: p.participant.id,
     name: p.participant.name,
     value: formatAmount(p.total),
@@ -101,27 +108,24 @@ export default function KPIDetail() {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
-      <EventDetailHeader 
-        eventId={event.id} 
+      <EventDetailHeader
+        eventId={event.id}
         eventTitle={event.title}
         onBack={() => navigate(`/event/${event.id}`)}
       />
-      
+
       <div className="w-full max-w-2xl mb-8">
-        <KPIBox 
-          label={KPI_CONFIG[kpi].label} 
-          value={kpiValue} 
-          colorClass={KPI_CONFIG[kpi].colorClass + ' py-8'} 
-          labelClassName='!text-lg'
-          valueClassName='!text-4xl'
+        <KPIBox
+          label={KPI_CONFIG[kpi].label}
+          value={kpiValue}
+          colorClass={KPI_CONFIG[kpi].colorClass + ' py-8'}
+          labelClassName="!text-lg"
+          valueClassName="!text-4xl"
         />
       </div>
-      
-      <KPIParticipantsList 
-        items={items}
-        title={t('kpiDetail.participants')}
-      />
-      
+
+      <KPIParticipantsList items={items} title={t('kpiDetail.participants')} />
+
       <KPIExplanation kpiType={kpi} />
     </div>
   );

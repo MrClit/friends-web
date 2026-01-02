@@ -12,12 +12,12 @@ export default function DemoInitializer() {
     const addEvent = useEventsStore.getState().addEvent;
     addEvent(demoEventTitle, demoParticipants);
     // Busca el id generado
-    const eventId = useEventsStore.getState().events.find(e => e.title === demoEventTitle)?.id;
+    const eventId = useEventsStore.getState().events.find((e) => e.title === demoEventTitle)?.id;
     if (!eventId) return;
 
     // Inserta transacciones demo
     const addExpense = useTransactionsStore.getState().addExpense;
-    demoTransactions.forEach(tx => {
+    demoTransactions.forEach((tx) => {
       addExpense({
         eventId,
         paymentType: tx.paymentType,

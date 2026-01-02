@@ -5,4 +5,3 @@ export { default as ParticipantsInput } from './ParticipantsInput';
 export { default as KPIBox } from './KPIBox';
 export { default as EventDetailHeader } from './EventDetailHeader';
 export { default as EventKPIGrid } from './EventKPIGrid';
-

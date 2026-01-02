@@ -16,7 +16,7 @@ export default function EventDetailHeader({
   onDelete,
 }: EventDetailHeaderProps) {
   const showContextMenu = onEdit && onDelete;
-  
+
   return (
     <div className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
       <button
@@ -31,10 +31,7 @@ export default function EventDetailHeader({
         {eventTitle}
       </h1>
       {showContextMenu ? (
-        <EventContextMenu
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+        <EventContextMenu onEdit={onEdit} onDelete={onDelete} />
       ) : (
         <div className="w-10" /> /* Spacer for centering */
       )}

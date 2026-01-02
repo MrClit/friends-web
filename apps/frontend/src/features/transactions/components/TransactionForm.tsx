@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import type { PaymentType } from '../types';
 import type { EventParticipant } from '../../events/types';
 import { useTranslation } from 'react-i18next';
@@ -35,51 +35,63 @@ export default function TransactionForm({
   return (
     <form className="flex flex-col gap-4 flex-1" onSubmit={onSubmit}>
       <div>
-        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">{t('transactionForm.titleLabel')}</label>
+        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">
+          {t('transactionForm.titleLabel')}
+        </label>
         <input
           className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
           type="text"
           value={title}
-          onChange={e => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           required
         />
       </div>
       <div>
-        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">{t('transactionForm.amountLabel')}</label>
+        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">
+          {t('transactionForm.amountLabel')}
+        </label>
         <input
           className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
           type="number"
           min="0"
           step="0.01"
           value={amount}
-          onChange={e => setAmount(e.target.value)}
+          onChange={(e) => setAmount(e.target.value)}
           required
         />
       </div>
       <div>
-        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">{t('transactionForm.dateLabel')}</label>
+        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">
+          {t('transactionForm.dateLabel')}
+        </label>
         <input
           className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
           type="date"
           value={date}
-          onChange={e => setDate(e.target.value)}
+          onChange={(e) => setDate(e.target.value)}
           required
         />
       </div>
       <div>
-        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">{t(`transactionForm.participantLabel.${type}`)}</label>
+        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">
+          {t(`transactionForm.participantLabel.${type}`)}
+        </label>
         <select
           className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
           value={from}
-          onChange={e => setParticipantId(e.target.value)}
+          onChange={(e) => setParticipantId(e.target.value)}
           required
         >
-          <option value="" disabled>{t('transactionForm.participantPlaceholder')}</option>
+          <option value="" disabled>
+            {t('transactionForm.participantPlaceholder')}
+          </option>
           {type === 'expense' && (
             <option value={POT_PARTICIPANT_ID}>{t('transactionForm.potOption')}</option>
           )}
-          {participants.map(p => (
-            <option key={p.id} value={p.id}>{p.name}</option>
+          {participants.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
           ))}
         </select>
       </div>

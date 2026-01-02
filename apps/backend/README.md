@@ -2,25 +2,92 @@
 
 > NestJS backend API for Friends expense sharing platform
 
-**Status:** 🚧 Planned - Not yet implemented
+**Status:** ✅ Phase 1 Complete - Setup and Configuration Done
 
-This will be the backend workspace of the Friends monorepo, built with NestJS and TypeScript.
-
----
-
-## 📋 Planned Features
-
-- RESTful API for events, transactions, and participants
-- PostgreSQL database with TypeORM
-- JWT authentication
-- Input validation with class-validator
-- API documentation with Swagger/OpenAPI
-- Real-time updates with WebSockets (optional)
-- Comprehensive testing with Jest
+This is the backend workspace of the Friends monorepo, built with NestJS, TypeScript, and PostgreSQL.
 
 ---
 
-## 🚀 Getting Started (When Ready)
+## 🎯 Implementation Status
+
+### ✅ Phase 1: Initial Setup (COMPLETED)
+
+- [x] Install dependencies (NestJS + TypeORM + PostgreSQL)
+- [x] Create folder structure (common, config, modules)
+- [x] Configure environment variables (.env, .env.example)
+- [x] Configure TypeORM with PostgreSQL
+- [x] Configure CORS for frontend (localhost:5173)
+- [x] Setup global validation pipes
+- [x] Setup exception filters
+
+### 🚧 Phase 2: Events Module (Next)
+
+- [ ] Create Event entity with JSONB participants
+- [ ] Create DTOs and validation
+- [ ] Implement EventsService
+- [ ] Implement EventsController
+- [ ] Unit and E2E tests
+
+---
+
+## 📦 Tech Stack
+
+- **Framework:** NestJS 11
+- **Language:** TypeScript
+- **Database:** PostgreSQL 15+
+- **ORM:** TypeORM
+- **Validation:** class-validator + class-transformer
+- **Config:** @nestjs/config
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 20+
+- pnpm 10+
+- PostgreSQL 15+ (running locally or Docker)
+
+### Database Setup
+
+**Option 1: Using Docker (Recommended)**
+
+```bash
+# Start PostgreSQL in Docker
+docker compose up -d
+
+# Check logs
+docker compose logs -f
+
+# Stop database
+docker compose down
+
+# Stop and remove volumes (fresh start)
+docker compose down -v
+```
+
+> **Note:** Use `docker compose` (without hyphen) for Docker Desktop. If you get "command not found", install Docker Desktop from https://www.docker.com/products/docker-desktop
+
+**Option 2: Install PostgreSQL locally**
+
+```bash
+# macOS
+brew install postgresql@15
+brew services start postgresql@15
+
+# Create database
+createdb friends_db
+```
+
+**Configure environment:**
+
+```bash
+cp .env.example .env
+# Edit .env if you need different credentials
+```
+
+### Running the App
 
 From the **monorepo root**:
 
@@ -28,16 +95,19 @@ From the **monorepo root**:
 # Install dependencies
 pnpm install
 
-# Start backend in development mode
-pnpm dev:backend
+# Start database (if using Docker)
+cd apps/backend && docker compose up -d && cd ../..
 
-# Or specifically target backend
+# Start backend in development mode
 pnpm --filter @friends/backend start:dev
 ```
 
 From **this directory** (`apps/backend/`):
 
 ```bash
+# Start database (Docker)
+docker compose up -d
+
 # Start development server
 pnpm start:dev
 
@@ -46,6 +116,24 @@ pnpm build
 
 # Run tests
 pnpm test
+
+# Run E2E tests
+pnpm test:e2e
+```
+
+**Available Scripts:**
+
+```bash
+pnpm start:dev      # Development mode with hot reload
+pnpm start:debug    # Debug mode
+pnpm start:prod     # Production mode
+pnpm build          # Build for production
+pnpm test           # Run unit tests
+pnpm test:watch     # Run tests in watch mode
+pnpm test:cov       # Generate coverage report
+pnpm test:e2e       # Run E2E tests
+pnpm lint           # Lint code
+pnpm format         # Format code with Prettier
 ```
 
 ---
@@ -64,12 +152,26 @@ pnpm test
 
 ---
 
-## 📂 Planned Structure
+## 📂 Project Structure
 
 ```
 src/
-├── modules/
-│   ├── events/
+├── common/                         # ✅ Shared code (Phase 1)
+│   ├── filters/                   # Exception filters
+│   │   └── http-exception.filter.ts
+│   ├── interceptors/              # Response transformers
+│   │   └── transform.interceptor.ts
+│   ├── pipes/                     # Validation pipes
+│   │   └── validation.pipe.ts
+│   ├── guards/                    # Auth guards (future)
+│   └── decorators/                # Custom decorators (future)
+│
+├── config/                         # ✅ Configuration (Phase 1)
+│   ├── database.config.ts         # TypeORM configuration
+│   └── app.config.ts              # App settings
+│
+├── modules/                        # 🚧 Feature modules
+│   ├── events/                    # 🚧 Phase 2
 │   │   ├── events.controller.ts
 │   │   ├── events.service.ts
 │   │   ├── events.module.ts
@@ -78,38 +180,33 @@ src/
 │   │   └── dto/
 │   │       ├── create-event.dto.ts
 │   │       └── update-event.dto.ts
-│   ├── transactions/
-│   │   ├── transactions.controller.ts
-│   │   ├── transactions.service.ts
-│   │   ├── transactions.module.ts
-│   │   ├── entities/
-│   │   └── dto/
-│   ├── participants/
-│   │   ├── participants.controller.ts
-│   │   ├── participants.service.ts
-│   │   └── participants.module.ts
-│   └── auth/
-│       ├── auth.controller.ts
-│       ├── auth.service.ts
-│       ├── auth.module.ts
-│       └── strategies/
-│           └── jwt.strategy.ts
-├── common/
-│   ├── filters/          # Exception filters
-│   ├── guards/           # Auth guards
-│   ├── interceptors/     # Request/response interceptors
-│   └── pipes/            # Validation pipes
-├── config/
-│   └── database.config.ts
-├── app.module.ts
-└── main.ts
+│   │
+│   └── transactions/              # 🚧 Phase 3
+│       ├── transactions.controller.ts
+│       ├── transactions.service.ts
+│       ├── transactions.module.ts
+│       ├── entities/
+│       │   └── transaction.entity.ts
+│       └── dto/
+│           ├── create-transaction.dto.ts
+│           ├── update-transaction.dto.ts
+│           └── paginated-transactions.dto.ts
+│
+├── app.module.ts                   # ✅ Root module (Phase 1)
+└── main.ts                         # ✅ Bootstrap (Phase 1)
 ```
+
+**Legend:**
+
+- ✅ Implemented (Phase 1)
+- 🚧 Planned (Future phases)
 
 ---
 
 ## 🔌 API Endpoints (Planned)
 
 ### Events
+
 ```
 GET    /api/events           # List all events
 POST   /api/events           # Create event
@@ -119,6 +216,7 @@ DELETE /api/events/:id       # Delete event
 ```
 
 ### Transactions
+
 ```
 GET    /api/events/:eventId/transactions      # List transactions for event
 POST   /api/events/:eventId/transactions      # Create transaction
@@ -128,6 +226,7 @@ DELETE /api/transactions/:id                  # Delete transaction
 ```
 
 ### Participants
+
 ```
 GET    /api/events/:eventId/participants      # List participants for event
 POST   /api/events/:eventId/participants      # Add participant
@@ -135,6 +234,7 @@ DELETE /api/participants/:id                  # Remove participant
 ```
 
 ### Authentication (Optional)
+
 ```
 POST   /api/auth/register    # Register new user
 POST   /api/auth/login       # Login
@@ -147,6 +247,7 @@ GET    /api/auth/profile     # Get current user
 ## 🗄️ Database Schema (Planned)
 
 ### Events Table
+
 ```sql
 CREATE TABLE events (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -160,6 +261,7 @@ CREATE TABLE events (
 ```
 
 ### Transactions Table
+
 ```sql
 CREATE TABLE transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -222,6 +324,7 @@ pnpm test:watch
 ## 🔧 Development Setup (When Ready)
 
 ### Prerequisites
+
 - Node.js 22+
 - pnpm 10+
 - PostgreSQL 15+
@@ -230,11 +333,13 @@ pnpm test:watch
 ### Setup Steps
 
 1. **Install dependencies:**
+
    ```bash
    pnpm install
    ```
 
 2. **Setup database:**
+
    ```bash
    # Using Docker
    docker run --name friends-db -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:15
@@ -243,17 +348,20 @@ pnpm test:watch
    ```
 
 3. **Configure environment:**
+
    ```bash
    cp .env.example .env
    # Edit .env with your database credentials
    ```
 
 4. **Run migrations:**
+
    ```bash
    pnpm migration:run
    ```
 
 5. **Start development server:**
+
    ```bash
    pnpm start:dev
    ```
@@ -294,14 +402,14 @@ const API_BASE = 'http://localhost:3000/api';
 
 export const api = {
   events: {
-    getAll: () => fetch(`${API_BASE}/events`).then(r => r.json()),
-    getById: (id: string) => fetch(`${API_BASE}/events/${id}`).then(r => r.json()),
-    create: (data: CreateEventDto) => 
+    getAll: () => fetch(`${API_BASE}/events`).then((r) => r.json()),
+    getById: (id: string) => fetch(`${API_BASE}/events/${id}`).then((r) => r.json()),
+    create: (data: CreateEventDto) =>
       fetch(`${API_BASE}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-      }).then(r => r.json()),
+      }).then((r) => r.json()),
   },
 };
 ```

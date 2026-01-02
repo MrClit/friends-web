@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import TransactionForm from './TransactionForm';
 import type { PaymentType, Transaction } from '../types';
 import { useTransactionsStore } from '../store/useTransactionsStore';
@@ -11,19 +11,24 @@ interface TransactionModalProps {
   open: boolean;
   onClose: () => void;
   event: Event;
-  transaction?: Transaction // Optional for editing existing transactions
+  transaction?: Transaction; // Optional for editing existing transactions
 }
 
-export default function TransactionModal({ open, onClose, event, transaction }: TransactionModalProps) {
+export default function TransactionModal({
+  open,
+  onClose,
+  event,
+  transaction,
+}: TransactionModalProps) {
   const [type, setType] = useState<PaymentType>('contribution');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [participantId, setParticipantId] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const addExpense = useTransactionsStore(state => state.addExpense);
-  const updateExpense = useTransactionsStore(state => state.updateTransaction);
-  const removeTransaction = useTransactionsStore(state => state.removeTransaction);
+  const addExpense = useTransactionsStore((state) => state.addExpense);
+  const updateExpense = useTransactionsStore((state) => state.updateTransaction);
+  const removeTransaction = useTransactionsStore((state) => state.removeTransaction);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -99,12 +104,16 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
     <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/40" onClick={onClose}>
       <div
         className="w-full max-w-md min-h-[50vh] max-h-[95vh] bg-white dark:bg-teal-900 rounded-t-3xl p-6 shadow-lg animate-slideUp overflow-y-auto flex flex-col"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         style={{ borderRadius: '1.5rem 1.5rem 0 0' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">{transaction ? t('transactionModal.editTitle') : t('transactionModal.addTitle')}</h2>
-          <button onClick={onClose} className="text-2xl text-teal-400 hover:text-teal-600">&times;</button>
+          <h2 className="text-xl font-bold text-teal-700 dark:text-teal-100">
+            {transaction ? t('transactionModal.editTitle') : t('transactionModal.addTitle')}
+          </h2>
+          <button onClick={onClose} className="text-2xl text-teal-400 hover:text-teal-600">
+            &times;
+          </button>
         </div>
         <div className="flex mb-6 justify-center">
           <TransactionTypeSelector value={type} onChange={setType} />

@@ -5,7 +5,12 @@ interface FloatingActionButtonProps {
   className?: string;
 }
 
-export default function FloatingActionButton({ onClick, label, icon, className }: FloatingActionButtonProps) {
+export default function FloatingActionButton({
+  onClick,
+  label,
+  icon,
+  className,
+}: FloatingActionButtonProps) {
   return (
     <button
       type="button"
