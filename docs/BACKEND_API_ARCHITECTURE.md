@@ -11,6 +11,7 @@
 ### Entidades Principales
 
 **Event:**
+
 ```typescript
 interface Event {
   id: string;
@@ -25,6 +26,7 @@ interface EventParticipant {
 ```
 
 **Transaction:**
+
 ```typescript
 type PaymentType = 'contribution' | 'expense' | 'compensation';
 
@@ -40,6 +42,7 @@ interface Transaction {
 ```
 
 ### Relaciones
+
 ```
 Events (1) ──── (N) Transactions
 ```
@@ -47,12 +50,14 @@ Events (1) ──── (N) Transactions
 ### Operaciones CRUD Frontend (Zustand)
 
 **Events:**
+
 - `addEvent(title, participants)` → Crear evento
 - `updateEvent(id, title, participants)` → Actualizar evento
 - `removeEvent(id)` → Eliminar evento + cascade delete transactions
 - Lista completa de eventos
 
 **Transactions:**
+
 - `addExpense(expense)` → Crear transacción
 - `updateTransaction(id, data)` → Actualizar transacción
 - `removeTransaction(id)` → Eliminar transacción
@@ -75,10 +80,12 @@ Events (1) ──── (N) Transactions
 
 ### Recursos Principales (2 módulos)
 
-#### 1. Módulo Events 
+#### 1. Módulo Events
+
 📍 `apps/backend/src/modules/events/`
 
 **Entidad (TypeORM):**
+
 ```typescript
 @Entity('events')
 export class Event {
@@ -105,6 +112,7 @@ export class Event {
 ```
 
 **Endpoints REST:**
+
 ```
 GET    /api/events                    # Listar todos los eventos
 POST   /api/events                    # Crear evento
@@ -115,6 +123,7 @@ GET    /api/events/:id/kpis           # [Opcional] KPIs agregados del evento
 ```
 
 **DTOs:**
+
 ```typescript
 // create-event.dto.ts
 export class CreateEventDto {
@@ -146,9 +155,11 @@ export class EventParticipantDto {
 ---
 
 #### 2. Módulo Transactions
+
 📍 `apps/backend/src/modules/transactions/`
 
 **Entidad (TypeORM):**
+
 ```typescript
 @Entity('transactions')
 export class Transaction {
@@ -187,6 +198,7 @@ export class Transaction {
 ```
 
 **Endpoints REST (Anidados bajo events):**
+
 ```
 # CRUD básico
 GET    /api/events/:eventId/transactions              # Listar transactions de un evento
@@ -201,6 +213,7 @@ GET    /api/events/:eventId/transactions/stats        # Estadísticas agregadas
 ```
 
 **DTOs:**
+
 ```typescript
 // create-transaction.dto.ts
 export class CreateTransactionDto {
@@ -228,6 +241,7 @@ export class UpdateTransactionDto extends PartialType(CreateTransactionDto) {}
 ```
 
 **Validaciones Importantes:**
+
 - Al crear/actualizar transaction, validar que `participantId` exista en `event.participants` o sea `'0'` (POT)
 - Al eliminar evento, cascade delete automático de transactions (configurado en ORM)
 
@@ -236,26 +250,27 @@ export class UpdateTransactionDto extends PartialType(CreateTransactionDto) {}
 ## 🔍 Decisiones Arquitecturales Clave
 
 ### 1. Anidación de Recursos (Nested Routes)
+
 ✅ **Usar rutas anidadas para transactions bajo events**
+
 ```
 POST /api/events/:eventId/transactions
 ```
 
 **Ventajas:**
+
 - Refleja la relación jerárquica 1:N
 - Valida automáticamente que el eventId exista
 - Más semántico y RESTful
 - Alineado con la lógica del frontend
 
 **Implementación en Controller:**
+
 ```typescript
 @Controller('events/:eventId/transactions')
 export class TransactionsController {
   @Post()
-  create(
-    @Param('eventId') eventId: string,
-    @Body() createDto: CreateTransactionDto,
-  ) {
+  create(@Param('eventId') eventId: string, @Body() createDto: CreateTransactionDto) {
     return this.transactionsService.create(eventId, createDto);
   }
 }
@@ -264,9 +279,11 @@ export class TransactionsController {
 ---
 
 ### 2. Cascade Delete
+
 ✅ **Configurar a nivel de base de datos + ORM**
 
 **Configuración TypeORM:**
+
 ```typescript
 // En Event entity
 @OneToMany(() => Transaction, (transaction) => transaction.event, {
@@ -282,24 +299,28 @@ event: Event;
 ```
 
 **Migration SQL:**
+
 ```sql
 ALTER TABLE transactions
 ADD CONSTRAINT fk_event
-FOREIGN KEY (event_id) 
-REFERENCES events(id) 
+FOREIGN KEY (event_id)
+REFERENCES events(id)
 ON DELETE CASCADE;
 ```
 
 **Comportamiento:**
+
 - Al eliminar un evento, sus transactions se borran automáticamente
 - Replica la lógica actual del frontend: `deleteTransactionsByEvent()`
 
 ---
 
 ### 3. Participantes como JSONB
+
 ✅ **Almacenar como JSONB en PostgreSQL**
 
 **Ventajas:**
+
 - Simple y flexible
 - No necesita tabla separada para participantes
 - Búsquedas rápidas con índices JSONB
@@ -307,6 +328,7 @@ ON DELETE CASCADE;
 - Fácil de sincronizar con Zustand
 
 **Índice JSONB (opcional):**
+
 ```sql
 CREATE INDEX idx_events_participants ON events USING GIN (participants);
 ```
@@ -316,28 +338,34 @@ CREATE INDEX idx_events_participants ON events USING GIN (participants);
 ---
 
 ### 4. Cálculos de KPIs
+
 ⚠️ **Dos opciones:**
 
 #### Opción A: Calcular en Frontend (Recomendada Inicialmente)
+
 - API solo devuelve transactions raw
 - Frontend calcula balances, totales, pending, etc. (lógica actual)
 
 **Ventajas:**
+
 - ✅ Menos carga en servidor
 - ✅ Más flexible para cambios de lógica de negocio
 - ✅ No duplica código entre frontend/backend
 - ✅ Implementación más rápida
 
 **Desventajas:**
+
 - ❌ Más datos transferidos (todas las transactions)
 - ❌ Puede ser lento con muchas transactions
 
 #### Opción B: Endpoint de Agregación en Backend
+
 ```typescript
 GET /api/events/:eventId/kpis
 ```
 
 **Response:**
+
 ```json
 {
   "totalExpenses": 150.50,
@@ -356,11 +384,13 @@ GET /api/events/:eventId/kpis
 ```
 
 **Ventajas:**
+
 - ✅ Menos datos transferidos
 - ✅ Mejor rendimiento para móviles/conexiones lentas
 - ✅ Cálculos optimizados con SQL
 
 **Desventajas:**
+
 - ❌ Duplica lógica de negocio
 - ❌ Mantenimiento de dos cálculos (frontend y backend)
 
@@ -369,9 +399,11 @@ GET /api/events/:eventId/kpis
 ---
 
 ### 5. Paginación por Fechas
+
 Tu frontend usa paginación especial: agrupa transactions por fecha única y pagina por número de fechas.
 
 **Implementación Backend:**
+
 ```typescript
 // transactions.service.ts
 async getTransactionsPaginated(
@@ -412,6 +444,7 @@ async getTransactionsPaginated(
 ```
 
 **Endpoint:**
+
 ```
 GET /api/events/:eventId/transactions/paginated?numberOfDates=3&offset=0
 ```
@@ -482,6 +515,7 @@ apps/backend/
 ### Base de Datos: PostgreSQL 15+
 
 **Esquema SQL:**
+
 ```sql
 -- Tabla Events
 CREATE TABLE events (
@@ -505,7 +539,7 @@ CREATE TABLE transactions (
   date DATE NOT NULL,
   event_id UUID NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
-  
+
   CONSTRAINT fk_event
     FOREIGN KEY (event_id)
     REFERENCES events(id)
@@ -521,6 +555,7 @@ CREATE INDEX idx_transactions_event_date ON transactions(event_id, date DESC);
 ### Environment Variables
 
 **`.env` file:**
+
 ```bash
 # Server
 PORT=3000
@@ -548,13 +583,12 @@ JWT_EXPIRATION=1d
 ### TypeORM Configuration
 
 **`config/database.config.ts`:**
+
 ```typescript
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
-export const getDatabaseConfig = (
-  configService: ConfigService,
-): TypeOrmModuleOptions => ({
+export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
   type: 'postgres',
   host: configService.get('DATABASE_HOST'),
   port: configService.get('DATABASE_PORT'),
@@ -573,6 +607,7 @@ export const getDatabaseConfig = (
 ## 🚀 Plan de Implementación (Paso a Paso)
 
 ### Fase 1: Setup Inicial ✅ COMPLETADA
+
 - [x] Instalar dependencias NestJS + TypeORM + PostgreSQL
 - [x] Configurar TypeORM con PostgreSQL local
 - [x] Configurar variables de entorno
@@ -581,6 +616,7 @@ export const getDatabaseConfig = (
 - [x] Setup exception filters
 
 **Dependencias instaladas:**
+
 ```bash
 @nestjs/typeorm typeorm pg
 @nestjs/config
@@ -588,6 +624,7 @@ class-validator class-transformer
 ```
 
 **Archivos creados:**
+
 - ✅ `src/config/database.config.ts` - Configuración TypeORM
 - ✅ `src/config/app.config.ts` - Configuración de la aplicación
 - ✅ `src/common/filters/http-exception.filter.ts` - Manejo global de errores
@@ -599,6 +636,7 @@ class-validator class-transformer
 - ✅ `QUICKSTART.md` - Guía rápida de inicio
 
 **Estructura de carpetas creada:**
+
 - ✅ `src/common/{decorators,filters,interceptors,pipes,guards}`
 - ✅ `src/config`
 - ✅ `src/modules/events/{entities,dto}`
@@ -606,22 +644,45 @@ class-validator class-transformer
 
 ---
 
-### Fase 2: Módulo Events
-- [ ] Crear Event entity con JSONB participants
-- [ ] Crear DTOs (CreateEventDto, UpdateEventDto, EventParticipantDto)
-- [ ] Implementar EventsService
-  - [ ] findAll()
-  - [ ] findOne(id)
-  - [ ] create(dto)
-  - [ ] update(id, dto)
-  - [ ] remove(id) con cascade
-- [ ] Implementar EventsController
-- [ ] Tests unitarios del service
-- [ ] Tests E2E de los endpoints
+### Fase 2: Módulo Events ✅ COMPLETADA
+
+- [x] Crear Event entity con JSONB participants
+- [x] Crear DTOs (CreateEventDto, UpdateEventDto, EventParticipantDto)
+- [x] Implementar EventsService
+  - [x] findAll()
+  - [x] findOne(id)
+  - [x] create(dto)
+  - [x] update(id, dto)
+  - [x] remove(id) con cascade
+- [x] Implementar EventsController
+- [x] Tests unitarios del service
+- [x] Tests E2E de los endpoints
+
+**Archivos creados:**
+
+- ✅ `src/modules/events/entities/event.entity.ts` - Entity con JSONB participants
+- ✅ `src/modules/events/dto/event-participant.dto.ts` - DTO para participantes
+- ✅ `src/modules/events/dto/create-event.dto.ts` - DTO de creación con validación
+- ✅ `src/modules/events/dto/update-event.dto.ts` - DTO de actualización (PartialType)
+- ✅ `src/modules/events/events.service.ts` - Service con CRUD completo y logging
+- ✅ `src/modules/events/events.controller.ts` - Controller con rutas RESTful
+- ✅ `src/modules/events/events.module.ts` - Module registration
+- ✅ `src/modules/events/events.service.spec.ts` - Tests unitarios (58 tests)
+- ✅ `test/events.e2e-spec.ts` - Tests E2E completos
+- ✅ `src/app.module.ts` - EventsModule registrado
+
+**Endpoints implementados:**
+
+- ✅ `GET /api/events` - Listar eventos (ordenados por fecha de creación)
+- ✅ `POST /api/events` - Crear evento
+- ✅ `GET /api/events/:id` - Obtener evento por ID
+- ✅ `PATCH /api/events/:id` - Actualizar evento
+- ✅ `DELETE /api/events/:id` - Eliminar evento (cascade delete futuro)
 
 ---
 
 ### Fase 3: Módulo Transactions
+
 - [ ] Crear Transaction entity con relación a Event
 - [ ] Crear DTOs (CreateTransactionDto, UpdateTransactionDto)
 - [ ] Implementar TransactionsService
@@ -638,6 +699,7 @@ class-validator class-transformer
 ---
 
 ### Fase 4: Validaciones y Lógica de Negocio
+
 - [ ] Validar que participantId exista en event.participants o sea '0' (POT)
 - [ ] Implementar custom decorator @ValidParticipant
 - [ ] Manejar errores de participante no válido
@@ -646,6 +708,7 @@ class-validator class-transformer
 ---
 
 ### Fase 5: [Opcional] Agregaciones de KPIs
+
 - [ ] Crear endpoint GET /api/events/:eventId/kpis
 - [ ] Implementar cálculos en TransactionsService:
   - [ ] getTotalExpenses(eventId)
@@ -658,6 +721,7 @@ class-validator class-transformer
 ---
 
 ### Fase 6: Migrations y Producción
+
 - [ ] Deshabilitar TypeORM sync
 - [ ] Crear migrations iniciales
 - [ ] Configurar scripts de migración
@@ -669,6 +733,7 @@ class-validator class-transformer
 ---
 
 ### Fase 7: Migración del Frontend
+
 - [ ] Instalar React Query o SWR
 - [ ] Crear cliente API (axios/fetch)
 - [ ] Migrar useEventsStore a usar API
@@ -686,6 +751,7 @@ class-validator class-transformer
 ### Cambios en Zustand Stores
 
 **Antes (LocalStorage):**
+
 ```typescript
 // useEventsStore.ts
 export const useEventsStore = create<EventsState>()(
@@ -694,36 +760,34 @@ export const useEventsStore = create<EventsState>()(
       events: [],
       addEvent: (title, participants) =>
         set((state) => ({
-          events: [
-            ...state.events,
-            { id: crypto.randomUUID(), title, participants },
-          ],
+          events: [...state.events, { id: crypto.randomUUID(), title, participants }],
         })),
     }),
-    { name: 'events-storage' }
-  )
+    { name: 'events-storage' },
+  ),
 );
 ```
 
 **Después (API):**
+
 ```typescript
 // useEventsStore.ts
 export const useEventsStore = create<EventsState>()((set) => ({
   events: [],
-  
+
   addEvent: async (title, participants) => {
     const response = await fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, participants }),
     });
-    
+
     if (!response.ok) throw new Error('Failed to create event');
-    
+
     const newEvent = await response.json();
     set((state) => ({ events: [...state.events, newEvent] }));
   },
-  
+
   fetchEvents: async () => {
     const response = await fetch('/api/events');
     const events = await response.json();
@@ -735,6 +799,7 @@ export const useEventsStore = create<EventsState>()((set) => ({
 ### Integración con React Query (Recomendado)
 
 **Ventajas:**
+
 - ✅ Cache automático
 - ✅ Sincronización servidor-cliente
 - ✅ Optimistic updates
@@ -743,6 +808,7 @@ export const useEventsStore = create<EventsState>()((set) => ({
 - ✅ Loading/error states
 
 **Ejemplo:**
+
 ```typescript
 // hooks/useEvents.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -759,7 +825,7 @@ export function useEvents() {
 
 export function useCreateEvent() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: CreateEventDto) => {
       const res = await fetch('/api/events', {
@@ -781,16 +847,19 @@ export function useCreateEvent() {
 ## 🧪 Testing Strategy
 
 ### Unit Tests (Jest)
+
 - Tests de services (lógica de negocio)
 - Tests de entities (validaciones)
 - Mocks de repositorios TypeORM
 
 ### E2E Tests (Supertest)
+
 - Tests de endpoints completos
 - Base de datos de test (PostgreSQL en memoria o contenedor Docker)
 - Seed data para tests
 
 **Ejemplo:**
+
 ```typescript
 // events.e2e-spec.ts
 describe('Events (e2e)', () => {
@@ -815,11 +884,13 @@ describe('Events (e2e)', () => {
 ## 🔒 Seguridad y Mejores Prácticas
 
 ### 1. Validación de Entrada
+
 - ✅ Usar class-validator en todos los DTOs
 - ✅ Validar tipos, longitudes, formatos
 - ✅ Sanitizar inputs para prevenir SQL injection
 
 ### 2. CORS
+
 ```typescript
 // main.ts
 app.enableCors({
@@ -829,16 +900,19 @@ app.enableCors({
 ```
 
 ### 3. Rate Limiting (futuro)
+
 ```bash
 pnpm add @nestjs/throttler
 ```
 
 ### 4. Helmet (seguridad HTTP)
+
 ```bash
 pnpm add helmet
 ```
 
 ### 5. Logging
+
 - ✅ Usar NestJS Logger
 - ✅ Log de errores
 - ✅ Log de requests importantes
@@ -857,15 +931,18 @@ pnpm add helmet
 ## 🚢 Deployment
 
 ### Backend Options:
+
 1. **Railway** - PostgreSQL incluido, fácil setup
 2. **Render** - Free tier con PostgreSQL
 3. **Vercel** - Serverless (necesita adaptador)
 4. **Fly.io** - Contenedores, buen free tier
 
 ### Frontend (Actual):
+
 - GitHub Pages (estático)
 
 ### Base de Datos:
+
 - **Supabase** - PostgreSQL managed (free tier generoso)
 - **Neon** - Serverless PostgreSQL
 - **Railway/Render** - PostgreSQL incluido
@@ -875,11 +952,13 @@ pnpm add helmet
 ## 📚 Referencias
 
 ### NestJS Docs:
+
 - [TypeORM Integration](https://docs.nestjs.com/techniques/database)
 - [Validation](https://docs.nestjs.com/techniques/validation)
 - [Exception Filters](https://docs.nestjs.com/exception-filters)
 
 ### Best Practices:
+
 - [REST API Design](https://restfulapi.net/)
 - [NestJS Best Practices](https://github.com/nestjs/nest/tree/master/sample)
 
@@ -912,6 +991,7 @@ pnpm add helmet
 ## ✅ Checklist de Implementación
 
 ### Backend Setup ✅ COMPLETADO
+
 - [x] Inicializar NestJS app
 - [x] Configurar PostgreSQL local (Docker)
 - [x] Configurar TypeORM
@@ -923,12 +1003,14 @@ pnpm add helmet
 - [x] Estructura de carpetas
 
 ### Events Module 🚧 SIGUIENTE
+
 - [ ] Entity + DTOs
 - [ ] Service + Controller
 - [ ] Tests
 - [ ] E2E tests
 
 ### Transactions Module
+
 - [ ] Entity + DTOs
 - [ ] Service + Controller (nested routes)
 - [ ] Validación de participantId
@@ -937,6 +1019,7 @@ pnpm add helmet
 - [ ] E2E tests
 
 ### Production Ready
+
 - [ ] Migrations setup
 - [ ] Error handling
 - [ ] Logging

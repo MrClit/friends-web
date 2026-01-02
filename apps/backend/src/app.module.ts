@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './common/health.controller';
 import { getDatabaseConfig } from './config/database.config';
+import { EventsModule } from './modules/events/events.module';
 
 @Module({
   imports: [
@@ -17,8 +18,11 @@ import { getDatabaseConfig } from './config/database.config';
     // TypeORM con configuración async para usar ConfigService
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => getDatabaseConfig(configService),
+      useFactory: (configService: ConfigService) =>
+        getDatabaseConfig(configService),
     }),
+    // Feature modules
+    EventsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

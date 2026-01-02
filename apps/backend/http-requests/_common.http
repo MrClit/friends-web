@@ -1,0 +1,10 @@
+###############################################
+# FRIENDS API - Variables Comunes
+###############################################
+# Variables cargadas desde .vscode/settings.json
+# Cambia el ambiente con el selector (barra inferior) o: Cmd+Shift+P → "REST Client: Switch Environment"
+
+###############################################
+# Health Check (común a toda la API)
+###############################################
+GET {{baseUrl}}/health

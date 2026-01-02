@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# HTTP Client private environment variables
+http-client.private.env.json

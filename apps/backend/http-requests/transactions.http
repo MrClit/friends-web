@@ -1,0 +1,201 @@
+###############################################
+# TRANSACTIONS API
+###############################################
+# Variables cargadas desde .vscode/settings.json
+# Selecciona ambiente: "development" o "production"
+
+# ID del evento para las transacciones
+# Cámbialo por un evento real de tu BD
+@eventId = 123e4567-e89b-12d3-a456-426614174000
+
+###############################################
+# 1. LIST TRANSACTIONS BY EVENT
+###############################################
+GET {{baseUrl}}/events/{{eventId}}/transactions
+
+###############################################
+# 2. CREATE TRANSACTION - Contribución
+###############################################
+# @name createContribution
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Aportación inicial",
+  "paymentType": "contribution",
+  "amount": 50.00,
+  "participantId": "1",
+  "date": "2026-01-15"
+}
+
+### Guardar ID de la transacción
+@transactionId = {{createContribution.response.body.id}}
+
+###############################################
+# 3. CREATE TRANSACTION - Gasto
+###############################################
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Cena del grupo",
+  "paymentType": "expense",
+  "amount": 120.50,
+  "participantId": "2",
+  "date": "2026-01-15"
+}
+
+###############################################
+# 4. CREATE TRANSACTION - Gasto del POT
+###############################################
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Bebidas para todos",
+  "paymentType": "expense",
+  "amount": 35.00,
+  "participantId": "0",
+  "date": "2026-01-15"
+}
+
+###############################################
+# 5. CREATE TRANSACTION - Compensación
+###############################################
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Compensación a Bob",
+  "paymentType": "compensation",
+  "amount": 25.00,
+  "participantId": "2",
+  "date": "2026-01-16"
+}
+
+###############################################
+# 6. GET TRANSACTION BY ID
+###############################################
+GET {{baseUrl}}/transactions/{{transactionId}}
+
+###############################################
+# 7. UPDATE TRANSACTION
+###############################################
+PATCH {{baseUrl}}/transactions/{{transactionId}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Aportación inicial actualizada",
+  "amount": 75.00
+}
+
+###############################################
+# 8. DELETE TRANSACTION
+###############################################
+DELETE {{baseUrl}}/transactions/{{transactionId}}
+
+###############################################
+# 9. GET PAGINATED TRANSACTIONS
+###############################################
+GET {{baseUrl}}/events/{{eventId}}/transactions/paginated?numberOfDates=3&offset=0
+
+###############################################
+# ERROR CASES
+###############################################
+
+### Invalid payment type (400)
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Test",
+  "paymentType": "invalid_type",
+  "amount": 50,
+  "participantId": "1",
+  "date": "2026-01-15"
+}
+
+### Negative amount (400)
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Test",
+  "paymentType": "contribution",
+  "amount": -50,
+  "participantId": "1",
+  "date": "2026-01-15"
+}
+
+### Invalid participant (400)
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Test",
+  "paymentType": "contribution",
+  "amount": 50,
+  "participantId": "999",
+  "date": "2026-01-15"
+}
+
+### POT cannot contribute (400)
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Intento de contribución del POT",
+  "paymentType": "contribution",
+  "amount": 50,
+  "participantId": "0",
+  "date": "2026-01-15"
+}
+
+###############################################
+# WORKFLOW COMPLETO - Ejecuta en orden
+###############################################
+
+### 1. Crear evento para transacciones
+# @name transactionTestEvent
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+
+{
+  "title": "Evento de Test de Transacciones",
+  "participants": [
+    { "id": "1", "name": "Alice" },
+    { "id": "2", "name": "Bob" }
+  ]
+}
+
+@testEventId = {{transactionTestEvent.response.body.id}}
+
+### 2. Crear contribución
+POST {{baseUrl}}/events/{{testEventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Contribución Alice",
+  "paymentType": "contribution",
+  "amount": 100,
+  "participantId": "1",
+  "date": "2026-01-15"
+}
+
+### 3. Crear gasto
+POST {{baseUrl}}/events/{{testEventId}}/transactions
+Content-Type: {{contentType}}
+
+{
+  "title": "Cena pagada por Bob",
+  "paymentType": "expense",
+  "amount": 60,
+  "participantId": "2",
+  "date": "2026-01-15"
+}
+
+### 4. Listar todas las transacciones
+GET {{baseUrl}}/events/{{testEventId}}/transactions
+
+### 5. Limpiar - Eliminar evento (cascade delete transactions)
+DELETE {{baseUrl}}/events/{{testEventId}}
