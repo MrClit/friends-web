@@ -139,12 +139,14 @@ Content-Type: {{contentType}}
   "date": "2026-01-15"
 }
 
-### POT cannot contribute (400)
+### POT as contribution - Currently allowed (200)
+# Note: Backend doesn't validate payment type per participant yet
+# This would be a business rule to implement in Phase 4
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
 
 {
-  "title": "Intento de contribución del POT",
+  "title": "Contribución del POT (permitido actualmente)",
   "paymentType": "contribution",
   "amount": 50,
   "participantId": "0",

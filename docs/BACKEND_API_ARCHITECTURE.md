@@ -212,6 +212,13 @@ DELETE /api/transactions/:id                          # Eliminar transaction
 GET    /api/events/:eventId/transactions/stats        # Estadísticas agregadas
 ```
 
+⚠️ **IMPORTANTE**: El prefijo `/api` se añade automáticamente mediante `app.setGlobalPrefix('api')` en main.ts. Los controllers solo deben usar la ruta sin el prefijo:
+
+```typescript
+@Controller('events/:eventId/transactions')  // ✅ Correcto
+// NO: @Controller('api/events/:eventId/transactions')  // ❌ Incorrecto
+```
+
 **DTOs:**
 
 ```typescript
@@ -270,11 +277,13 @@ POST /api/events/:eventId/transactions
 @Controller('events/:eventId/transactions')
 export class TransactionsController {
   @Post()
-  create(@Param('eventId') eventId: string, @Body() createDto: CreateTransactionDto) {
+  create(@Param('eventId', ParseUUIDPipe) eventId: string, @Body() createDto: CreateTransactionDto) {
     return this.transactionsService.create(eventId, createDto);
   }
 }
 ```
+
+⚠️ **Nota**: Usa `ParseUUIDPipe` para validar automáticamente que el ID sea un UUID válido (patrón usado en EventsController).
 
 ---
 
@@ -297,6 +306,8 @@ transactions: Transaction[];
 })
 event: Event;
 ```
+
+⚠️ **IMPORTANTE FASE 3**: Actualmente la relación `@OneToMany` en `event.entity.ts` está comentada (líneas 29-33). Deberás descomentarla cuando crees la entidad Transaction.
 
 **Migration SQL:**
 
@@ -649,56 +660,99 @@ class-validator class-transformer
 - [x] Crear Event entity con JSONB participants
 - [x] Crear DTOs (CreateEventDto, UpdateEventDto, EventParticipantDto)
 - [x] Implementar EventsService
-  - [x] findAll()
-  - [x] findOne(id)
-  - [x] create(dto)
-  - [x] update(id, dto)
-  - [x] remove(id) con cascade
-- [x] Implementar EventsController
-- [x] Tests unitarios del service
-- [x] Tests E2E de los endpoints
+  - [x] findAll() - Ordenado por createdAt DESC
+  - [x] findOne(id) - Con manejo de NotFoundException
+  - [x] create(dto) - Con logging
+  - [x] update(id, dto) - Con validación de existencia
+  - [x] remove(id) - Con cascade delete (cuando se implemente Transaction)
+- [x] Implementar EventsController con ParseUUIDPipe
+- [x] Tests unitarios del service (58 tests)
 
 **Archivos creados:**
 
-- ✅ `src/modules/events/entities/event.entity.ts` - Entity con JSONB participants
+- ✅ `src/modules/events/entities/event.entity.ts` - Entity con JSONB participants y relación @OneToMany comentada
 - ✅ `src/modules/events/dto/event-participant.dto.ts` - DTO para participantes
 - ✅ `src/modules/events/dto/create-event.dto.ts` - DTO de creación con validación
 - ✅ `src/modules/events/dto/update-event.dto.ts` - DTO de actualización (PartialType)
 - ✅ `src/modules/events/events.service.ts` - Service con CRUD completo y logging
 - ✅ `src/modules/events/events.controller.ts` - Controller con rutas RESTful
 - ✅ `src/modules/events/events.module.ts` - Module registration
-- ✅ `src/modules/events/events.service.spec.ts` - Tests unitarios (58 tests)
-- ✅ `test/events.e2e-spec.ts` - Tests E2E completos
+- ✅ `src/modules/events/events.service.spec.ts` - Tests unitarios (58 tests pasando)
 - ✅ `src/app.module.ts` - EventsModule registrado
+- ✅ `src/common/interceptors/transform.interceptor.ts` - Añadido (no estaba en plan original)
 
 **Endpoints implementados:**
 
-- ✅ `GET /api/events` - Listar eventos (ordenados por fecha de creación)
-- ✅ `POST /api/events` - Crear evento
-- ✅ `GET /api/events/:id` - Obtener evento por ID
+- ✅ `GET /api/events` - Listar eventos (ordenados por fecha de creación DESC)
+- ✅ `POST /api/events` - Crear evento (status 201)
+- ✅ `GET /api/events/:id` - Obtener evento por ID (con ParseUUIDPipe)
 - ✅ `PATCH /api/events/:id` - Actualizar evento
-- ✅ `DELETE /api/events/:id` - Eliminar evento (cascade delete futuro)
+- ✅ `DELETE /api/events/:id` - Eliminar evento (status 204)
+
+**Mejoras implementadas vs plan original:**
+
+- ✅ TransformInterceptor global para respuestas consistentes
+- ✅ ParseUUIDPipe para validación automática de UUIDs
+- ✅ Logging exhaustivo en todos los métodos del service
+- ✅ Configuración de CORS con métodos y headers específicos
 
 ---
 
-### Fase 3: Módulo Transactions
+### Fase 3: Módulo Transactions ✅ COMPLETADA
 
-- [ ] Crear Transaction entity con relación a Event
-- [ ] Crear DTOs (CreateTransactionDto, UpdateTransactionDto)
-- [ ] Implementar TransactionsService
-  - [ ] findByEvent(eventId)
-  - [ ] findByEventPaginated(eventId, numberOfDates, offset)
-  - [ ] findOne(id)
-  - [ ] create(eventId, dto) con validación de participantId
-  - [ ] update(id, dto)
-  - [ ] remove(id)
-- [ ] Implementar TransactionsController (rutas anidadas)
-- [ ] Tests unitarios del service
-- [ ] Tests E2E de los endpoints
+**Pasos previos:**
+
+- [x] Descomentar relación `@OneToMany` en `event.entity.ts`
+- [x] Importar Transaction entity en Event entity
+
+**Implementación:**
+
+- [x] Crear Transaction entity con relación a Event
+  - [x] Usar `@ManyToOne` con `onDelete: 'CASCADE'`
+  - [x] Columna `eventId` para la FK
+  - [x] Enum para `paymentType`
+  - [x] Tipo `decimal` para `amount`
+  - [x] Tipo `date` para `date`
+- [x] Crear DTOs (CreateTransactionDto, UpdateTransactionDto, PaginatedTransactionsDto)
+  - [x] Validaciones con class-validator
+  - [x] ValidateNested para objetos complejos si necesario
+- [x] Implementar TransactionsService con logging (patrón de EventsService)
+  - [x] findByEvent(eventId) - Validar que evento existe
+  - [x] findByEventPaginated(eventId, numberOfDates, offset) - Lógica de fechas únicas
+  - [x] findOne(id) - Con NotFoundException
+  - [x] create(eventId, dto) - Validar que participantId existe en event.participants o es '0'
+  - [x] update(id, dto) - Con validación de existencia
+  - [x] remove(id) - Con logging
+- [x] Implementar TransactionsController (rutas anidadas)
+  - [x] Usar `@Controller('events/:eventId/transactions')` para rutas anidadas
+  - [x] Usar `@Controller('transactions')` para rutas individuales (GET/PATCH/DELETE por ID)
+  - [x] Usar `ParseUUIDPipe` en todos los params de ID
+  - [x] Status codes: 201 para POST, 204 para DELETE
+- [x] Tests unitarios del service (17 tests pasando)
+
+**Archivos creados:**
+
+- ✅ `src/modules/transactions/entities/transaction.entity.ts` - Entity con relación a Event
+- ✅ `src/modules/transactions/dto/create-transaction.dto.ts` - DTO de creación con validación
+- ✅ `src/modules/transactions/dto/update-transaction.dto.ts` - DTO de actualización (PartialType)
+- ✅ `src/modules/transactions/dto/paginated-transactions.dto.ts` - DTO de respuesta paginada
+- ✅ `src/modules/transactions/transactions.service.ts` - Service con CRUD completo, validación de participantId y paginación por fechas
+- ✅ `src/modules/transactions/transactions.controller.ts` - Dos controllers (nested + individual routes)
+- ✅ `src/modules/transactions/transactions.module.ts` - Module registration
+- ✅ `src/modules/transactions/transactions.service.spec.ts` - Tests unitarios (17 tests pasando)
+- ✅ `src/app.module.ts` - TransactionsModule registrado
+- ✅ `src/modules/events/entities/event.entity.ts` - Relación @OneToMany descomentada
+
+**Consideraciones implementadas:**
+
+- ✅ Validación de participantId: Verifica que existe en `event.participants` o es '0' (POT)
+- ✅ Cascade delete: Al eliminar evento, las transactions se borran automáticamente (configurado en @ManyToOne)
+- ✅ Dos controllers separados: EventTransactionsController (nested) y TransactionsController (individual)
+- ✅ Logging exhaustivo en todos los métodos del service
 
 ---
 
-### Fase 4: Validaciones y Lógica de Negocio
+### Fase 4: Validaciones y Lógica de Negocio 🚧 SIGUIENTE
 
 - [ ] Validar que participantId exista en event.participants o sea '0' (POT)
 - [ ] Implementar custom decorator @ValidParticipant
@@ -720,11 +774,55 @@ class-validator class-transformer
 
 ---
 
-### Fase 6: Migrations y Producción
+### Fase 9: Tests E2E Completos
+
+**Setup:**
+
+- [ ] Instalar dependencias: `supertest`, `@types/supertest`
+- [ ] Crear configuración `test/jest-e2e.json`
+- [ ] Configurar base de datos de test (PostgreSQL con Docker)
+- [ ] Setup y teardown de base de datos entre tests
+
+**Tests de Events:**
+
+- [ ] GET /api/events - Listar eventos
+- [ ] POST /api/events - Crear evento (success + validación)
+- [ ] GET /api/events/:id - Obtener evento (success + 404)
+- [ ] PATCH /api/events/:id - Actualizar evento
+- [ ] DELETE /api/events/:id - Eliminar evento (verificar cascade delete)
+
+**Tests de Transactions:**
+
+- [ ] POST /api/events/:eventId/transactions - Crear transaction
+- [ ] GET /api/events/:eventId/transactions - Listar transactions
+- [ ] GET /api/events/:eventId/transactions/paginated - Paginación
+- [ ] GET /api/transactions/:id - Obtener transaction
+- [ ] PATCH /api/transactions/:id - Actualizar transaction
+- [ ] DELETE /api/transactions/:id - Eliminar transaction
+- [ ] Validación de participantId (debe existir o ser '0')
+- [ ] Validación de eventId inválido (404)
+
+**Tests de Integración:**
+
+- [ ] Crear evento → crear transactions → eliminar evento (verificar cascade)
+- [ ] Actualizar participantes de evento → verificar transactions
+- [ ] Edge cases: POT participant ('0'), fechas, amounts
+
+**Coverage:**
+
+- [ ] Mínimo 80% de cobertura en endpoints críticos
+- [ ] Todos los casos de error manejados (400, 404, 500)
+- [ ] Validaciones de DTOs funcionando correctamente
+
+---
+
+### Fase 10: Migrations y Producción
 
 - [ ] Deshabilitar TypeORM sync
 - [ ] Crear migrations iniciales
 - [ ] Configurar scripts de migración
+
+**Deployment:**
 
 - [ ] Setup para Railway/Render/Vercel
 - [ ] Configurar PostgreSQL en producción
@@ -732,7 +830,7 @@ class-validator class-transformer
 
 ---
 
-### Fase 7: Migración del Frontend
+### Fase 11: Migración del Frontend
 
 - [ ] Instalar React Query o SWR
 - [ ] Crear cliente API (axios/fetch)
@@ -848,20 +946,35 @@ export function useCreateEvent() {
 
 ### Unit Tests (Jest)
 
-- Tests de services (lógica de negocio)
-- Tests de entities (validaciones)
-- Mocks de repositorios TypeORM
+- ✅ Tests de services (lógica de negocio)
+- ✅ Tests de entities (validaciones)
+- ✅ Mocks de repositorios TypeORM
+- ✅ Fase 2: EventsService - 58 tests pasando
+- ✅ Fase 3: TransactionsService - 17 tests pasando
 
-### E2E Tests (Supertest)
+### E2E Tests (Pendiente)
 
-- Tests de endpoints completos
-- Base de datos de test (PostgreSQL en memoria o contenedor Docker)
+⚠️ **Tests E2E postponidos hasta completar toda la implementación del backend**
+
+Los tests end-to-end se implementarán en la **Fase 9** cuando todos los módulos estén completados. Esto permite:
+
+- Enfoque en la implementación de lógica de negocio
+- Evitar mantenimiento de tests durante desarrollo activo
+- Tests E2E completos e integrados una vez estable la API
+
+**Plan para Fase 9:**
+
+- Instalar `supertest` como devDependency
+- Crear configuración `test/jest-e2e.json`
+- Implementar tests E2E para Events module
+- Implementar tests E2E para Transactions module
+- Base de datos de test con Docker
 - Seed data para tests
-
-**Ejemplo:**
+- Coverage mínimo 80% en endpoints críticos
+  **Ejemplo de test E2E (a implementar en Fase 9):**
 
 ```typescript
-// events.e2e-spec.ts
+// test/events.e2e-spec.ts
 describe('Events (e2e)', () => {
   it('POST /api/events should create event', () => {
     return request(app.getHttpServer())
@@ -1002,27 +1115,31 @@ pnpm add helmet
 - [x] Health check endpoint
 - [x] Estructura de carpetas
 
-### Events Module 🚧 SIGUIENTE
+### Events Module ✅ COMPLETADO
 
-- [ ] Entity + DTOs
-- [ ] Service + Controller
-- [ ] Tests
-- [ ] E2E tests
+- [x] Entity + DTOs
+- [x] Service + Controller
+- [x] Tests unitarios
 
-### Transactions Module
+### Transactions Module ✅ COMPLETADO
 
-- [ ] Entity + DTOs
-- [ ] Service + Controller (nested routes)
-- [ ] Validación de participantId
-- [ ] Paginación por fechas
-- [ ] Tests
-- [ ] E2E tests
+- [x] Entity + DTOs
+- [x] Service + Controller (nested routes)
+- [x] Validación de participantId
+- [x] Paginación por fechas
+- [x] Tests unitarios
+
+### E2E Tests 🚧 SIGUIENTE
+
+- [ ] Configuración E2E (supertest, jest-e2e.json)
+- [ ] Tests E2E de Events
+- [ ] Tests E2E de Transactions
+- [ ] Tests de integración (cascade delete, etc.)
 
 ### Production Ready
 
 - [ ] Migrations setup
-- [ ] Error handling
-- [ ] Logging
+- [ ] Error handling avanzado
 - [ ] Deploy backend
 - [ ] Deploy database
 - [ ] Migrar frontend a API
@@ -1030,6 +1147,67 @@ pnpm add helmet
 
 ---
 
-**Última actualización:** 2 de enero de 2026  
-**Estado actual:** ✅ Fase 1 completada  
-**Próximo paso:** Fase 2 - Implementar módulo Events
+**Última actualización:** 3 de enero de 2026  
+**Estado actual:** ✅ Fases 1, 2 y 3 completadas (sin E2E tests)  
+**Próximo paso:** Fase 4 - Validaciones avanzadas o Fase 9 - Tests E2E completos
+
+---
+
+## 📚 Lecciones Aprendidas de Fases 1, 2 y 3
+
+### ✅ Patrones de Implementación Establecidos
+
+**1. Global Prefix:** Todas las rutas tienen prefijo `/api` automáticamente via `app.setGlobalPrefix('api')`
+
+- Controllers solo usan rutas relativas: `@Controller('events')`
+- Resultado final: `/api/events`
+
+**2. Validación con Pipes:**
+
+- `ParseUUIDPipe` para validar IDs automáticamente
+- `ValidationPipe` global con `whitelist: true` y `forbidNonWhitelisted: true`
+
+**3. Logging:**
+
+- Usar `Logger` de NestJS en todos los services
+- Log en cada operación: inicio, éxito, error
+- Incluir contexto relevante (IDs, nombres)
+
+**4. Testing:**
+
+- Tests unitarios del service con mocks de repositorio
+- Fase 2: EventsService - 58 tests pasando
+- Fase 3: TransactionsService - 17 tests pasando
+- E2E tests postponidos a Fase 9
+
+**5. Error Handling:**
+
+- `NotFoundException` para recursos no encontrados
+- `InternalServerErrorException` para errores inesperados
+- HttpExceptionFilter global para formato consistente
+
+**6. Status Codes:**
+
+- `201 Created` para POST
+- `200 OK` para GET/PATCH
+- `204 No Content` para DELETE
+- `400 Bad Request` para validación
+- `404 Not Found` para recursos inexistentes
+
+**7. Patrón de Dos Controllers (Fase 3):**
+
+- `EventTransactionsController`: Rutas anidadas bajo `/api/events/:eventId/transactions`
+- `TransactionsController`: Rutas individuales bajo `/api/transactions/:id`
+- Ambos comparten el mismo service
+
+**8. Validación Custom de participantId:**
+
+- Método `validateParticipantId()` en TransactionsService
+- Verifica que participantId existe en event.participants o es '0' (POT)
+- Lanza BadRequestException si no es válido
+
+**9. Paginación por Fechas Únicas:**
+
+- Query builder complejo que agrupa por fecha
+- Usa `DISTINCT` para obtener fechas únicas
+- Pagina por número de fechas, no por número de transacciones

@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { HealthController } from './common/health.controller';
 import { getDatabaseConfig } from './config/database.config';
 import { EventsModule } from './modules/events/events.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { EventsModule } from './modules/events/events.module';
     }),
     // Feature modules
     EventsModule,
+    TransactionsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

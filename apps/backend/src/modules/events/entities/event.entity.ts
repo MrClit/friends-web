@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Transaction } from '../../transactions/entities/transaction.entity';
 
 export interface EventParticipant {
   id: string;
@@ -28,9 +30,8 @@ export class Event {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  // @OneToMany(() => Transaction, (transaction) => transaction.event, {
-  //   cascade: true,
-  // })
-  // transactions: Transaction[];
-  // TODO: Uncomment when Transaction entity is created
+  @OneToMany(() => Transaction, (transaction) => transaction.event, {
+    cascade: true,
+  })
+  transactions: Transaction[];
 }
