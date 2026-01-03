@@ -15,6 +15,7 @@ Backend RESTful API del monorepo Friends, construido con NestJS, TypeScript, Pos
 - **Database:** PostgreSQL 15+
 - **ORM:** TypeORM 0.3
 - **Validation:** class-validator + class-transformer
+- **API Documentation:** Swagger/OpenAPI (@nestjs/swagger)
 - **Configuration:** @nestjs/config
 - **Testing:** Jest 30
 
@@ -52,14 +53,26 @@ El servidor debería iniciarse en el puerto **3000** y verás:
 
 ```
 🚀 Application is running on: http://localhost:3000/api
+📚 Swagger documentation: http://localhost:3000/api/docs
 🌐 CORS enabled for: http://localhost:5173
 ```
 
-Prueba el endpoint por defecto:
+**Prueba el endpoint por defecto:**
 
 ```bash
 curl http://localhost:3000/api
 ```
+
+**Accede a la documentación Swagger:**
+
+Abre en tu navegador: **http://localhost:3000/api/docs**
+
+Swagger UI te permite:
+
+- 📖 Ver todos los endpoints documentados
+- 🧪 Probar endpoints interactivamente
+- 📋 Ver schemas de DTOs y validaciones
+- 📝 Generar código cliente automáticamente
 
 ---
 
@@ -243,6 +256,20 @@ src/
 
 ## 🔌 API Endpoints
 
+### 📚 Documentación Interactiva (Swagger)
+
+**Accede a Swagger UI:**  
+🔗 **http://localhost:3000/api/docs**
+
+La documentación Swagger proporciona:
+
+- ✅ Explorador interactivo de todos los endpoints
+- ✅ Schemas completos de DTOs con validaciones
+- ✅ Prueba de endpoints con respuestas en tiempo real
+- ✅ Especificación OpenAPI exportable
+
+---
+
 ### Health Check
 
 ```
@@ -269,7 +296,6 @@ POST   /api/events/:eventId/transactions            # Crear transacción
 GET    /api/transactions/:id                        # Obtener transacción por ID
 PATCH  /api/transactions/:id                        # Actualizar transacción
 DELETE /api/transactions/:id                        # Eliminar transacción
-DELETE /api/transactions/by-ids                     # Eliminar múltiples transacciones
 ```
 
 **Paginación de transacciones:**
@@ -278,8 +304,97 @@ DELETE /api/transactions/by-ids                     # Eliminar múltiples transa
 GET /api/events/:eventId/transactions/paginated?numberOfDates=3&offset=0
 ```
 
-- `numberOfDates`: Número de fechas únicas a retornar (default: 3)
-- `offset`: Offset para paginación (default: 0)
+**Query Parameters:**
+
+- `numberOfDates` (opcional): Número de fechas únicas a retornar (default: 3, min: 1, max: 50)
+- `offset` (opcional): Offset para paginación (default: 0, min: 0)
+
+**Respuesta:**
+
+```json
+{
+  "data": {
+    "transactions": [...],
+    "hasMore": true,
+    "totalDates": 10,
+    "loadedDates": 3
+  }
+}
+```
+
+> 💡 **Tip:** Prueba este endpoint interactivamente en [Swagger UI](http://localhost:3000/api/docs) para ver las validaciones en acción.
+
+---
+
+## 📤 Formato de Respuestas
+
+### Envoltura Estándar para Respuestas Exitosas
+
+Todas las respuestas exitosas (200, 201) están envueltas en un formato estándar:
+
+```json
+{
+  "data": <contenido de la respuesta>
+}
+```
+
+**Ejemplos:**
+
+```json
+// GET /api/events/:id (Single entity)
+{
+  "data": {
+    "id": "uuid",
+    "title": "Dinner Party",
+    "participants": [...]
+  }
+}
+
+// GET /api/events (Array)
+{
+  "data": [
+    { "id": "uuid1", "title": "Event 1" },
+    { "id": "uuid2", "title": "Event 2" }
+  ]
+}
+
+// POST /api/events (Created entity)
+{
+  "data": {
+    "id": "uuid",
+    "title": "New Event",
+    "participants": [...]
+  }
+}
+```
+
+### Excepciones
+
+**DELETE operations (204 No Content):**
+
+- No retornan cuerpo de respuesta
+- HTTP Status: 204
+
+**Errores:**
+
+- NO usan la envoltura `{ data }`
+- Formato estandarizado con `HttpExceptionFilter`:
+
+```json
+{
+  "statusCode": 404,
+  "timestamp": "2026-01-03T12:00:00.000Z",
+  "path": "/api/events/invalid-uuid",
+  "method": "GET",
+  "message": "Event with ID invalid-uuid not found"
+}
+```
+
+### Implementación
+
+- **Interceptor**: `TransformInterceptor` (activado globalmente)
+- **Swagger**: Respuestas documentadas con `@ApiStandardResponse`
+- **Cliente**: Siempre accede a `.data` para obtener el contenido
 
 ---
 
@@ -326,6 +441,56 @@ CREATE TYPE payment_type_enum AS ENUM ('contribution', 'expense', 'compensation'
 **Participant ID Especial:**
 
 - `'0'`: Representa el "bote común" (POT) para gastos compartidos
+
+---
+
+## ⚠️ Dependencias de Base de Datos
+
+### PostgreSQL Window Functions
+
+El endpoint de **paginación de transacciones** (`GET /api/events/:eventId/transactions/paginated`) utiliza **window functions de PostgreSQL** (específicamente `DENSE_RANK()`) para optimizar el rendimiento al paginar por fechas únicas.
+
+**Query optimizada:**
+
+```sql
+WITH RankedTransactions AS (
+  SELECT
+    t.*,
+    DENSE_RANK() OVER (ORDER BY t.date DESC) as date_rank
+  FROM transactions t
+  WHERE t."eventId" = :eventId
+)
+SELECT * FROM RankedTransactions
+WHERE date_rank > :offset AND date_rank <= :offset + :numberOfDates
+ORDER BY date DESC, createdAt DESC;
+```
+
+**Consideraciones:**
+
+- ✅ **Window functions** son parte del estándar SQL:2003
+- ✅ Soportadas por: **PostgreSQL 8.4+**, MySQL 8.0+, SQL Server 2005+, Oracle 8i+, SQLite 3.25+
+- ⚠️ **Elementos específicos de PostgreSQL:**
+  - Comillas dobles para columnas case-sensitive: `t."eventId"`
+  - Si migras a otra BD, ajusta comillas (MySQL usa backticks `` `eventId` ``, SQL Server usa `[eventId]`)
+
+**Impacto en migración de BD:**
+
+- Si migras a otra BD moderna → Cambio menor (ajustar comillas)
+- Si migras a BD sin window functions → Implementar fallback con 2 queries
+- **Decisión:** Mantenemos optimización porque:
+  - PostgreSQL es nuestro target principal
+  - Beneficio en rendimiento > riesgo de migración
+  - Migración de BD es poco frecuente
+
+**Alternativa portable (no implementada):**
+
+```typescript
+// Fallback sin window functions (2 queries)
+const dates = await getDates(eventId, numberOfDates, offset);
+const transactions = await getTransactionsByDates(eventId, dates);
+```
+
+> 💡 **Tip:** Si en el futuro necesitas máxima portabilidad, refactoriza a TypeORM QueryBuilder o implementa fallback condicional por tipo de BD.
 
 ---
 
@@ -579,9 +744,13 @@ GET {{baseUrl}}/health
 
 ---
 
-## �🔗 Integración con Frontend
+## 🔗 Integración con Frontend
 
-El backend se integra con [@friends/frontend](../frontend/) vía REST API:
+El backend se integra con [@friends/frontend](../frontend/) vía REST API.
+
+### Formato de Respuestas
+
+**Todas las respuestas exitosas están envueltas en `{ data: T }`:**
 
 ```typescript
 // Ejemplo de cliente API en el frontend
@@ -589,51 +758,73 @@ const API_BASE = 'http://localhost:3000/api';
 
 export const api = {
   events: {
-    getAll: () => fetch(`${API_BASE}/events`).then((r) => r.json()),
+    getAll: () =>
+      fetch(`${API_BASE}/events`)
+        .then((r) => r.json())
+        .then((response) => response.data), // ⚠️ Accede a .data
+
     getById: (id: string) =>
-      fetch(`${API_BASE}/events/${id}`).then((r) => r.json()),
+      fetch(`${API_BASE}/events/${id}`)
+        .then((r) => r.json())
+        .then((response) => response.data), // ⚠️ Accede a .data
+
     create: (data: CreateEventDto) =>
       fetch(`${API_BASE}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-      }).then((r) => r.json()),
+      })
+        .then((r) => r.json())
+        .then((response) => response.data), // ⚠️ Accede a .data
   },
+
   transactions: {
     getByEvent: (eventId: string) =>
-      fetch(`${API_BASE}/events/${eventId}/transactions`).then((r) => r.json()),
+      fetch(`${API_BASE}/events/${eventId}/transactions`)
+        .then((r) => r.json())
+        .then((response) => response.data), // ⚠️ Accede a .data
+
+    getPaginated: (eventId: string, numberOfDates = 3, offset = 0) =>
+      fetch(
+        `${API_BASE}/events/${eventId}/transactions/paginated?numberOfDates=${numberOfDates}&offset=${offset}`,
+      )
+        .then((r) => r.json())
+        .then((response) => response.data), // ⚠️ Accede a .data
+
     create: (eventId: string, data: CreateTransactionDto) =>
       fetch(`${API_BASE}/events/${eventId}/transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-      }).then((r) => r.json()),
+      })
+        .then((r) => r.json())
+        .then((response) => response.data), // ⚠️ Accede a .data
   },
 };
 ```
 
----
+### Manejo de Errores
 
-## ✅ Características Implementadas
+```typescript
+async function fetchEvent(id: string) {
+  try {
+    const response = await fetch(`${API_BASE}/events/${id}`);
 
-### Configuración Base
+    if (!response.ok) {
+      const error = await response.json();
+      // Estructura de error: { statusCode, timestamp, path, method, message }
+      throw new Error(error.message);
+    }
 
-- ✅ NestJS 11 con TypeScript
-- ✅ TypeORM con PostgreSQL
-- ✅ Variables de entorno por ambiente (.env.development, .env.production)
-- ✅ CORS configurado para frontend (localhost:5173)
-- ✅ Global validation pipes
-- ✅ Global exception filters
-- ✅ Transform interceptor para respuestas consistentes
+    const { data } = await response.json();
+    return data; // Event object
+  } catch (error) {
+    console.error('Failed to fetch event:', error);
+    throw error;
+  }
+}
+```
 
-### Módulo Events
-
-- ✅ CRUD completo de eventos
-- ✅ Entity con UUID, title, participants (JSONB), timestamps
-- ✅ DTOs validados (CreateEventDto, UpdateEventDto)
-- ✅ Service con logging y error handling
-- ✅ Controller con endpoints RESTful
-- ✅ Cascade delete de transactions
 - ✅ Unit tests
 
 ### Módulo Transactions
@@ -641,12 +832,12 @@ export const api = {
 - ✅ CRUD completo de transacciones
 - ✅ Entity con UUID, title, paymentType (enum), amount, participantId, date
 - ✅ Relación ManyToOne con Events (ON DELETE CASCADE)
-- ✅ DTOs validados (CreateTransactionDto, UpdateTransactionDto)
+- ✅ DTOs validados (CreateTransactionDto, UpdateTransactionDto, PaginationQueryDto)
 - ✅ Service con lógica de negocio completa
 - ✅ Controller con endpoints anidados bajo events
-- ✅ Paginación por fechas únicas
-- ✅ Eliminación batch por IDs
+- ✅ Paginación por fechas únicas (optimizada con SQL window functions)
 - ✅ Soporte para POT (participant_id = '0')
+- ✅ Swagger documentation completa
 - ✅ Unit tests
 
 ### Health & Monitoring

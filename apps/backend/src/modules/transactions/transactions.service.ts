@@ -6,14 +6,30 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Transaction } from './entities/transaction.entity';
 import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { PaginatedTransactionsDto } from './dto/paginated-transactions.dto';
+import { PaginatedTransactionsResponseDto } from './dto/paginated-transactions-response.dto';
 
 const POT_PARTICIPANT_ID = '0';
+
+/**
+ * Interface for raw SQL query results with window function
+ */
+interface RankedTransactionRow {
+  id: string;
+  eventId: string;
+  participantId: string;
+  paymentType: string;
+  amount: string;
+  title: string;
+  date: Date;
+  createdAt: Date;
+  date_rank: number;
+  total_dates: number;
+}
 
 @Injectable()
 export class TransactionsService {
@@ -72,15 +88,16 @@ export class TransactionsService {
 
   /**
    * Get paginated transactions grouped by unique dates
+   * Optimized with a single query using PostgreSQL window functions
    * @param eventId - Event ID
-   * @param numberOfDates - Number of unique dates to return (default: 3)
-   * @param offset - Offset for pagination (default: 0)
+   * @param numberOfDates - Number of unique dates to return (validated: 1-50)
+   * @param offset - Offset for pagination (validated: >= 0)
    */
   async findByEventPaginated(
     eventId: string,
-    numberOfDates = 3,
-    offset = 0,
-  ): Promise<PaginatedTransactionsDto> {
+    numberOfDates: number,
+    offset: number,
+  ): Promise<PaginatedTransactionsResponseDto> {
     try {
       this.logger.log(
         `Fetching paginated transactions for event ${eventId}: numberOfDates=${numberOfDates}, offset=${offset}`,
@@ -95,45 +112,69 @@ export class TransactionsService {
         throw new NotFoundException(`Event with ID ${eventId} not found`);
       }
 
-      // 1. Get unique dates ordered DESC
-      const uniqueDatesResult = await this.transactionRepository
-        .createQueryBuilder('t')
-        .select('DISTINCT t.date', 'date')
-        .where('t.eventId = :eventId', { eventId })
-        .orderBy('t.date', 'DESC')
-        .getRawMany<{ date: Date }>();
+      // Single optimized query using window functions
+      // DENSE_RANK() groups transactions by unique dates
+      const query = `
+        WITH RankedTransactions AS (
+          SELECT 
+            t.*,
+            DENSE_RANK() OVER (ORDER BY t.date DESC) as date_rank
+          FROM transactions t
+          WHERE t."eventId" = $1
+        ),
+        DateCounts AS (
+          SELECT COUNT(DISTINCT date_rank) as total_dates
+          FROM RankedTransactions
+        )
+        SELECT 
+          rt.*,
+          dc.total_dates
+        FROM RankedTransactions rt
+        CROSS JOIN DateCounts dc
+        WHERE rt.date_rank > $2 AND rt.date_rank <= $3
+        ORDER BY rt.date DESC, rt."createdAt" DESC
+      `;
 
-      const totalDates = uniqueDatesResult.length;
-      const targetDates = uniqueDatesResult
-        .slice(offset, offset + numberOfDates)
-        .map((d) => d.date);
+      const rawResults: RankedTransactionRow[] =
+        await this.transactionRepository.query(query, [
+          eventId,
+          offset,
+          offset + numberOfDates,
+        ]);
 
-      // 2. Get transactions for those dates
-      const transactions =
-        targetDates.length > 0
-          ? await this.transactionRepository.find({
-              where: {
-                eventId,
-                date: In(targetDates),
-              },
-              order: {
-                date: 'DESC',
-                createdAt: 'DESC',
-              },
-            })
-          : [];
+      // Extract total dates from first row (all rows have same value)
+      const totalDates = rawResults.length > 0 ? rawResults[0].total_dates : 0;
+
+      // Map raw results to Transaction entities
+      const transactions = rawResults.map((row) => {
+        const transaction = new Transaction();
+        transaction.id = row.id;
+        transaction.eventId = row.eventId;
+        transaction.participantId = row.participantId;
+        transaction.paymentType = row.paymentType as Transaction['paymentType'];
+        transaction.amount = parseFloat(row.amount);
+        transaction.title = row.title;
+        transaction.date = row.date;
+        transaction.createdAt = row.createdAt;
+        return transaction;
+      });
+
+      // Calculate unique dates loaded
+      const uniqueDatesLoaded = new Set(
+        transactions.map((t) => t.date.toISOString().split('T')[0]),
+      ).size;
 
       const hasMore = offset + numberOfDates < totalDates;
 
       this.logger.log(
-        `Paginated result: ${transactions.length} transactions, ${targetDates.length} dates loaded, hasMore=${hasMore}`,
+        `Paginated result: ${transactions.length} transactions, ${uniqueDatesLoaded} dates loaded, hasMore=${hasMore}`,
       );
 
       return {
         transactions,
         hasMore,
         totalDates,
-        loadedDates: targetDates.length,
+        loadedDates: uniqueDatesLoaded,
       };
     } catch (error) {
       if (

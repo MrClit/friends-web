@@ -6,7 +6,7 @@
 
 # ID del evento para las transacciones
 # Cámbialo por un evento real de tu BD
-@eventId = 123e4567-e89b-12d3-a456-426614174000
+@eventId = c4b40caf-268a-401f-bb69-6ff3527427b5
 
 ###############################################
 # 1. LIST TRANSACTIONS BY EVENT
@@ -42,7 +42,7 @@ Content-Type: {{contentType}}
   "paymentType": "expense",
   "amount": 120.50,
   "participantId": "2",
-  "date": "2026-01-15"
+  "date": "2026-01-20"
 }
 
 ###############################################
