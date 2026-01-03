@@ -14,9 +14,7 @@ interface EventFormModalProps {
 
 export default function EventFormModal({ open, onClose, event, onSubmit }: EventFormModalProps) {
   const [title, setTitle] = useState('');
-  const [participants, setParticipants] = useState<EventParticipant[]>([
-    { id: crypto.randomUUID(), name: '' },
-  ]);
+  const [participants, setParticipants] = useState<EventParticipant[]>([{ id: crypto.randomUUID(), name: '' }]);
   const [showConfirm, setShowConfirm] = useState(false);
   const addEvent = useEventsStore((state) => state.addEvent);
   const { t } = useTranslation();
@@ -84,9 +82,7 @@ export default function EventFormModal({ open, onClose, event, onSubmit }: Event
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanParticipants = participants
-      .map((p) => ({ ...p, name: p.name.trim() }))
-      .filter((p) => p.name);
+    const cleanParticipants = participants.map((p) => ({ ...p, name: p.name.trim() })).filter((p) => p.name);
     if (!title.trim() || cleanParticipants.length === 0) return;
     if (onSubmit) {
       onSubmit({ id: event?.id, title: title.trim(), participants: cleanParticipants });
@@ -98,15 +94,11 @@ export default function EventFormModal({ open, onClose, event, onSubmit }: Event
     onClose();
   };
 
-  const canSubmit =
-    !!title.trim() && participants.some((p) => typeof p.name === 'string' && !!p.name.trim());
+  const canSubmit = !!title.trim() && participants.some((p) => typeof p.name === 'string' && !!p.name.trim());
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-20 flex items-end justify-center bg-black/30"
-        onClick={handleClose}
-      >
+      <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/30" onClick={handleClose}>
         <div
           className="w-full max-w-md bg-white dark:bg-teal-900 rounded-t-3xl p-6 shadow-lg animate-slideUp
             min-h-[50vh] max-h-[90vh] overflow-y-auto"
@@ -143,9 +135,7 @@ export default function EventFormModal({ open, onClose, event, onSubmit }: Event
       <ConfirmDialog
         open={showConfirm}
         title={event ? t('eventFormModal.discardEditTitle') : t('eventFormModal.discardNewTitle')}
-        message={
-          event ? t('eventFormModal.discardEditMessage') : t('eventFormModal.discardNewMessage')
-        }
+        message={event ? t('eventFormModal.discardEditMessage') : t('eventFormModal.discardNewMessage')}
         confirmText={t('eventFormModal.discard')}
         cancelText={t('eventFormModal.cancel')}
         onConfirm={handleConfirmClose}

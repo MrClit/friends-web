@@ -14,12 +14,7 @@ interface TransactionModalProps {
   transaction?: Transaction; // Optional for editing existing transactions
 }
 
-export default function TransactionModal({
-  open,
-  onClose,
-  event,
-  transaction,
-}: TransactionModalProps) {
+export default function TransactionModal({ open, onClose, event, transaction }: TransactionModalProps) {
   const [type, setType] = useState<PaymentType>('contribution');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');

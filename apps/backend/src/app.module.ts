@@ -19,8 +19,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
     // TypeORM con configuración async para usar ConfigService
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        getDatabaseConfig(configService),
+      useFactory: (configService: ConfigService) => getDatabaseConfig(configService),
     }),
     // Feature modules
     EventsModule,

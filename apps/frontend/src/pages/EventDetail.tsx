@@ -20,13 +20,9 @@ export default function EventDetail() {
   const removeEvent = useEventsStore((state) => state.removeEvent);
 
   const getTotalExpensesByEvent = useTransactionsStore((state) => state.getTotalExpensesByEvent);
-  const getTotalContributionsByEvent = useTransactionsStore(
-    (state) => state.getTotalContributionsByEvent,
-  );
+  const getTotalContributionsByEvent = useTransactionsStore((state) => state.getTotalContributionsByEvent);
   const getPotBalanceByEvent = useTransactionsStore((state) => state.getPotBalanceByEvent);
-  const getPendingToCompensateByEvent = useTransactionsStore(
-    (state) => state.getPendingToCompensateByEvent,
-  );
+  const getPendingToCompensateByEvent = useTransactionsStore((state) => state.getPendingToCompensateByEvent);
 
   const totalExpenses = event ? getTotalExpensesByEvent(event.id) : 0;
   const totalContributions = event ? getTotalContributionsByEvent(event.id) : 0;
@@ -87,11 +83,7 @@ export default function EventDetail() {
         event={event}
         onSubmit={handleEditSubmit}
       />
-      <TransactionModal
-        open={transactionModalOpen}
-        onClose={() => setTransactionModalOpen(false)}
-        event={event}
-      />
+      <TransactionModal open={transactionModalOpen} onClose={() => setTransactionModalOpen(false)} event={event} />
       <ConfirmDialog
         open={deleteDialogOpen}
         title={t('eventDetail.deleteTitle')}

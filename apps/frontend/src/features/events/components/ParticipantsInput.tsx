@@ -5,15 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 interface ParticipantsInputProps {
   participants: EventParticipant[];
-  setParticipants: (
-    newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[]),
-  ) => void;
+  setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
 }
 
-export default function ParticipantsInput({
-  participants,
-  setParticipants,
-}: ParticipantsInputProps) {
+export default function ParticipantsInput({ participants, setParticipants }: ParticipantsInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { t } = useTranslation();
 
@@ -26,19 +21,12 @@ export default function ParticipantsInput({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="block text-teal-700 dark:text-teal-100 font-medium">
-          {t('participantsInput.label')}
-        </label>
+        <label className="block text-teal-700 dark:text-teal-100 font-medium">{t('participantsInput.label')}</label>
         <button
           type="button"
           aria-label={t('participantsInput.addAria')}
           className={`ml-2 p-1 rounded-full hover:bg-teal-200 dark:hover:bg-teal-700 text-teal-600 dark:text-teal-200 transition disabled:opacity-50`}
-          onClick={() =>
-            setParticipants((p: EventParticipant[]) => [
-              ...p,
-              { id: crypto.randomUUID(), name: '' },
-            ])
-          } // UUID nunca será '0' (reservado para el Bote)
+          onClick={() => setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: '' }])} // UUID nunca será '0' (reservado para el Bote)
           disabled={
             participants.length === 0 ||
             typeof participants[participants.length - 1]?.name !== 'string' ||

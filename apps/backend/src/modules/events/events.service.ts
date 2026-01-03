@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  Logger,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity';
@@ -57,10 +52,7 @@ export class EventsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to fetch event ${id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to fetch event ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to fetch event');
     }
   }
@@ -103,10 +95,7 @@ export class EventsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to update event ${id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to update event ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to update event');
     }
   }
@@ -130,10 +119,7 @@ export class EventsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to delete event ${id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to delete event ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to delete event');
     }
   }

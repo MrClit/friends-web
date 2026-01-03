@@ -20,20 +20,12 @@ export default function KPIDetail() {
 
   // Store methods
   const getTotalExpensesByEvent = useTransactionsStore((state) => state.getTotalExpensesByEvent);
-  const getTotalContributionsByEvent = useTransactionsStore(
-    (state) => state.getTotalContributionsByEvent,
-  );
+  const getTotalContributionsByEvent = useTransactionsStore((state) => state.getTotalContributionsByEvent);
   const getPotBalanceByEvent = useTransactionsStore((state) => state.getPotBalanceByEvent);
-  const getPendingToCompensateByEvent = useTransactionsStore(
-    (state) => state.getPendingToCompensateByEvent,
-  );
+  const getPendingToCompensateByEvent = useTransactionsStore((state) => state.getPendingToCompensateByEvent);
 
-  const getTotalExpensesByParticipant = useTransactionsStore(
-    (state) => state.getTotalExpensesByParticipant,
-  );
-  const getTotalContributionsByParticipant = useTransactionsStore(
-    (state) => state.getTotalContributionsByParticipant,
-  );
+  const getTotalExpensesByParticipant = useTransactionsStore((state) => state.getTotalExpensesByParticipant);
+  const getTotalContributionsByParticipant = useTransactionsStore((state) => state.getTotalContributionsByParticipant);
   const getPendingToCompensateByParticipant = useTransactionsStore(
     (state) => state.getPendingToCompensateByParticipant,
   );
@@ -108,11 +100,7 @@ export default function KPIDetail() {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
-      <EventDetailHeader
-        eventId={event.id}
-        eventTitle={event.title}
-        onBack={() => navigate(`/event/${event.id}`)}
-      />
+      <EventDetailHeader eventId={event.id} eventTitle={event.title} onBack={() => navigate(`/event/${event.id}`)} />
 
       <div className="w-full max-w-2xl mb-8">
         <KPIBox

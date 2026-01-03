@@ -9,12 +9,7 @@ interface EventDetailHeaderProps {
   onDelete?: () => void;
 }
 
-export default function EventDetailHeader({
-  eventTitle,
-  onBack,
-  onEdit,
-  onDelete,
-}: EventDetailHeaderProps) {
+export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: EventDetailHeaderProps) {
   const showContextMenu = onEdit && onDelete;
 
   return (

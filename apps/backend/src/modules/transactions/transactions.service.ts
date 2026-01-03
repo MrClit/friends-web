@@ -66,22 +66,14 @@ export class TransactionsService {
         },
       });
 
-      this.logger.log(
-        `Found ${transactions.length} transactions for event ${eventId}`,
-      );
+      this.logger.log(`Found ${transactions.length} transactions for event ${eventId}`);
       return transactions;
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to fetch transactions for event ${eventId}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to fetch transactions for event ${eventId}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to fetch transactions');
     }
   }
@@ -135,12 +127,11 @@ export class TransactionsService {
         ORDER BY rt.date DESC, rt."createdAt" DESC
       `;
 
-      const rawResults: RankedTransactionRow[] =
-        await this.transactionRepository.query(query, [
-          eventId,
-          offset,
-          offset + numberOfDates,
-        ]);
+      const rawResults: RankedTransactionRow[] = await this.transactionRepository.query(query, [
+        eventId,
+        offset,
+        offset + numberOfDates,
+      ]);
 
       // Extract total dates from first row (all rows have same value)
       const totalDates = rawResults.length > 0 ? rawResults[0].total_dates : 0;
@@ -160,9 +151,7 @@ export class TransactionsService {
       });
 
       // Calculate unique dates loaded
-      const uniqueDatesLoaded = new Set(
-        transactions.map((t) => t.date.toISOString().split('T')[0]),
-      ).size;
+      const uniqueDatesLoaded = new Set(transactions.map((t) => t.date.toISOString().split('T')[0])).size;
 
       const hasMore = offset + numberOfDates < totalDates;
 
@@ -177,20 +166,12 @@ export class TransactionsService {
         loadedDates: uniqueDatesLoaded,
       };
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to fetch paginated transactions for event ${eventId}: ${err.message}`,
-        err.stack,
-      );
-      throw new InternalServerErrorException(
-        'Failed to fetch paginated transactions',
-      );
+      this.logger.error(`Failed to fetch paginated transactions for event ${eventId}: ${err.message}`, err.stack);
+      throw new InternalServerErrorException('Failed to fetch paginated transactions');
     }
   }
 
@@ -214,10 +195,7 @@ export class TransactionsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to fetch transaction ${id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to fetch transaction ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to fetch transaction');
     }
   }
@@ -226,14 +204,9 @@ export class TransactionsService {
    * Create a new transaction
    * Validates that participantId exists in event participants or is '0' (POT)
    */
-  async create(
-    eventId: string,
-    createTransactionDto: CreateTransactionDto,
-  ): Promise<Transaction> {
+  async create(eventId: string, createTransactionDto: CreateTransactionDto): Promise<Transaction> {
     try {
-      this.logger.log(
-        `Creating new transaction for event ${eventId}: ${createTransactionDto.title}`,
-      );
+      this.logger.log(`Creating new transaction for event ${eventId}: ${createTransactionDto.title}`);
 
       // Verify event exists
       const event = await this.eventRepository.findOne({
@@ -245,10 +218,7 @@ export class TransactionsService {
       }
 
       // Validate participantId
-      this.validateParticipantId(
-        createTransactionDto.participantId,
-        event.participants,
-      );
+      this.validateParticipantId(createTransactionDto.participantId, event.participants);
 
       // Create transaction
       const transaction = this.transactionRepository.create({
@@ -256,24 +226,15 @@ export class TransactionsService {
         eventId,
       });
 
-      const savedTransaction =
-        await this.transactionRepository.save(transaction);
-      this.logger.log(
-        `Transaction created successfully with ID: ${savedTransaction.id}`,
-      );
+      const savedTransaction = await this.transactionRepository.save(transaction);
+      this.logger.log(`Transaction created successfully with ID: ${savedTransaction.id}`);
       return savedTransaction;
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to create transaction: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to create transaction: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to create transaction');
     }
   }
@@ -281,10 +242,7 @@ export class TransactionsService {
   /**
    * Update a transaction
    */
-  async update(
-    id: string,
-    updateTransactionDto: UpdateTransactionDto,
-  ): Promise<Transaction> {
+  async update(id: string, updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
     try {
       this.logger.log(`Updating transaction with ID: ${id}`);
 
@@ -298,15 +256,10 @@ export class TransactionsService {
         });
 
         if (!event) {
-          throw new NotFoundException(
-            `Event with ID ${transaction.eventId} not found`,
-          );
+          throw new NotFoundException(`Event with ID ${transaction.eventId} not found`);
         }
 
-        this.validateParticipantId(
-          updateTransactionDto.participantId,
-          event.participants,
-        );
+        this.validateParticipantId(updateTransactionDto.participantId, event.participants);
       }
 
       // Update transaction
@@ -316,17 +269,11 @@ export class TransactionsService {
       this.logger.log(`Transaction ${id} updated successfully`);
       return updatedTransaction;
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to update transaction ${id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to update transaction ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to update transaction');
     }
   }
@@ -349,10 +296,7 @@ export class TransactionsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(
-        `Failed to delete transaction ${id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to delete transaction ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to delete transaction');
     }
   }
@@ -361,10 +305,7 @@ export class TransactionsService {
    * Validate that participantId exists in event participants or is '0' (POT)
    * @throws BadRequestException if participantId is invalid
    */
-  private validateParticipantId(
-    participantId: string,
-    participants: Array<{ id: string; name: string }>,
-  ): void {
+  private validateParticipantId(participantId: string, participants: Array<{ id: string; name: string }>): void {
     // Allow POT participant
     if (participantId === POT_PARTICIPANT_ID) {
       return;

@@ -25,9 +25,7 @@ export const ApiStandardResponse = <TModel extends Type<any>>(
   model?: TModel,
   isArray = false,
 ) => {
-  const decorators: Array<
-    ClassDecorator | MethodDecorator | PropertyDecorator
-  > = [];
+  const decorators: Array<ClassDecorator | MethodDecorator | PropertyDecorator> = [];
 
   // Add model to Swagger if provided
   if (model) {

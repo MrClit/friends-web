@@ -77,20 +77,14 @@ interface TransactionsState {
   // AGGREGATIONS - BY PARTICIPANT (returns array of participant data)
   // ============================================================
   /** Total expenses per participant (excludes pot expenses) */
-  getTotalExpensesByParticipant: (
-    event: Event,
-  ) => { participant: EventParticipant; total: number }[];
+  getTotalExpensesByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   /** Total contributions per participant */
-  getTotalContributionsByParticipant: (
-    event: Event,
-  ) => { participant: EventParticipant; total: number }[];
+  getTotalContributionsByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   /**
    * Pending to compensate per participant
    * Formula: participant expenses - compensations (excludes pot expenses)
    */
-  getPendingToCompensateByParticipant: (
-    event: Event,
-  ) => { participant: EventParticipant; total: number }[];
+  getPendingToCompensateByParticipant: (event: Event) => { participant: EventParticipant; total: number }[];
   /**
    * Balance per participant
    * Formula: contributions - expenses - compensations
@@ -132,9 +126,7 @@ export const useTransactionsStore = create<TransactionsState>()(
       clearParticipantFromEventTransactions: (eventId, participantId) =>
         set((state) => ({
           transactions: state.transactions.map((tx) =>
-            tx.eventId === eventId &&
-            tx.participantId === participantId &&
-            participantId !== POT_PARTICIPANT_ID
+            tx.eventId === eventId && tx.participantId === participantId && participantId !== POT_PARTICIPANT_ID
               ? { ...tx, participantId: '' }
               : tx,
           ),
@@ -151,9 +143,7 @@ export const useTransactionsStore = create<TransactionsState>()(
           .sort((a, b) => b.date.localeCompare(a.date));
 
         // Get unique dates sorted descending (most recent first)
-        const uniqueDates = Array.from(new Set(allTransactions.map((t) => t.date))).sort((a, b) =>
-          b.localeCompare(a),
-        );
+        const uniqueDates = Array.from(new Set(allTransactions.map((t) => t.date))).sort((a, b) => b.localeCompare(a));
 
         // Calculate pagination
         const totalDates = uniqueDates.length;
@@ -212,10 +202,7 @@ export const useTransactionsStore = create<TransactionsState>()(
       getTotalPotExpensesByEvent: (eventId) =>
         get()
           .transactions.filter(
-            (e) =>
-              e.eventId === eventId &&
-              e.paymentType === 'expense' &&
-              e.participantId === POT_PARTICIPANT_ID,
+            (e) => e.eventId === eventId && e.paymentType === 'expense' && e.participantId === POT_PARTICIPANT_ID,
           )
           .reduce((sum, e) => sum + e.amount, 0),
 
@@ -227,8 +214,7 @@ export const useTransactionsStore = create<TransactionsState>()(
       },
 
       getPendingToCompensateByEvent: (eventId) => {
-        const totalExpenses =
-          get().getTotalExpensesByEvent(eventId) - get().getTotalPotExpensesByEvent(eventId);
+        const totalExpenses = get().getTotalExpensesByEvent(eventId) - get().getTotalPotExpensesByEvent(eventId);
         const totalCompensations = get().getTotalCompensationsByEvent(eventId);
         return totalExpenses - totalCompensations;
       },
@@ -237,25 +223,17 @@ export const useTransactionsStore = create<TransactionsState>()(
       // AGGREGATIONS - BY PARTICIPANT
       // ============================================================
       getTotalExpensesByParticipant: (event) => {
-        const txs = get().transactions.filter(
-          (e) => e.eventId === event.id && e.paymentType === 'expense',
-        );
+        const txs = get().transactions.filter((e) => e.eventId === event.id && e.paymentType === 'expense');
         return event.participants.map((p) => {
-          const total = txs
-            .filter((t) => t.participantId === p.id)
-            .reduce((sum, t) => sum + t.amount, 0);
+          const total = txs.filter((t) => t.participantId === p.id).reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
       },
 
       getTotalContributionsByParticipant: (event) => {
-        const txs = get().transactions.filter(
-          (e) => e.eventId === event.id && e.paymentType === 'contribution',
-        );
+        const txs = get().transactions.filter((e) => e.eventId === event.id && e.paymentType === 'contribution');
         return event.participants.map((p) => {
-          const total = txs
-            .filter((t) => t.participantId === p.id)
-            .reduce((sum, t) => sum + t.amount, 0);
+          const total = txs.filter((t) => t.participantId === p.id).reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
         });
       },
@@ -264,10 +242,7 @@ export const useTransactionsStore = create<TransactionsState>()(
         const expenses = get().getTotalExpensesByParticipant(event);
         const compensations = event.participants.map((p) => {
           const txs = get().transactions.filter(
-            (e) =>
-              e.eventId === event.id &&
-              e.paymentType === 'compensation' &&
-              e.participantId === p.id,
+            (e) => e.eventId === event.id && e.paymentType === 'compensation' && e.participantId === p.id,
           );
           const total = txs.reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };
@@ -283,10 +258,7 @@ export const useTransactionsStore = create<TransactionsState>()(
         const expenses = get().getTotalExpensesByParticipant(event);
         const compensations = event.participants.map((p) => {
           const txs = get().transactions.filter(
-            (e) =>
-              e.eventId === event.id &&
-              e.paymentType === 'compensation' &&
-              e.participantId === p.id,
+            (e) => e.eventId === event.id && e.paymentType === 'compensation' && e.participantId === p.id,
           );
           const total = txs.reduce((sum, t) => sum + t.amount, 0);
           return { participant: p, total };

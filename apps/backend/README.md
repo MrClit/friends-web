@@ -785,9 +785,7 @@ export const api = {
         .then((response) => response.data), // ⚠️ Accede a .data
 
     getPaginated: (eventId: string, numberOfDates = 3, offset = 0) =>
-      fetch(
-        `${API_BASE}/events/${eventId}/transactions/paginated?numberOfDates=${numberOfDates}&offset=${offset}`,
-      )
+      fetch(`${API_BASE}/events/${eventId}/transactions/paginated?numberOfDates=${numberOfDates}&offset=${offset}`)
         .then((r) => r.json())
         .then((response) => response.data), // ⚠️ Accede a .data
 

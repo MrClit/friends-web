@@ -5,11 +5,7 @@ import type { ComponentType } from 'react';
 /**
  * Array of all payment types for iteration
  */
-export const PAYMENT_TYPES: readonly PaymentType[] = [
-  'contribution',
-  'expense',
-  'compensation',
-] as const;
+export const PAYMENT_TYPES: readonly PaymentType[] = ['contribution', 'expense', 'compensation'] as const;
 
 /**
  * Centralized configuration for payment types

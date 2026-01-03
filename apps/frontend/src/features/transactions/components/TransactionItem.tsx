@@ -36,9 +36,7 @@ function TransactionItem({ transaction, onClick, participantsMap }: TransactionI
     : participantsMap.get(transaction.participantId) || t('transactionsList.unknownParticipant');
 
   // Determine amount color class
-  const amountColorClass = isPot
-    ? POT_CONFIG.colorClass
-    : PAYMENT_TYPE_CONFIG[transaction.paymentType].colorStrong;
+  const amountColorClass = isPot ? POT_CONFIG.colorClass : PAYMENT_TYPE_CONFIG[transaction.paymentType].colorStrong;
 
   return (
     <li
@@ -60,9 +58,7 @@ function TransactionItem({ transaction, onClick, participantsMap }: TransactionI
           {t(`transactionsList.participantPrefix.${transaction.paymentType}`)} {participantName}
         </div>
       </div>
-      <div className={`font-bold text-lg tabular-nums ${amountColorClass}`}>
-        {formatAmount(transaction.amount)}
-      </div>
+      <div className={`font-bold text-lg tabular-nums ${amountColorClass}`}>{formatAmount(transaction.amount)}</div>
     </li>
   );
 }

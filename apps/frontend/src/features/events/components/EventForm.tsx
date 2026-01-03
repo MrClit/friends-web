@@ -6,9 +6,7 @@ interface EventFormProps {
   title: string;
   setTitle: (title: string) => void;
   participants: EventParticipant[];
-  setParticipants: (
-    newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[]),
-  ) => void;
+  setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
   onSubmit: (e: React.FormEvent) => void;
   canSubmit: boolean;
   mode?: 'edit' | 'create';
@@ -27,10 +25,7 @@ export default function EventForm({
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
       <div>
-        <label
-          htmlFor="event-title"
-          className="block text-teal-700 dark:text-teal-100 font-medium mb-1"
-        >
+        <label htmlFor="event-title" className="block text-teal-700 dark:text-teal-100 font-medium mb-1">
           {t('eventForm.titleLabel')}
         </label>
         <input

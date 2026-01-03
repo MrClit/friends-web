@@ -1,9 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  NotFoundException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { Event } from './entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -78,9 +75,7 @@ describe('EventsService', () => {
     it('should throw InternalServerErrorException on database error', async () => {
       mockRepository.find.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.findAll()).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(service.findAll()).rejects.toThrow(InternalServerErrorException);
       await expect(service.findAll()).rejects.toThrow('Failed to fetch events');
     });
   });
@@ -100,20 +95,14 @@ describe('EventsService', () => {
     it('should throw NotFoundException when event not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('non-existent-id')).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.findOne('non-existent-id')).rejects.toThrow(
-        'Event with ID non-existent-id not found',
-      );
+      await expect(service.findOne('non-existent-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('non-existent-id')).rejects.toThrow('Event with ID non-existent-id not found');
     });
 
     it('should throw InternalServerErrorException on database error', async () => {
       mockRepository.findOne.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.findOne(mockEvent.id)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(service.findOne(mockEvent.id)).rejects.toThrow(InternalServerErrorException);
     });
   });
 
@@ -143,9 +132,7 @@ describe('EventsService', () => {
       mockRepository.create.mockReturnValue(mockEvent);
       mockRepository.save.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.create(createDto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(service.create(createDto)).rejects.toThrow(InternalServerErrorException);
     });
   });
 
@@ -178,9 +165,7 @@ describe('EventsService', () => {
 
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.update('non-existent-id', updateDto),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('non-existent-id', updateDto)).rejects.toThrow(NotFoundException);
     });
 
     it('should update participants when provided', async () => {
@@ -211,9 +196,7 @@ describe('EventsService', () => {
       mockRepository.merge.mockReturnValue(mockEvent);
       mockRepository.save.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.update(mockEvent.id, updateDto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(service.update(mockEvent.id, updateDto)).rejects.toThrow(InternalServerErrorException);
     });
   });
 
@@ -233,9 +216,7 @@ describe('EventsService', () => {
     it('should throw NotFoundException when event not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('non-existent-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.remove('non-existent-id')).rejects.toThrow(NotFoundException);
       expect(mockRepository.delete).not.toHaveBeenCalled();
     });
 
@@ -243,9 +224,7 @@ describe('EventsService', () => {
       mockRepository.findOne.mockResolvedValue(mockEvent);
       mockRepository.delete.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.remove(mockEvent.id)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(service.remove(mockEvent.id)).rejects.toThrow(InternalServerErrorException);
     });
   });
 });

@@ -27,9 +27,7 @@ export default function KPIBox({
       tabIndex={onClick ? 0 : undefined} // Hace que el div sea enfocablesi onClick está presente
       role={onClick ? 'button' : undefined} // Establece el rol como botón si onClick está presente
     >
-      <span
-        className={`text-xs mb-1 font-medium uppercase tracking-wide whitespace-nowrap ${labelClassName || ''}`}
-      >
+      <span className={`text-xs mb-1 font-medium uppercase tracking-wide whitespace-nowrap ${labelClassName || ''}`}>
         {label}
       </span>
       <span className={`text-2xl font-bold ${valueClassName || ''}`}>{formatAmount(value)}</span>

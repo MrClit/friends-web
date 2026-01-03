@@ -50,13 +50,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       expect(screen.getByText('Monthly contribution')).toBeInTheDocument();
       expect(screen.getByText('€100.00')).toBeInTheDocument();
@@ -74,13 +68,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       expect(screen.getByText('Groceries')).toBeInTheDocument();
       expect(screen.getByText('€50.50')).toBeInTheDocument();
@@ -98,13 +86,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       expect(screen.getByText('Reimbursement')).toBeInTheDocument();
       expect(screen.getByText('€25.00')).toBeInTheDocument();
@@ -128,13 +110,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={potTransaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={potTransaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       expect(screen.getByText('Venue rental')).toBeInTheDocument();
       expect(screen.getByText('€500.00')).toBeInTheDocument();
@@ -152,13 +128,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       expect(screen.getByText(/Participante desconocido/)).toBeInTheDocument();
     });
@@ -177,13 +147,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       const item = screen.getByRole('button');
       await user.click(item);
@@ -203,13 +167,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       const item = screen.getByRole('button');
       item.focus();
@@ -230,13 +188,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       const item = screen.getByRole('button');
       item.focus();
@@ -259,13 +211,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       expect(screen.getByRole('button')).toBeInTheDocument();
     });
@@ -281,13 +227,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       const item = screen.getByRole('button');
       expect(item).toHaveAttribute('tabIndex', '0');
@@ -304,13 +244,7 @@ describe('TransactionItem', () => {
         eventId: 'e1',
       };
 
-      render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      render(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       const item = screen.getByRole('button');
       expect(item).toHaveAttribute('aria-label', 'Dinner, €45.50');
@@ -328,11 +262,7 @@ describe('TransactionItem', () => {
       };
 
       const { container } = render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
+        <TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />,
       );
 
       const iconSpan = container.querySelector('span.text-xl');
@@ -355,23 +285,13 @@ describe('TransactionItem', () => {
       };
 
       const { rerender } = render(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
+        <TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />,
       );
 
       const firstText = screen.getByText('Test');
 
       // Rerender with the exact same props (same reference)
-      rerender(
-        <TransactionItem
-          transaction={transaction}
-          participantsMap={participantsMap}
-          onClick={mockOnClick}
-        />,
-      );
+      rerender(<TransactionItem transaction={transaction} participantsMap={participantsMap} onClick={mockOnClick} />);
 
       const secondText = screen.getByText('Test');
 

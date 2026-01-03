@@ -40,8 +40,7 @@ export const useEventsStore = create<EventsState>()(
             const oldIds = oldEvent.participants.map((p) => p.id);
             const newIds = participants.map((p) => p.id);
             const removedIds = oldIds.filter((oid) => !newIds.includes(oid));
-            const clearParticipant =
-              useTransactionsStore.getState().clearParticipantFromEventTransactions;
+            const clearParticipant = useTransactionsStore.getState().clearParticipantFromEventTransactions;
             removedIds.forEach((pid) => {
               clearParticipant(id, pid);
             });

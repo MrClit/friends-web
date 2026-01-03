@@ -23,8 +23,7 @@ export default function KPIExplanation({ kpiType }: KPIExplanationProps) {
     <div className="mt-6 text-xs text-teal-700 dark:text-teal-200 opacity-80">
       <strong>{t('kpiDetail.noteTitle')}</strong> <br />
       <span className="block mt-1">
-        <span className="font-semibold">{t(`kpiDetail.kpi.${kpiType}`)}</span>:{' '}
-        {explanations[kpiType]}
+        <span className="font-semibold">{t(`kpiDetail.kpi.${kpiType}`)}</span>: {explanations[kpiType]}
       </span>
     </div>
   );

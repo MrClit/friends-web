@@ -1,10 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  NotFoundException,
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { Transaction } from './entities/transaction.entity';
 import { Event } from '../events/entities/event.entity';
@@ -92,20 +88,14 @@ describe('TransactionsService', () => {
     it('should throw NotFoundException when event does not exist', async () => {
       mockEventRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findByEvent('nonexistent-id')).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.findByEvent('nonexistent-id')).rejects.toThrow(
-        'Event with ID nonexistent-id not found',
-      );
+      await expect(service.findByEvent('nonexistent-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findByEvent('nonexistent-id')).rejects.toThrow('Event with ID nonexistent-id not found');
     });
 
     it('should throw InternalServerErrorException on database error', async () => {
       mockEventRepository.findOne.mockRejectedValue(new Error('DB Error'));
 
-      await expect(service.findByEvent('event-uuid-1')).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      await expect(service.findByEvent('event-uuid-1')).rejects.toThrow(InternalServerErrorException);
     });
   });
 
@@ -126,9 +116,7 @@ describe('TransactionsService', () => {
           ]),
       };
 
-      mockTransactionRepository.createQueryBuilder.mockReturnValue(
-        mockQueryBuilder,
-      );
+      mockTransactionRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
       mockTransactionRepository.find.mockResolvedValue([mockTransaction]);
 
       const result = await service.findByEventPaginated('event-uuid-1', 2, 0);
@@ -151,9 +139,7 @@ describe('TransactionsService', () => {
         getRawMany: jest.fn().mockResolvedValue([]),
       };
 
-      mockTransactionRepository.createQueryBuilder.mockReturnValue(
-        mockQueryBuilder,
-      );
+      mockTransactionRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
       const result = await service.findByEventPaginated('event-uuid-1', 3, 0);
 
@@ -168,9 +154,7 @@ describe('TransactionsService', () => {
     it('should throw NotFoundException when event does not exist', async () => {
       mockEventRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.findByEventPaginated('nonexistent-id', 3, 0),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findByEventPaginated('nonexistent-id', 3, 0)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -189,12 +173,8 @@ describe('TransactionsService', () => {
     it('should throw NotFoundException when transaction does not exist', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent-id')).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.findOne('nonexistent-id')).rejects.toThrow(
-        'Transaction with ID nonexistent-id not found',
-      );
+      await expect(service.findOne('nonexistent-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent-id')).rejects.toThrow('Transaction with ID nonexistent-id not found');
     });
   });
 
@@ -241,9 +221,7 @@ describe('TransactionsService', () => {
     it('should throw NotFoundException when event does not exist', async () => {
       mockEventRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.create('nonexistent-id', createDto)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.create('nonexistent-id', createDto)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw BadRequestException for invalid participantId', async () => {
@@ -251,9 +229,7 @@ describe('TransactionsService', () => {
 
       const invalidDto = { ...createDto, participantId: '999' };
 
-      await expect(service.create('event-uuid-1', invalidDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create('event-uuid-1', invalidDto)).rejects.toThrow(BadRequestException);
       await expect(service.create('event-uuid-1', invalidDto)).rejects.toThrow(
         'Participant with ID 999 does not exist in this event',
       );
@@ -275,10 +251,7 @@ describe('TransactionsService', () => {
 
       const result = await service.update('transaction-uuid-1', updateDto);
 
-      expect(mockTransactionRepository.update).toHaveBeenCalledWith(
-        'transaction-uuid-1',
-        updateDto,
-      );
+      expect(mockTransactionRepository.update).toHaveBeenCalledWith('transaction-uuid-1', updateDto);
       expect(result.title).toEqual(updateDto.title);
       expect(result.amount).toEqual(updateDto.amount);
     });
@@ -292,17 +265,15 @@ describe('TransactionsService', () => {
         participantId: '999',
       };
 
-      await expect(
-        service.update('transaction-uuid-1', updateDtoWithInvalidParticipant),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.update('transaction-uuid-1', updateDtoWithInvalidParticipant)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw NotFoundException when transaction does not exist', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent-id', updateDto)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.update('nonexistent-id', updateDto)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -316,17 +287,13 @@ describe('TransactionsService', () => {
       expect(mockTransactionRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'transaction-uuid-1' },
       });
-      expect(mockTransactionRepository.delete).toHaveBeenCalledWith(
-        'transaction-uuid-1',
-      );
+      expect(mockTransactionRepository.delete).toHaveBeenCalledWith('transaction-uuid-1');
     });
 
     it('should throw NotFoundException when transaction does not exist', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('nonexistent-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.remove('nonexistent-id')).rejects.toThrow(NotFoundException);
     });
   });
 });

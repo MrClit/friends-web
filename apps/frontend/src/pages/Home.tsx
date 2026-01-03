@@ -19,11 +19,7 @@ export default function Home() {
         <LanguageMenu />
       </div>
       <EventsList />
-      <FloatingActionButton
-        onClick={() => setModalOpen(true)}
-        label={t('home.newEvent')}
-        icon={'+'}
-      />
+      <FloatingActionButton onClick={() => setModalOpen(true)} label={t('home.newEvent')} icon={'+'} />
       <EventFormModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );

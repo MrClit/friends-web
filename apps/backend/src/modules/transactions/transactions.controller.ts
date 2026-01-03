@@ -45,15 +45,8 @@ export class EventTransactionsController {
   @ApiStandardResponse(200, 'Paginated transactions retrieved successfully')
   @ApiResponse({ status: 404, description: 'Event not found' })
   @ApiResponse({ status: 400, description: 'Invalid query parameters' })
-  findByEventPaginated(
-    @Param('eventId', ParseUUIDPipe) eventId: string,
-    @Query() query: PaginationQueryDto,
-  ) {
-    return this.transactionsService.findByEventPaginated(
-      eventId,
-      query.numberOfDates,
-      query.offset,
-    );
+  findByEventPaginated(@Param('eventId', ParseUUIDPipe) eventId: string, @Query() query: PaginationQueryDto) {
+    return this.transactionsService.findByEventPaginated(eventId, query.numberOfDates, query.offset);
   }
 
   /**
@@ -68,12 +61,7 @@ export class EventTransactionsController {
     type: String,
     format: 'uuid',
   })
-  @ApiStandardResponse(
-    200,
-    'Transactions retrieved successfully',
-    Transaction,
-    true,
-  )
+  @ApiStandardResponse(200, 'Transactions retrieved successfully', Transaction, true)
   @ApiResponse({ status: 404, description: 'Event not found' })
   findByEvent(@Param('eventId', ParseUUIDPipe) eventId: string) {
     return this.transactionsService.findByEvent(eventId);
@@ -95,10 +83,7 @@ export class EventTransactionsController {
   @ApiStandardResponse(201, 'Transaction created successfully', Transaction)
   @ApiResponse({ status: 400, description: 'Invalid input' })
   @ApiResponse({ status: 404, description: 'Event not found' })
-  create(
-    @Param('eventId', ParseUUIDPipe) eventId: string,
-    @Body() createTransactionDto: CreateTransactionDto,
-  ) {
+  create(@Param('eventId', ParseUUIDPipe) eventId: string, @Body() createTransactionDto: CreateTransactionDto) {
     return this.transactionsService.create(eventId, createTransactionDto);
   }
 }
@@ -145,10 +130,7 @@ export class TransactionsController {
   @ApiStandardResponse(200, 'Transaction updated successfully', Transaction)
   @ApiResponse({ status: 400, description: 'Invalid input' })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateTransactionDto: UpdateTransactionDto,
-  ) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
     return this.transactionsService.update(id, updateTransactionDto);
   }
 

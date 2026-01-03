@@ -29,9 +29,7 @@ export default function TransactionsList({ event }: TransactionsListProps) {
   const { t } = useTranslation();
 
   // Get paginated transactions from store
-  const getTransactionsPaginated = useTransactionsStore(
-    (state) => state.getTransactionsByEventPaginated,
-  );
+  const getTransactionsPaginated = useTransactionsStore((state) => state.getTransactionsByEventPaginated);
 
   // Get paginated data with useMemo to avoid recalculations
   const { transactions, hasMore } = useMemo(
@@ -40,10 +38,7 @@ export default function TransactionsList({ event }: TransactionsListProps) {
   );
 
   // Create participants map for O(1) lookup
-  const participantsMap = useMemo(
-    () => new Map(event.participants.map((p) => [p.id, p.name])),
-    [event.participants],
-  );
+  const participantsMap = useMemo(() => new Map(event.participants.map((p) => [p.id, p.name])), [event.participants]);
 
   // Infinite scroll handler
   const loadMore = useCallback(() => {
@@ -102,10 +97,7 @@ export default function TransactionsList({ event }: TransactionsListProps) {
         <div ref={observerRef} className="py-4 text-center">
           {isLoading ? (
             <div className="flex justify-center items-center gap-2 text-teal-500">
-              <div
-                className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"
-                aria-hidden="true"
-              ></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500" aria-hidden="true"></div>
               <span>{t('transactionsList.loadingMore')}</span>
             </div>
           ) : (
