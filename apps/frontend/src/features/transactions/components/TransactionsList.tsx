@@ -5,7 +5,7 @@ import TransactionItem from './TransactionItem';
 import { useState, useMemo, useCallback } from 'react';
 import { formatDateLong } from '../../../shared/utils/formatDateLong';
 import { useTranslation } from 'react-i18next';
-import { useTransactionsStore } from '../store/useTransactionsStore';
+import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
 import { useInfiniteScroll } from '../../../shared/hooks';
 
 interface TransactionsListProps {
@@ -25,36 +25,35 @@ function groupByDate(transactions: Transaction[]) {
 export default function TransactionsList({ event }: TransactionsListProps) {
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [loadedDates, setLoadedDates] = useState(10); // Start with 10 days
   const { t } = useTranslation();
 
-  // Get paginated transactions from store
-  const getTransactionsPaginated = useTransactionsStore((state) => state.getTransactionsByEventPaginated);
-
-  // Get paginated data with useMemo to avoid recalculations
-  const { transactions, hasMore } = useMemo(
-    () => getTransactionsPaginated(event.id, loadedDates, 0),
-    [event.id, loadedDates, getTransactionsPaginated],
+  // Use React Query infinite query for pagination
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } = useTransactionsPaginated(
+    event.id,
+    3,
   );
+
+  // Flatten all pages into single array
+  const allTransactions = useMemo(() => data?.pages.flatMap((page) => page.transactions) ?? [], [data]);
 
   // Create participants map for O(1) lookup
   const participantsMap = useMemo(() => new Map(event.participants.map((p) => [p.id, p.name])), [event.participants]);
 
   // Infinite scroll handler
   const loadMore = useCallback(() => {
-    if (hasMore) {
-      setLoadedDates((prev) => prev + 5); // Load 5 more days
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  }, [hasMore]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const { observerRef, isLoading } = useInfiniteScroll({
+  const { observerRef } = useInfiniteScroll({
     onLoadMore: loadMore,
-    hasMore,
+    hasMore: hasNextPage ?? false,
     threshold: 0.1,
   });
 
   // Group transactions by date
-  const grouped = useMemo(() => groupByDate(transactions), [transactions]);
+  const grouped = useMemo(() => groupByDate(allTransactions), [allTransactions]);
   const dates = useMemo(() => Object.keys(grouped).sort((a, b) => b.localeCompare(a)), [grouped]);
 
   // Handler for clicking on a transaction
@@ -68,6 +67,18 @@ export default function TransactionsList({ event }: TransactionsListProps) {
     setTransactionModalOpen(false);
     setSelectedTransaction(null);
   }, []);
+
+  if (isLoading) {
+    return <div className="w-full max-w-2xl mb-8 text-center text-teal-400 py-8">{t('common.loading')}</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="w-full max-w-2xl mb-8 text-center text-red-400 py-8">
+        {t('common.error')}: {error.message}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-2xl mb-8">
@@ -93,9 +104,9 @@ export default function TransactionsList({ event }: TransactionsListProps) {
       ))}
 
       {/* Infinite scroll trigger */}
-      {hasMore && (
+      {hasNextPage && (
         <div ref={observerRef} className="py-4 text-center">
-          {isLoading ? (
+          {isFetchingNextPage ? (
             <div className="flex justify-center items-center gap-2 text-teal-500">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500" aria-hidden="true"></div>
               <span>{t('transactionsList.loadingMore')}</span>

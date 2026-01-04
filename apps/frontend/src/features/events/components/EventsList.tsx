@@ -1,12 +1,24 @@
-import { useEventsStore } from '../store/useEventsStore';
+import { useEvents } from '@/hooks/api/useEvents';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 export default function EventsList() {
-  const events = useEventsStore((state) => state.events);
+  const { data: events, isLoading, error } = useEvents();
   const { t } = useTranslation();
 
-  if (events.length === 0) {
+  if (isLoading) {
+    return <div className="text-center text-teal-400">{t('common.loading')}</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-400">
+        {t('common.error')}: {error.message}
+      </div>
+    );
+  }
+
+  if (!events || events.length === 0) {
     return <div className="text-center text-teal-400">{t('eventsList.noEvents')}</div>;
   }
 

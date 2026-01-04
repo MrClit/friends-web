@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import TransactionForm from './TransactionForm';
 import type { PaymentType, Transaction } from '../types';
-import { useTransactionsStore } from '../store/useTransactionsStore';
 import type { Event } from '../../events/types';
 import TransactionTypeSelector from './TransactionTypeSelector';
 import ConfirmDialog from '../../../shared/components/ConfirmDialog';
 import { useTranslation } from 'react-i18next';
+import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../../../hooks/api/useTransactions';
 
 interface TransactionModalProps {
   open: boolean;
@@ -21,10 +21,13 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [participantId, setParticipantId] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const addExpense = useTransactionsStore((state) => state.addExpense);
-  const updateExpense = useTransactionsStore((state) => state.updateTransaction);
-  const removeTransaction = useTransactionsStore((state) => state.removeTransaction);
+
   const { t } = useTranslation();
+
+  // React Query mutations
+  const createTransaction = useCreateTransaction(event.id);
+  const updateTransaction = useUpdateTransaction();
+  const deleteTransaction = useDeleteTransaction();
 
   useEffect(() => {
     if (!open) return;
@@ -40,7 +43,7 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
       setType(transaction.paymentType);
       setTitle(transaction.title);
       setAmount(transaction.amount.toString());
-      setDate(transaction.date);
+      setDate(transaction.date.slice(0, 10));
       setParticipantId(transaction.participantId || '');
     } else {
       setType('contribution');
@@ -56,25 +59,40 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
     if (!title || !amount || !date || !participantId) return;
     if (transaction) {
       // Update existing transaction
-      updateExpense(transaction.id, {
+      updateTransaction.mutate(
+        {
+          id: transaction.id,
+          data: {
+            title,
+            paymentType: type,
+            amount: parseFloat(amount),
+            participantId: participantId,
+            date,
+          },
+        },
+        {
+          onSuccess: () => {
+            onClose();
+          },
+        },
+      );
+      return;
+    }
+    // Create new transaction
+    createTransaction.mutate(
+      {
         title,
         paymentType: type,
         amount: parseFloat(amount),
         participantId: participantId,
         date,
-      });
-      onClose();
-      return;
-    }
-    addExpense({
-      title,
-      paymentType: type,
-      amount: parseFloat(amount),
-      participantId: participantId,
-      date,
-      eventId: event.id,
-    });
-    onClose();
+      },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      },
+    );
   }
 
   function handleDelete() {
@@ -83,9 +101,12 @@ export default function TransactionModal({ open, onClose, event, transaction }: 
 
   function handleConfirmDelete() {
     if (transaction) {
-      removeTransaction(transaction.id);
-      setConfirmOpen(false);
-      onClose();
+      deleteTransaction.mutate(transaction.id, {
+        onSuccess: () => {
+          setConfirmOpen(false);
+          onClose();
+        },
+      });
     }
   }
 

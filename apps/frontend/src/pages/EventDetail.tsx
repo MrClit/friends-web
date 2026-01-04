@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useEventsStore } from '../features/events/store/useEventsStore';
-import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
+import { useEvent, useUpdateEvent, useDeleteEvent } from '@/hooks/api/useEvents';
+import { useEventKPIs } from '@/hooks/api/useEventKPIs';
 import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
 import TransactionModal from '../features/transactions/components/TransactionModal';
 import TransactionsList from '../features/transactions/components/TransactionsList';
@@ -15,19 +15,11 @@ export default function EventDetail() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const event = useEventsStore((state) => state.events.find((e) => e.id === id));
-  const updateEvent = useEventsStore((state) => state.updateEvent);
-  const removeEvent = useEventsStore((state) => state.removeEvent);
-
-  const getTotalExpensesByEvent = useTransactionsStore((state) => state.getTotalExpensesByEvent);
-  const getTotalContributionsByEvent = useTransactionsStore((state) => state.getTotalContributionsByEvent);
-  const getPotBalanceByEvent = useTransactionsStore((state) => state.getPotBalanceByEvent);
-  const getPendingToCompensateByEvent = useTransactionsStore((state) => state.getPendingToCompensateByEvent);
-
-  const totalExpenses = event ? getTotalExpensesByEvent(event.id) : 0;
-  const totalContributions = event ? getTotalContributionsByEvent(event.id) : 0;
-  const potBalance = event ? getPotBalanceByEvent(event.id) : 0;
-  const pendingToCompensate = event ? getPendingToCompensateByEvent(event.id) : 0;
+  // React Query hooks
+  const { data: event, isLoading, error } = useEvent(id!);
+  const updateEvent = useUpdateEvent();
+  const deleteEvent = useDeleteEvent();
+  const { kpis } = useEventKPIs(id!);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -43,14 +35,53 @@ export default function EventDetail() {
     participants: EventParticipant[];
   }) => {
     if (id) {
-      updateEvent(id, title, participants);
+      updateEvent.mutate(
+        { id, data: { title, participants } },
+        {
+          onSuccess: () => setEditModalOpen(false),
+        },
+      );
     }
-    setEditModalOpen(false);
+  };
+
+  const handleDelete = () => {
+    if (event) {
+      deleteEvent.mutate(event.id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          navigate('/');
+        },
+      });
+    }
   };
 
   const handleBack = () => navigate('/');
 
-  if (!event) return <div className="text-center mt-10">{t('eventDetail.notFound')}</div>;
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+        <div className="text-center mt-10 text-teal-400">{t('common.loading')}</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+        <div className="text-center mt-10 text-red-400">
+          {t('common.error')}: {error.message}
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+        <div className="text-center mt-10">{t('eventDetail.notFound')}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
@@ -64,10 +95,10 @@ export default function EventDetail() {
 
       <EventKPIGrid
         eventId={event.id}
-        potBalance={potBalance}
-        totalContributions={totalContributions}
-        totalExpenses={totalExpenses}
-        pendingToCompensate={pendingToCompensate}
+        potBalance={kpis?.potBalance ?? 0}
+        totalContributions={kpis?.totalContributions ?? 0}
+        totalExpenses={kpis?.totalExpenses ?? 0}
+        pendingToCompensate={kpis?.pendingToCompensate ?? 0}
       />
 
       {/* Lista de transacciones */}
@@ -90,11 +121,7 @@ export default function EventDetail() {
         message={t('eventDetail.deleteMessage')}
         confirmText={t('eventDetail.deleteConfirm')}
         cancelText={t('eventDetail.deleteCancel')}
-        onConfirm={() => {
-          removeEvent(event.id);
-          setDeleteDialogOpen(false);
-          navigate('/');
-        }}
+        onConfirm={handleDelete}
         onCancel={() => setDeleteDialogOpen(false)}
       />
     </div>

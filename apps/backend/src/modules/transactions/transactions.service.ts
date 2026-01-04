@@ -20,13 +20,13 @@ const POT_PARTICIPANT_ID = '0';
  */
 interface RankedTransactionRow {
   id: string;
-  eventId: string;
-  participantId: string;
+  event_id: string;
+  participant_id: string;
   paymentType: string;
   amount: string;
   title: string;
   date: Date;
-  createdAt: Date;
+  created_at: Date;
   date_rank: number;
   total_dates: number;
 }
@@ -109,22 +109,37 @@ export class TransactionsService {
       const query = `
         WITH RankedTransactions AS (
           SELECT 
-            t.*,
+            t.id,
+            t.title,
+            t."paymentType",
+            t.amount,
+            t.participant_id,
+            t.date,
+            t.event_id,
+            t.created_at,
             DENSE_RANK() OVER (ORDER BY t.date DESC) as date_rank
           FROM transactions t
-          WHERE t."eventId" = $1
+          WHERE t.event_id = $1
         ),
         DateCounts AS (
           SELECT COUNT(DISTINCT date_rank) as total_dates
           FROM RankedTransactions
         )
         SELECT 
-          rt.*,
+          rt.id,
+          rt.title,
+          rt."paymentType",
+          rt.amount,
+          rt.participant_id,
+          rt.date,
+          rt.event_id,
+          rt.created_at,
+          rt.date_rank,
           dc.total_dates
         FROM RankedTransactions rt
         CROSS JOIN DateCounts dc
         WHERE rt.date_rank > $2 AND rt.date_rank <= $3
-        ORDER BY rt.date DESC, rt."createdAt" DESC
+        ORDER BY rt.date DESC, rt.created_at DESC
       `;
 
       const rawResults: RankedTransactionRow[] = await this.transactionRepository.query(query, [
@@ -140,13 +155,13 @@ export class TransactionsService {
       const transactions = rawResults.map((row) => {
         const transaction = new Transaction();
         transaction.id = row.id;
-        transaction.eventId = row.eventId;
-        transaction.participantId = row.participantId;
+        transaction.eventId = row.event_id;
+        transaction.participantId = row.participant_id;
         transaction.paymentType = row.paymentType as Transaction['paymentType'];
         transaction.amount = parseFloat(row.amount);
         transaction.title = row.title;
         transaction.date = row.date;
-        transaction.createdAt = row.createdAt;
+        transaction.createdAt = row.created_at;
         return transaction;
       });
 

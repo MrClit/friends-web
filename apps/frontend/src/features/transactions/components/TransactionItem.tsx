@@ -1,10 +1,10 @@
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Transaction } from '../types';
-import { useTransactionsStore } from '../store/useTransactionsStore';
 import { PAYMENT_TYPE_CONFIG, POT_CONFIG } from '../constants';
 import { formatAmount } from '../../../shared/utils/formatAmount';
 import PaymentIcon from './PaymentIcon';
+import { isPotExpense } from '../utils/isPotExpense';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -19,7 +19,6 @@ interface TransactionItemProps {
  */
 function TransactionItem({ transaction, onClick, participantsMap }: TransactionItemProps) {
   const { t } = useTranslation();
-  const isPotExpense = useTransactionsStore((state) => state.isPotExpense);
 
   const isPot = isPotExpense(transaction);
 
@@ -35,8 +34,11 @@ function TransactionItem({ transaction, onClick, participantsMap }: TransactionI
     ? t('transactionsList.potLabel')
     : participantsMap.get(transaction.participantId) || t('transactionsList.unknownParticipant');
 
-  // Determine amount color class
-  const amountColorClass = isPot ? POT_CONFIG.colorClass : PAYMENT_TYPE_CONFIG[transaction.paymentType].colorStrong;
+  // TODO: revisar esto porque no se que hace ni si esta bien
+  // Determine amount color class with fallback for unknown payment types
+  const amountColorClass = isPot
+    ? POT_CONFIG.colorClass
+    : PAYMENT_TYPE_CONFIG[transaction.paymentType]?.colorStrong || 'text-gray-800 dark:text-gray-200';
 
   return (
     <li

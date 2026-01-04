@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useEventsStore } from '../store/useEventsStore';
 import ConfirmDialog from '../../../shared/components/ConfirmDialog';
 import EventForm from './EventForm';
 import type { Event, EventParticipant } from '../types';
 import { useTranslation } from 'react-i18next';
+import { useCreateEvent } from '../../../hooks/api/useEvents';
 
 interface EventFormModalProps {
   open: boolean;
@@ -16,7 +16,7 @@ export default function EventFormModal({ open, onClose, event, onSubmit }: Event
   const [title, setTitle] = useState('');
   const [participants, setParticipants] = useState<EventParticipant[]>([{ id: crypto.randomUUID(), name: '' }]);
   const [showConfirm, setShowConfirm] = useState(false);
-  const addEvent = useEventsStore((state) => state.addEvent);
+  const createEvent = useCreateEvent();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -87,7 +87,18 @@ export default function EventFormModal({ open, onClose, event, onSubmit }: Event
     if (onSubmit) {
       onSubmit({ id: event?.id, title: title.trim(), participants: cleanParticipants });
     } else {
-      addEvent(title.trim(), cleanParticipants);
+      // Use React Query mutation for creating new event
+      createEvent.mutate(
+        { title: title.trim(), participants: cleanParticipants },
+        {
+          onSuccess: () => {
+            setTitle('');
+            setParticipants([{ id: crypto.randomUUID(), name: '' }]);
+            onClose();
+          },
+        },
+      );
+      return; // Don't reset form here, wait for mutation success
     }
     setTitle(event ? event.title : '');
     setParticipants(event ? event.participants : [{ id: crypto.randomUUID(), name: '' }]);
