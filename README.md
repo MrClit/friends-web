@@ -1,10 +1,35 @@
 # Friends - Expense Sharing Platform
 
-> Monorepo for managing shared expenses at events • React 19 + NestJS (planned)
+> Monorepo for managing shared expenses at events • React 19 + NestJS
 
-A personal project to help groups track expenses, contributions, and compensations at shared events. Built with modern TypeScript stack and organized as a pnpm monorepo.
+A modern web application to help groups track expenses, contributions, and compensations at shared events. Built with TypeScript and organized as a pnpm monorepo with separate frontend and backend workspaces.
 
-**✨ Live Demo:** [https://mrclit.github.io/friends-web/](https://mrclit.github.io/friends-web/)
+## Table of Contents
+
+- [Live Demo](#-live-demo)
+- [Workspaces](#️-workspaces)
+- [Quick Start](#-quick-start)
+- [Monorepo Management](#️-monorepo-management)
+- [Project Structure](#-project-structure)
+- [Documentation](#-documentation)
+- [License](#license)
+
+---
+
+## ✨ Live Demo
+
+You can try the app live here: **[https://mrclit.github.io/friends-web/](https://mrclit.github.io/friends-web/)**
+
+The demo includes sample data to explore all features:
+
+- Event management and participant tracking
+- Transaction types (contributions, expenses, compensations)
+- Pot expenses (shared costs)
+- KPI dashboard with drill-down details
+- Multi-language support (Spanish, English, Catalan)
+- Dark mode
+
+All data is stored locally in your browser (no backend required for demo).
 
 ---
 
@@ -12,11 +37,11 @@ A personal project to help groups track expenses, contributions, and compensatio
 
 This is a **pnpm monorepo** containing:
 
-| Workspace | Description | Status |
-|-----------|-------------|--------|
-| **[@friends/frontend](apps/frontend/)** | React 19 + Vite frontend | ✅ Production |
-| **[@friends/backend](apps/backend/)** | NestJS API backend | 🚧 Planned |
-| **[@friends/shared-types](packages/shared-types/)** | Shared TypeScript types | 🚧 Planned |
+| Workspace                                           | Description                        | Status         |
+| --------------------------------------------------- | ---------------------------------- | -------------- |
+| **[@friends/frontend](apps/frontend/)**             | React 19 + TanStack Query frontend | ✅ Operational |
+| **[@friends/backend](apps/backend/)**               | NestJS + PostgreSQL API backend    | ✅ Operational |
+| **[@friends/shared-types](packages/shared-types/)** | Shared TypeScript types            | 🚧 Planned     |
 
 ---
 
@@ -42,44 +67,15 @@ pnpm build
 
 ---
 
-## 📦 Tech Stack
+## �️ Monorepo Management
 
-### Frontend ([@friends/frontend](apps/frontend/))
-- **Framework:** React 19 + TypeScript
-- **Build:** Vite 7
-- **State:** Zustand (with LocalStorage persistence)
-- **Styling:** TailwindCSS v4
-- **Routing:** React Router DOM 7
-- **i18n:** i18next (Spanish, English, Catalan)
-- **Testing:** Vitest + Testing Library
+### Package Manager
 
-### Backend ([@friends/backend](apps/backend/)) - Planned
-- **Framework:** NestJS + TypeScript
-- **Database:** PostgreSQL + TypeORM
-- **API:** RESTful + Swagger/OpenAPI
-- **Auth:** JWT (planned)
-- **Testing:** Jest + Supertest
+- **pnpm v10.27.0** with workspaces
+- Configured in `pnpm-workspace.yaml`
+- Lock file: `pnpm-lock.yaml`
 
-### Shared
-- **Package Manager:** pnpm v10.27.0 (workspaces)
-- **Monorepo:** pnpm workspaces
-- **CI/CD:** GitHub Actions
-- **Deployment:** GitHub Pages (frontend)
-
----
-
-## 📚 Documentation
-
-- **[Frontend Documentation](apps/frontend/README.md)** - React app details, features, and architecture
-- **[Monorepo Migration Guide](docs/MONOREPO_MIGRATION.md)** - How we migrated to pnpm monorepo
-- **[Backend Documentation](apps/backend/README.md)** - Coming soon
-- **[Copilot Instructions](.github/copilot-instructions.md)** - AI coding agent guidelines
-
----
-
-## 🛠️ Development
-
-### Working with the Monorepo
+### Working with Workspaces
 
 ```bash
 # Install dependencies for all workspaces
@@ -101,40 +97,25 @@ pnpm --filter @friends/backend add @nestjs/core
 pnpm add -D -w husky
 ```
 
-### Available Scripts (Root)
+### Available Scripts
 
 ```bash
+# Development
 pnpm dev          # Start frontend dev server
+pnpm dev:backend  # Start backend dev server
+
+# Build
 pnpm build        # Build frontend for production
+pnpm build:backend # Build backend for production
+
+# Testing
 pnpm test         # Run frontend tests
-pnpm test:run     # Run frontend tests once
+pnpm test:run     # Run frontend tests (CI mode)
+pnpm -r test:run  # Run tests in all workspaces
+
+# Code Quality
 pnpm lint         # Lint frontend code
 ```
-
----
-
-## 🎯 Features
-
-### Current (Frontend)
-- ✅ Event management (create, edit, delete)
-- ✅ Participant management per event
-- ✅ Transaction tracking (contributions, expenses, compensations)
-- ✅ Pot expenses (shared expenses from common pot)
-- ✅ KPI dashboard with drill-down details
-- ✅ Infinite scroll for transactions
-- ✅ Multi-language support (es, en, ca)
-- ✅ Dark mode
-- ✅ Persistent state (LocalStorage)
-- ✅ Responsive design
-- ✅ 58 tests passing
-
-### Planned (Backend)
-- 🚧 RESTful API with NestJS
-- 🚧 PostgreSQL database
-- 🚧 User authentication (JWT)
-- 🚧 Shared types between frontend/backend
-- 🚧 Real-time updates (WebSockets)
-- 🚧 API documentation (Swagger)
 
 ---
 
@@ -167,43 +148,30 @@ friends-web/
 
 ---
 
-## 🧪 Testing
+## 📚 Documentation
 
-```bash
-# Run tests for all workspaces
-pnpm -r test:run
+For detailed information about each workspace, see their respective documentation:
 
-# Run tests for specific workspace
-pnpm --filter @friends/frontend test
-pnpm --filter @friends/frontend test:coverage
+### Workspace Documentation
 
-# Open Vitest UI
-pnpm --filter @friends/frontend test:ui
-```
+- **[Frontend README](apps/frontend/README.md)** - React 19 + TanStack Query application
+  - Tech stack and features
+  - Architecture patterns and state management
+  - Configuration and environment variables
+  - Testing strategy
+- **[Backend README](apps/backend/README.md)** - NestJS + PostgreSQL API
+  - Tech stack and API endpoints
+  - Database schema and migrations
+  - Environment configuration
+  - Development tools and testing
 
-**Current Coverage:**
-- Frontend: 58 tests passing
-  - Store tests (Zustand)
-  - Component tests (React Testing Library)
-  - Utility tests (formatters, helpers)
+### Additional Documentation
+
+- **[Monorepo Migration Guide](docs/MONOREPO_MIGRATION.md)** - How we migrated to pnpm monorepo
+- **[Frontend API Integration](docs/FRONTEND_API_INTEGRATION.md)** - TanStack Query integration
+- **[Copilot Instructions](.github/copilot-instructions.md)** - AI coding agent guidelines
 
 ---
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes and test them
-4. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-### Contribution Guidelines
-- Follow TypeScript best practices
-- Write tests for new features
-- Update documentation as needed
-- Use conventional commits
-- Ensure all tests pass before PR
 
 ## License
 

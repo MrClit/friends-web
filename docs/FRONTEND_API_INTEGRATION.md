@@ -1371,11 +1371,157 @@ export default function KPIDetail() {
 
 ---
 
-### Fase 6: Testing
+### Fase 6: Cleanup
+
+**Objetivo:** Limpiar código antiguo y completar la migración.
+
+**Tareas:**
+
+1. **Eliminar archivos de stores antiguos:**
+
+```bash
+# Eliminar stores de Zustand con persist
+rm apps/frontend/src/features/events/store/useEventsStore.ts
+rm apps/frontend/src/features/transactions/store/useTransactionsStore.ts
+```
+
+2. **Limpiar localStorage:**
+
+```typescript
+// Ejecutar una vez en desarrollo para limpiar keys antiguas
+localStorage.removeItem('events-storage');
+localStorage.removeItem('transactions-storage');
+```
+
+O crear un script de migración:
+
+```typescript
+// scripts/clearOldStorage.ts
+export function clearOldStorage() {
+  const oldKeys = ['events-storage', 'transactions-storage'];
+  oldKeys.forEach((key) => {
+    if (localStorage.getItem(key)) {
+      console.log(`Removing old storage key: ${key}`);
+      localStorage.removeItem(key);
+    }
+  });
+}
+
+// Llamar una vez al inicio de la app
+clearOldStorage();
+```
+
+3. **Actualizar documentación:**
+
+- Actualizar README con nueva arquitectura
+- Documentar hooks de React Query
+- Actualizar diagramas de arquitectura
+
+4. **Verificar imports:**
+
+```bash
+# Buscar imports rotos
+pnpm run lint
+pnpm run build
+```
+
+5. **Review final:**
+
+- ✅ Todos los tests pasan
+- ✅ No hay errores de TypeScript
+- ✅ No hay imports de stores antiguos
+- ✅ DevTools de React Query funcionan
+- ✅ La aplicación funciona correctamente end-to-end
+
+---
+
+## 📋 Checklist de Migración
+
+### Setup ✅
+
+- [x] Instalar `@tanstack/react-query`
+- [x] Instalar `@tanstack/react-query-devtools` (dev)
+- [x] Crear `lib/queryClient.ts`
+- [x] Crear `providers/QueryProvider.tsx`
+- [x] Añadir provider en `App.tsx`
+- [x] Configurar variable `VITE_API_URL` en `.env`
+
+### API Layer ✅
+
+- [x] Crear `api/client.ts` con `apiRequest` wrapper
+- [x] Crear `api/types.ts` con DTOs
+- [x] Crear `api/events.api.ts`
+- [x] Crear `api/transactions.api.ts`
+- [x] Crear custom `ApiError` class
+
+### Query Hooks ✅
+
+- [x] Crear `hooks/api/keys.ts` con query keys
+- [x] Crear `hooks/api/useEvents.ts`
+  - [x] `useEvents()` - Listar
+  - [x] `useEvent(id)` - Detalle
+  - [x] `useCreateEvent()` - Crear
+  - [x] `useUpdateEvent()` - Actualizar
+  - [x] `useDeleteEvent()` - Eliminar (con cascade)
+- [x] Crear `hooks/api/useTransactions.ts`
+  - [x] `useTransactionsByEvent(eventId)` - Listar
+  - [x] `useTransactionsPaginated(eventId)` - Paginación
+  - [x] `useTransaction(id)` - Detalle
+  - [x] `useCreateTransaction(eventId)` - Crear
+  - [x] `useUpdateTransaction()` - Actualizar
+  - [x] `useDeleteTransaction()` - Eliminar
+- [x] Crear `hooks/api/useEventKPIs.ts` - KPIs calculados
+
+### Refactorizar Stores ✅
+
+- [x] Refactorizar `useEventsStore` → `useEventsUIStore`
+  - [x] Remover persist
+  - [x] Solo mantener UI state (modales, selections)
+  - [x] Remover CRUD operations
+- [x] Refactorizar `useTransactionsStore` → `useTransactionsUIStore`
+  - [x] Remover persist
+  - [x] Solo mantener UI state (filtros, paginación UI)
+  - [x] Remover CRUD operations
+
+### Migrar Componentes ✅
+
+- [x] Migrar `features/events/components/`
+  - [x] `EventsList.tsx`
+  - [x] `EventFormModal.tsx`
+- [x] Migrar `features/transactions/components/`
+  - [x] `TransactionsList.tsx`
+  - [x] `TransactionItem.tsx`
+  - [x] `TransactionModal.tsx`
+- [x] Migrar `pages/`
+  - [x] `Home.tsx`
+  - [x] `EventDetail.tsx`
+  - [x] `KPIDetail.tsx`
+
+### Testing 🚧 (Pendiente - Ver Futuras Mejoras)
+
+- [ ] Crear `test/utils/test-utils.tsx` con helpers
+- [ ] Migrar tests de stores a tests de hooks
+- [ ] Añadir tests de integración con React Query
+- [ ] Verificar coverage mantiene >80%
+
+### Cleanup ✅ (Completado)
+
+- [x] Remover lógica de persist de Zustand
+- [x] Limpiar localStorage keys antiguas
+- [x] Actualizar documentación
+- [x] Verificar no hay imports rotos
+
+---
+
+## 🔮 Futuras Mejoras
+
+### 1. Testing Completo con React Query 🚧
 
 **Objetivo:** Migrar tests de Zustand stores a tests de React Query hooks y añadir tests de integración.
 
-**Tareas:**
+**Nota:** Esta fase se ha pospuesto para enfocarnos primero en completar la migración funcional. Se implementará después del Cleanup.
+
+**Tareas pendientes:**
 
 1. **Crear utilidades de testing:**
 
@@ -1514,151 +1660,7 @@ Asegurarse de mantener >80% de cobertura.
 
 ---
 
-### Fase 7: Cleanup
-
-**Objetivo:** Limpiar código antiguo y completar la migración.
-
-**Tareas:**
-
-1. **Eliminar archivos de stores antiguos:**
-
-```bash
-# Eliminar stores de Zustand con persist
-rm apps/frontend/src/features/events/store/useEventsStore.ts
-rm apps/frontend/src/features/transactions/store/useTransactionsStore.ts
-```
-
-2. **Limpiar localStorage:**
-
-```typescript
-// Ejecutar una vez en desarrollo para limpiar keys antiguas
-localStorage.removeItem('events-storage');
-localStorage.removeItem('transactions-storage');
-```
-
-O crear un script de migración:
-
-```typescript
-// scripts/clearOldStorage.ts
-export function clearOldStorage() {
-  const oldKeys = ['events-storage', 'transactions-storage'];
-  oldKeys.forEach((key) => {
-    if (localStorage.getItem(key)) {
-      console.log(`Removing old storage key: ${key}`);
-      localStorage.removeItem(key);
-    }
-  });
-}
-
-// Llamar una vez al inicio de la app
-clearOldStorage();
-```
-
-3. **Actualizar documentación:**
-
-- Actualizar README con nueva arquitectura
-- Documentar hooks de React Query
-- Actualizar diagramas de arquitectura
-
-4. **Verificar imports:**
-
-```bash
-# Buscar imports rotos
-pnpm run lint
-pnpm run build
-```
-
-5. **Review final:**
-
-- ✅ Todos los tests pasan
-- ✅ No hay errores de TypeScript
-- ✅ No hay imports de stores antiguos
-- ✅ DevTools de React Query funcionan
-- ✅ La aplicación funciona correctamente end-to-end
-
----
-
-## 📋 Checklist de Migración
-
-### Setup ✅
-
-- [x] Instalar `@tanstack/react-query`
-- [x] Instalar `@tanstack/react-query-devtools` (dev)
-- [x] Crear `lib/queryClient.ts`
-- [x] Crear `providers/QueryProvider.tsx`
-- [x] Añadir provider en `App.tsx`
-- [x] Configurar variable `VITE_API_URL` en `.env`
-
-### API Layer ✅
-
-- [x] Crear `api/client.ts` con `apiRequest` wrapper
-- [x] Crear `api/types.ts` con DTOs
-- [x] Crear `api/events.api.ts`
-- [x] Crear `api/transactions.api.ts`
-- [x] Crear custom `ApiError` class
-
-### Query Hooks ✅
-
-- [x] Crear `hooks/api/keys.ts` con query keys
-- [x] Crear `hooks/api/useEvents.ts`
-  - [x] `useEvents()` - Listar
-  - [x] `useEvent(id)` - Detalle
-  - [x] `useCreateEvent()` - Crear
-  - [x] `useUpdateEvent()` - Actualizar
-  - [x] `useDeleteEvent()` - Eliminar (con cascade)
-- [x] Crear `hooks/api/useTransactions.ts`
-  - [x] `useTransactionsByEvent(eventId)` - Listar
-  - [x] `useTransactionsPaginated(eventId)` - Paginación
-  - [x] `useTransaction(id)` - Detalle
-  - [x] `useCreateTransaction(eventId)` - Crear
-  - [x] `useUpdateTransaction()` - Actualizar
-  - [x] `useDeleteTransaction()` - Eliminar
-- [x] Crear `hooks/api/useEventKPIs.ts` - KPIs calculados
-
-### Refactorizar Stores ✅
-
-- [x] Refactorizar `useEventsStore` → `useEventsUIStore`
-  - [x] Remover persist
-  - [x] Solo mantener UI state (modales, selections)
-  - [x] Remover CRUD operations
-- [x] Refactorizar `useTransactionsStore` → `useTransactionsUIStore`
-  - [x] Remover persist
-  - [x] Solo mantener UI state (filtros, paginación UI)
-  - [x] Remover CRUD operations
-
-### Migrar Componentes ✅
-
-- [x] Migrar `features/events/components/`
-  - [x] `EventsList.tsx`
-  - [x] `EventFormModal.tsx`
-- [x] Migrar `features/transactions/components/`
-  - [x] `TransactionsList.tsx`
-  - [x] `TransactionItem.tsx`
-  - [x] `TransactionModal.tsx`
-- [x] Migrar `pages/`
-  - [x] `Home.tsx`
-  - [x] `EventDetail.tsx`
-  - [x] `KPIDetail.tsx`
-
-### Testing ✅
-
-- [ ] Crear `test/utils/test-utils.tsx` con helpers
-- [ ] Migrar tests de stores a tests de hooks
-- [ ] Añadir tests de integración con React Query
-- [ ] Verificar coverage mantiene >80%
-
-### Cleanup ✅
-
-- [ ] Remover lógica de persist de Zustand
-- [ ] Limpiar localStorage keys antiguas
-- [ ] Actualizar documentación
-- [ ] Verificar no hay imports rotos
-
----
-
-## 🔮 Futuras Mejoras
-
-### 1. Prefetching
+### 2. Prefetching
 
 ```typescript
 // Prefetch al hover sobre un evento
@@ -1683,7 +1685,7 @@ function EventItem({ event }: { event: Event }) {
 }
 ```
 
-### 2. Persistencia de Cache (Plugin)
+### 3. Persistencia de Cache (Plugin)
 
 ```bash
 pnpm add @tanstack/query-persist-client-core
@@ -1705,7 +1707,7 @@ persistQueryClient({
 });
 ```
 
-### 3. Optimistic Updates Avanzados
+### 4. Optimistic Updates Avanzados
 
 Con múltiples mutaciones dependientes.
 

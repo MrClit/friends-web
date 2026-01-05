@@ -2,9 +2,23 @@
 
 > NestJS backend API for Friends expense sharing platform
 
-**Status:** ✅ Operacional - Events y Transactions implementados
+**Status:** ✅ Operational - Events y Transactions implementados
 
-Backend RESTful API del monorepo Friends, construido con NestJS, TypeScript, PostgreSQL y TypeORM.
+Backend RESTful API built with NestJS, TypeScript, PostgreSQL and TypeORM. Provides a complete REST API for managing events, participants, transactions, and KPIs.
+
+## Table of Contents
+
+- [Tech Stack](#-tech-stack)
+- [Quick Start](#-quick-start)
+- [Available Scripts](#%EF%B8%8F-available-scripts)
+- [Project Structure](#-project-structure)
+- [API Documentation](#-api-documentation)
+- [Database](#%EF%B8%8F-database)
+- [Configuration](#%EF%B8%8F-configuration)
+- [Testing](#-testing)
+- [Development Tools](#-development-tools)
+- [Integration](#-integration-with-frontend)
+- [Resources](#-resources)
 
 ---
 
@@ -88,7 +102,9 @@ docker compose down
 
 ---
 
-## ⚙️ Variables de Entorno
+## ⚙️ Configuration
+
+### Environment Variables
 
 Este proyecto utiliza diferentes archivos `.env` según el ambiente.
 
@@ -205,7 +221,33 @@ pnpm test
 
 ---
 
-## 📂 Estructura del Proyecto
+## �️ Available Scripts
+
+```bash
+# Development
+pnpm start:dev      # Development mode con hot reload
+pnpm start:debug    # Debug mode
+
+# Production
+pnpm build          # Build para producción
+pnpm start:prod     # Ejecutar en producción
+
+# Testing
+pnpm test           # Run unit tests
+pnpm test:watch     # Tests en watch mode
+pnpm test:coverage  # Generar coverage report
+
+# Code Quality
+pnpm lint           # Lint code
+pnpm lint:fix       # Lint y auto-fix
+
+# Utilidades
+pnpm clean          # Limpiar directorio dist
+```
+
+---
+
+## 📂 Project Structure
 
 ```
 src/
@@ -254,9 +296,9 @@ src/
 
 ---
 
-## 🔌 API Endpoints
+## 🔌 API Documentation
 
-### 📚 Documentación Interactiva (Swagger)
+### 📚 Interactive Documentation (Swagger)
 
 **Accede a Swagger UI:**  
 🔗 **http://localhost:3000/api/docs**
@@ -398,7 +440,7 @@ Todas las respuestas exitosas (200, 201) están envueltas en un formato estánda
 
 ---
 
-## 🗄️ Database Schema
+## 🗄️ Database
 
 ### Events Table
 
@@ -846,13 +888,21 @@ async function fetchEvent(id: string) {
 
 ---
 
-## 📚 Recursos
+## 📚 Resources
+
+### Official Documentation
 
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [TypeORM Documentation](https://typeorm.io/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [class-validator Documentation](https://github.com/typestack/class-validator)
 
+### Related Documentation
+
+- [Frontend Integration](../frontend/README.md) - How the frontend consumes this API
+- [API Integration Guide](../../docs/FRONTEND_API_INTEGRATION.md) - TanStack Query setup
+
 ---
 
-> Part of the Friends monorepo • [Back to root](../../)
+**Part of the Friends monorepo**  
+[← Back to monorepo root](../../README.md) | [View Frontend →](../frontend/README.md)
