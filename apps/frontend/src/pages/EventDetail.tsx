@@ -59,7 +59,7 @@ export default function EventDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
         <div className="text-center mt-10 text-teal-400">{t('common.loading')}</div>
       </div>
     );
@@ -67,7 +67,7 @@ export default function EventDetail() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
         <div className="text-center mt-10 text-red-400">
           {t('common.error')}: {error.message}
         </div>
@@ -77,14 +77,14 @@ export default function EventDetail() {
 
   if (!event) {
     return (
-      <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
         <div className="text-center mt-10">{t('eventDetail.notFound')}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+    <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
       <EventDetailHeader
         eventId={event.id}
         eventTitle={event.title}
@@ -105,7 +105,7 @@ export default function EventDetail() {
       <TransactionsList event={event} />
       <FloatingActionButton
         onClick={() => setTransactionModalOpen(true)}
-        label={t('eventDetail.addTransaction')}
+        translationKey="eventDetail.addTransaction"
         icon={'+'}
       />
       <EventFormModal

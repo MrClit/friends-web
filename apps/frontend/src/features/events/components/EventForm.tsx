@@ -1,5 +1,5 @@
 import type { EventParticipant } from '../types';
-import ParticipantsInput from './ParticipantsInput';
+import ParticipantsList from './ParticipantsList';
 import { useTranslation } from 'react-i18next';
 
 interface EventFormProps {
@@ -9,7 +9,8 @@ interface EventFormProps {
   setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
   onSubmit: (e: React.FormEvent) => void;
   canSubmit: boolean;
-  mode?: 'edit' | 'create';
+  isLoading: boolean;
+  mode: 'edit' | 'create';
 }
 
 export default function EventForm({
@@ -19,7 +20,8 @@ export default function EventForm({
   setParticipants,
   onSubmit,
   canSubmit,
-  mode,
+  isLoading,
+  mode = 'create',
 }: EventFormProps) {
   const { t } = useTranslation();
   return (
@@ -35,15 +37,17 @@ export default function EventForm({
           placeholder={t('eventForm.titlePlaceholder')}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          required
+          autoFocus
         />
       </div>
-      <ParticipantsInput participants={participants} setParticipants={setParticipants} />
+      <ParticipantsList participants={participants} setParticipants={setParticipants} />
       <button
         type="submit"
-        className="w-full py-2 rounded-lg bg-teal-500 hover:bg-teal-600 text-white font-bold text-lg transition"
-        disabled={!canSubmit}
+        className="w-full py-2 rounded-lg bg-teal-500 hover:bg-teal-600 text-white font-bold text-lg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        disabled={!canSubmit || isLoading}
       >
-        {mode === 'edit' ? t('eventForm.update') : t('eventForm.create')}
+        {isLoading ? t('eventForm.saving') : mode === 'edit' ? t('eventForm.update') : t('eventForm.create')}
       </button>
     </form>
   );

@@ -1,4 +1,5 @@
 export { default as EventsList } from './EventsList';
+export { default as EventsListSkeleton } from './EventsListSkeleton';
 export { default as EventFormModal } from './EventFormModal';
 export { default as EventForm } from './EventForm';
 export { default as ParticipantsInput } from './ParticipantsInput';
