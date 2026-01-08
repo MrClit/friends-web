@@ -1,7 +1,7 @@
-import { useRef, useEffect, useMemo, useCallback } from 'react';
 import { MdDelete, MdPersonAdd } from 'react-icons/md';
 import type { EventParticipant } from '../types';
 import { useTranslation } from 'react-i18next';
+import { useParticipantsList } from '../hooks/useParticipantsList';
 
 interface ParticipantsListProps {
   participants: EventParticipant[];
@@ -9,55 +9,14 @@ interface ParticipantsListProps {
 }
 
 export default function ParticipantsList({ participants, setParticipants }: ParticipantsListProps) {
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { t } = useTranslation();
-
-  // Memoize validation for add button
-  const canAddParticipant = useMemo(
-    () => participants.length > 0 && !!participants[participants.length - 1]?.name.trim(),
-    [participants],
-  );
-
-  // Focus on last input when a new participant is added
-  useEffect(() => {
-    if (participants.length > 1) {
-      const lastIndex = participants.length - 1;
-      inputRefs.current[lastIndex]?.focus();
-    }
-  }, [participants.length]);
-
-  // Cleanup refs array to match participants length
-  useEffect(() => {
-    inputRefs.current = inputRefs.current.slice(0, participants.length);
-  }, [participants.length]);
-
-  const handleAddParticipant = useCallback(() => {
-    setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: '' }]);
-  }, [setParticipants]);
-
-  const handleParticipantChange = useCallback(
-    (idx: number, name: string) => {
-      const newList = [...participants];
-      newList[idx] = { ...participants[idx], name };
-      setParticipants(newList);
-    },
-    [participants, setParticipants],
-  );
-
-  const handleDeleteParticipant = useCallback(
-    (idx: number) => {
-      const newList = participants.filter((_, i) => i !== idx);
-      setParticipants(newList);
-    },
-    [participants, setParticipants],
-  );
+  const { inputRefs, canAddParticipant, handleAddParticipant, handleParticipantChange, handleDeleteParticipant } =
+    useParticipantsList({ participants, setParticipants });
 
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label htmlFor="participants-group" className="block text-teal-700 dark:text-teal-100 font-medium">
-          {t('participantsInput.label')}
-        </label>
+        <span className="block text-teal-700 dark:text-teal-100 font-medium">{t('participantsInput.label')}</span>
         <button
           type="button"
           aria-label={t('participantsInput.addAria')}
@@ -82,6 +41,7 @@ export default function ParticipantsList({ participants, setParticipants }: Part
               placeholder={t('participantsInput.placeholder', { number: idx + 1 })}
               value={participant.name}
               onChange={(e) => handleParticipantChange(idx, e.target.value)}
+              required={idx === 0}
             />
             {participants.length > 1 && (
               <div className="absolute right-2 top-1.5">

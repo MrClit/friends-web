@@ -45,6 +45,7 @@
     "deleteAria": "Elimina participant"
   },
   "eventDetail": {
+    "invalidId": "ID d'esdeveniment invàlid",
     "notFound": "Esdeveniment no trobat",
     "kpi": {
       "pot": "Saldo del Pot",

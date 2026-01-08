@@ -25,7 +25,8 @@ This is the frontend workspace of the Friends monorepo. A modern web application
 - **Build Tool:** Vite 7
 - **State Management:**
   - TanStack Query v5 (server state, caching)
-  - Zustand (UI state)
+  - Custom hooks (UI state - modals, dialogs)
+  - Zustand (theme preferences only)
 - **Backend Integration:** REST API + PostgreSQL
 - **Styling:** TailwindCSS v4 + @tailwindcss/vite
 - **UI Components:** Radix UI primitives
@@ -150,7 +151,7 @@ src/
 ├─ features/         # Domain modules (feature-based organization)
 │  ├─ events/
 │  │  ├─ components/   # Event UI components
-│  │  ├─ store/        # UI state only (useEventsUIStore)
+│  │  ├─ hooks/        # Business logic hooks
 │  │  ├─ types.ts      # Event TypeScript types
 │  │  └─ index.ts      # Public API exports
 │  ├─ kpi/
@@ -159,15 +160,15 @@ src/
 │  │  └─ index.ts
 │  └─ transactions/
 │     ├─ components/   # Transaction UI components
-│     ├─ store/        # UI state only (useTransactionsUIStore)
 │     ├─ constants.ts  # Payment type configuration
 │     ├─ types.ts      # Transaction types
+│     ├─ utils/        # Transaction utilities
 │     └─ index.ts
 ├─ hooks/
-│  └─ api/           # React Query hooks (server state)
-│     ├─ keys.ts      # Centralized query keys
-│     ├─ useEvents.ts # Events queries and mutations
-│     ├─ useTransactions.ts # Transactions queries and mutations
+│  ├─ api/           # React Query hooks (server state)
+│  │  ├─ keys.ts      # Centralized query keys
+│  │  ├─ useEvents.ts # Events queries and mutations
+│  │  ├─ useTransactions.ts # Transactions queries and mutations
 │     └─ useEventKPIs.ts # Computed KPIs from queries
 ├─ i18n/             # Internationalization
 │  ├─ index.ts       # i18next setup and locale mapping
@@ -237,16 +238,26 @@ The application uses a hybrid state management approach with clear separation of
   - Query deduplication
   - DevTools integration
 
-**Zustand - UI State (Local Only):**
+**Custom Hooks - UI State (Component-Level):**
 
-- Manages ephemeral UI state (modals, filters, selections)
-- Store files: `src/features/*/store/use*UIStore.ts`
-- Key stores:
-  - `useEventsUIStore` - Modal state, event selection, filter text
-  - `useTransactionsUIStore` - Modal state, filter type, transaction selection
-  - `useThemeStore` - Theme preferences (light/dark mode) with localStorage
-- **No `persist` middleware** (except theme store)
-- No CRUD operations (handled by React Query)
+- Manages ephemeral UI state (modals, confirmation dialogs)
+- Located in `src/shared/hooks/`
+- Key hooks:
+  - `useModalState()` - Generic modal open/close state (replaces Zustand stores)
+  - `useConfirmDialog()` - Confirmation dialogs with pending actions
+  - `useInfiniteScroll()` - Infinite scroll observer
+- **Pattern:**
+  - UI state lives in components, not global stores
+  - Business logic separated in custom hooks (e.g., `useEventDetail`)
+  - Follows React best practices (local state + composition)
+  - Fully tested (33 unit tests passing)
+
+**Zustand - Theme Preferences Only:**
+
+- Store file: `src/shared/store/useThemeStore.ts`
+- Purpose: Theme preferences (light/dark mode) with localStorage
+- **Only remaining Zustand store** in the application
+- Uses manual localStorage sync (no persist middleware)
 
 **Data Integrity:**
 

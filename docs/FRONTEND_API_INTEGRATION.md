@@ -1766,5 +1766,131 @@ Si en el futuro necesitas sincronización real-time entre usuarios.
 
 ---
 
-**Última actualización:** 4 de enero de 2026  
-**Estado:** Listo para implementación
+## 🎨 UI State Management Patterns
+
+### Custom Hooks for UI State
+
+**Decisión Arquitectónica:** Eliminamos Zustand stores para UI state en favor de custom hooks locales.
+
+**Rationale:**
+
+- ✅ UI state no necesita ser global (modales, diálogos)
+- ✅ Mejor separación de concerns (business logic vs UI state)
+- ✅ Más testeable y mantenible
+- ✅ Sigue React best practices (composition over inheritance)
+- ✅ Reduce dependencias innecesarias
+
+### Available Hooks
+
+**1. useModalState()**
+
+Generic hook for modal open/close state:
+
+```typescript
+import { useModalState } from '@/shared/hooks';
+
+function MyComponent() {
+  const myModal = useModalState();
+
+  return (
+    <>
+      <button onClick={myModal.open}>Open</button>
+      <Modal open={myModal.isOpen} onClose={myModal.close}>
+        Content
+      </Modal>
+    </>
+  );
+}
+```
+
+**API:**
+- `isOpen: boolean` - Current modal state
+- `open: () => void` - Open modal
+- `close: () => void` - Close modal
+- `toggle: () => void` - Toggle modal state
+
+**2. useConfirmDialog()**
+
+Specialized hook for confirmation dialogs with pending actions:
+
+```typescript
+import { useConfirmDialog } from '@/shared/hooks';
+
+function MyComponent() {
+  const deleteDialog = useConfirmDialog();
+
+  const handleDelete = () => {
+    // This action will be called when user confirms
+    deleteItem();
+  };
+
+  return (
+    <>
+      <button onClick={() => deleteDialog.confirm(handleDelete)}>
+        Delete
+      </button>
+      <ConfirmDialog
+        open={deleteDialog.isOpen}
+        onConfirm={deleteDialog.handleConfirm}
+        onCancel={deleteDialog.handleCancel}
+      />
+    </>
+  );
+}
+```
+
+**API:**
+- `isOpen: boolean` - Current dialog state
+- `confirm: (action: () => void | Promise<void>) => void` - Store action and open dialog
+- `handleConfirm: () => Promise<void>` - Execute pending action and close
+- `handleCancel: () => void` - Cancel and close
+
+### Decision Tree
+
+**When to use what:**
+
+```
+Is it UI state (modals, dialogs, dropdowns)?
+├─ Yes → Use custom hooks (useModalState, useConfirmDialog)
+│
+Is it server data (events, transactions)?
+├─ Yes → Use React Query hooks (useEvents, useTransactions)
+│
+Is it theme preference?
+└─ Yes → Use useThemeStore (Zustand with localStorage)
+```
+
+### Migration Examples
+
+**Before (Zustand store):**
+```typescript
+// ❌ Old pattern - unnecessary global store
+const { isModalOpen, openModal, closeModal } = useEventsUIStore();
+
+<button onClick={openModal}>Add</button>
+<Modal open={isModalOpen} onClose={closeModal} />
+```
+
+**After (Custom hook):**
+```typescript
+// ✅ New pattern - local UI state
+const eventModal = useModalState();
+
+<button onClick={eventModal.open}>Add</button>
+<Modal open={eventModal.isOpen} onClose={eventModal.close} />
+```
+
+### Testing
+
+Both hooks have comprehensive test coverage (33 tests total):
+
+```bash
+pnpm test useModalState useConfirmDialog
+```
+
+See: [Shared Hooks README](../apps/frontend/src/shared/hooks/README.md)
+
+---
+
+**Última actualización:** 8 de enero de 2026  
+**Estado:** ✅ Implementado y documentado

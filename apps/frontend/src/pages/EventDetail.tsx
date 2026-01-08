@@ -1,61 +1,31 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useEvent, useUpdateEvent, useDeleteEvent } from '@/hooks/api/useEvents';
-import { useEventKPIs } from '@/hooks/api/useEventKPIs';
+import { useEventDetail } from '@/hooks/useEventDetail';
+import { useModalState, useConfirmDialog } from '@/shared/hooks';
 import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
 import TransactionModal from '../features/transactions/components/TransactionModal';
 import TransactionsList from '../features/transactions/components/TransactionsList';
 import FloatingActionButton from '../shared/components/FloatingActionButton';
-import ConfirmDialog from '../shared/components/ConfirmDialog';
-import type { EventParticipant } from '../features/events/types';
+import { ConfirmDialog } from '@/shared/components';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { t } = useTranslation();
+  const { event, kpis, isLoading, error, handleEditSubmit, handleDelete, handleBack } = useEventDetail(id);
 
-  // React Query hooks
-  const { data: event, isLoading, error } = useEvent(id!);
-  const updateEvent = useUpdateEvent();
-  const deleteEvent = useDeleteEvent();
-  const { kpis } = useEventKPIs(id!);
+  // UI state management
+  const editModal = useModalState();
+  const transactionModal = useModalState();
+  const deleteDialog = useConfirmDialog();
 
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
-
-  const handleEditSubmit = ({
-    id,
-    title,
-    participants,
-  }: {
-    id?: string;
-    title: string;
-    participants: EventParticipant[];
-  }) => {
-    if (id) {
-      updateEvent.mutate(
-        { id, data: { title, participants } },
-        {
-          onSuccess: () => setEditModalOpen(false),
-        },
-      );
-    }
-  };
-
-  const handleDelete = () => {
-    if (event) {
-      deleteEvent.mutate(event.id, {
-        onSuccess: () => {
-          setDeleteDialogOpen(false);
-          navigate('/');
-        },
-      });
-    }
-  };
-
-  const handleBack = () => navigate('/');
+  // Validate id after all hooks
+  if (!id) {
+    return (
+      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+        <div className="text-center mt-10 text-red-400">{t('eventDetail.invalidId')}</div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -89,8 +59,8 @@ export default function EventDetail() {
         eventId={event.id}
         eventTitle={event.title}
         onBack={handleBack}
-        onEdit={() => setEditModalOpen(true)}
-        onDelete={() => setDeleteDialogOpen(true)}
+        onEdit={editModal.open}
+        onDelete={() => deleteDialog.confirm(handleDelete)}
       />
 
       <EventKPIGrid
@@ -103,26 +73,22 @@ export default function EventDetail() {
 
       {/* Lista de transacciones */}
       <TransactionsList event={event} />
-      <FloatingActionButton
-        onClick={() => setTransactionModalOpen(true)}
-        translationKey="eventDetail.addTransaction"
-        icon={'+'}
-      />
+      <FloatingActionButton onClick={transactionModal.open} translationKey="eventDetail.addTransaction" icon={'+'} />
       <EventFormModal
-        open={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
+        open={editModal.isOpen}
+        onClose={editModal.close}
         event={event}
-        onSubmit={handleEditSubmit}
+        onSubmit={(data) => handleEditSubmit(data, editModal.close)}
       />
-      <TransactionModal open={transactionModalOpen} onClose={() => setTransactionModalOpen(false)} event={event} />
+      <TransactionModal open={transactionModal.isOpen} onClose={transactionModal.close} event={event} />
       <ConfirmDialog
-        open={deleteDialogOpen}
+        open={deleteDialog.isOpen}
         title={t('eventDetail.deleteTitle')}
         message={t('eventDetail.deleteMessage')}
         confirmText={t('eventDetail.deleteConfirm')}
         cancelText={t('eventDetail.deleteCancel')}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteDialogOpen(false)}
+        onConfirm={deleteDialog.handleConfirm}
+        onCancel={deleteDialog.handleCancel}
       />
     </div>
   );

@@ -6,7 +6,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { formatDateLong } from '../../../shared/utils/formatDateLong';
 import { useTranslation } from 'react-i18next';
 import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
-import { useInfiniteScroll } from '../../../shared/hooks';
+import { useInfiniteScroll, useModalState } from '../../../shared/hooks';
 
 interface TransactionsListProps {
   event: Event;
@@ -23,7 +23,7 @@ function groupByDate(transactions: Transaction[]) {
 }
 
 export default function TransactionsList({ event }: TransactionsListProps) {
-  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const transactionModal = useModalState();
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const { t } = useTranslation();
 
@@ -57,16 +57,19 @@ export default function TransactionsList({ event }: TransactionsListProps) {
   const dates = useMemo(() => Object.keys(grouped).sort((a, b) => b.localeCompare(a)), [grouped]);
 
   // Handler for clicking on a transaction
-  const handleTransactionClick = useCallback((transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setTransactionModalOpen(true);
-  }, []);
+  const handleTransactionClick = useCallback(
+    (transaction: Transaction) => {
+      setSelectedTransaction(transaction);
+      transactionModal.open();
+    },
+    [transactionModal],
+  );
 
   // Handler for closing modal
   const handleCloseModal = useCallback(() => {
-    setTransactionModalOpen(false);
+    transactionModal.close();
     setSelectedTransaction(null);
-  }, []);
+  }, [transactionModal]);
 
   if (isLoading) {
     return <div className="w-full max-w-2xl mb-8 text-center text-teal-400 py-8">{t('common.loading')}</div>;
@@ -124,7 +127,7 @@ export default function TransactionsList({ event }: TransactionsListProps) {
       )}
 
       <TransactionModal
-        open={transactionModalOpen}
+        open={transactionModal.isOpen}
         onClose={handleCloseModal}
         event={event}
         transaction={selectedTransaction ?? undefined}

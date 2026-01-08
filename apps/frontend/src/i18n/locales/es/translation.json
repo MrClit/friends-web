@@ -45,6 +45,7 @@
     "deleteAria": "Eliminar participante"
   },
   "eventDetail": {
+    "invalidId": "ID de evento inválido",
     "notFound": "Evento no encontrado",
     "kpi": {
       "pot": "Saldo del Bote",

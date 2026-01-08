@@ -45,6 +45,7 @@
     "deleteAria": "Delete participant"
   },
   "eventDetail": {
+    "invalidId": "Invalid event ID",
     "notFound": "Event not found",
     "kpi": {
       "pot": "Pot Balance",
