@@ -6,7 +6,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { formatDateLong } from '../../../shared/utils/formatDateLong';
 import { useTranslation } from 'react-i18next';
 import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
-import { useInfiniteScroll, useModalState } from '../../../shared/hooks';
+import { useInfiniteScroll, useModalState } from '@/hooks/common';
 
 interface TransactionsListProps {
   event: Event;

@@ -1787,7 +1787,7 @@ Si en el futuro necesitas sincronización real-time entre usuarios.
 Generic hook for modal open/close state:
 
 ```typescript
-import { useModalState } from '@/shared/hooks';
+import { useModalState } from '@/hooks/common';
 
 function MyComponent() {
   const myModal = useModalState();
@@ -1804,6 +1804,7 @@ function MyComponent() {
 ```
 
 **API:**
+
 - `isOpen: boolean` - Current modal state
 - `open: () => void` - Open modal
 - `close: () => void` - Close modal
@@ -1814,7 +1815,7 @@ function MyComponent() {
 Specialized hook for confirmation dialogs with pending actions:
 
 ```typescript
-import { useConfirmDialog } from '@/shared/hooks';
+import { useConfirmDialog } from '@/hooks/common';
 
 function MyComponent() {
   const deleteDialog = useConfirmDialog();
@@ -1840,6 +1841,7 @@ function MyComponent() {
 ```
 
 **API:**
+
 - `isOpen: boolean` - Current dialog state
 - `confirm: (action: () => void | Promise<void>) => void` - Store action and open dialog
 - `handleConfirm: () => Promise<void>` - Execute pending action and close
@@ -1863,6 +1865,7 @@ Is it theme preference?
 ### Migration Examples
 
 **Before (Zustand store):**
+
 ```typescript
 // ❌ Old pattern - unnecessary global store
 const { isModalOpen, openModal, closeModal } = useEventsUIStore();
@@ -1872,6 +1875,7 @@ const { isModalOpen, openModal, closeModal } = useEventsUIStore();
 ```
 
 **After (Custom hook):**
+
 ```typescript
 // ✅ New pattern - local UI state
 const eventModal = useModalState();

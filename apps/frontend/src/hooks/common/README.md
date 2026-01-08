@@ -1,6 +1,9 @@
-# Shared Hooks
+# Common Hooks
 
 Collection of reusable React hooks for the Friends application.
+
+**Location:** `src/hooks/common/`  
+**Purpose:** Generic, reusable UI hooks and utilities
 
 ## Modal State Management
 
@@ -11,7 +14,7 @@ Generic hook for managing modal/dialog open/close state.
 **Usage:**
 
 ```tsx
-import { useModalState } from '@/shared/hooks';
+import { useModalState } from '@/hooks/common';
 
 function MyComponent() {
   const modal = useModalState();
@@ -50,7 +53,7 @@ Specialized hook for managing confirmation dialogs with pending actions.
 **Usage:**
 
 ```tsx
-import { useConfirmDialog } from '@/shared/hooks';
+import { useConfirmDialog } from '@/hooks/common';
 
 function MyComponent() {
   const deleteDialog = useConfirmDialog();

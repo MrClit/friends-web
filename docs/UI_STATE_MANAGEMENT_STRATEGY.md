@@ -349,7 +349,7 @@ export default function Home() {
 **DESPUÉS (Consistente con EventDetail):**
 
 ```tsx
-import { useModalState } from '@/shared/hooks';
+import { useModalState } from '@/hooks/common';
 
 export default function Home() {
   // ✅ useModalState - Consistente con el resto de la app
@@ -1022,18 +1022,21 @@ test('opens edit modal when clicking edit button', async () => {
 ### Métricas de Éxito
 
 **Código eliminado:**
+
 - ❌ `useEventsUIStore.ts` (36 líneas)
 - ❌ `useTransactionsUIStore.ts` (39 líneas)
 - ❌ Carpetas `store/` vacías (2)
 - **Total**: 75+ líneas eliminadas
 
 **Código nuevo:**
+
 - ✅ `useModalState.ts` (48 líneas) + 15 tests
 - ✅ `useConfirmDialog.ts` (74 líneas) + 18 tests
 - ✅ README.md para hooks (documentación completa)
 - **Total**: 122 líneas + 33 tests
 
 **Archivos actualizados:**
+
 - ✅ Home.tsx (18 líneas) - Zustand → useModalState
 - ✅ EventDetail.tsx (108 líneas) - Estado mixto → hooks locales
 - ✅ TransactionsList.tsx (138 líneas) - useState → useModalState
@@ -1041,22 +1044,23 @@ test('opens edit modal when clicking edit button', async () => {
 - ✅ 2 index.ts (exports limpiados)
 
 **Documentación actualizada:**
+
 - ✅ UI_STATE_MANAGEMENT_STRATEGY.md (este archivo)
 - ✅ FRONTEND_API_INTEGRATION.md (nueva sección de UI patterns)
 - ✅ apps/frontend/README.md (estructura y patrones actualizados)
 
 ### Tiempo Real vs Estimado
 
-| Fase | Estimado | Real | Diferencia |
-|------|----------|------|------------|
-| Fase 1: Infraestructura | 2-3h | ~2h | ✅ Dentro |
-| Fase 2: useEventDetail | 1-2h | ~30min | ✅ Más rápido |
-| Fase 3: Home.tsx | 30min | ~15min | ✅ Más rápido |
-| Fase 4: EventDetail.tsx | 1h | ~30min | ✅ Más rápido |
-| Fase 5: TransactionsList | 1h | ~20min | ✅ Más rápido |
-| Fase 6: Eliminar stores | 30min | ~15min | ✅ Más rápido |
-| Fase 7: Documentación | 30min | ~30min | ✅ Exacto |
-| **TOTAL** | **6-8.5h** | **~4h** | ✅ **50% más rápido** |
+| Fase                     | Estimado   | Real    | Diferencia            |
+| ------------------------ | ---------- | ------- | --------------------- |
+| Fase 1: Infraestructura  | 2-3h       | ~2h     | ✅ Dentro             |
+| Fase 2: useEventDetail   | 1-2h       | ~30min  | ✅ Más rápido         |
+| Fase 3: Home.tsx         | 30min      | ~15min  | ✅ Más rápido         |
+| Fase 4: EventDetail.tsx  | 1h         | ~30min  | ✅ Más rápido         |
+| Fase 5: TransactionsList | 1h         | ~20min  | ✅ Más rápido         |
+| Fase 6: Eliminar stores  | 30min      | ~15min  | ✅ Más rápido         |
+| Fase 7: Documentación    | 30min      | ~30min  | ✅ Exacto             |
+| **TOTAL**                | **6-8.5h** | **~4h** | ✅ **50% más rápido** |
 
 ### Beneficios Conseguidos
 

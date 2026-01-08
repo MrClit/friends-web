@@ -165,11 +165,18 @@ src/
 │     ├─ utils/        # Transaction utilities
 │     └─ index.ts
 ├─ hooks/
-│  ├─ api/           # React Query hooks (server state)
+│  ├─ api/            # React Query hooks (server state)
 │  │  ├─ keys.ts      # Centralized query keys
 │  │  ├─ useEvents.ts # Events queries and mutations
 │  │  ├─ useTransactions.ts # Transactions queries and mutations
-│     └─ useEventKPIs.ts # Computed KPIs from queries
+│  │  └─ useEventKPIs.ts # Computed KPIs from queries
+│  ├─ common/         # Generic reusable hooks (UI state, utilities)
+│  │  ├─ useModalState.ts # Modal open/close state
+│  │  ├─ useConfirmDialog.ts # Confirmation dialogs
+│  │  ├─ useInfiniteScroll.ts # Infinite scroll observer
+│  │  └─ README.md    # Documentation for common hooks
+│  └─ domain/         # Business logic hooks (page-specific)
+│     └─ useEventDetail.ts # EventDetail page business logic
 ├─ i18n/             # Internationalization
 │  ├─ index.ts       # i18next setup and locale mapping
 │  └─ locales/       # Translation files
@@ -241,14 +248,14 @@ The application uses a hybrid state management approach with clear separation of
 **Custom Hooks - UI State (Component-Level):**
 
 - Manages ephemeral UI state (modals, confirmation dialogs)
-- Located in `src/shared/hooks/`
+- Located in `src/hooks/common/`
 - Key hooks:
   - `useModalState()` - Generic modal open/close state (replaces Zustand stores)
   - `useConfirmDialog()` - Confirmation dialogs with pending actions
   - `useInfiniteScroll()` - Infinite scroll observer
 - **Pattern:**
   - UI state lives in components, not global stores
-  - Business logic separated in custom hooks (e.g., `useEventDetail`)
+  - Business logic separated in domain hooks (e.g., `useEventDetail` in `src/hooks/domain/`)
   - Follows React best practices (local state + composition)
   - Fully tested (33 unit tests passing)
 

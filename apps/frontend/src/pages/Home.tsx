@@ -1,5 +1,5 @@
 import { EventsList, EventFormModal } from '../features/events/components';
-import { useModalState } from '@/shared/hooks';
+import { useModalState } from '@/hooks/common';
 import AppHeader from '../shared/components/AppHeader';
 import FloatingActionButton from '../shared/components/FloatingActionButton';
 
