@@ -9,20 +9,15 @@ interface EventDetailHeaderProps {
   onDelete?: () => void;
 }
 
-export default function EventDetailHeader({
-  eventTitle,
-  onBack,
-  onEdit,
-  onDelete,
-}: EventDetailHeaderProps) {
+export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: EventDetailHeaderProps) {
   const showContextMenu = onEdit && onDelete;
-  
+
   return (
     <div className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
       <button
         type="button"
         onClick={onBack}
-        className="p-2 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors"
+        className="p-2 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors cursor-pointer"
         aria-label="Volver"
       >
         <MdArrowBack className="text-teal-900 dark:text-teal-100 text-2xl" />
@@ -31,10 +26,7 @@ export default function EventDetailHeader({
         {eventTitle}
       </h1>
       {showContextMenu ? (
-        <EventContextMenu
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+        <EventContextMenu onEdit={onEdit} onDelete={onDelete} />
       ) : (
         <div className="w-10" /> /* Spacer for centering */
       )}

@@ -1,0 +1,3 @@
+# HTTP Client private environment variables
+# Usa este archivo para tokens, API keys, etc.
+http-client.private.env.json

@@ -2,8 +2,21 @@
   "home": {
     "newEvent": "Nuevo Evento"
   },
+  "theme": {
+    "toggleDark": "Desactivar modo oscuro",
+    "toggleLight": "Activar modo oscuro"
+  },
+  "language": {
+    "select": "Seleccionar idioma"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "errorLoading": "No se pudo cargar los datos. Por favor, intenta de nuevo."
+  },
   "eventsList": {
     "noEvents": "No hay eventos aún.",
+    "emptyHint": "Pulsa el botón \"+\" para crear tu primer evento.",
     "title": "Eventos",
     "participants_one": "1 participante",
     "participants_other": "{{count}} participantes"
@@ -22,7 +35,8 @@
     "titleLabel": "Título",
     "titlePlaceholder": "Nombre del evento",
     "update": "Actualizar Evento",
-    "create": "Crear Evento"
+    "create": "Crear Evento",
+    "saving": "Guardando..."
   },
   "participantsInput": {
     "label": "Participantes",
@@ -31,6 +45,7 @@
     "deleteAria": "Eliminar participante"
   },
   "eventDetail": {
+    "invalidId": "ID de evento inválido",
     "notFound": "Evento no encontrado",
     "kpi": {
       "pot": "Saldo del Bote",

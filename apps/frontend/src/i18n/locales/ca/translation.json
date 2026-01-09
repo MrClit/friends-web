@@ -2,8 +2,21 @@
   "home": {
     "newEvent": "Nou Esdeveniment"
   },
+  "theme": {
+    "toggleDark": "Desactiva el mode fosc",
+    "toggleLight": "Activa el mode fosc"
+  },
+  "language": {
+    "select": "Selecciona l'idioma"
+  },
+  "common": {
+    "loading": "Carregant...",
+    "error": "Error",
+    "errorLoading": "No s'han pogut carregar les dades. Si us plau, torna-ho a provar."
+  },
   "eventsList": {
     "noEvents": "Encara no hi ha esdeveniments.",
+    "emptyHint": "Prem el botó \"+\" per crear el teu primer esdeveniment.",
     "title": "Esdeveniments",
     "participants_one": "1 participant",
     "participants_other": "{{count}} participants"
@@ -22,7 +35,8 @@
     "titleLabel": "Títol",
     "titlePlaceholder": "Nom de l'esdeveniment",
     "update": "Actualitza l'esdeveniment",
-    "create": "Crea l'esdeveniment"
+    "create": "Crear Esdeveniment",
+    "saving": "Desant..."
   },
   "participantsInput": {
     "label": "Participants",
@@ -31,6 +45,7 @@
     "deleteAria": "Elimina participant"
   },
   "eventDetail": {
+    "invalidId": "ID d'esdeveniment invàlid",
     "notFound": "Esdeveniment no trobat",
     "kpi": {
       "pot": "Saldo del Pot",

@@ -1,93 +1,94 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useEventsStore } from '../features/events/store/useEventsStore';
-import { useTransactionsStore } from '../features/transactions/store/useTransactionsStore';
+import { useEventDetail } from '@/hooks/domain/useEventDetail';
+import { useModalState, useConfirmDialog } from '@/hooks/common';
 import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
 import TransactionModal from '../features/transactions/components/TransactionModal';
 import TransactionsList from '../features/transactions/components/TransactionsList';
 import FloatingActionButton from '../shared/components/FloatingActionButton';
-import ConfirmDialog from '../shared/components/ConfirmDialog';
-import type { EventParticipant } from '../features/events/types';
+import { ConfirmDialog } from '@/shared/components';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { t } = useTranslation();
-  
-  const event = useEventsStore(state => state.events.find(e => e.id === id));
-  const updateEvent = useEventsStore(state => state.updateEvent);
-  const removeEvent = useEventsStore(state => state.removeEvent);
-  
-  const getTotalExpensesByEvent = useTransactionsStore(state => state.getTotalExpensesByEvent);
-  const getTotalContributionsByEvent = useTransactionsStore(state => state.getTotalContributionsByEvent);
-  const getPotBalanceByEvent = useTransactionsStore(state => state.getPotBalanceByEvent);
-  const getPendingToCompensateByEvent = useTransactionsStore(state => state.getPendingToCompensateByEvent);
-  
-  const totalExpenses = event ? getTotalExpensesByEvent(event.id) : 0;
-  const totalContributions = event ? getTotalContributionsByEvent(event.id) : 0;
-  const potBalance = event ? getPotBalanceByEvent(event.id) : 0;
-  const pendingToCompensate = event ? getPendingToCompensateByEvent(event.id) : 0;
-  
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const { event, kpis, isLoading, error, handleEditSubmit, handleDelete, handleBack } = useEventDetail(id);
 
-  const handleEditSubmit = ({ id, title, participants }: { id?: string; title: string; participants: EventParticipant[] }) => {
-    if (id) {
-      updateEvent(id, title, participants);
-    }
-    setEditModalOpen(false);
-  };
+  // UI state management
+  const editModal = useModalState();
+  const transactionModal = useModalState();
+  const deleteDialog = useConfirmDialog();
 
-  const handleBack = () => navigate('/');
+  // Validate id after all hooks
+  if (!id) {
+    return (
+      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+        <div className="text-center mt-10 text-red-400">{t('eventDetail.invalidId')}</div>
+      </div>
+    );
+  }
 
-  if (!event) return <div className="text-center mt-10">{t('eventDetail.notFound')}</div>;
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+        <div className="text-center mt-10 text-teal-400">{t('common.loading')}</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+        <div className="text-center mt-10 text-red-400">
+          {t('common.error')}: {error.message}
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+        <div className="text-center mt-10">{t('eventDetail.notFound')}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+    <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
       <EventDetailHeader
         eventId={event.id}
         eventTitle={event.title}
         onBack={handleBack}
-        onEdit={() => setEditModalOpen(true)}
-        onDelete={() => setDeleteDialogOpen(true)}
+        onEdit={editModal.open}
+        onDelete={() => deleteDialog.confirm(handleDelete)}
       />
-      
+
       <EventKPIGrid
         eventId={event.id}
-        potBalance={potBalance}
-        totalContributions={totalContributions}
-        totalExpenses={totalExpenses}
-        pendingToCompensate={pendingToCompensate}
+        potBalance={kpis?.potBalance ?? 0}
+        totalContributions={kpis?.totalContributions ?? 0}
+        totalExpenses={kpis?.totalExpenses ?? 0}
+        pendingToCompensate={kpis?.pendingToCompensate ?? 0}
       />
-      
+
       {/* Lista de transacciones */}
       <TransactionsList event={event} />
-      <FloatingActionButton
-        onClick={() => setTransactionModalOpen(true)}
-        label={t('eventDetail.addTransaction')}
-        icon={"+"}
-      />
+      <FloatingActionButton onClick={transactionModal.open} translationKey="eventDetail.addTransaction" icon={'+'} />
       <EventFormModal
-        open={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
+        open={editModal.isOpen}
+        onClose={editModal.close}
         event={event}
-        onSubmit={handleEditSubmit}
+        onSubmit={(data) => handleEditSubmit(data, editModal.close)}
       />
-      <TransactionModal open={transactionModalOpen} onClose={() => setTransactionModalOpen(false)} event={event} />
+      <TransactionModal open={transactionModal.isOpen} onClose={transactionModal.close} event={event} />
       <ConfirmDialog
-        open={deleteDialogOpen}
+        open={deleteDialog.isOpen}
         title={t('eventDetail.deleteTitle')}
         message={t('eventDetail.deleteMessage')}
         confirmText={t('eventDetail.deleteConfirm')}
         cancelText={t('eventDetail.deleteCancel')}
-        onConfirm={() => {
-          removeEvent(event.id);
-          setDeleteDialogOpen(false);
-          navigate('/');
-        }}
-        onCancel={() => setDeleteDialogOpen(false)}
+        onConfirm={deleteDialog.handleConfirm}
+        onCancel={deleteDialog.handleCancel}
       />
     </div>
   );

@@ -5,13 +5,27 @@
   "type": "module",
   "packageManager": "pnpm@10.27.0",
   "scripts": {
-    "dev": "pnpm --filter @friends/frontend dev",
-    "build": "pnpm --filter @friends/frontend build",
-    "lint": "pnpm --filter @friends/frontend lint",
+    "dev:frontend": "pnpm --filter @friends/frontend dev",
+    "dev:backend": "pnpm --filter @friends/backend dev",
+    "build": "pnpm -r build",
+    "build:frontend": "pnpm --filter @friends/frontend build",
+    "build:backend": "pnpm --filter @friends/backend build",
     "preview": "pnpm --filter @friends/frontend preview",
-    "test": "pnpm --filter @friends/frontend test",
-    "test:ui": "pnpm --filter @friends/frontend test:ui",
-    "test:run": "pnpm --filter @friends/frontend test:run",
-    "test:coverage": "pnpm --filter @friends/frontend test:coverage"
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "test": "pnpm -r test:run",
+    "test:watch": "pnpm -r --parallel test:watch",
+    "test:coverage": "pnpm -r test:coverage",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,js,jsx,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"apps/**/*.{ts,tsx,js,jsx,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "clean": "pnpm -r clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.0.0",
+    "prettier": "^3.4.2",
+    "typescript-eslint": "^8.51.0"
   }
 }

@@ -1,226 +1,454 @@
-# Friends Web - AI Coding Agent Instructions
+# Friends - AI Coding Agent Instructions
 
-## Project Overview
-Friends Web is a React 19 + TypeScript app for managing shared expenses at events. Built with Vite, Zustand, TailwindCSS v4, and i18next. Uses HashRouter for GitHub Pages deployment.
+> Expense sharing platform • React 19 + NestJS + PostgreSQL • pnpm monorepo
 
-### Package Manager
-- **Uses pnpm** (v10.27.0) as the package manager
-- Configured via `"packageManager": "pnpm@10.27.0"` in package.json
-- Lock file: `pnpm-lock.yaml` (committed to repository)
-- **Always use pnpm commands**: `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm test`
-- For running scripts: `pnpm <script>` (not `npm run <script>`)
-- For adding dependencies: `pnpm add <package>` or `pnpm add -D <package>`
+**Live Demo:** [https://mrclit.github.io/friends-web/](https://mrclit.github.io/friends-web/)
 
-## Architecture Patterns
+---
 
-### State Management (Zustand + LocalStorage Persistence)
-- **All stores use Zustand with `persist` middleware** for automatic localStorage sync
-- Store pattern: `src/features/*/store/use*Store.ts`
-- Key stores: `useEventsStore` (events), `useTransactionsStore` (transactions), `useThemeStore` (theme)
-- **Critical**: When deleting an event, use `useTransactionsStore.getState().deleteTransactionsByEvent()` to cascade delete transactions (see [useEventsStore.ts](../src/features/events/store/useEventsStore.ts#L32-L37))
-- **Participant removal**: When updating event participants, removed participants must be cleared from transactions via `clearParticipantFromEventTransactions()` ([useEventsStore.ts](../src/features/events/store/useEventsStore.ts#L45-L52))
-- **Theme store**: Uses `useThemeStore` without persist middleware - manually syncs with localStorage and respects system preferences
+## 🏗️ Monorepo Structure
 
-### Feature-Based Organization
+**Workspaces:**
+
+- `@friends/frontend` - React 19 + TanStack Query UI (`apps/frontend/`)
+- `@friends/backend` - NestJS + TypeORM API (`apps/backend/`)
+- `@friends/shared-types` - Shared TypeScript types (planned)
+
+**Package Manager:** pnpm v10.27.0 • Workspaces in `apps/*` and `packages/*`
+
+**Quick Commands:**
+
+```bash
+pnpm install                              # Install all workspaces
+pnpm dev                                  # Frontend dev (localhost:5173)
+pnpm dev:backend                          # Backend dev (localhost:3000)
+pnpm --filter @friends/frontend test      # Run frontend tests
+pnpm --filter @friends/backend test       # Run backend tests
+pnpm -r build                             # Build all workspaces
+```
+
+**Workspace Dependencies:**
+
+```bash
+# Add to workspace
+pnpm --filter @friends/frontend add lodash
+
+# Add workspace dependency
+pnpm --filter @friends/frontend add @friends/shared-types@workspace:*
+
+# Add to root (shared dev deps)
+pnpm add -D -w prettier
+```
+
+---
+
+## 📱 Frontend (@friends/frontend)
+
+**Stack:** React 19 • TypeScript • Vite • TanStack Query • Zustand (theme only) • TailwindCSS v4 • i18next
+
+### Architecture Patterns
+
+**Feature-Based Structure:**
+
 ```
 src/features/{feature}/
-  ├─ components/       # Feature UI components
-  ├─ store/           # Feature Zustand store
-  ├─ types.ts         # Feature TypeScript types
-  ├─ constants.ts     # Feature constants (optional)
-  └─ index.ts         # Public API exports
+  ├─ components/       # Feature UI
+  ├─ types.ts         # Feature types
+  ├─ constants.ts     # Config (e.g., PAYMENT_TYPE_CONFIG)
+  └─ index.ts         # Barrel exports
 ```
-- Features: `events`, `transactions`, `kpi`
-- Import from feature barrel exports: `import { EventsList } from '@/features/events'`
-- **Never import directly from store files in components** - use store hooks
-- Constants exported via `constants.ts` (e.g., `PAYMENT_TYPES`, `PAYMENT_TYPE_CONFIG` in transactions)
 
-### Transaction System
-Three payment types ([types.ts](../src/features/transactions/types.ts)):
-- `contribution`: Money added to event pot
-- `expense`: Money spent from pot by participant
-- `compensation`: Reimbursements to balance accounts
+**State Management:**
 
-**Payment Type Constants** ([constants.ts](../src/features/transactions/constants.ts)):
-- `PAYMENT_TYPES`: Array of all payment types for iteration
-- `PAYMENT_TYPE_CONFIG`: Centralized config with icon components and color variants (light/strong) for each type
-- `POT_CONFIG`: Special config for pot expenses (piggy bank icon, orange colors)
+- **Server State:** TanStack Query hooks in `src/hooks/api/` (queries, mutations, cache invalidation) - fully API-backed
+- **UI State:** Minimal Zustand for theme only (`src/shared/store/useThemeStore.ts`)
+- **localStorage:** Only used for language preference (i18n) - all event/transaction data comes from backend API
 
-**Pot System** ([pot.ts](../src/shared/constants/pot.ts)):
-- `POT_PARTICIPANT_ID = '0'`: Special participant ID representing the common pot
-- Pot can only make expenses (not contributions or compensations)
-- Pot expenses shown in KPI details with special orange styling
+**API Integration:**
 
-**KPI calculations** in `useTransactionsStore`:
-- `getPotBalanceByEvent`: contributions - compensations - expenses (includes pot expenses)
-- `getPendingToCompensateByEvent`: expenses - compensations
-- `getTotalPotExpensesByEvent`: Filter expenses by POT_PARTICIPANT_ID
-- `getPotExpensesData`: Returns pot expenses data for KPI display
-- **All KPIs computed per-event AND per-participant** (see store methods)
-- Helper method `isPotExpense(transaction)`: Check if transaction is a pot expense
+- Request wrapper: `src/api/client.ts` (handles `{ data: T }` unwrapping)
+- API methods: `src/api/events.api.ts`, `src/api/transactions.api.ts`
+- Hooks: `src/hooks/api/useEvents.ts`, `src/hooks/api/useTransactions.ts`
+- Query keys: `src/hooks/api/keys.ts` (centralized)
 
-### KPI System
-New feature structure: `src/features/kpi/`
-- **Types** ([types.ts](../src/features/kpi/types.ts)):
-  - `KPIType`: Union type for KPI identifiers (`'balance' | 'contributions' | 'expenses' | 'pending'`)
-  - `KPIParticipantItem`: Display item with id, name, formatted value, and isPot flag
-  - `KPIConfig`: Configuration interface for KPI components
-- **Components** ([components/](../src/features/kpi/components/)):
-  - `KPIDetailHeader`: Header with back button and title
-  - `KPIParticipantsList`: List component that displays participants and pot with special styling
-  - `KPIExplanation`: Displays contextual explanation for each KPI
-- **Page**: [KPIDetail.tsx](../src/pages/KPIDetail.tsx) uses KPI feature components
-- **Pot integration**: `expenses` KPI includes pot expenses when `getPotExpensesData()` returns data
+**Key Patterns:**
 
-### Internationalization (i18next)
-- Three languages: `en`, `es` (default), `ca`
-- Translation files: `src/i18n/locales/{lang}/translation.json`
-- **Key naming**: Use pattern `<feature>.<context>.<key>` (e.g., `events.form.title`)
-- **Locale mapping**: `getCurrentLocale()` from `src/i18n/index.ts` maps language codes to locale codes:
-  - `'es'` → `'es-ES'`, `'en'` → `'en-US'`, `'ca'` → `'ca-ES'`
-- **Pluralization**: Supports i18next pluralization (e.g., `participants_one`, `participants_other`)
-- **Amount formatting**: Always use `formatAmount(amount, currency = 'EUR', useGrouping = true)` from `src/shared/utils/formatAmount.ts`
-  - Uses `getCurrentLocale()` for locale-aware formatting
-  - Default currency: EUR
-  - Returns formatted string with currency symbol
-- **Date formatting**: Use `formatDateLong(dateStr)` from `src/shared/utils/formatDateLong.ts`
-  - Uses `getCurrentLocale()` for locale-aware formatting
-  - Returns full format: weekday, year, month, day
-- Both formatters automatically adapt to user's selected language
-- In components: `const { t } = useTranslation()` then `t('key.path')`
-- **Dynamic labels**: Use dynamic keys for context-sensitive translations (e.g., `t(\`transactionForm.participantLabel.${type}\`)`)
+```typescript
+// Query hook pattern
+export function useEvent(id: string) {
+  return useQuery({
+    queryKey: queryKeys.events.detail(id),
+    queryFn: () => eventsApi.getById(id),
+    enabled: !!id,
+  });
+}
+
+// Mutation with cache invalidation
+export function useCreateEvent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: eventsApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+    },
+  });
+}
+```
+
+### Domain Model
+
+**Transaction Types:** `'contribution' | 'expense' | 'compensation'`
+
+- Contributions: Money added to pot (blue)
+- Expenses: Money spent (red)
+- Compensations: Reimbursements (green)
+
+**POT System:** Special participant `id: '0'` for shared expenses (orange UI)
+
+**Config:** `src/features/transactions/constants.ts`
+
+```typescript
+PAYMENT_TYPE_CONFIG = {
+  contribution: { icon: FaHandHoldingUsd, colors: { light: 'blue-100', strong: 'blue-800' } },
+  expense: { icon: FaWallet, colors: { light: 'red-100', strong: 'red-800' } },
+  compensation: { icon: FaHandshake, colors: { light: 'green-100', strong: 'green-800' } },
+};
+POT_CONFIG = { icon: FaPiggyBank, colors: { light: 'orange-100', strong: 'orange-800' } };
+```
+
+### i18n (i18next)
+
+- **Languages:** `es` (default), `en`, `ca`
+- **Pattern:** `feature.context.key` (e.g., `events.form.title`)
+- **Formatting:** `formatAmount(amount, 'EUR')` for currency, `formatDateLong(date)` for dates
+- **Locale mapping:** `'es'` → `'es-ES'`, `'en'` → `'en-US'`, `'ca'` → `'ca-ES'`
 
 ### Styling (TailwindCSS v4)
-- **Use `@tailwindcss/vite` plugin** (not PostCSS) - see [vite.config.ts](../vite.config.ts#L7)
-- Utility helper: `cn()` from `@/lib/utils` for conditional classes (uses `clsx` + `tailwind-merge`)
-- Theme: Teal color scheme with dark mode support via `useThemeStore`
-- Dark mode classes: Use `dark:` prefix (e.g., `dark:bg-teal-800`)
-- **Color conventions**:
-  - Teal: Primary color for UI (buttons, backgrounds, text)
-  - Blue: Contributions (light: `bg-blue-100 text-blue-800`, dark: `dark:bg-blue-900 dark:text-blue-200`)
-  - Red: Expenses (light: `bg-red-100 text-red-800`, dark: `dark:bg-red-900 dark:text-red-200`)
-  - Green: Balance/compensation (light: `bg-green-100 text-green-800`, dark: `dark:bg-green-900 dark:text-green-200`)
-  - Yellow: Pending amounts (light: `bg-yellow-100 text-yellow-800`, dark: `dark:bg-yellow-900 dark:text-yellow-200`)
-  - Orange: Pot expenses (light/strong: `text-orange-800 dark:text-orange-200`, border: `border-orange-300 dark:border-orange-700`)
-- **Responsive design**: Use `sm:`, `md:`, `lg:` prefixes for breakpoints
-- **Animations**: Custom animations defined inline (e.g., `slideUp` in EventFormModal)
 
-### Path Aliases
-```typescript
-"@": "/src"  // Configured in vite.config.ts
-```
-Always use `@/` imports: `import { cn } from '@/lib/utils'`
+- **Plugin:** `@tailwindcss/vite` (not PostCSS)
+- **Helper:** `cn()` from `@/lib/utils` for conditional classes
+- **Theme:** Teal primary, semantic colors (blue=contributions, red=expenses, green=balance, orange=pot)
+- **Dark mode:** `dark:` prefix, synced via `useThemeStore`
 
-## Development Workflow
+### Routing (React Router DOM 7)
 
-### Running the App
-```bash
-pnpm dev          # Dev server at localhost:5173
-pnpm build        # TypeScript check + Vite build
-pnpm preview      # Preview production build
-```
+- **HashRouter** (GitHub Pages compatibility)
+- **Routes:** `/` (Home), `/event/:id` (Detail), `/event/:id/kpi/:kpi` (KPI drill-down)
+- **Navigation:** `useNavigate()`, `useParams<{ id: string }>()`
 
 ### Testing (Vitest + Testing Library)
-```bash
-pnpm test         # Watch mode
-pnpm test:run     # Single run
-pnpm test:ui      # Vitest UI
-pnpm test:coverage # Coverage report
+
+- Co-locate tests: `*.test.ts` next to source
+- Setup: `src/test/setup.ts` (localStorage mocks, jest-dom)
+- Run: `pnpm test` (watch), `pnpm test:run` (CI), `pnpm test:coverage`
+
+### Common Tasks
+
+**Add feature:**
+
+1. Create `src/features/{feature}/` with types, components, constants
+2. Export via `index.ts`
+3. Add translations to `src/i18n/locales/{en,es,ca}/translation.json`
+
+**Add API endpoint:**
+
+1. Add method to `src/api/{resource}.api.ts`
+2. Create hook in `src/hooks/api/use{Resource}.ts`
+3. Update query keys in `src/hooks/api/keys.ts`
+4. Use hook in component
+
+---
+
+## 🔧 Backend (@friends/backend)
+
+**Stack:** NestJS • TypeORM • PostgreSQL • Swagger/OpenAPI
+
+### Architecture
+
+**Modular Structure:**
+
 ```
-- **Test setup**: [src/test/setup.ts](../src/test/setup.ts) - mocks localStorage, extends jest-dom matchers
-- **Test pattern**: Co-locate tests with code (`*.test.ts` next to `*.ts`)
-- Example: [useEventsStore.test.ts](../src/features/events/store/useEventsStore.test.ts)
-
-### Code Quality
-```bash
-pnpm lint         # ESLint check
+src/modules/{module}/
+  ├─ {module}.controller.ts    # HTTP layer (routes, validation)
+  ├─ {module}.service.ts       # Business logic
+  ├─ {module}.module.ts        # Module definition
+  ├─ entities/                 # TypeORM entities
+  └─ dto/                      # Data Transfer Objects
 ```
-- Config: `eslint.config.js` (flat config format)
-- Uses `@typescript-eslint`, `react-hooks`, `react-refresh` plugins
 
-## Key Conventions
+**Global Configuration:**
 
-### Code Style
-- **Naming**: camelCase for variables/functions, PascalCase for components, useCamelCase for hooks
-- **Components**: Functional components with hooks only (no class components)
-- **Composition**: Prefer component composition over logic duplication
-- **Documentation**: JSDoc comments in English for functions and components
-- **ID Generation**: Use `crypto.randomUUID()` for unique IDs
+- **API Prefix:** `/api` (all endpoints under `/api/*`)
+- **Swagger Docs:** `/api/docs` (auto-generated)
+- **CORS:** Configured for frontend origin (env: `CORS_ORIGIN`)
+- **Response Format:** All responses wrapped as `{ data: T }` via `TransformInterceptor`
+- **Validation:** Global `ValidationPipe` with `whitelist: true`, `transform: true`
 
-### Component Patterns
-- **Default exports** for components (not named exports)
-- **UI Primitives**: Radix UI for complex patterns (dropdowns, dialogs) in `src/components/ui/`
-- **Icons**: Use react-icons for all icons
-  - `FaHandHoldingUsd`: Contributions
-  - `FaWallet`: Expenses
-  - `FaHandshake`: Compensations
-  - `FaPiggyBank`: Pot expenses
-  - `MdArrowBack`: Navigation back
-- **Forms**: Controlled components with validation, error handling, loading states
-  - Use `required` attribute for form validation
-  - Disable submit button when form is invalid
-  - Show loading/disabled states during async operations
-- **Modals**: State lifting pattern with submit/cancel actions (see [EventFormModal.tsx](../src/features/events/components/EventFormModal.tsx))
-  - Implement dirty state tracking to prevent accidental data loss
-  - Show confirmation dialog when closing with unsaved changes
-  - Reset form state on close
-- **Lists**: Use `map()` with unique `key` prop (prefer ID over index)
-- **Conditional rendering**: Use ternary operator or `&&` for simple conditions
-- **Transaction Type Selector**: Segmented control pattern with icons and labels ([TransactionTypeSelector.tsx](../src/features/transactions/components/TransactionTypeSelector.tsx))
+### Key Patterns
 
-### Type Safety
-- **No `any` types** - use proper TypeScript types
-- Domain types defined in feature `types.ts` files
-- Export types through feature `index.ts`
-- Share types across features when needed (e.g., `EventParticipant` used by transactions)
+**Standard Controller Pattern:**
 
-### Error Handling & Async
-- Use try-catch for error handling
-- Handle loading and error states explicitly
-- Provide user feedback for async operations
+```typescript
+@ApiTags('Events')
+@Controller('events')
+export class EventsController {
+  constructor(private readonly eventsService: EventsService) {}
 
-### Demo Data
-- Demo initializer: [DemoInitializer.tsx](../src/shared/components/DemoInitializer.tsx) 
-- Seed data: [demoData.ts](../src/shared/demo/demoData.ts)
-- Checks localStorage before creating demo event
+  @Get(':id')
+  @ApiOperation({ summary: 'Get event by ID' })
+  @ApiStandardResponse(200, 'Event retrieved', Event)
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.eventsService.findOne(id);
+  }
+}
+```
 
-### Routing
-- Uses `HashRouter` (for GitHub Pages compatibility)
-- Routes in [App.tsx](../src/App.tsx):
-  - `/` - Home (events list)
-  - `/event/:id` - Event detail
-  - `/event/:id/kpi/:kpi` - KPI detail drill-down
-- **Navigation**: Use `useNavigate()` hook from react-router-dom
-- **Route params**: Use `useParams<{ id: string }>()` for type-safe route parameters
-- **KPI navigation**: KPI boxes are clickable and navigate to detail page
+**Service with Error Handling:**
 
-## Common Tasks
+```typescript
+@Injectable()
+export class EventsService {
+  private readonly logger = new Logger(EventsService.name);
 
-### Adding a New Feature
-1. Create `src/features/{feature}/` directory
-2. Add `types.ts`, `store/use{Feature}Store.ts`, `components/`
-3. Create `constants.ts` if feature needs centralized configuration
-4. Export public API via `index.ts`
-5. Update imports in pages
-6. Add translations for all three languages
+  async findOne(id: string): Promise<Event> {
+    const event = await this.eventRepository.findOne({ where: { id } });
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${id} not found`);
+    }
+    return event;
+  }
+}
+```
 
-### Adding Translations
-1. Add keys to all three locale files: `src/i18n/locales/{en,es,ca}/translation.json`
-2. Use consistent nesting: `feature.component.key`
-3. Support pluralization when needed (add `_one` and `_other` variants)
-4. Use dynamic keys for context-sensitive translations
+**Entity with Relations:**
 
-### Creating New KPIs
-1. Add calculation method to `useTransactionsStore`
-2. Update `KPIType` union in `src/features/kpi/types.ts`
-3. Add KPI configuration in KPIDetail page
-4. Create UI component in `features/events/components/` or use existing `KPIBox`
-5. Display in `EventDetail` page
-6. Add translations for KPI labels
+```typescript
+@Entity('events')
+export class Event {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-### Working with Transactions
-1. Always use `PAYMENT_TYPE_CONFIG` for icons and colors
-2. Use `POT_PARTICIPANT_ID` when dealing with pot transactions
-3. Include pot option in transaction forms for expenses only
-4. Filter transactions by event using `getTransactionsByEvent(eventId)`
-5. Use type-safe `PaymentType` union for transaction types
+  @Column({ type: 'jsonb' })
+  participants: EventParticipant[];
+
+  @OneToMany(() => Transaction, (tx) => tx.event, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  transactions: Transaction[];
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+}
+```
+
+### API Endpoints
+
+**Events:**
+
+```
+GET    /api/events              # List all events
+GET    /api/events/:id          # Get event by ID
+POST   /api/events              # Create event
+PATCH  /api/events/:id          # Update event
+DELETE /api/events/:id          # Delete event (cascade to transactions)
+GET    /api/events/:id/transactions  # Get event transactions (paginated)
+```
+
+**Transactions:**
+
+```
+POST   /api/events/:eventId/transactions          # Create transaction
+GET    /api/events/:eventId/transactions          # Paginated list (query: page, limit)
+PATCH  /api/transactions/:id                      # Update transaction
+DELETE /api/transactions/:id                      # Delete transaction
+```
+
+### Database (TypeORM + PostgreSQL)
+
+**Configuration:** `src/config/database.config.ts` (uses `ConfigService` for env vars)
+
+**Entities:**
+
+- `Event`: `id`, `title`, `participants` (JSONB), `createdAt`, `updatedAt`
+- `Transaction`: `id`, `eventId`, `participantId`, `paymentType`, `amount`, `title`, `date`, `createdAt`
+
+**Environment Variables:**
+
+```bash
+# .env.development
+NODE_ENV=development
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABASE=friends_db
+CORS_ORIGIN=http://localhost:5173
+```
+
+### Development
+
+```bash
+# From root
+pnpm dev:backend          # Start in watch mode
+
+# From apps/backend/
+pnpm start:dev           # Watch mode
+pnpm build               # Production build
+pnpm test                # Run tests
+pnpm lint                # ESLint check
+```
+
+**Database Setup:**
+
+```bash
+# Docker Compose (from apps/backend/)
+docker-compose up -d     # Start PostgreSQL container
+```
+
+### Best Practices
+
+**1. Separation of Concerns:**
+
+- Controllers handle HTTP (routing, validation, status codes)
+- Services contain business logic only
+- Entities define data structure and relations
+
+**2. Validation:**
+
+```typescript
+// DTOs with class-validator
+export class CreateEventDto {
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  title: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EventParticipantDto)
+  participants: EventParticipantDto[];
+}
+```
+
+**3. Error Handling:**
+
+- Use NestJS exceptions: `NotFoundException`, `BadRequestException`, etc.
+- Log with context: `this.logger.error('Event not found', { id })`
+- Never expose sensitive data in errors
+
+**4. Testing:**
+
+- Unit tests: Mock repositories, test service logic
+- E2E tests: Test full API endpoints with test database
+
+**5. API Documentation:**
+
+- Use Swagger decorators: `@ApiOperation`, `@ApiResponse`, `@ApiProperty`
+- Custom decorator: `@ApiStandardResponse(status, description, type, isArray?)`
+
+---
+
+## 📦 Shared Packages
+
+### @friends/shared-types (Planned)
+
+**Purpose:** Single source of truth for data structures between frontend and backend
+
+**Structure:**
+
+```typescript
+packages/shared-types/src/
+├── event.types.ts         # Event, EventParticipant, DTOs
+├── transaction.types.ts   # Transaction, PaymentType, DTOs
+├── kpi.types.ts          # KPIType, KPIConfig
+├── common.types.ts       # ApiResponse, PaginatedResponse
+└── index.ts              # Barrel export
+```
+
+**Usage:** `import { Event, Transaction } from '@friends/shared-types'`
+
+---
+
+## 🔀 Git & CI/CD
+
+**Commit Convention:**
+
+- Format: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- Scopes: `frontend`, `backend`, `shared-types`, `ci`
+
+**Examples:**
+
+```bash
+feat(frontend): add transaction filtering
+fix(backend): resolve database connection timeout
+docs(monorepo): update workspace structure
+```
+
+**CI/CD Workflows:**
+
+- `.github/workflows/deploy.yml` - Frontend deployment to GitHub Pages
+- Tests run on PR to main/develop branches
+
+---
+
+## 📝 Common Development Tasks
+
+### Testing Both Workspaces
+
+```bash
+pnpm -r test:run              # All tests
+pnpm --filter @friends/frontend test:coverage
+pnpm --filter @friends/backend test
+```
+
+### Debugging
+
+**Frontend:**
+
+- React DevTools extension
+- TanStack Query DevTools (enabled in dev)
+- Vite error overlay
+
+**Backend:**
+
+- NestJS Logger with context
+- VS Code debugger
+- Swagger docs at `/api/docs`
+
+**Monorepo:**
+
+```bash
+pnpm list --depth 0           # Check workspace resolution
+ls -la node_modules/@friends  # Verify symlinks
+pnpm store prune             # Clear cache
+```
+
+### Environment Setup
+
+**Frontend (`.env`):**
+
+```bash
+VITE_API_URL=http://localhost:3000/api
+VITE_ENABLE_DEVTOOLS=true
+```
+
+**Backend (`.env.development`):**
+
+```bash
+NODE_ENV=development
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABASE=friends_db
+CORS_ORIGIN=http://localhost:5173
+```
+
+---
+
+**Last Updated:** January 9, 2026  
+**Status:** Frontend ✅ Active • Backend ✅ Active • Shared-types 🚧 Planned

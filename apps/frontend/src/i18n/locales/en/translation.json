@@ -2,8 +2,21 @@
   "home": {
     "newEvent": "New Event"
   },
+  "theme": {
+    "toggleDark": "Disable dark mode",
+    "toggleLight": "Enable dark mode"
+  },
+  "language": {
+    "select": "Select language"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "errorLoading": "Could not load data. Please try again."
+  },
   "eventsList": {
     "noEvents": "No events yet.",
+    "emptyHint": "Click the \"+\" button to create your first event.",
     "title": "Events",
     "participants_one": "1 participant",
     "participants_other": "{{count}} participants"
@@ -22,7 +35,8 @@
     "titleLabel": "Title",
     "titlePlaceholder": "Event name",
     "update": "Update Event",
-    "create": "Create Event"
+    "create": "Create Event",
+    "saving": "Saving..."
   },
   "participantsInput": {
     "label": "Participants",
@@ -31,6 +45,7 @@
     "deleteAria": "Delete participant"
   },
   "eventDetail": {
+    "invalidId": "Invalid event ID",
     "notFound": "Event not found",
     "kpi": {
       "pot": "Pot Balance",

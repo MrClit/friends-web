@@ -1,0 +1,141 @@
+###############################################
+# EVENTS API
+###############################################
+# Variables cargadas desde .vscode/settings.json
+# Selecciona ambiente: "development" o "production"
+
+###############################################
+# 1. LIST ALL EVENTS
+###############################################
+GET {{baseUrl}}/events
+
+###############################################
+# 2. CREATE EVENT
+###############################################
+# @name createEvent
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+
+{
+  "title": "Cena en Barcelona",
+  "participants": [
+    { "id": "1", "name": "Alice" },
+    { "id": "2", "name": "Bob" },
+    { "id": "3", "name": "Charlie" }
+  ]
+}
+
+### Guardar el ID del evento creado
+@createdEventId = {{createEvent.response.body.id}}
+
+###############################################
+# 3. GET EVENT BY ID
+###############################################
+GET {{baseUrl}}/events/{{createdEventId}}
+
+###############################################
+# 4. UPDATE EVENT - Solo título
+###############################################
+PATCH {{baseUrl}}/events/{{createdEventId}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Cena actualizada en Barcelona"
+}
+
+###############################################
+# 5. UPDATE EVENT - Cambiar participantes
+###############################################
+PATCH {{baseUrl}}/events/{{createdEventId}}
+Content-Type: {{contentType}}
+
+{
+  "participants": [
+    { "id": "1", "name": "Alice" },
+    { "id": "4", "name": "David" },
+    { "id": "5", "name": "Eva" }
+  ]
+}
+
+###############################################
+# 6. DELETE EVENT
+###############################################
+# ⚠️ Esto eliminará el evento y todas sus transacciones
+DELETE {{baseUrl}}/events/{{createdEventId}}
+
+###############################################
+# ERROR CASES - Validaciones
+###############################################
+
+### GET Non-existent Event (404)
+GET {{baseUrl}}/events/00000000-0000-0000-0000-000000000000
+
+### GET Invalid UUID (400)
+GET {{baseUrl}}/events/not-a-uuid
+
+### CREATE Event without participants (400)
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+
+{
+  "title": "Evento sin participantes",
+  "participants": []
+}
+
+### CREATE Event without title (400)
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+
+{
+  "participants": [
+    { "id": "1", "name": "Alice" }
+  ]
+}
+
+### UPDATE with invalid data (400)
+PATCH {{baseUrl}}/events/{{createdEventId}}
+Content-Type: {{contentType}}
+
+{
+  "title": "",
+  "participants": []
+}
+
+###############################################
+# WORKFLOW COMPLETO - Ejecuta en orden
+###############################################
+
+### 1. Crear evento de prueba
+# @name testEvent
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+
+{
+  "title": "Viaje a Madrid 2026",
+  "participants": [
+    { "id": "1", "name": "Ana" },
+    { "id": "2", "name": "Carlos" },
+    { "id": "3", "name": "María" }
+  ]
+}
+
+### 2. Verificar creación
+@testEventId = {{testEvent.response.body.id}}
+GET {{baseUrl}}/events/{{testEventId}}
+
+### 3. Actualizar evento
+PATCH {{baseUrl}}/events/{{testEventId}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Viaje a Madrid 2026 - Confirmado"
+}
+
+### 4. Listar todos (debe aparecer)
+GET {{baseUrl}}/events
+
+### 5. Eliminar evento de prueba
+DELETE {{baseUrl}}/events/{{testEventId}}
+
+### 6. Verificar eliminación (404)
+GET {{baseUrl}}/events/{{testEventId}}

@@ -66,7 +66,7 @@ describe('formatAmount', () => {
     });
 
     it('should use dot as decimal separator', () => {
-      const result = formatAmount(100.50);
+      const result = formatAmount(100.5);
       expect(result).toContain('100.50');
     });
 
@@ -88,7 +88,7 @@ describe('formatAmount', () => {
     });
 
     it('should use comma as decimal separator', () => {
-      const result = formatAmount(100.50);
+      const result = formatAmount(100.5);
       expect(result).toContain('100,50');
     });
   });

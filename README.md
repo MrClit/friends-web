@@ -1,135 +1,177 @@
-# Friends Web
+# Friends - Expense Sharing Platform
 
-This is a personal project to manage events, participants, and shared expenses. Built with React 19, TypeScript, Vite, Zustand, TailwindCSS, and MUI. Now includes multi-language support (i18n), dark mode, and a modular architecture.
+> Monorepo for managing shared expenses at events • React 19 + NestJS
+
+A modern web application to help groups track expenses, contributions, and compensations at shared events. Built with TypeScript and organized as a pnpm monorepo with separate frontend and backend workspaces.
 
 ## Table of Contents
-- [Features](#features)
-- [Demo](#demo)
-- [Installation](#installation)
-- [Available Scripts](#available-scripts)
-- [Project Structure](#project-structure)
-- [Configuration](#configuration)
-- [Linting & Formatting](#linting--formatting)
-- [Testing](#testing)
-- [Contributing](#contributing)
+
+- [Live Demo](#-live-demo)
+- [Workspaces](#️-workspaces)
+- [Quick Start](#-quick-start)
+- [Monorepo Management](#️-monorepo-management)
+- [Project Structure](#-project-structure)
+- [Documentation](#-documentation)
 - [License](#license)
 
-## Features
-- ⚡️ Fast development with Vite
-- ⚛️ React 19 + TypeScript
-- 🎨 TailwindCSS and MUI for UI
-- 🌐 Multi-language support (i18n) with translation files in `src/i18n/locales/`
-- 🧩 Modular architecture: features, shared, pages
-- 🛠️ Advanced ESLint setup for TypeScript and React
-- 📦 Scalable and maintainable structure
-- 👫 Event management: create, edit, delete
-- 👥 Participant management per event
-- 💸 Transaction management: contributions, expenses, and reimbursements linked to events
-- 📊 Event detail page with KPIs and contextual menu
-- ⏬ **Infinite scroll** for transaction lists (date-based pagination)
-- ➕ Reusable and accessible forms and modals
-- 🗃️ Persistent state with Zustand + LocalStorage
-- 🌙 Dark mode support and theme selector
-- 🔄 Navigation with React Router DOM 7
+---
 
-## Demo
+## ✨ Live Demo
 
-You can try the app live here:
-[https://mrclit.github.io/friends-web/](https://mrclit.github.io/friends-web/)
+You can try the app live here: **[https://mrclit.github.io/friends-web/](https://mrclit.github.io/friends-web/)**
 
-## Installation
+The demo includes sample data to explore all features:
+
+- Event management and participant tracking
+- Transaction types (contributions, expenses, compensations)
+- Pot expenses (shared costs)
+- KPI dashboard with drill-down details
+- Multi-language support (Spanish, English, Catalan)
+- Dark mode
+
+All data is stored locally in your browser (no backend required for demo).
+
+---
+
+## 🏗️ Workspaces
+
+This is a **pnpm monorepo** containing:
+
+| Workspace                                           | Description                        | Status         |
+| --------------------------------------------------- | ---------------------------------- | -------------- |
+| **[@friends/frontend](apps/frontend/)**             | React 19 + TanStack Query frontend | ✅ Operational |
+| **[@friends/backend](apps/backend/)**               | NestJS + PostgreSQL API backend    | ✅ Operational |
+| **[@friends/shared-types](packages/shared-types/)** | Shared TypeScript types            | 🚧 Planned     |
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 # Clone the repository
 git clone https://github.com/MrClit/friends-web.git
 cd friends-web
 
-# Install dependencies
+# Install dependencies (uses pnpm workspaces)
 pnpm install
+
+# Start frontend development server
+pnpm dev
+
+# Run all tests
+pnpm test
+
+# Build for production
+pnpm build
 ```
 
-## Available Scripts
+---
+
+## �️ Monorepo Management
+
+### Package Manager
+
+- **pnpm v10.27.0** with workspaces
+- Configured in `pnpm-workspace.yaml`
+- Lock file: `pnpm-lock.yaml`
+
+### Working with Workspaces
 
 ```bash
-pnpm dev        # Start the development server
-pnpm build      # Build the app for production
-pnpm preview    # Preview the production build
-pnpm lint       # Lint the code
+# Install dependencies for all workspaces
+pnpm install
+
+# Run commands in specific workspace
+pnpm --filter @friends/frontend dev
+pnpm --filter @friends/frontend test
+
+# Run commands in all workspaces
+pnpm -r build
+pnpm -r test
+
+# Add dependency to specific workspace
+pnpm --filter @friends/frontend add lodash
+pnpm --filter @friends/backend add @nestjs/core
+
+# Add dev dependency to root
+pnpm add -D -w husky
 ```
 
-## Project Structure
-
-```
-/ ├─ public/                # Static files
-  ├─ src/
-  │   ├─ assets/           # Images and resources
-  │   ├─ features/         # Domain modules (events, transactions, kpi)
-  │   │   ├─ events/
-  │   │   │   ├─ components/   # Event components
-  │   │   │   ├─ store/        # Local event state (with tests)
-  │   │   │   ├─ types.ts      # Event types
-  │   │   ├─ kpi/
-  │   │   │   ├─ components/   # KPI detail components
-  │   │   │   ├─ types.ts      # KPI types
-  │   │   ├─ transactions/
-  │   │   │   ├─ components/   # Transaction components (with tests)
-  │   │   │   ├─ store/        # Local transaction state (with tests)
-  │   │   │   ├─ constants.ts  # Payment type configuration
-  │   │   │   ├─ types.ts      # Transaction types
-  │   ├─ i18n/             # Internationalization and translations
-  │   │   ├─ locales/      # Language files (es, en, ca)
-  │   ├─ pages/            # Main pages
-  │   ├─ shared/           # Reusable components and hooks
-  │   │   ├─ components/   # E.g.: ConfirmDialog, DarkModeToggle, etc.
-  │   │   ├─ hooks/        # Custom hooks (useInfiniteScroll)
-  │   │   ├─ store/        # Global state (theme, etc.)
-  │   │   ├─ utils/        # Common utilities (with tests)
-  │   │   ├─ demo/         # Demo data generator
-  │   └─ main.tsx         # Entry point
-  ├─ index.html
-  ├─ package.json
-  ├─ tailwind.config.js
-  ├─ vite.config.ts
-  └─ ...
-```
-
-## Configuration
-- Environment variables: create a `.env` file if you need custom variables.
-- TailwindCSS: configuration in `tailwind.config.js`.
-- ESLint: rules in `eslint.config.js`.
-- Translations: add languages in `src/i18n/locales/`.
-
-## Linting & Formatting
+### Available Scripts
 
 ```bash
-pnpm lint
+# Development
+pnpm dev          # Start frontend dev server
+pnpm dev:backend  # Start backend dev server
+
+# Build
+pnpm build        # Build frontend for production
+pnpm build:backend # Build backend for production
+
+# Testing
+pnpm test         # Run frontend tests
+pnpm test:run     # Run frontend tests (CI mode)
+pnpm -r test:run  # Run tests in all workspaces
+
+# Code Quality
+pnpm lint         # Lint frontend code
 ```
 
-You can extend the ESLint configuration for stricter rules and advanced React support.
+---
 
-## Testing
+## 📂 Project Structure
 
-This project uses [Vitest](https://vitest.dev/) with [@testing-library/react](https://testing-library.com/react) for unit and component testing.
-
-```bash
-pnpm test          # Run tests in watch mode
-pnpm test:run      # Run tests once
-pnpm test:ui       # Open Vitest UI
-pnpm test:coverage # Generate coverage report
+```
+friends-web/
+├── apps/
+│   ├── frontend/           # React frontend application
+│   │   ├── src/
+│   │   ├── package.json    # @friends/frontend
+│   │   └── README.md
+│   └── backend/            # NestJS backend (planned)
+│       ├── src/
+│       ├── package.json    # @friends/backend
+│       └── README.md
+├── packages/
+│   ├── shared-types/       # Shared TypeScript types (planned)
+│   └── shared-utils/       # Shared utilities (planned)
+├── docs/
+│   └── MONOREPO_MIGRATION.md
+├── .github/
+│   ├── workflows/
+│   │   └── deploy.yml      # GitHub Actions CI/CD
+│   └── copilot-instructions.md
+├── package.json            # Root package (friends-monorepo)
+├── pnpm-workspace.yaml     # pnpm workspaces config
+└── pnpm-lock.yaml          # Lockfile
 ```
 
-**Current Test Coverage:**
-- ✅ 58 tests passing
-- Store tests (useEventsStore, useTransactionsStore)
-- Component tests (TransactionItem)
-- Utility tests (formatAmount, formatDateLong)
+---
 
-## Contributing
-1. Fork the project
-2. Create a branch (`git checkout -b feature/new-feature`)
-3. Make your changes and commit (`git commit -am 'feat: new feature'`)
-4. Push to your branch (`git push origin feature/new-feature`)
-5. Open a Pull Request
+## 📚 Documentation
+
+For detailed information about each workspace, see their respective documentation:
+
+### Workspace Documentation
+
+- **[Frontend README](apps/frontend/README.md)** - React 19 + TanStack Query application
+  - Tech stack and features
+  - Architecture patterns and state management
+  - Configuration and environment variables
+  - Testing strategy
+- **[Backend README](apps/backend/README.md)** - NestJS + PostgreSQL API
+  - Tech stack and API endpoints
+  - Database schema and migrations
+  - Environment configuration
+  - Development tools and testing
+
+### Additional Documentation
+
+- **[Monorepo Migration Guide](docs/MONOREPO_MIGRATION.md)** - How we migrated to pnpm monorepo
+- **[Frontend API Integration](docs/FRONTEND_API_INTEGRATION.md)** - TanStack Query integration
+- **[Copilot Instructions](.github/copilot-instructions.md)** - AI coding agent guidelines
+
+---
 
 ## License
 

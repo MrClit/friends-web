@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Environment variables - Local overrides
+# Commitear: .env, .env.development, .env.production, .env.test
+# NO commitear: .env.local, .env.*.local
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+.env.test.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +31,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# HTTP Client private environment variables
+http-client.private.env.json

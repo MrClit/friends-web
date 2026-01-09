@@ -15,7 +15,7 @@ describe('formatDateLong', () => {
   describe('Spanish locale', () => {
     it('should format a date in long Spanish format', () => {
       const result = formatDateLong('2025-01-15');
-      
+
       // Check that it contains the expected parts
       expect(result).toContain('2025');
       expect(result).toContain('enero'); // January in Spanish
@@ -31,7 +31,7 @@ describe('formatDateLong', () => {
     it('should format different months correctly', () => {
       const resultJan = formatDateLong('2025-01-01');
       const resultDec = formatDateLong('2025-12-25');
-      
+
       expect(resultJan).toContain('enero');
       expect(resultDec).toContain('diciembre');
     });
@@ -39,7 +39,7 @@ describe('formatDateLong', () => {
     it('should format all components together correctly', () => {
       // 2025-12-23 is a Tuesday (martes)
       const result = formatDateLong('2025-12-23');
-      
+
       // Should contain all parts
       expect(result).toContain('martes');
       expect(result).toContain('23');
@@ -55,7 +55,7 @@ describe('formatDateLong', () => {
 
     it('should format a date in long English format', () => {
       const result = formatDateLong('2025-01-15');
-      
+
       expect(result).toContain('2025');
       expect(result).toContain('January');
       expect(result).toContain('15');
@@ -75,7 +75,7 @@ describe('formatDateLong', () => {
 
     it('should format a date in long Catalan format', () => {
       const result = formatDateLong('2025-01-15');
-      
+
       expect(result).toContain('2025');
       expect(result).toContain('gener'); // January in Catalan
       expect(result).toContain('15');
@@ -92,7 +92,7 @@ describe('formatDateLong', () => {
     it('should handle different years', () => {
       const result2024 = formatDateLong('2024-06-15');
       const result2025 = formatDateLong('2025-06-15');
-      
+
       expect(result2024).toContain('2024');
       expect(result2025).toContain('2025');
     });

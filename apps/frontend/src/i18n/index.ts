@@ -28,9 +28,9 @@ i18n
 
 // Map i18n language codes to locale codes for date/number formatting
 export const LOCALE_MAP: Record<string, string> = {
-  'es': 'es-ES',
-  'en': 'en-US',
-  'ca': 'ca-ES',
+  es: 'es-ES',
+  en: 'en-US',
+  ca: 'ca-ES',
 };
 
 /**

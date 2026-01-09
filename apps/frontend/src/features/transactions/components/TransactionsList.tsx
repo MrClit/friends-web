@@ -5,81 +5,88 @@ import TransactionItem from './TransactionItem';
 import { useState, useMemo, useCallback } from 'react';
 import { formatDateLong } from '../../../shared/utils/formatDateLong';
 import { useTranslation } from 'react-i18next';
-import { useTransactionsStore } from '../store/useTransactionsStore';
-import { useInfiniteScroll } from '../../../shared/hooks';
+import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
+import { useInfiniteScroll, useModalState } from '@/hooks/common';
 
 interface TransactionsListProps {
   event: Event;
 }
 
 function groupByDate(transactions: Transaction[]) {
-  return transactions.reduce((acc, tx) => {
-    (acc[tx.date] = acc[tx.date] || []).push(tx);
-    return acc;
-  }, {} as Record<string, Transaction[]>);
+  return transactions.reduce(
+    (acc, tx) => {
+      (acc[tx.date] = acc[tx.date] || []).push(tx);
+      return acc;
+    },
+    {} as Record<string, Transaction[]>,
+  );
 }
 
 export default function TransactionsList({ event }: TransactionsListProps) {
-  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const transactionModal = useModalState();
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [loadedDates, setLoadedDates] = useState(10); // Start with 10 days
   const { t } = useTranslation();
 
-  // Get paginated transactions from store
-  const getTransactionsPaginated = useTransactionsStore(
-    (state) => state.getTransactionsByEventPaginated
+  // Use React Query infinite query for pagination
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } = useTransactionsPaginated(
+    event.id,
+    3,
   );
 
-  // Get paginated data with useMemo to avoid recalculations
-  const { transactions, hasMore } = useMemo(
-    () => getTransactionsPaginated(event.id, loadedDates, 0),
-    [event.id, loadedDates, getTransactionsPaginated]
-  );
+  // Flatten all pages into single array
+  const allTransactions = useMemo(() => data?.pages.flatMap((page) => page.transactions) ?? [], [data]);
 
   // Create participants map for O(1) lookup
-  const participantsMap = useMemo(
-    () => new Map(event.participants.map((p) => [p.id, p.name])),
-    [event.participants]
-  );
+  const participantsMap = useMemo(() => new Map(event.participants.map((p) => [p.id, p.name])), [event.participants]);
 
   // Infinite scroll handler
   const loadMore = useCallback(() => {
-    if (hasMore) {
-      setLoadedDates((prev) => prev + 5); // Load 5 more days
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  }, [hasMore]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const { observerRef, isLoading } = useInfiniteScroll({
+  const { observerRef } = useInfiniteScroll({
     onLoadMore: loadMore,
-    hasMore,
+    hasMore: hasNextPage ?? false,
     threshold: 0.1,
   });
 
   // Group transactions by date
-  const grouped = useMemo(() => groupByDate(transactions), [transactions]);
-  const dates = useMemo(
-    () => Object.keys(grouped).sort((a, b) => b.localeCompare(a)),
-    [grouped]
-  );
+  const grouped = useMemo(() => groupByDate(allTransactions), [allTransactions]);
+  const dates = useMemo(() => Object.keys(grouped).sort((a, b) => b.localeCompare(a)), [grouped]);
 
   // Handler for clicking on a transaction
-  const handleTransactionClick = useCallback((transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setTransactionModalOpen(true);
-  }, []);
+  const handleTransactionClick = useCallback(
+    (transaction: Transaction) => {
+      setSelectedTransaction(transaction);
+      transactionModal.open();
+    },
+    [transactionModal],
+  );
 
   // Handler for closing modal
   const handleCloseModal = useCallback(() => {
-    setTransactionModalOpen(false);
+    transactionModal.close();
     setSelectedTransaction(null);
-  }, []);
+  }, [transactionModal]);
+
+  if (isLoading) {
+    return <div className="w-full max-w-2xl mb-8 text-center text-teal-400 py-8">{t('common.loading')}</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="w-full max-w-2xl mb-8 text-center text-red-400 py-8">
+        {t('common.error')}: {error.message}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-2xl mb-8">
       {dates.length === 0 && (
-        <div className="text-center text-teal-400 py-8">
-          {t('transactionsList.noTransactions')}
-        </div>
+        <div className="text-center text-teal-400 py-8">{t('transactionsList.noTransactions')}</div>
       )}
       {dates.map((date) => (
         <div key={date} className="mb-6">
@@ -100,9 +107,9 @@ export default function TransactionsList({ event }: TransactionsListProps) {
       ))}
 
       {/* Infinite scroll trigger */}
-      {hasMore && (
+      {hasNextPage && (
         <div ref={observerRef} className="py-4 text-center">
-          {isLoading ? (
+          {isFetchingNextPage ? (
             <div className="flex justify-center items-center gap-2 text-teal-500">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500" aria-hidden="true"></div>
               <span>{t('transactionsList.loadingMore')}</span>
@@ -120,7 +127,7 @@ export default function TransactionsList({ event }: TransactionsListProps) {
       )}
 
       <TransactionModal
-        open={transactionModalOpen}
+        open={transactionModal.isOpen}
         onClose={handleCloseModal}
         event={event}
         transaction={selectedTransaction ?? undefined}
