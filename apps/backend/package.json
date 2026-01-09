@@ -19,7 +19,11 @@
     "test:run": "NODE_ENV=test jest --run",
     "test:coverage": "NODE_ENV=test jest --coverage",
     "test:debug": "NODE_ENV=test node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "migration:generate": "typeorm migration:generate src/migrations/InitSchema --dataSource src/data-source.ts --require ts-node/register",
+    "migration:run": "typeorm migration:run --dataSource src/data-source.ts",
+    "migration:revert": "typeorm migration:revert --dataSource src/data-source.ts",
+    "typeorm": "typeorm"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -31,6 +35,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
+    "dotenv": "^17.2.3",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

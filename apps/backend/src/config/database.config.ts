@@ -12,4 +12,5 @@ export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOp
   synchronize: configService.get('TYPEORM_SYNC') === 'true',
   logging: configService.get('TYPEORM_LOGGING') === 'true',
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+  ssl: configService.get('DATABASE_SSL') === 'true' ? { rejectUnauthorized: false } : false,
 });
