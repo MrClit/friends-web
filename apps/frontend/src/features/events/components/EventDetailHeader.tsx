@@ -17,7 +17,7 @@ export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete
       <button
         type="button"
         onClick={onBack}
-        className="p-2 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors"
+        className="p-2 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors cursor-pointer"
         aria-label="Volver"
       >
         <MdArrowBack className="text-teal-900 dark:text-teal-100 text-2xl" />
