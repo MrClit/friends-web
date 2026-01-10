@@ -22,7 +22,7 @@ interface RankedTransactionRow {
   id: string;
   event_id: string;
   participant_id: string;
-  paymentType: string;
+  payment_type: string;
   amount: string;
   title: string;
   date: Date;
@@ -111,7 +111,7 @@ export class TransactionsService {
           SELECT 
             t.id,
             t.title,
-            t."paymentType",
+            t.payment_type,
             t.amount,
             t.participant_id,
             t.date,
@@ -128,7 +128,7 @@ export class TransactionsService {
         SELECT 
           rt.id,
           rt.title,
-          rt."paymentType",
+          rt.payment_type,
           rt.amount,
           rt.participant_id,
           rt.date,
@@ -157,7 +157,7 @@ export class TransactionsService {
         transaction.id = row.id;
         transaction.eventId = row.event_id;
         transaction.participantId = row.participant_id;
-        transaction.paymentType = row.paymentType as Transaction['paymentType'];
+        transaction.paymentType = row.payment_type as Transaction['paymentType'];
         transaction.amount = parseFloat(row.amount);
         transaction.title = row.title;
         transaction.date = row.date;
