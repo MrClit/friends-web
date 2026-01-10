@@ -111,7 +111,7 @@ export class TransactionsService {
           SELECT 
             t.id,
             t.title,
-            t."paymentType",
+            t.payment_type,
             t.amount,
             t.participant_id,
             t.date,
@@ -128,7 +128,7 @@ export class TransactionsService {
         SELECT 
           rt.id,
           rt.title,
-          rt."paymentType",
+          rt.payment_type,
           rt.amount,
           rt.participant_id,
           rt.date,
