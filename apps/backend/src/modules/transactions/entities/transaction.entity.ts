@@ -15,6 +15,7 @@ export class Transaction {
     type: 'enum',
     enum: ['contribution', 'expense', 'compensation'],
     enumName: 'payment_type_enum',
+    name: 'payment_type',
   })
   paymentType: PaymentType;
 
