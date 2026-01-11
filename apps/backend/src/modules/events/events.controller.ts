@@ -5,6 +5,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Event } from './entities/event.entity';
+import { EventKPIsDto } from './dto/event-kpis.dto';
 
 @ApiTags('Events')
 @Controller('events')
@@ -92,5 +93,23 @@ export class EventsController {
   @ApiResponse({ status: 404, description: 'Event not found' })
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     await this.eventsService.remove(id);
+  }
+
+  /**
+   * GET /api/events/:id/kpis
+   * Get KPIs for a specific event
+   */
+  @Get(':id/kpis')
+  @ApiOperation({ summary: 'Get KPIs for a specific event' })
+  @ApiParam({
+    name: 'id',
+    description: 'Event UUID',
+    type: String,
+    format: 'uuid',
+  })
+  @ApiStandardResponse(200, 'KPIs retrieved successfully', EventKPIsDto)
+  @ApiResponse({ status: 404, description: 'Event not found' })
+  getKPIs(@Param('id', ParseUUIDPipe) id: string) {
+    return this.eventsService.getKPIs(id);
   }
 }

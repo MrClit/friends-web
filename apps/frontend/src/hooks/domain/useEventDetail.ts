@@ -15,7 +15,7 @@ export function useEventDetail(id: string | undefined) {
   const { data: event, isLoading, error } = useEvent(id ?? '');
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
-  const { kpis } = useEventKPIs(id ?? '');
+  const { data: kpis } = useEventKPIs(id ?? '');
 
   /**
    * Handles event update submission

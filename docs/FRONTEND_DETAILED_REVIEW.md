@@ -88,7 +88,7 @@ Código y estilo
 
 Checklist de acciones recomendadas (ordenadas y con ejemplos)
 
-1. Mejorar `apiRequest` (urgente)
+1. ✅ Mejorar `apiRequest` (urgente)
 
 - Wrap fetch errors and content-type check. Example:
 
@@ -106,15 +106,15 @@ if (contentType.includes('application/json')) {
 }
 ```
 
-2. Harden ENV handling (alto)
+2. ✅ Harden ENV handling (alto)
 
 - Validate `ENV.API_URL` at startup and fail-fast in dev.
 
-3. QueryClient tuning (medio)
+3. ✅ QueryClient tuning (medio)
 
 - Consider `refetchOnWindowFocus: false` and using manual refetch for specific queries.
 
-4. Lazy-load heavy routes (medio)
+4. ✅ Lazy-load heavy routes (medio)
 
 - Convert route imports to `React.lazy()` with `Suspense` for `EventDetail` and `KPIDetail`.
 
@@ -126,7 +126,7 @@ if (contentType.includes('application/json')) {
 
 - Add Playwright tests for critical user flows and run in CI.
 
-7. Tailwind safelist (bajo)
+7. ✅ Tailwind safelist (bajo)
 
 - If classes are generated at runtime, add safelist to `tailwind.config.js`.
 

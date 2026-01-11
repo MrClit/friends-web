@@ -5,6 +5,8 @@ import { EventsService } from './events.service';
 import { Event } from './entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { TransactionsService } from '../transactions/transactions.service';
+import { EventKPIsService } from './services/event-kpis.service';
 
 describe('EventsService', () => {
   let service: EventsService;
@@ -18,6 +20,14 @@ describe('EventsService', () => {
     delete: jest.fn(),
   };
 
+  const mockTransactionsService = {
+    findByEvent: jest.fn(),
+  };
+
+  const mockEventKPIsService = {
+    getKPIs: jest.fn(),
+  };
+
   const mockEvent: Event = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Test Event',
@@ -25,6 +35,7 @@ describe('EventsService', () => {
       { id: '1', name: 'Alice' },
       { id: '2', name: 'Bob' },
     ],
+    transactions: [],
     createdAt: new Date('2026-01-01'),
     updatedAt: new Date('2026-01-01'),
   };
@@ -36,6 +47,14 @@ describe('EventsService', () => {
         {
           provide: getRepositoryToken(Event),
           useValue: mockRepository,
+        },
+        {
+          provide: TransactionsService,
+          useValue: mockTransactionsService,
+        },
+        {
+          provide: EventKPIsService,
+          useValue: mockEventKPIsService,
         },
       ],
     }).compile();
@@ -225,6 +244,45 @@ describe('EventsService', () => {
       mockRepository.delete.mockRejectedValue(new Error('Database error'));
 
       await expect(service.remove(mockEvent.id)).rejects.toThrow(InternalServerErrorException);
+    });
+  });
+
+  describe('getKPIs', () => {
+    const expectedKPIs = {
+      totalExpenses: 75.0,
+      totalContributions: 150.0,
+      totalCompensations: 0,
+      potBalance: 75.0,
+      pendingToCompensate: 75.0,
+      participantBalances: { '1': 50.0, '2': 50.0 },
+      participantContributions: { '1': 100.0, '2': 50.0 },
+      participantExpenses: { '1': 50.0, '2': 0 },
+      participantCompensations: { '1': 0, '2': 0 },
+      participantPending: { '1': 50.0 },
+      potExpenses: 25.0,
+    };
+
+    it('should calculate KPIs correctly', async () => {
+      mockEventKPIsService.getKPIs.mockResolvedValue(expectedKPIs);
+
+      const result = await service.getKPIs(mockEvent.id);
+
+      expect(result).toEqual(expectedKPIs);
+      expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith(mockEvent.id);
+    });
+
+    it('should throw NotFoundException when event not found', async () => {
+      mockEventKPIsService.getKPIs.mockRejectedValue(new NotFoundException());
+
+      await expect(service.getKPIs('non-existent-id')).rejects.toThrow(NotFoundException);
+      expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith('non-existent-id');
+    });
+
+    it('should throw InternalServerErrorException on database error', async () => {
+      mockEventKPIsService.getKPIs.mockRejectedValue(new InternalServerErrorException());
+
+      await expect(service.getKPIs(mockEvent.id)).rejects.toThrow(InternalServerErrorException);
+      expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith(mockEvent.id);
     });
   });
 });
