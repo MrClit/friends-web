@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { eventsApi } from '@/api/events.api';
 import { queryKeys } from './keys';
 import type { UpdateEventDto } from '@/api/types';
+import { useDeletingStore } from '@/shared/store/useDeletingStore';
 
 /**
  * Query hook to fetch all events
@@ -21,10 +22,14 @@ export function useEvents() {
  * @returns Query result with event detail, loading state, and error
  */
 export function useEvent(id: string) {
+  const isDeleting = useDeletingStore((state) => state.isDeleting);
+
   return useQuery({
     queryKey: queryKeys.events.detail(id),
     queryFn: () => eventsApi.getById(id),
-    enabled: !!id, // Only fetch if ID is provided
+    enabled: !!id && !isDeleting, // Only fetch if ID is provided and not deleting
+    retry: false, // Disable retry to prevent refetch after deletion
+    staleTime: Infinity, // Never mark as stale to prevent automatic refetch
   });
 }
 
@@ -71,21 +76,29 @@ export function useUpdateEvent() {
  */
 export function useDeleteEvent() {
   const queryClient = useQueryClient();
+  const setDeleting = useDeletingStore((state) => state.setDeleting);
 
   return useMutation({
     mutationFn: (id: string) => eventsApi.delete(id),
-    onSuccess: (_, deletedId) => {
-      // Invalidate events list
+    onMutate: async (deletedId) => {
+      // Set deleting state to disable queries
+      setDeleting(true);
+
+      // Cancel any ongoing requests and remove queries from cache before deletion
+      await queryClient.cancelQueries({ queryKey: ['events'] });
+      await queryClient.cancelQueries({ queryKey: ['transactions'] });
+      queryClient.removeQueries({ queryKey: ['events', deletedId], exact: false });
+      queryClient.removeQueries({ queryKey: ['transactions', 'event', deletedId], exact: false });
+    },
+    onSuccess: async () => {
+      // Note: Don't clear deleting state here to prevent re-enabling queries before unmount
+
+      // Invalidate lists to trigger refetch for unrelated queries
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
-
-      // Invalidate transactions related to this event
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.transactions.byEvent(deletedId),
-      });
-
-      // Remove specific queries from cache (no refetch needed)
-      queryClient.removeQueries({ queryKey: queryKeys.events.detail(deletedId) });
-      queryClient.removeQueries({ queryKey: queryKeys.transactions.byEvent(deletedId) });
+    },
+    onError: () => {
+      // Clear deleting state on error
+      setDeleting(false);
     },
   });
 }
