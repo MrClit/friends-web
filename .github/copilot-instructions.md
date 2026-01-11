@@ -461,7 +461,7 @@ When requested to generate code for features, refactors, or fixes involving modi
    - Summary checklist aligned with the implementation plan
    - Identified improvements and lessons learned
 
-   The .md file will be documented in the language used by the user in their request.
+   The .md file will be named in the format YYYYMMDD_descriptive_name.md, where YYYYMMDD is the date of the request, and documented in the language used by the user in their request.
 
 2. **Iteration with User:** This analysis will be iterated with the user until it meets their satisfaction.
 
