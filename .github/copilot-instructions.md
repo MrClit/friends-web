@@ -450,5 +450,26 @@ CORS_ORIGIN=http://localhost:5173
 
 ---
 
-**Last Updated:** January 9, 2026  
+## 🤖 Copilot Code Generation Workflow
+
+When requested to generate code for features, refactors, or fixes involving modifications to more than 1 file, Copilot will proceed as follows:
+
+1. **Implementation Plan Documentation:** Create a .md file in the `/docs` folder with:
+   - Motivations and objectives for making the changes
+   - Analysis and design of the solution to implement
+   - Detailed implementation plan and steps to follow
+   - Summary checklist aligned with the implementation plan
+   - Identified improvements and lessons learned
+
+   The .md file will be documented in the language used by the user in their request.
+
+2. **Iteration with User:** This analysis will be iterated with the user until it meets their satisfaction.
+
+3. **Implementation:** When the user requests it, implementation will begin, either in phases or all at once.
+
+4. **Tracking:** Copilot will mark off the steps in the checklist as they are completed.
+
+---
+
+**Last Updated:** January 11, 2026  
 **Status:** Frontend ✅ Active • Backend ✅ Active • Shared-types 🚧 Planned
