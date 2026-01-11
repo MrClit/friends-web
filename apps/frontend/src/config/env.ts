@@ -37,9 +37,16 @@ if (ENV.IS_DEV) {
 
   requiredVars.forEach((varName) => {
     if (!ENV[varName]) {
-      console.error(`⚠️  Missing required environment variable: VITE_${varName}`);
+      throw new Error(`Missing required environment variable: VITE_${varName}. Please set it in your .env file.`);
     }
   });
+
+  // Validate API_URL is a valid URL
+  try {
+    new URL(ENV.API_URL);
+  } catch {
+    throw new Error(`Invalid API_URL: ${ENV.API_URL}. Must be a valid URL.`);
+  }
 
   // Log configuration in development
   console.log('🔧 Environment Configuration:', {
