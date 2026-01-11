@@ -2,6 +2,7 @@ import { useQuery, useMutation, useInfiniteQuery, useQueryClient } from '@tansta
 import { transactionsApi } from '@/api/transactions.api';
 import { queryKeys } from './keys';
 import type { CreateTransactionDto, UpdateTransactionDto } from '@/api/types';
+import { useDeletingStore } from '@/shared/store/useDeletingStore';
 
 /**
  * Query hook to fetch all transactions for a specific event
@@ -9,10 +10,14 @@ import type { CreateTransactionDto, UpdateTransactionDto } from '@/api/types';
  * @returns Query result with transactions list, loading state, and error
  */
 export function useTransactionsByEvent(eventId: string) {
+  const isDeleting = useDeletingStore((state) => state.isDeleting);
+
   return useQuery({
     queryKey: queryKeys.transactions.byEvent(eventId),
     queryFn: () => transactionsApi.getByEvent(eventId),
-    enabled: !!eventId, // Only fetch if eventId is provided
+    enabled: !!eventId && !isDeleting, // Only fetch if eventId is provided and not deleting
+    retry: false, // Disable retry to prevent refetch after deletion
+    staleTime: Infinity, // Never mark as stale to prevent automatic refetch
   });
 }
 
@@ -24,6 +29,8 @@ export function useTransactionsByEvent(eventId: string) {
  * @returns Infinite query result with pages, fetchNextPage, hasNextPage, etc.
  */
 export function useTransactionsPaginated(eventId: string, numberOfDates = 3) {
+  const isDeleting = useDeletingStore((state) => state.isDeleting);
+
   return useInfiniteQuery({
     queryKey: queryKeys.transactions.paginated(eventId, { numberOfDates, offset: 0 }),
     queryFn: ({ pageParam = 0 }) => transactionsApi.getPaginated(eventId, numberOfDates, pageParam),
@@ -34,7 +41,9 @@ export function useTransactionsPaginated(eventId: string, numberOfDates = 3) {
       return allPages.length * numberOfDates;
     },
     initialPageParam: 0,
-    enabled: !!eventId, // Only fetch if eventId is provided
+    enabled: !!eventId && !isDeleting, // Only fetch if eventId is provided and not deleting
+    retry: false, // Disable retry to prevent refetch after deletion
+    staleTime: Infinity, // Never mark as stale to prevent automatic refetch
   });
 }
 

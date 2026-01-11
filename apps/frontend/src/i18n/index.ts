@@ -26,6 +26,14 @@ i18n
     },
   });
 
+// Set initial HTML lang attribute based on detected language
+document.documentElement.lang = i18n.language;
+
+// Sync HTML lang attribute with i18n language changes
+i18n.on('languageChanged', (lng) => {
+  document.documentElement.lang = lng;
+});
+
 // Map i18n language codes to locale codes for date/number formatting
 export const LOCALE_MAP: Record<string, string> = {
   es: 'es-ES',

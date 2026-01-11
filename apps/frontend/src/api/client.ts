@@ -25,21 +25,31 @@ export class ApiError extends Error {
  * @throws ApiError on request failure
  */
 export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+    });
+  } catch (e) {
+    throw new ApiError(0, 'NetworkError', (e as Error).message);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new ApiError(
-      response.status,
-      response.statusText,
-      error.message || `Request failed with status ${response.status}`,
-    );
+    let errorMessage: string;
+    if (contentType.includes('application/json')) {
+      const error = await response.json().catch(() => ({}));
+      errorMessage = error.message || `Request failed with status ${response.status}`;
+    } else {
+      const text = await response.text();
+      errorMessage = text || `Request failed with status ${response.status}`;
+    }
+    throw new ApiError(response.status, response.statusText, errorMessage);
   }
 
   // Handle 204 No Content responses
@@ -47,7 +57,13 @@ export async function apiRequest<T>(endpoint: string, options?: RequestInit): Pr
     return undefined as T;
   }
 
-  // Backend wraps responses in { data: T }
-  const json = await response.json();
-  return json.data as T;
+  // Backend wraps responses in { data: T }, assume JSON
+  if (contentType.includes('application/json')) {
+    const json = await response.json();
+    return json.data as T;
+  } else {
+    // Fallback to text if not JSON
+    const text = await response.text();
+    return text as unknown as T; // This might not be ideal, but for robustness
+  }
 }
