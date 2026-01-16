@@ -10,6 +10,7 @@ import {
   HttpStatus,
   ParseUUIDPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
@@ -18,6 +19,8 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { Transaction } from './entities/transaction.entity';
+import { RolesGuard } from '../auth/roles.guard';
+import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
 
 /**
  * Controller for nested routes under events
@@ -25,6 +28,7 @@ import { Transaction } from './entities/transaction.entity';
  */
 @ApiTags('Event Transactions')
 @Controller('events/:eventId/transactions')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class EventTransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 

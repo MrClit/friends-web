@@ -452,24 +452,72 @@ CORS_ORIGIN=http://localhost:5173
 
 ## 🤖 Copilot Code Generation Workflow
 
-When requested to generate code for features, refactors, or fixes involving modifications to more than 1 file, Copilot will proceed as follows:
+When generating an implementation plan for a new feature, refactor, or fix involving multiple files, the documentation in `/docs` must follow this standard structure to maximize clarity, reproducibility, and navigability for both LLMs and human developers:
 
-1. **Implementation Plan Documentation:** Create a .md file in the `/docs` folder with:
-   - Motivations and objectives for making the changes
-   - Analysis and design of the solution to implement
-   - Detailed implementation plan and steps to follow
-   - Summary checklist aligned with the implementation plan
-   - Identified improvements and lessons learned
+### Required Implementation Plan Structure
 
-   The .md file will be named in the format YYYYMMDD_descriptive_name.md, where YYYYMMDD is the date of the request, and documented in the language used by the user in their request.
+1. **Table of Contents**
+   - List all main sections and subsections with anchors for easy navigation.
 
-2. **Iteration with User:** This analysis will be iterated with the user until it meets their satisfaction.
+2. **Motivation and Objectives**
+   - Why is this feature/change being implemented?
+   - Concrete goals and scope.
 
-3. **Implementation:** When the user requests it, implementation will begin, either in phases or all at once.
+3. **System Overview and Requirements**
+   - Brief context, dependencies, and prerequisites.
 
-4. **Tracking:** Copilot will mark off the steps in the checklist as they are completed.
+4. **Solution Design**
+   - 4.1. Detailed flow (diagrams, pseudocode, or clear step-by-step)
+   - 4.2. Folder/file structure and affected areas
+   - 4.3. Data models and migrations (with examples)
+   - 4.4. API contracts (endpoints, request/response, errors)
+   - 4.5. Security, roles, and validations
+   - 4.6. Error handling and logging
+
+5. **External Configuration and Prerequisites**
+   - Steps for configuring external services, environment variables, etc.
+
+6. **Step-by-Step Implementation Plan**
+   - Ordered list of technical tasks, with atomic subtasks.
+
+7. **Detailed Checklist**
+   - Granular verification list, aligned with the plan.
+
+8. **Testing and Validation**
+   - Recommended test cases, mocks, and acceptance criteria.
+
+9. **Deployment Notes and Environment Variables**
+   - Example configuration, security warnings.
+
+10. **References and Resources**
+    - Links to official docs, articles, and relevant examples.
+
+11. **Improvements and Lessons Learned**
+    - Reflection on extensibility, possible improvements, and learnings.
+
+### Additional Requirements
+
+- The plan must be self-contained and easy to navigate.
+- Include code examples, migrations, and API contracts where relevant.
+- Explain the motivation for the structure at the end of the document.
+- The level of detail must allow any LLM or developer to implement the feature without ambiguity or context switching.
+
+#### Example section outline:
+
+```
+# Implementation Plan: [Feature Name]
+
+## Table of Contents
+1. Motivation and Objectives
+2. System Overview and Requirements
+3. Solution Design
+   3.1. ...
+...
+```
+
+The above structure replaces the previous, less prescriptive format. All new implementation plans must follow this template to ensure consistency and developer/LLM friendliness.
 
 ---
 
-**Last Updated:** January 11, 2026  
+**Last Updated:** January 12, 2026  
 **Status:** Frontend ✅ Active • Backend ✅ Active • Shared-types 🚧 Planned

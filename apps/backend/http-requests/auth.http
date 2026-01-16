@@ -1,0 +1,16 @@
+
+### 1. Iniciar login con Google (redirige a Google)
+GET http://localhost:3000/api/auth/google
+
+### 2. Callback de Google (este endpoint es llamado por Google tras login)
+# NOTA: Este endpoint requiere que completes el login en Google y Google te redirigirá aquí.
+# Puedes copiar la URL de redirección y pegarla en el navegador para probar manualmente.
+GET http://localhost:3000/api/auth/google/callback
+
+### 3. Obtener perfil del usuario autenticado (requiere JWT)
+# Reemplaza <token> por el JWT recibido en el paso anterior
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJkNjc5OC0zODU4LTQzMDgtYjBhNS0xMTY5MzBjZDNlOWEiLCJlbWFpbCI6InZpY3Rvci5zYWxlczgzQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2ODYwMjI1MSwiZXhwIjoxNzY4NjA1ODUxfQ.zkqExVJdiqNMWdb0qgNWUA4AwKfbH_hC_se_oksO3sI
+
+### 4. Logout (opcional, según implementación)
+POST http://localhost:3000/api/auth/logout
