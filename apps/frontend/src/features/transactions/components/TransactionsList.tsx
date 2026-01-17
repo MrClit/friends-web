@@ -3,7 +3,7 @@ import type { Event } from '../../events/types';
 import TransactionModal from './TransactionModal';
 import TransactionItem from './TransactionItem';
 import { useState, useMemo, useCallback } from 'react';
-import { formatDateLong } from '../../../shared/utils/formatDateLong';
+import { formatDateLong } from '@/shared/utils/format';
 import { useTranslation } from 'react-i18next';
 import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
 import { useInfiniteScroll, useModalState } from '@/hooks/common';

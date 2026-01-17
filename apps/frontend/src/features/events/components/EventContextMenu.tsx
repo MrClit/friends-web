@@ -1,11 +1,6 @@
 import { MdEdit, MdDelete, MdMoreVert } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/components/ui';
 
 interface EventContextMenuProps {
   onEdit?: () => void;

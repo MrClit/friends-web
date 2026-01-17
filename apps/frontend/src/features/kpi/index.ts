@@ -9,4 +9,4 @@ export { KPI_SPEC } from './types';
 export { getKPIConfig, getKPIConfigByType, isValidKPI } from './constants';
 
 // Utils
-export { buildKPIItems } from './utils';
+export { buildKPIItems } from './utils/utils';

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useEventDetail } from '@/hooks/domain/useEventDetail';
+import { useEventDetail } from '@/features/events/hooks';
 import { useModalState, useConfirmDialog } from '@/hooks/common';
 import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
 import TransactionModal from '../features/transactions/components/TransactionModal';

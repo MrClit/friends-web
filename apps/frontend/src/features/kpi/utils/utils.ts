@@ -1,8 +1,8 @@
 import type { TFunction } from 'i18next';
 import type { Event } from '@/api/types';
-import { formatAmount } from '@/shared/utils/formatAmount';
-import type { KPIParticipantItem, KPIType } from './types';
-import { getKPIConfig } from './constants';
+import { formatAmount } from '@/shared/utils/format';
+import type { KPIParticipantItem, KPIType } from '@/features/kpi/types';
+import { getKPIConfig } from '@/features/kpi/constants';
 
 /**
  * Build KPI participant items list including pot if needed

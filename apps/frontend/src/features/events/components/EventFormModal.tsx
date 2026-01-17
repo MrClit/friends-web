@@ -1,4 +1,4 @@
-import { Dialog, DialogBottomSheet, DialogTitle } from '../../../components/ui/dialog';
+import { Dialog, DialogBottomSheet, DialogTitle } from '@/shared/components/ui';
 import ConfirmDialog from '../../../shared/components/ConfirmDialog';
 import EventForm from './EventForm';
 import type { Event, EventParticipant } from '../types';

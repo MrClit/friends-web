@@ -144,8 +144,8 @@ src/
 │  ├─ transactions.api.ts # Transactions endpoints (CRUD + pagination)
 │  └─ types.ts       # API DTOs (request/response types)
 ├─ assets/           # Images and resources
-├─ components/
-│  └─ ui/            # Radix UI primitives (dropdown-menu, dialog, etc.)
+├─ components/           # Reusable UI (AppHeader, ConfirmDialog, etc.)
+│  └─ ui/                # Radix UI primitives (dropdown-menu, dialog, etc.)
 ├─ config/
 │  └─ env.ts         # Environment configuration helper
 ├─ features/         # Domain modules (feature-based organization)
@@ -195,9 +195,8 @@ src/
 ├─ shared/           # Shared/reusable code
 │  ├─ components/    # Reusable UI (ConfirmDialog, DarkModeToggle, etc.)
 │  ├─ constants/     # Shared constants (POT_PARTICIPANT_ID)
-│  ├─ hooks/         # Custom hooks (useInfiniteScroll)
 │  ├─ store/         # Global state (theme)
-│  ├─ utils/         # Utilities (formatAmount, formatDateLong)
+│  ├─ utils/         # Utilities (format/formatAmount, format/formatDateLong, barrel files)
 │  └─ demo/          # Demo data generator
 ├─ test/
 │  └─ setup.ts       # Vitest setup (localStorage mock, jest-dom)
@@ -211,12 +210,13 @@ src/
 
 **Feature-Based Organization:**
 
-Each feature is self-contained with its own components, state, types, and constants:
+Each feature is self-contained with its own components, hooks, state, types, and constants:
 
 ```
 features/{feature}/
 ├─ components/     # Feature UI components
-├─ store/          # Feature state (Zustand with persist)
+├─ hooks/          # Business logic hooks (domain logic, e.g. useEventDetail)
+├─ store/          # Feature state (Zustand, if needed)
 ├─ types.ts        # Feature TypeScript types
 ├─ constants.ts    # Feature constants (optional)
 └─ index.ts        # Public API (barrel exports)
@@ -248,16 +248,16 @@ The application uses a hybrid state management approach with clear separation of
 **Custom Hooks - UI State (Component-Level):**
 
 - Manages ephemeral UI state (modals, confirmation dialogs)
-- Located in `src/hooks/common/`
+  - Common UI state hooks are in `src/hooks/common/`
 - Key hooks:
   - `useModalState()` - Generic modal open/close state (replaces Zustand stores)
   - `useConfirmDialog()` - Confirmation dialogs with pending actions
   - `useInfiniteScroll()` - Infinite scroll observer
 - **Pattern:**
   - UI state lives in components, not global stores
-  - Business logic separated in domain hooks (e.g., `useEventDetail` in `src/hooks/domain/`)
+  - Business logic hooks (domain logic) now live in each feature: `features/{feature}/hooks/` (e.g., `useEventDetail` in `features/events/hooks/`)
   - Follows React best practices (local state + composition)
-  - Fully tested (33 unit tests passing)
+  - Fully tested (33+ unit tests passing)
 
 **Zustand - Theme Preferences Only:**
 
@@ -300,6 +300,8 @@ All KPIs computed per-event AND per-participant:
 - `@/*` → `src/*` (configured in `vite.config.ts`)
 - Example: `import { cn } from '@/lib/utils'`
 - Use barrel exports: `import { EventsList } from '@/features/events'`
+  - Utilidades: `import { formatAmount } from '@/shared/utils/format'`
+  - Componentes UI: `import { Dialog } from '@/shared/components/ui'`
 
 ## Configuration
 
@@ -520,11 +522,11 @@ const title = t('events.form.title');
 
 ```typescript
 // Amount formatting (locale-aware)
-import { formatAmount } from '@/shared/utils/formatAmount';
+import { formatAmount } from '@/shared/utils/format';
 formatAmount(1234.56); // "1.234,56 €" (in Spanish)
 
 // Date formatting (locale-aware)
-import { formatDateLong } from '@/shared/utils/formatDateLong';
+import { formatDateLong } from '@/shared/utils/format';
 formatDateLong('2026-01-05'); // "domingo, 5 de enero de 2026" (in Spanish)
 ```
 

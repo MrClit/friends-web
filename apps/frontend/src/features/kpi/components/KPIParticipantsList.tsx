@@ -26,7 +26,7 @@ export default function KPIParticipantsList({ items, title }: KPIParticipantsLis
                   : 'hover:bg-teal-50 dark:hover:bg-teal-900'
               } transition-colors`}
           >
-            {item.isPot && <FaPiggyBank className="text-orange-600 dark:text-orange-400 text-xl flex-shrink-0" />}
+            {item.isPot && <FaPiggyBank className="text-orange-600 dark:text-orange-400 text-xl shrink-0" />}
             <div className="flex-1">
               <div
                 className={`font-semibold text-base ${
