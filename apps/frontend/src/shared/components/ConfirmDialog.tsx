@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/shared/components/ui';
 
 interface ConfirmDialogProps {
   open: boolean;

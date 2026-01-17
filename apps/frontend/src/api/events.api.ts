@@ -1,5 +1,5 @@
 import { apiRequest } from './client';
-import type { Event, CreateEventDto, UpdateEventDto } from './types';
+import type { Event, CreateEventDto, UpdateEventDto, EventKPIs } from './types';
 
 /**
  * Events API endpoints
@@ -52,4 +52,11 @@ export const eventsApi = {
     apiRequest<void>(`/events/${id}`, {
       method: 'DELETE',
     }),
+
+  /**
+   * Get KPIs for an event
+   * @param id - Event ID
+   * @returns Event KPIs
+   */
+  getKPIs: (id: string) => apiRequest<EventKPIs>(`/events/${id}/kpis`),
 };

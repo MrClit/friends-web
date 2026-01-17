@@ -12,24 +12,8 @@ import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { PaginatedTransactionsResponseDto } from './dto/paginated-transactions-response.dto';
-
-const POT_PARTICIPANT_ID = '0';
-
-/**
- * Interface for raw SQL query results with window function
- */
-interface RankedTransactionRow {
-  id: string;
-  event_id: string;
-  participant_id: string;
-  payment_type: string;
-  amount: string;
-  title: string;
-  date: Date;
-  created_at: Date;
-  date_rank: number;
-  total_dates: number;
-}
+import { ParticipantValidationService } from './services/participant-validation.service';
+import { TransactionPaginationService } from './services/transaction-pagination.service';
 
 @Injectable()
 export class TransactionsService {
@@ -40,6 +24,8 @@ export class TransactionsService {
     private readonly transactionRepository: Repository<Transaction>,
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
+    private readonly participantValidationService: ParticipantValidationService,
+    private readonly transactionPaginationService: TransactionPaginationService,
   ) {}
 
   /**
@@ -90,104 +76,7 @@ export class TransactionsService {
     numberOfDates: number,
     offset: number,
   ): Promise<PaginatedTransactionsResponseDto> {
-    try {
-      this.logger.log(
-        `Fetching paginated transactions for event ${eventId}: numberOfDates=${numberOfDates}, offset=${offset}`,
-      );
-
-      // Verify event exists
-      const event = await this.eventRepository.findOne({
-        where: { id: eventId },
-      });
-
-      if (!event) {
-        throw new NotFoundException(`Event with ID ${eventId} not found`);
-      }
-
-      // Single optimized query using window functions
-      // DENSE_RANK() groups transactions by unique dates
-      const query = `
-        WITH RankedTransactions AS (
-          SELECT 
-            t.id,
-            t.title,
-            t.payment_type,
-            t.amount,
-            t.participant_id,
-            t.date,
-            t.event_id,
-            t.created_at,
-            DENSE_RANK() OVER (ORDER BY t.date DESC) as date_rank
-          FROM transactions t
-          WHERE t.event_id = $1
-        ),
-        DateCounts AS (
-          SELECT COUNT(DISTINCT date_rank) as total_dates
-          FROM RankedTransactions
-        )
-        SELECT 
-          rt.id,
-          rt.title,
-          rt.payment_type,
-          rt.amount,
-          rt.participant_id,
-          rt.date,
-          rt.event_id,
-          rt.created_at,
-          rt.date_rank,
-          dc.total_dates
-        FROM RankedTransactions rt
-        CROSS JOIN DateCounts dc
-        WHERE rt.date_rank > $2 AND rt.date_rank <= $3
-        ORDER BY rt.date DESC, rt.created_at DESC
-      `;
-
-      const rawResults: RankedTransactionRow[] = await this.transactionRepository.query(query, [
-        eventId,
-        offset,
-        offset + numberOfDates,
-      ]);
-
-      // Extract total dates from first row (all rows have same value)
-      const totalDates = rawResults.length > 0 ? rawResults[0].total_dates : 0;
-
-      // Map raw results to Transaction entities
-      const transactions = rawResults.map((row) => {
-        const transaction = new Transaction();
-        transaction.id = row.id;
-        transaction.eventId = row.event_id;
-        transaction.participantId = row.participant_id;
-        transaction.paymentType = row.payment_type as Transaction['paymentType'];
-        transaction.amount = parseFloat(row.amount);
-        transaction.title = row.title;
-        transaction.date = row.date;
-        transaction.createdAt = row.created_at;
-        return transaction;
-      });
-
-      // Calculate unique dates loaded
-      const uniqueDatesLoaded = new Set(transactions.map((t) => t.date.toISOString().split('T')[0])).size;
-
-      const hasMore = offset + numberOfDates < totalDates;
-
-      this.logger.log(
-        `Paginated result: ${transactions.length} transactions, ${uniqueDatesLoaded} dates loaded, hasMore=${hasMore}`,
-      );
-
-      return {
-        transactions,
-        hasMore,
-        totalDates,
-        loadedDates: uniqueDatesLoaded,
-      };
-    } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
-        throw error;
-      }
-      const err = error as Error;
-      this.logger.error(`Failed to fetch paginated transactions for event ${eventId}: ${err.message}`, err.stack);
-      throw new InternalServerErrorException('Failed to fetch paginated transactions');
-    }
+    return this.transactionPaginationService.findByEventPaginated(eventId, numberOfDates, offset);
   }
 
   /**
@@ -233,7 +122,7 @@ export class TransactionsService {
       }
 
       // Validate participantId
-      this.validateParticipantId(createTransactionDto.participantId, event.participants);
+      this.participantValidationService.validateParticipantId(createTransactionDto.participantId, event.participants);
 
       // Create transaction
       const transaction = this.transactionRepository.create({
@@ -274,7 +163,7 @@ export class TransactionsService {
           throw new NotFoundException(`Event with ID ${transaction.eventId} not found`);
         }
 
-        this.validateParticipantId(updateTransactionDto.participantId, event.participants);
+        this.participantValidationService.validateParticipantId(updateTransactionDto.participantId, event.participants);
       }
 
       // Update transaction
@@ -313,26 +202,6 @@ export class TransactionsService {
       const err = error as Error;
       this.logger.error(`Failed to delete transaction ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to delete transaction');
-    }
-  }
-
-  /**
-   * Validate that participantId exists in event participants or is '0' (POT)
-   * @throws BadRequestException if participantId is invalid
-   */
-  private validateParticipantId(participantId: string, participants: Array<{ id: string; name: string }>): void {
-    // Allow POT participant
-    if (participantId === POT_PARTICIPANT_ID) {
-      return;
-    }
-
-    // Check if participant exists in event
-    const participantExists = participants.some((p) => p.id === participantId);
-
-    if (!participantExists) {
-      throw new BadRequestException(
-        `Participant with ID ${participantId} does not exist in this event. Valid participant IDs: ${participants.map((p) => p.id).join(', ')} or '0' for POT`,
-      );
     }
   }
 }

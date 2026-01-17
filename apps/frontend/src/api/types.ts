@@ -67,3 +67,19 @@ export interface PaginatedTransactionsResponse {
   totalDates: number;
   loadedDates: number;
 }
+
+// ============= KPI Types =============
+
+export interface EventKPIs {
+  totalExpenses: number;
+  totalContributions: number;
+  totalCompensations: number;
+  potBalance: number;
+  pendingToCompensate: number;
+  participantBalances: Record<string, number>;
+  participantContributions: Record<string, number>;
+  participantExpenses: Record<string, number>;
+  participantCompensations: Record<string, number>;
+  participantPending: Record<string, number>;
+  potExpenses: number;
+}

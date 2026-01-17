@@ -1,24 +1,30 @@
 ###############################################
 # TRANSACTIONS API
 ###############################################
+
 # Variables cargadas desde .vscode/settings.json
 # Selecciona ambiente: "development" o "production"
 
+# Token JWT para autenticación
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJkNjc5OC0zODU4LTQzMDgtYjBhNS0xMTY5MzBjZDNlOWEiLCJlbWFpbCI6InZpY3Rvci5zYWxlczgzQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2ODYwMjI1MSwiZXhwIjoxNzY4NjA1ODUxfQ.zkqExVJdiqNMWdb0qgNWUA4AwKfbH_hC_se_oksO3sI
+
 # ID del evento para las transacciones
 # Cámbialo por un evento real de tu BD
-@eventId = c4b40caf-268a-401f-bb69-6ff3527427b5
+@eventId = 14c5f4cc-0087-46fd-b9c4-0b0d41bc9744
 
 ###############################################
 # 1. LIST TRANSACTIONS BY EVENT
 ###############################################
-GET {{baseUrl}}/events/{{eventId}}/transactions
+Authorization: Bearer {{token}}
 
 ###############################################
 # 2. CREATE TRANSACTION - Contribución
 ###############################################
 # @name createContribution
+
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Aportación inicial",
@@ -34,8 +40,10 @@ Content-Type: {{contentType}}
 ###############################################
 # 3. CREATE TRANSACTION - Gasto
 ###############################################
+
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Cena del grupo",
@@ -48,8 +56,10 @@ Content-Type: {{contentType}}
 ###############################################
 # 4. CREATE TRANSACTION - Gasto del POT
 ###############################################
+
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Bebidas para todos",
@@ -62,8 +72,10 @@ Content-Type: {{contentType}}
 ###############################################
 # 5. CREATE TRANSACTION - Compensación
 ###############################################
+
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Compensación a Bob",
@@ -76,13 +88,17 @@ Content-Type: {{contentType}}
 ###############################################
 # 6. GET TRANSACTION BY ID
 ###############################################
+
 GET {{baseUrl}}/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
 
 ###############################################
 # 7. UPDATE TRANSACTION
 ###############################################
+
 PATCH {{baseUrl}}/transactions/{{transactionId}}
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Aportación inicial actualizada",
@@ -92,20 +108,26 @@ Content-Type: {{contentType}}
 ###############################################
 # 8. DELETE TRANSACTION
 ###############################################
+
 DELETE {{baseUrl}}/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
 
 ###############################################
 # 9. GET PAGINATED TRANSACTIONS
 ###############################################
+
 GET {{baseUrl}}/events/{{eventId}}/transactions/paginated?numberOfDates=3&offset=0
+Authorization: Bearer {{token}}
 
 ###############################################
 # ERROR CASES
 ###############################################
 
 ### Invalid payment type (400)
+
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Test",
@@ -116,8 +138,10 @@ Content-Type: {{contentType}}
 }
 
 ### Negative amount (400)
+
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Test",
@@ -128,8 +152,10 @@ Content-Type: {{contentType}}
 }
 
 ### Invalid participant (400)
+
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Test",
@@ -142,8 +168,10 @@ Content-Type: {{contentType}}
 ### POT as contribution - Currently allowed (200)
 # Note: Backend doesn't validate payment type per participant yet
 # This would be a business rule to implement in Phase 4
+
 POST {{baseUrl}}/events/{{eventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Contribución del POT (permitido actualmente)",
@@ -159,8 +187,10 @@ Content-Type: {{contentType}}
 
 ### 1. Crear evento para transacciones
 # @name transactionTestEvent
+
 POST {{baseUrl}}/events
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Evento de Test de Transacciones",
@@ -173,8 +203,10 @@ Content-Type: {{contentType}}
 @testEventId = {{transactionTestEvent.response.body.id}}
 
 ### 2. Crear contribución
+
 POST {{baseUrl}}/events/{{testEventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Contribución Alice",
@@ -185,8 +217,10 @@ Content-Type: {{contentType}}
 }
 
 ### 3. Crear gasto
+
 POST {{baseUrl}}/events/{{testEventId}}/transactions
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Cena pagada por Bob",
@@ -197,7 +231,11 @@ Content-Type: {{contentType}}
 }
 
 ### 4. Listar todas las transacciones
+
 GET {{baseUrl}}/events/{{testEventId}}/transactions
+Authorization: Bearer {{token}}
 
 ### 5. Limpiar - Eliminar evento (cascade delete transactions)
+
 DELETE {{baseUrl}}/events/{{testEventId}}
+Authorization: Bearer {{token}}

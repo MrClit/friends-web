@@ -1,13 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  ParseUUIDPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Event } from './entities/event.entity';
+import { EventKPIsDto } from './dto/event-kpis.dto';
+import { RolesGuard } from '../auth/roles.guard';
+import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
 
 @ApiTags('Events')
 @Controller('events')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
@@ -92,5 +108,23 @@ export class EventsController {
   @ApiResponse({ status: 404, description: 'Event not found' })
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     await this.eventsService.remove(id);
+  }
+
+  /**
+   * GET /api/events/:id/kpis
+   * Get KPIs for a specific event
+   */
+  @Get(':id/kpis')
+  @ApiOperation({ summary: 'Get KPIs for a specific event' })
+  @ApiParam({
+    name: 'id',
+    description: 'Event UUID',
+    type: String,
+    format: 'uuid',
+  })
+  @ApiStandardResponse(200, 'KPIs retrieved successfully', EventKPIsDto)
+  @ApiResponse({ status: 404, description: 'Event not found' })
+  getKPIs(@Param('id', ParseUUIDPipe) id: string) {
+    return this.eventsService.getKPIs(id);
   }
 }

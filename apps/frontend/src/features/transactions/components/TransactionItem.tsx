@@ -2,9 +2,9 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Transaction } from '../types';
 import { PAYMENT_TYPE_CONFIG, POT_CONFIG } from '../constants';
-import { formatAmount } from '../../../shared/utils/formatAmount';
+import { formatAmount } from '@/shared/utils/format';
 import PaymentIcon from './PaymentIcon';
-import { isPotExpense } from '../utils/isPotExpense';
+import { isPotExpense } from '../utils';
 
 interface TransactionItemProps {
   transaction: Transaction;

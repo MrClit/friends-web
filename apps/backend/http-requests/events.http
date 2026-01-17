@@ -4,17 +4,21 @@
 # Variables cargadas desde .vscode/settings.json
 # Selecciona ambiente: "development" o "production"
 
+# Token JWT para autenticación
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTJkNjc5OC0zODU4LTQzMDgtYjBhNS0xMTY5MzBjZDNlOWEiLCJlbWFpbCI6InZpY3Rvci5zYWxlczgzQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2ODYwMjI1MSwiZXhwIjoxNzY4NjA1ODUxfQ.zkqExVJdiqNMWdb0qgNWUA4AwKfbH_hC_se_oksO3sI
+
 ###############################################
 # 1. LIST ALL EVENTS
 ###############################################
 GET {{baseUrl}}/events
-
+Authorization: Bearer {{token}}
 ###############################################
 # 2. CREATE EVENT
 ###############################################
 # @name createEvent
 POST {{baseUrl}}/events
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Cena en Barcelona",
@@ -26,18 +30,20 @@ Content-Type: {{contentType}}
 }
 
 ### Guardar el ID del evento creado
-@createdEventId = {{createEvent.response.body.id}}
+@createdEventId = {{createEvent.response.body.data.id}}
 
 ###############################################
 # 3. GET EVENT BY ID
 ###############################################
 GET {{baseUrl}}/events/{{createdEventId}}
+Authorization: Bearer {{token}}
 
 ###############################################
 # 4. UPDATE EVENT - Solo título
 ###############################################
 PATCH {{baseUrl}}/events/{{createdEventId}}
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Cena actualizada en Barcelona"
@@ -48,6 +54,7 @@ Content-Type: {{contentType}}
 ###############################################
 PATCH {{baseUrl}}/events/{{createdEventId}}
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "participants": [
@@ -62,6 +69,7 @@ Content-Type: {{contentType}}
 ###############################################
 # ⚠️ Esto eliminará el evento y todas sus transacciones
 DELETE {{baseUrl}}/events/{{createdEventId}}
+Authorization: Bearer {{token}}
 
 ###############################################
 # ERROR CASES - Validaciones
@@ -69,13 +77,16 @@ DELETE {{baseUrl}}/events/{{createdEventId}}
 
 ### GET Non-existent Event (404)
 GET {{baseUrl}}/events/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
 
 ### GET Invalid UUID (400)
 GET {{baseUrl}}/events/not-a-uuid
+Authorization: Bearer {{token}}
 
 ### CREATE Event without participants (400)
 POST {{baseUrl}}/events
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Evento sin participantes",
@@ -85,6 +96,7 @@ Content-Type: {{contentType}}
 ### CREATE Event without title (400)
 POST {{baseUrl}}/events
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "participants": [
@@ -95,6 +107,7 @@ Content-Type: {{contentType}}
 ### UPDATE with invalid data (400)
 PATCH {{baseUrl}}/events/{{createdEventId}}
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "",
@@ -109,6 +122,7 @@ Content-Type: {{contentType}}
 # @name testEvent
 POST {{baseUrl}}/events
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Viaje a Madrid 2026",
@@ -122,10 +136,12 @@ Content-Type: {{contentType}}
 ### 2. Verificar creación
 @testEventId = {{testEvent.response.body.id}}
 GET {{baseUrl}}/events/{{testEventId}}
+Authorization: Bearer {{token}}
 
 ### 3. Actualizar evento
 PATCH {{baseUrl}}/events/{{testEventId}}
 Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
 
 {
   "title": "Viaje a Madrid 2026 - Confirmado"
@@ -133,9 +149,12 @@ Content-Type: {{contentType}}
 
 ### 4. Listar todos (debe aparecer)
 GET {{baseUrl}}/events
+Authorization: Bearer {{token}}
 
 ### 5. Eliminar evento de prueba
 DELETE {{baseUrl}}/events/{{testEventId}}
+Authorization: Bearer {{token}}
 
 ### 6. Verificar eliminación (404)
 GET {{baseUrl}}/events/{{testEventId}}
+Authorization: Bearer {{token}}

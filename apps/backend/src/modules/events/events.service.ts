@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { TransactionsService } from '../transactions/transactions.service';
+import { EventKPIsService } from './services/event-kpis.service';
+import { EventKPIsDto } from './dto/event-kpis.dto';
 
 @Injectable()
 export class EventsService {
@@ -12,6 +15,8 @@ export class EventsService {
   constructor(
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
+    private readonly transactionsService: TransactionsService,
+    private readonly eventKPIsService: EventKPIsService,
   ) {}
 
   /**
@@ -122,5 +127,12 @@ export class EventsService {
       this.logger.error(`Failed to delete event ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to delete event');
     }
+  }
+
+  /**
+   * Get KPIs for a specific event
+   */
+  async getKPIs(eventId: string): Promise<EventKPIsDto> {
+    return this.eventKPIsService.getKPIs(eventId);
   }
 }

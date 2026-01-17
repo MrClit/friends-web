@@ -2,6 +2,11 @@ import { ENV } from '@/config/env';
 
 const API_BASE = ENV.API_URL;
 
+function getAuthToken() {
+  // Intenta obtener el token desde localStorage
+  return localStorage.getItem('token');
+}
+
 /**
  * Custom API Error class with status information
  */
@@ -26,11 +31,13 @@ export class ApiError extends Error {
  */
 export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   let response: Response;
+  const token = getAuthToken();
   try {
     response = await fetch(`${API_BASE}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options?.headers,
       },
     });

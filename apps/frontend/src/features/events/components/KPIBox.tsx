@@ -1,4 +1,4 @@
-import { formatAmount } from '../../../shared/utils/formatAmount';
+import { formatAmount } from '@/shared/utils/format';
 
 interface KPIBoxProps {
   label: string;

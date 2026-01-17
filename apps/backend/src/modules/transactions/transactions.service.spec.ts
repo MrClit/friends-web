@@ -5,7 +5,8 @@ import { TransactionsService } from './transactions.service';
 import { Transaction } from './entities/transaction.entity';
 import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { ParticipantValidationService } from './services/participant-validation.service';
+import { TransactionPaginationService } from './services/transaction-pagination.service';
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
@@ -40,10 +41,19 @@ describe('TransactionsService', () => {
     update: jest.fn(),
     delete: jest.fn(),
     createQueryBuilder: jest.fn(),
+    query: jest.fn(),
   };
 
   const mockEventRepository = {
     findOne: jest.fn(),
+  };
+
+  const mockParticipantValidationService = {
+    validateParticipantId: jest.fn(),
+  };
+
+  const mockTransactionPaginationService = {
+    findByEventPaginated: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -57,6 +67,14 @@ describe('TransactionsService', () => {
         {
           provide: getRepositoryToken(Event),
           useValue: mockEventRepository,
+        },
+        {
+          provide: ParticipantValidationService,
+          useValue: mockParticipantValidationService,
+        },
+        {
+          provide: TransactionPaginationService,
+          useValue: mockTransactionPaginationService,
         },
       ],
     }).compile();
@@ -101,58 +119,62 @@ describe('TransactionsService', () => {
 
   describe('findByEventPaginated', () => {
     it('should return paginated transactions grouped by dates', async () => {
-      mockEventRepository.findOne.mockResolvedValue(mockEvent);
-
-      const mockQueryBuilder = {
-        select: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        getRawMany: jest
-          .fn()
-          .mockResolvedValue([
-            { date: new Date('2026-01-03') },
-            { date: new Date('2026-01-02') },
-            { date: new Date('2026-01-01') },
-          ]),
-      };
-
-      mockTransactionRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
-      mockTransactionRepository.find.mockResolvedValue([mockTransaction]);
-
-      const result = await service.findByEventPaginated('event-uuid-1', 2, 0);
-
-      expect(result).toEqual({
-        transactions: [mockTransaction],
+      const mockResult = {
+        transactions: [
+          {
+            id: 'transaction-uuid-1',
+            eventId: 'event-uuid-1',
+            participantId: '1',
+            paymentType: 'contribution',
+            amount: 50.0,
+            title: 'Test Transaction',
+            date: new Date('2026-01-03'),
+            createdAt: new Date(),
+          },
+          {
+            id: 'transaction-uuid-2',
+            eventId: 'event-uuid-1',
+            participantId: '1',
+            paymentType: 'expense',
+            amount: 25.0,
+            title: 'Another Transaction',
+            date: new Date('2026-01-02'),
+            createdAt: new Date(),
+          },
+        ],
         hasMore: true,
         totalDates: 3,
         loadedDates: 2,
-      });
+      };
+
+      mockTransactionPaginationService.findByEventPaginated.mockResolvedValue(mockResult);
+
+      const result = await service.findByEventPaginated('event-uuid-1', 2, 0);
+
+      expect(mockTransactionPaginationService.findByEventPaginated).toHaveBeenCalledWith('event-uuid-1', 2, 0);
+      expect(result).toEqual(mockResult);
     });
 
     it('should handle empty results', async () => {
-      mockEventRepository.findOne.mockResolvedValue(mockEvent);
-
-      const mockQueryBuilder = {
-        select: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        getRawMany: jest.fn().mockResolvedValue([]),
-      };
-
-      mockTransactionRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
-
-      const result = await service.findByEventPaginated('event-uuid-1', 3, 0);
-
-      expect(result).toEqual({
+      const mockResult = {
         transactions: [],
         hasMore: false,
         totalDates: 0,
         loadedDates: 0,
-      });
+      };
+
+      mockTransactionPaginationService.findByEventPaginated.mockResolvedValue(mockResult);
+
+      const result = await service.findByEventPaginated('event-uuid-1', 3, 0);
+
+      expect(mockTransactionPaginationService.findByEventPaginated).toHaveBeenCalledWith('event-uuid-1', 3, 0);
+      expect(result).toEqual(mockResult);
     });
 
     it('should throw NotFoundException when event does not exist', async () => {
-      mockEventRepository.findOne.mockResolvedValue(null);
+      mockTransactionPaginationService.findByEventPaginated.mockRejectedValue(
+        new NotFoundException('Event with ID nonexistent-id not found'),
+      );
 
       await expect(service.findByEventPaginated('nonexistent-id', 3, 0)).rejects.toThrow(NotFoundException);
     });
@@ -209,7 +231,13 @@ describe('TransactionsService', () => {
       mockTransactionRepository.create.mockReturnValue(mockTransaction);
       mockTransactionRepository.save.mockResolvedValue(mockTransaction);
 
-      const potDto = { ...createDto, participantId: '0' };
+      const potDto: CreateTransactionDto = {
+        title: createDto.title,
+        paymentType: createDto.paymentType,
+        amount: createDto.amount,
+        participantId: '0',
+        date: createDto.date,
+      };
       await service.create('event-uuid-1', potDto);
 
       expect(mockTransactionRepository.create).toHaveBeenCalledWith({
@@ -226,42 +254,70 @@ describe('TransactionsService', () => {
 
     it('should throw BadRequestException for invalid participantId', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
+      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId) => {
+        if (participantId === '999') {
+          throw new BadRequestException(
+            "Participant with ID 999 does not exist in this event. Valid participant IDs: 1, 2 or '0' for POT",
+          );
+        }
+      });
 
-      const invalidDto = { ...createDto, participantId: '999' };
+      const invalidDto: CreateTransactionDto = {
+        title: createDto.title,
+        paymentType: createDto.paymentType,
+        amount: createDto.amount,
+        participantId: '999',
+        date: createDto.date,
+      };
 
       await expect(service.create('event-uuid-1', invalidDto)).rejects.toThrow(BadRequestException);
       await expect(service.create('event-uuid-1', invalidDto)).rejects.toThrow(
-        'Participant with ID 999 does not exist in this event',
+        "Participant with ID 999 does not exist in this event. Valid participant IDs: 1, 2 or '0' for POT",
       );
     });
   });
 
   describe('update', () => {
-    const updateDto: UpdateTransactionDto = {
+    const updateDto = {
       title: 'Updated Transaction',
       amount: 150,
     };
 
     it('should update a transaction', async () => {
+      const updatedTransaction = {
+        ...mockTransaction,
+        title: 'Updated Transaction',
+        amount: 150,
+      };
       mockTransactionRepository.findOne
         .mockResolvedValueOnce(mockTransaction)
-        .mockResolvedValueOnce({ ...mockTransaction, ...updateDto });
+        .mockResolvedValueOnce(updatedTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
       mockTransactionRepository.update.mockResolvedValue({ affected: 1 });
 
       const result = await service.update('transaction-uuid-1', updateDto);
 
       expect(mockTransactionRepository.update).toHaveBeenCalledWith('transaction-uuid-1', updateDto);
-      expect(result.title).toEqual(updateDto.title);
-      expect(result.amount).toEqual(updateDto.amount);
+      expect(result).toMatchObject({
+        title: 'Updated Transaction',
+        amount: 150,
+      });
     });
 
     it('should validate participantId when updating', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
+      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId) => {
+        if (participantId === '999') {
+          throw new BadRequestException(
+            "Participant with ID 999 does not exist in this event. Valid participant IDs: 1, 2 or '0' for POT",
+          );
+        }
+      });
 
       const updateDtoWithInvalidParticipant = {
-        ...updateDto,
+        title: 'Updated Transaction',
+        amount: 150,
         participantId: '999',
       };
 

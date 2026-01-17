@@ -7,7 +7,16 @@
     "toggleLight": "Activar modo oscuro"
   },
   "language": {
-    "select": "Seleccionar idioma"
+    "select": "Seleccionar idioma",
+    "current": "Idioma actual: {{lng}}"
+  },
+  "header": {
+    "ariaLabel": "Barra de navegación principal"
+  },
+  "user": {
+    "menu": "Opciones de usuario",
+    "logout": "Cerrar sesión",
+    "logout_success": "Sesión cerrada correctamente"
   },
   "common": {
     "loading": "Cargando...",

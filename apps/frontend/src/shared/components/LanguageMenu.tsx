@@ -1,12 +1,6 @@
 import { MdLanguage, MdCheck } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import IconButton from './IconButton';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/components/ui';
 import { LANGUAGES } from '@/i18n/constants';
 
 /**
@@ -24,17 +18,24 @@ export default function LanguageMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <IconButton ariaLabel={t('language.select')} variant="primary" title={current.name}>
+        <button
+          aria-label={t('language.select', 'Seleccionar idioma')}
+          title={t('language.current', { lng: current.name })}
+          className="flex items-center p-2 gap-2 rounded-full border-2 border-teal-400 dark:border-teal-700 bg-transparent hover:bg-teal-100 dark:hover:bg-teal-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+        >
           <MdLanguage className="text-teal-600 dark:text-yellow-300 text-xl" />
-          <span className="ml-1 font-bold text-teal-700 dark:text-yellow-200 text-xs drop-shadow">{current.label}</span>
-        </IconButton>
+          <span className="font-bold text-teal-700 dark:text-yellow-200 text-xs drop-shadow">{current.label}</span>
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-32">
+      <DropdownMenuContent
+        align="end"
+        className="min-w-32 rounded-lg border border-teal-200 dark:border-teal-800 bg-white dark:bg-teal-900"
+      >
         {LANGUAGES.map((l) => (
           <DropdownMenuItem
             key={l.code}
             onClick={() => handleSelect(l.code)}
-            className={`text-sm font-semibold cursor-pointer flex items-center justify-between gap-2 ${
+            className={`text-sm font-semibold cursor-pointer flex items-center justify-between gap-2 rounded-md ${
               i18n.language === l.code
                 ? 'bg-teal-100 dark:bg-teal-800 text-teal-900 dark:text-teal-100'
                 : 'text-teal-700 dark:text-teal-200'

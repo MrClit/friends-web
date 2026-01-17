@@ -7,7 +7,16 @@
     "toggleLight": "Enable dark mode"
   },
   "language": {
-    "select": "Select language"
+    "select": "Select language",
+    "current": "Current language: {{lng}}"
+  },
+  "header": {
+    "ariaLabel": "Main navigation bar"
+  },
+  "user": {
+    "menu": "User options",
+    "logout": "Log out",
+    "logout_success": "Logged out successfully"
   },
   "common": {
     "loading": "Loading...",

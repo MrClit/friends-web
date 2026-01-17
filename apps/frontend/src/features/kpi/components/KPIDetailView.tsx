@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { KPIType } from '../types';
 import { isValidKPI, getKPIConfig, buildKPIItems } from '../index';
@@ -14,14 +14,13 @@ import KPIDetailContent from './KPIDetailContent.tsx';
  * Handles all business logic: data fetching, validation, state management
  * Renders KPIDetailContent for presentation
  */
-export default function KPIDetailView({ eventId }: { eventId: string }) {
-  const { kpi: rawKpi } = useParams<{ kpi?: string }>();
+export default function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: string }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   // React Query hooks - MUST be called before any early returns
   const { data: event, isLoading: isLoadingEvent, error: eventError } = useEvent(eventId);
-  const { kpis, isLoading: isLoadingKPIs } = useEventKPIs(eventId);
+  const { data: kpis, isLoading: isLoadingKPIs } = useEventKPIs(eventId);
 
   // Validate KPI parameter early (after hooks)
   if (!rawKpi || !isValidKPI(rawKpi)) {
