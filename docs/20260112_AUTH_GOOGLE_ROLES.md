@@ -300,10 +300,10 @@ fetch('/api/events', { headers: { Authorization: `Bearer ${token}` } });
 - [x] Configuración de variables de entorno y secrets
 - [x] Documentar contratos de API y ejemplos
 - [x] Configuración Google Cloud Console
-- [ ] Feature auth y login con Google en frontend
-- [ ] Contexto de usuario y gestión JWT en frontend
-- [ ] UI condicional por rol en frontend
-- [ ] Logout en frontend
+- [x] Feature auth y login con Google en frontend
+- [x] Contexto de usuario y gestión JWT en frontend
+- [x] UI condicional por rol en frontend
+- [x] Logout en frontend
 
 ### Ejemplo: Uso de `RolesGuard` y `@Roles`
 
