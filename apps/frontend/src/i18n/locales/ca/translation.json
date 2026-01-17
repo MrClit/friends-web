@@ -7,7 +7,16 @@
     "toggleLight": "Activa el mode fosc"
   },
   "language": {
-    "select": "Selecciona l'idioma"
+    "select": "Selecciona l'idioma",
+    "current": "Idioma actual: {{lng}}"
+  },
+  "header": {
+    "ariaLabel": "Barra de navegació principal"
+  },
+  "user": {
+    "menu": "Opcions d'usuari",
+    "logout": "Tanca la sessió",
+    "logout_success": "Sessió tancada correctament"
   },
   "common": {
     "loading": "Carregant...",

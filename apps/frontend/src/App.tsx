@@ -1,7 +1,9 @@
 import { Suspense, lazy } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
+
 import { QueryProvider } from './providers/QueryProvider';
 import { RequireAuth } from './features/auth/RequireAuth';
+import { Toaster } from 'react-hot-toast';
 
 // Lazy-loaded components for code-splitting
 const Home = lazy(() => import('./pages/Home'));
@@ -15,8 +17,6 @@ export default function App() {
     <QueryProvider>
       <HashRouter>
         <Suspense fallback={<div>Loading...</div>}>
-          {' '}
-          {/* TODO: Improve with a spinner or loading component */}
           <Routes>
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/login" element={<LoginPage />} />
@@ -45,6 +45,14 @@ export default function App() {
               }
             />
           </Routes>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              className:
+                'bg-white dark:bg-teal-900 text-teal-900 dark:text-teal-100 rounded-lg shadow-lg font-semibold',
+              duration: 2500,
+            }}
+          />
         </Suspense>
       </HashRouter>
     </QueryProvider>

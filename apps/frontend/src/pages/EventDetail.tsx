@@ -1,3 +1,4 @@
+import ProtectedLayout from './ProtectedLayout';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEventDetail } from '@/features/events/hooks';
@@ -21,40 +22,40 @@ export default function EventDetail() {
   // Validate id after all hooks
   if (!id) {
     return (
-      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+      <ProtectedLayout>
         <div className="text-center mt-10 text-red-400">{t('eventDetail.invalidId')}</div>
-      </div>
+      </ProtectedLayout>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+      <ProtectedLayout>
         <div className="text-center mt-10 text-teal-400">{t('common.loading')}</div>
-      </div>
+      </ProtectedLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+      <ProtectedLayout>
         <div className="text-center mt-10 text-red-400">
           {t('common.error')}: {error.message}
         </div>
-      </div>
+      </ProtectedLayout>
     );
   }
 
   if (!event) {
     return (
-      <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+      <ProtectedLayout>
         <div className="text-center mt-10">{t('eventDetail.notFound')}</div>
-      </div>
+      </ProtectedLayout>
     );
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-linear-to-b from-teal-50 to-teal-100 dark:from-teal-900 dark:to-teal-950 p-4">
+    <ProtectedLayout>
       <EventDetailHeader
         eventId={event.id}
         eventTitle={event.title}
@@ -90,6 +91,6 @@ export default function EventDetail() {
         onConfirm={deleteDialog.handleConfirm}
         onCancel={deleteDialog.handleCancel}
       />
-    </div>
+    </ProtectedLayout>
   );
 }
