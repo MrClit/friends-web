@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (res.ok) {
         const response = await res.json();
+        console.log('Fetched user:', response.data);
         setUser(response.data);
       } else {
         setUser(null);
@@ -61,7 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const setAuth = (user: User, token: string) => {
-    console.log('setAuth called:', { user, token });
     setUser(user);
     setToken(token);
     localStorage.setItem(TOKEN_KEY, token);

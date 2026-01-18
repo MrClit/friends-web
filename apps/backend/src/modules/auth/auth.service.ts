@@ -17,7 +17,7 @@ export class AuthService {
       this.logger.warn(`Login attempt with unregistered email: ${email}`);
       throw new UnauthorizedException('No autorizado');
     }
-    await this.usersService.updateProfileIfEmpty(user, name, avatar);
+    await this.usersService.updateProfileIfChanged(user, name, avatar);
     return user;
   }
 

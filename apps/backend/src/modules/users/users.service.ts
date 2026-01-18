@@ -14,13 +14,13 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async updateProfileIfEmpty(user: User, name?: string, avatar?: string) {
+  async updateProfileIfChanged(user: User, name?: string, avatar?: string) {
     let updated = false;
-    if (!user.name && name) {
+    if (name && user.name !== name) {
       user.name = name;
       updated = true;
     }
-    if (!user.avatar && avatar) {
+    if (avatar && user.avatar !== avatar) {
       user.avatar = avatar;
       updated = true;
     }

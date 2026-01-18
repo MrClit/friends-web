@@ -6,13 +6,13 @@ import { User } from '../users/user.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let usersService: { findByEmail: jest.Mock; updateProfileIfEmpty: jest.Mock };
+  let usersService: { findByEmail: jest.Mock; updateProfileIfChanged: jest.Mock };
   let jwtService: { sign: jest.Mock };
 
   beforeEach(() => {
     usersService = {
       findByEmail: jest.fn(),
-      updateProfileIfEmpty: jest.fn(),
+      updateProfileIfChanged: jest.fn(),
     };
     jwtService = {
       sign: jest.fn().mockReturnValue('signed-token'),
@@ -37,7 +37,7 @@ describe('AuthService', () => {
     };
     usersService.findByEmail.mockResolvedValue(user);
     await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'avatar')).resolves.toBe(user);
-    expect(usersService.updateProfileIfEmpty).toHaveBeenCalledWith(user, 'Name', 'avatar');
+    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, 'Name', 'avatar');
   });
 
   it('generates jwt', () => {

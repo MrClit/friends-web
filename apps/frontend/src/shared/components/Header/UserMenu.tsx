@@ -29,7 +29,7 @@ export default function UserMenu() {
           className="flex items-center gap-2 rounded-full border-2 border-teal-400 dark:border-teal-700 px-2 py-1 bg-transparent hover:bg-teal-100 dark:hover:bg-teal-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
           aria-label={t('user.menu', 'Opciones de usuario')}
         >
-          {user.avatar ? (
+          {user.avatar && user.avatar.trim() !== '' ? (
             <img
               src={user.avatar}
               alt={user.name || user.email || 'User'}
