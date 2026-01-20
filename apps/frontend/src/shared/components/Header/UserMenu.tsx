@@ -1,8 +1,8 @@
 import { useAuth } from '@/features/auth/useAuth';
 import { MdLogout, MdAccountCircle } from 'react-icons/md';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
-import { showLogoutToast } from './toastUtils';
 import { useTranslation } from 'react-i18next';
+import { showLogoutToast } from '@/shared/utils/toastUtils';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
 
 function stringAvatar(name?: string, email?: string) {
   if (name) return name[0].toUpperCase();

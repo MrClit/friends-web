@@ -1,9 +1,8 @@
-
 import { useTranslation } from 'react-i18next';
-import Logo from './Logo';
-import LanguageSelector from './LanguageSelector';
-import ThemeToggle from './ThemeToggle';
-import UserMenu from './UserMenu';
+import { Logo } from '@/shared/components';
+import { LanguageSelector } from '@/shared/components/Header';
+import { ThemeToggle } from '@/shared/components/Header';
+import { UserMenu } from '@/shared/components/Header';
 
 /**
  * Main application header with logo, language selector, theme toggle, and user menu.

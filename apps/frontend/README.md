@@ -298,7 +298,7 @@ All KPIs computed per-event AND per-participant:
 **Path Aliases:**
 
 - `@/*` → `src/*` (configured in `vite.config.ts`)
-- Example: `import { cn } from '@/lib/utils'`
+- Example: `import { cn } from '@/shared/utils'`
 - Use barrel exports: `import { EventsList } from '@/features/events'`
   - Utilidades: `import { formatAmount } from '@/shared/utils/format'`
   - Componentes UI: `import { Dialog } from '@/shared/components/ui'`
@@ -461,7 +461,7 @@ Configuration in `tailwind.config.js`. Uses TailwindCSS v4 with `@tailwindcss/vi
 **Utility Helper:**
 
 ```typescript
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/utils';
 
 // Combines clsx and tailwind-merge for conditional classes
 className={cn('base-class', { 'conditional-class': condition })}

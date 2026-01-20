@@ -1,0 +1,306 @@
+<!doctype html>
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Selección de Evento - SplitEvent</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#059669',
+              'mint-light': '#f0fdfa',
+              'mint-dark': '#064e3b',
+              'background-light': '#ecfdf5',
+              'background-dark': '#022c22',
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            borderRadius: {
+              DEFAULT: '1rem',
+            },
+          },
+        },
+      };
+    </script>
+    <style type="text/tailwindcss">
+      @layer base {
+        body {
+          @apply text-slate-800 dark:text-emerald-50 transition-colors duration-300;
+          background: radial-gradient(circle at top left, #f0fdfa, #ecfdf5);
+          background-attachment: fixed;
+        }
+        .dark body {
+          background: radial-gradient(circle at top left, #064e3b, #022c22);
+          background-attachment: fixed;
+        }
+      }
+      .glass-nav {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(16px);
+      }
+      .dark .glass-nav {
+        background: rgba(2, 44, 34, 0.8);
+      }
+      .event-card {
+        @apply bg-white dark:bg-emerald-950/60 border-slate-100 dark:border-emerald-800/50 shadow-sm transition-all duration-300;
+      }
+      .event-card:hover {
+        transform: translateY(-4px);
+        @apply shadow-xl shadow-emerald-900/10 border-emerald-200/50;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <nav class="sticky top-0 z-50 px-6 py-4 glass-nav border-b border-emerald-100 dark:border-emerald-800/50">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/30"
+          >
+            <span class="material-symbols-outlined font-bold">account_balance_wallet</span>
+          </div>
+          <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Split<span class="text-primary">Event</span>
+          </h1>
+        </div>
+        <div class="flex items-center gap-2 md:gap-4">
+          <button
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-emerald-800 hover:bg-white dark:hover:bg-emerald-900/50 transition-all"
+          >
+            <span class="material-symbols-outlined text-[20px] text-emerald-600 dark:text-emerald-400">language</span>
+            <span class="text-sm font-semibold hidden sm:inline">ES</span>
+          </button>
+          <button
+            class="p-2 rounded-lg border border-slate-200 dark:border-emerald-800 hover:bg-white dark:hover:bg-emerald-900/50 transition-all"
+            id="theme-toggle"
+          >
+            <span class="material-symbols-outlined dark:hidden text-emerald-600">dark_mode</span>
+            <span class="material-symbols-outlined hidden dark:inline text-emerald-400">light_mode</span>
+          </button>
+          <div class="h-8 w-[1px] bg-emerald-100 dark:bg-emerald-800 mx-2"></div>
+          <button
+            class="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-white dark:hover:bg-emerald-900/50 transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-800"
+          >
+            <img
+              alt="Avatar de Victor"
+              class="w-8 h-8 rounded-full object-cover ring-2 ring-primary/20"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRK9-JBTOY4YzQ43lgVlSJetzF1e4Y3UZV-ToqkpWItDEbeB0ppkvjftScngCg3fxmuCOgV-gPZnThUEPESnVTU9o36Bk0AF7uIoFMcaGBMqP8iirI_dbtueOTb3SPLWPUfDQ34L_gOfTEgIZ2gEiafp1bWMcq3N_Hvoc6PRBcbmc2wtkmBPDqWWkoGZwvCW2FZLHaCqzi49IEhvq-1V9LGSozrgT9fUSt0PdCvnqms8OtXSqTt0rSIJQ9Y9E2_y6OSwqubFiXuZg"
+            />
+            <span class="text-sm font-bold hidden md:inline">Victor Sales</span>
+            <span class="material-symbols-outlined text-slate-400 hidden md:inline text-[20px]">expand_more</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <main class="flex-1 p-6 md:p-12">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div>
+            <h2 class="text-4xl font-extrabold text-slate-900 dark:text-emerald-50 mb-3 tracking-tight">Tus Eventos</h2>
+            <p class="text-emerald-800/60 dark:text-emerald-300/60 text-lg">
+              Gestiona tus gastos compartidos de forma sencilla.
+            </p>
+          </div>
+          <button
+            class="bg-primary hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl flex items-center justify-center gap-3 font-bold shadow-xl shadow-emerald-600/25 transition-all active:scale-95 group"
+          >
+            <span class="material-symbols-outlined font-bold group-hover:rotate-90 transition-transform">add</span>
+            Nuevo Evento
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div class="group event-card p-7 rounded-3xl cursor-pointer flex flex-col">
+            <div class="flex justify-between items-start mb-6">
+              <div
+                class="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/40 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300"
+              >
+                <span class="material-symbols-outlined text-3xl">flight_takeoff</span>
+              </div>
+              <span
+                class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold rounded-lg uppercase tracking-wider border border-emerald-200/50"
+                >Activo</span
+              >
+            </div>
+            <h3
+              class="text-2xl font-bold mb-2 group-hover:text-primary transition-colors text-slate-900 dark:text-white"
+            >
+              Viaje a Mallorca
+            </h3>
+            <p class="text-slate-500 dark:text-emerald-200/60 text-sm mb-8 leading-relaxed">
+              Vuelos, alojamiento y cenas grupales del fin de semana en la isla.
+            </p>
+            <div
+              class="mt-auto flex items-center justify-between pt-6 border-t border-emerald-50 dark:border-emerald-800/50"
+            >
+              <div class="flex -space-x-3">
+                <img
+                  alt="Participante"
+                  class="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB7YHeG8IqB-sDEuOUJj28L4zgse-pD_qdcWZIZ0Y6jgdjycPQphVDi7usjycVid1NX7QO4teHB33QtPPZ7_pjybytW9SogrRtY8DqNRgi-EyhFIaE7gon0lXymU5PVHs-BnLiQxlXzdg6vQVlhwWSijs5lwnyheK55-hFbzTkLWNkp9iYqwY0iqjUzkFraEZwenlkMVl90X2fvyMo6_4WxrF2mBv6SlOamRqu5hqBmr2FCPaC2oqlgceZjSY30Xw7h4lGtk4SRkc"
+                />
+                <img
+                  alt="Participante"
+                  class="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuArc1HY0A1bV_wot5hJ725PL1Zn9U_o7ry_x3TScczQOdja74nULJBkNjStrwEPNwWLl2mXf5jdoh6qFmWY7p658yAs6_FQedQERKAF9eZeSeVSmSzls6E91XxoUuTHNm1_8iQRIZ_rp0L21j5j3mELmI5pMnaX7RDXyhjtNK6KTPVNrrgszatubrxzQ3F1IKWvQV-ETlO2WegM1TfEsyAuxK2S9jJvFNtezReJUlzmOD9x5oLZ8A9iC9RuU69Jog9laUzC3fzpsrE"
+                />
+                <div
+                  class="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 bg-emerald-50 dark:bg-emerald-900 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-300"
+                >
+                  +3
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-[10px] font-bold text-emerald-600/50 dark:text-emerald-400/50 uppercase tracking-widest">
+                  Último cambio
+                </p>
+                <p class="text-sm font-semibold text-slate-600 dark:text-emerald-200">Hace 2 horas</p>
+              </div>
+            </div>
+          </div>
+          <div class="group event-card p-7 rounded-3xl cursor-pointer flex flex-col">
+            <div class="flex justify-between items-start mb-6">
+              <div
+                class="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/40 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:bg-primary group-hover:text-white transition-colors duration-300"
+              >
+                <span class="material-symbols-outlined text-3xl">restaurant</span>
+              </div>
+              <span
+                class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold rounded-lg uppercase tracking-wider border border-emerald-200/50"
+                >Activo</span
+              >
+            </div>
+            <h3
+              class="text-2xl font-bold mb-2 group-hover:text-primary transition-colors text-slate-900 dark:text-white"
+            >
+              Cena Cumpleaños
+            </h3>
+            <p class="text-slate-500 dark:text-emerald-200/60 text-sm mb-8 leading-relaxed">
+              Reserva del restaurante y tarta para la fiesta sorpresa de Marta.
+            </p>
+            <div
+              class="mt-auto flex items-center justify-between pt-6 border-t border-emerald-50 dark:border-emerald-800/50"
+            >
+              <div class="flex -space-x-3">
+                <img
+                  alt="Participante"
+                  class="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnoftGqne5et-QyLsBXd2lFd9NiCDHnawTmOvI5sjwW1QnugN7QowAQD49dqR_q7r77XMyov3UXFBAToZYQVtZiC7_P5ucWG2lXdqb2uuCKr9OdnOozoX1wdoB_t2vueEa4KMJjmUwGDD6b5_CU9C-o3tQsxAym88P_56GXlj98LfbT4on6xI7VPeKt9x6oYLmEyUSCcTBUHw2h92uzZKtR_vgm1Imi4oeAflMqdTGv-shiYsalJo_c4Rc16Av4gV4zylkQfSIBSE"
+                />
+                <img
+                  alt="Participante"
+                  class="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHbIPQ6YmHaZ-AXdjyXn2xVZYtbQ36Ms3iDWm52Jsq644p8xYGuNlkpwilrcWCd7CYvTQnwbJfK_Q2-hFZRAk9AhZVDQsVF2-efyd8IWaDiAREeoueqtq8OmuBj0Xythw0mvWkAVzTHRG94yiNvgiWaunSRgn4PgWICdbrgqHfh2xuSJN7PKmhxQ-11RExRywcTREDRNuvQ1Dc7IGGWOwUZwBXeWC67fQDlueX3lLrBvaWmCfDHrJrXQap8idRE3CZWBh5Ta85OM4"
+                />
+              </div>
+              <div class="text-right">
+                <p class="text-[10px] font-bold text-emerald-600/50 dark:text-emerald-400/50 uppercase tracking-widest">
+                  Último cambio
+                </p>
+                <p class="text-sm font-semibold text-slate-600 dark:text-emerald-200">Ayer</p>
+              </div>
+            </div>
+          </div>
+          <div class="group event-card p-7 rounded-3xl cursor-pointer flex flex-col">
+            <div class="flex justify-between items-start mb-6">
+              <div
+                class="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/40 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:bg-primary group-hover:text-white transition-colors duration-300"
+              >
+                <span class="material-symbols-outlined text-3xl">directions_car</span>
+              </div>
+              <span
+                class="px-3 py-1 bg-slate-100 dark:bg-emerald-900/30 text-slate-500 dark:text-emerald-400 text-[11px] font-bold rounded-lg uppercase tracking-wider border border-slate-200/50"
+                >Archivado</span
+              >
+            </div>
+            <h3
+              class="text-2xl font-bold mb-2 group-hover:text-primary transition-colors text-slate-900 dark:text-white"
+            >
+              Roadtrip Pirineos
+            </h3>
+            <p class="text-slate-500 dark:text-emerald-200/60 text-sm mb-8 leading-relaxed">
+              Gastos de gasolina, peajes y alquiler de furgoneta para el viaje de esquí.
+            </p>
+            <div
+              class="mt-auto flex items-center justify-between pt-6 border-t border-emerald-50 dark:border-emerald-800/50"
+            >
+              <div class="flex -space-x-3">
+                <img
+                  alt="Participante"
+                  class="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB7YHeG8IqB-sDEuOUJj28L4zgse-pD_qdcWZIZ0Y6jgdjycPQphVDi7usjycVid1NX7QO4teHB33QtPPZ7_pjybytW9SogrRtY8DqNRgi-EyhFIaE7gon0lXymU5PVHs-BnLiQxlXzdg6vQVlhwWSijs5lwnyheK55-hFbzTkLWNkp9iYqwY0iqjUzkFraEZwenlkMVl90X2fvyMo6_4WxrF2mBv6SlOamRqu5hqBmr2FCPaC2oqlgceZjSY30Xw7h4lGtk4SRkc"
+                />
+                <div
+                  class="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 bg-emerald-50 dark:bg-emerald-900 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-300"
+                >
+                  +2
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-[10px] font-bold text-emerald-600/50 dark:text-emerald-400/50 uppercase tracking-widest">
+                  Fecha
+                </p>
+                <p class="text-sm font-semibold text-slate-600 dark:text-emerald-200">Dic 2025</p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="group border-2 border-dashed border-emerald-200 dark:border-emerald-800/50 p-8 rounded-3xl flex flex-col items-center justify-center text-slate-400 hover:border-primary/50 hover:bg-white/50 dark:hover:bg-emerald-900/20 transition-all cursor-pointer min-h-[300px]"
+          >
+            <div
+              class="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/40 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all text-primary"
+            >
+              <span class="material-symbols-outlined text-4xl">add_circle</span>
+            </div>
+            <p
+              class="font-bold text-lg text-emerald-800 dark:text-emerald-100 group-hover:text-primary transition-colors"
+            >
+              Crear nuevo evento
+            </p>
+            <p class="text-sm mt-2 text-center text-emerald-600/60 dark:text-emerald-400/60 px-6">
+              Empieza a dividir gastos con tus amigos ahora mismo.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+    <button
+      class="lg:hidden fixed bottom-8 right-8 w-16 h-16 bg-primary text-white rounded-2xl shadow-2xl flex items-center justify-center z-50 active:scale-90 transition-transform"
+    >
+      <span class="material-symbols-outlined text-3xl font-bold">add</span>
+    </button>
+    <script>
+      const themeToggle = document.getElementById('theme-toggle');
+      const html = document.documentElement;
+      themeToggle.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+          html.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+    </script>
+  </body>
+</html>

@@ -1,12 +1,6 @@
 import { createContext, useState, useEffect, type ReactNode } from 'react';
 import type { AuthContextType, User } from './types';
 
-declare global {
-  interface Window {
-    __friends_debug?: boolean;
-  }
-}
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const TOKEN_KEY = 'token';
@@ -34,7 +28,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (res.ok) {
         const response = await res.json();
-        console.log('Fetched user:', response.data);
         setUser(response.data);
       } else {
         setUser(null);
