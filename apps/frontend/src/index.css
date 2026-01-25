@@ -1,3 +1,15 @@
-@import "tailwindcss";
+/* Forzar Inter como fuente base en Tailwind v4 y sobrescribir --font-sans */
+:root,
+html {
+  --font-sans: 'Inter', sans-serif;
+  --default-font-family: 'Inter', sans-serif;
+}
+
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  font-family: 'Inter', sans-serif;
+  @apply font-sans;
+}

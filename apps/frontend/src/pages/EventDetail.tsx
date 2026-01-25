@@ -1,4 +1,4 @@
-import ProtectedLayout from './ProtectedLayout';
+import MainLayout from './MainLayout';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEventDetail } from '@/features/events/hooks';
@@ -22,40 +22,40 @@ export default function EventDetail() {
   // Validate id after all hooks
   if (!id) {
     return (
-      <ProtectedLayout>
+      <MainLayout>
         <div className="text-center mt-10 text-red-400">{t('eventDetail.invalidId')}</div>
-      </ProtectedLayout>
+      </MainLayout>
     );
   }
 
   if (isLoading) {
     return (
-      <ProtectedLayout>
+      <MainLayout>
         <div className="text-center mt-10 text-teal-400">{t('common.loading')}</div>
-      </ProtectedLayout>
+      </MainLayout>
     );
   }
 
   if (error) {
     return (
-      <ProtectedLayout>
+      <MainLayout>
         <div className="text-center mt-10 text-red-400">
           {t('common.error')}: {error.message}
         </div>
-      </ProtectedLayout>
+      </MainLayout>
     );
   }
 
   if (!event) {
     return (
-      <ProtectedLayout>
+      <MainLayout>
         <div className="text-center mt-10">{t('eventDetail.notFound')}</div>
-      </ProtectedLayout>
+      </MainLayout>
     );
   }
 
   return (
-    <ProtectedLayout>
+    <MainLayout>
       <EventDetailHeader
         eventId={event.id}
         eventTitle={event.title}
@@ -91,6 +91,6 @@ export default function EventDetail() {
         onConfirm={deleteDialog.handleConfirm}
         onCancel={deleteDialog.handleCancel}
       />
-    </ProtectedLayout>
+    </MainLayout>
   );
 }

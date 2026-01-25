@@ -1,5 +1,7 @@
 {
   "home": {
+    "title": "Esdeveniments",
+    "subtitle": "Gestiona els teus esdeveniments",
     "newEvent": "Nou Esdeveniment"
   },
   "theme": {
@@ -130,5 +132,11 @@
     "title": "Estàs segur?",
     "confirm": "Sí",
     "cancel": "Cancel·lar"
+  },
+  "events": {
+    "createEventCard": {
+      "title": "Crear nou esdeveniment",
+      "subtitle": "Comença a dividir despeses amb els teus amics ara mateix."
+    }
   }
 }

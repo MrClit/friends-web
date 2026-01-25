@@ -21,15 +21,15 @@ export default function LanguageSelector() {
         <button
           aria-label={t('language.select', 'Seleccionar idioma')}
           title={t('language.current', { lng: current.name })}
-          className="flex items-center p-2 gap-2 rounded-full border-2 border-teal-400 dark:border-teal-700 bg-transparent hover:bg-teal-100 dark:hover:bg-teal-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-emerald-800 hover:bg-white dark:hover:bg-emerald-900/50 transition-all cursor-pointer"
         >
-          <MdLanguage className="text-teal-600 dark:text-yellow-300 text-xl" />
-          <span className="font-bold text-teal-700 dark:text-yellow-200 text-xs drop-shadow">{current.label}</span>
+          <MdLanguage className="text-[20px] text-emerald-600 dark:text-emerald-400" />
+          <span className="text-sm font-semibold dark:text-white hidden sm:inline">{current.label}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="min-w-32 rounded-lg border border-teal-200 dark:border-teal-800 bg-white dark:bg-teal-900"
+        className="min-w-32 rounded-lg border border-slate-200 dark:border-emerald-800 bg-white dark:bg-emerald-900/50 shadow-lg transition-all"
       >
         {LANGUAGES.map((l) => (
           <DropdownMenuItem

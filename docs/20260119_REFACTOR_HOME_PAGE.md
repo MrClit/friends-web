@@ -121,13 +121,13 @@
 
 ## 6. Checklist Detallado
 
-- [ ] HeaderSection con título, subtítulo y botón (i18n)
-- [ ] Grid de EventCard y CreateEventCard (iconos react-icons, valores por defecto)
-- [ ] FAB visible solo en móvil (lg:hidden, MdAdd)
-- [ ] Accesibilidad y roles ARIA en todos los componentes
-- [ ] i18n para todos los textos y keys de ejemplo
+- [x] HeaderSection con título, subtítulo y botón (i18n)
+- [x] Grid de EventCard y CreateEventCard (iconos react-icons, valores por defecto)
+- [x] FAB visible solo en móvil (lg:hidden, MdAdd)
+- [x] Accesibilidad y roles ARIA en todos los componentes
+- [x] i18n para todos los textos y keys de ejemplo
 - [ ] Pruebas visuales y de interacción
-- [ ] Sin breaking changes en hooks/API
+- [x] Sin breaking changes en hooks/API
 - [ ] Cobertura mínima 80% en tests
 - [ ] Validación de criterios de aceptación y QA
 

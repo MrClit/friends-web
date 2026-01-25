@@ -3,6 +3,7 @@ import { MdLogout, MdAccountCircle } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { showLogoutToast } from '@/shared/utils/toastUtils';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
+import { MdExpandMore } from 'react-icons/md';
 
 function stringAvatar(name?: string, email?: string) {
   if (name) return name[0].toUpperCase();
@@ -26,7 +27,7 @@ export default function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex items-center gap-2 rounded-full border-2 border-teal-400 dark:border-teal-700 px-2 py-1 bg-transparent hover:bg-teal-100 dark:hover:bg-teal-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+          className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-white dark:hover:bg-emerald-900/50 transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-800 cursor-pointer"
           aria-label={t('user.menu', 'Opciones de usuario')}
         >
           {user.avatar && user.avatar.trim() !== '' ? (
@@ -36,13 +37,15 @@ export default function UserMenu() {
               className="w-8 h-8 rounded-full object-cover border-2 border-teal-400 dark:border-teal-700 shadow"
             />
           ) : (
-            <span className="w-8 h-8 flex items-center justify-center rounded-full bg-teal-200 dark:bg-teal-700 text-teal-800 dark:text-teal-100 font-bold text-lg border-2 border-teal-400 dark:border-teal-700">
+            <span className="hidden sm:block font-semibold text-teal-900 dark:text-teal-100 text-sm max-w-30 truncate">
               {stringAvatar(user.name, user.email)}
             </span>
           )}
           <span className="hidden sm:block font-semibold text-teal-900 dark:text-teal-100 text-sm max-w-30 truncate">
             {user.name || user.email}
           </span>
+
+          <MdExpandMore className="text-slate-400 hidden md:inline text-[20px]" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

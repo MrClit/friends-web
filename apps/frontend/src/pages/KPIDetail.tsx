@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { KPIDetailView } from '@/features/kpi';
-import ProtectedLayout from './ProtectedLayout';
+import MainLayout from './MainLayout';
 
 /**
  * KPI Detail Page
@@ -11,15 +11,15 @@ export default function KPIDetail() {
 
   if (!id || !kpi) {
     return (
-      <ProtectedLayout>
+      <MainLayout>
         <div className="text-center mt-10">Invalid event ID or KPI type</div>
-      </ProtectedLayout>
+      </MainLayout>
     );
   }
 
   return (
-    <ProtectedLayout>
+    <MainLayout>
       <KPIDetailView eventId={id} kpi={kpi} />
-    </ProtectedLayout>
+    </MainLayout>
   );
 }

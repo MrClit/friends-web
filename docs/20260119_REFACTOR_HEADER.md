@@ -177,17 +177,17 @@
 
 ### Checklist Actionable Paso a Paso
 
-1. [ ] Auditar el estado actual de cada archivo (`Header.tsx`, `Logo.tsx`, `LanguageSelector.tsx`, `ThemeToggle.tsx`, `UserMenu.tsx`).
-2. [ ] Comparar visualmente cada elemento con el diseño de `home.html` y anotar diferencias.
-3. [ ] Modificar `Header.tsx` para fondo glass, layout sticky, border, paddings, y estructura flex exacta.
-4. [ ] Modificar `Logo.tsx` para icono y texto, colores, tipografía y espaciado igual al diseño.
-5. [ ] Modificar `LanguageSelector.tsx` para icono, label, borde, hover, transición y accesibilidad.
-6. [ ] Modificar `ThemeToggle.tsx` para icono, animación, borde, hover y accesibilidad.
-7. [ ] Añadir separador vertical entre ThemeToggle y UserMenu.
-8. [ ] Modificar `UserMenu.tsx` para avatar, nombre, expand_more, borde, hover, fallback y accesibilidad.
-9. [ ] Añadir/ajustar aria-labels y navegación por teclado en todos los botones.
-10. [ ] Unificar clases Tailwind y helpers (`cn()`) para responsividad y consistencia.
-11. [ ] Añadir/ajustar keys de i18n para textos y tooltips.
+1. [x] Auditar el estado actual de cada archivo (`Header.tsx`, `Logo.tsx`, `LanguageSelector.tsx`, `ThemeToggle.tsx`, `UserMenu.tsx`).
+2. [x] Comparar visualmente cada elemento con el diseño de `home.html` y anotar diferencias.
+3. [x] Modificar `Header.tsx` para fondo glass, layout sticky, border, paddings, y estructura flex exacta.
+4. [x] Modificar `Logo.tsx` para icono y texto, colores, tipografía y espaciado igual al diseño.
+5. [x] Modificar `LanguageSelector.tsx` para icono, label, borde, hover, transición y accesibilidad.
+6. [x] Modificar `ThemeToggle.tsx` para icono, animación, borde, hover y accesibilidad.
+7. [x] Añadir separador vertical entre ThemeToggle y UserMenu.
+8. [x] Modificar `UserMenu.tsx` para avatar, nombre, expand_more, borde, hover, fallback y accesibilidad.
+9. [x] Añadir/ajustar aria-labels y navegación por teclado en todos los botones.
+10. [x] Unificar clases Tailwind y helpers (`cn()`) para responsividad y consistencia.
+11. [x] Añadir/ajustar keys de i18n para textos y tooltips.
 12. [ ] Crear/actualizar tests unitarios y de integración.
 13. [ ] Validar visualmente en mobile y desktop, comparando con home.html.
 14. [ ] Validar accesibilidad (axe, Lighthouse).
@@ -195,18 +195,18 @@
 
 ### Criterios de aceptación por archivo
 
-- [ ] `Header.tsx` funcional, accesible y responsivo, con fondo glass y layout idéntico a home.html
-- [ ] `Logo.tsx` visualmente igual al diseño (icono, texto, colores, tipografía)
-- [ ] `LanguageSelector.tsx` igual al diseño (icono, label, borde, hover, accesibilidad)
-- [ ] `ThemeToggle.tsx` igual al diseño (iconos, animación, borde, hover, accesibilidad)
-- [ ] Separador vertical añadido y visualmente igual al diseño
-- [ ] `UserMenu.tsx` igual al diseño (avatar, nombre, expand_more, borde, hover, accesibilidad, fallback)
-- [ ] Subcomponentes desacoplados y reutilizables
-- [ ] Roles ARIA y navegación por teclado en todos los subcomponentes
-- [ ] i18n para todos los textos y keys de ejemplo
+- [x] `Header.tsx` funcional, accesible y responsivo, con fondo glass y layout idéntico a home.html
+- [x] `Logo.tsx` visualmente igual al diseño (icono, texto, colores, tipografía)
+- [x] `LanguageSelector.tsx` igual al diseño (icono, label, borde, hover, accesibilidad)
+- [x] `ThemeToggle.tsx` igual al diseño (iconos, animación, borde, hover, accesibilidad)
+- [x] Separador vertical añadido y visualmente igual al diseño
+- [x] `UserMenu.tsx` igual al diseño (avatar, nombre, expand_more, borde, hover, accesibilidad, fallback)
+- [x] Subcomponentes desacoplados y reutilizables
+- [x] Roles ARIA y navegación por teclado en todos los subcomponentes
+- [x] i18n para todos los textos y keys de ejemplo
 - [ ] Pruebas visuales y de interacción (unitarias e integración)
 - [ ] Validación de accesibilidad (axe, Lighthouse)
-- [ ] Sin breaking changes en layouts ni navegación
+- [x] Sin breaking changes en layouts ni navegación
 
 ## 7. Testing y Validación
 

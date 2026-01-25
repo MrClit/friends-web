@@ -1,5 +1,7 @@
 {
   "home": {
+    "title": "Eventos",
+    "subtitle": "Gestiona tus eventos",
     "newEvent": "Nuevo Evento"
   },
   "theme": {
@@ -130,5 +132,11 @@
     "title": "¿Estás seguro?",
     "confirm": "Sí",
     "cancel": "Cancelar"
+  },
+  "events": {
+    "createEventCard": {
+      "title": "Crear nuevo evento",
+      "subtitle": "Empieza a dividir gastos con tus amigos ahora mismo."
+    }
   }
 }

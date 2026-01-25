@@ -17,7 +17,7 @@ export default function ThemeToggle() {
           ? t('theme.toggleDark', 'Cambiar a modo claro')
           : t('theme.toggleLight', 'Cambiar a modo oscuro')
       }
-      className="rounded-full border-2 border-teal-400 dark:border-teal-700 p-2 bg-transparent hover:bg-teal-100 dark:hover:bg-teal-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+      className="p-2 rounded-lg border border-slate-200 dark:border-emerald-800 hover:bg-white dark:hover:bg-emerald-900/50 transition-all cursor-pointer"
     >
       {mode === 'dark' ? (
         <MdBrightness7 className="text-yellow-400 text-xl transition-all duration-300 ease-in-out" />

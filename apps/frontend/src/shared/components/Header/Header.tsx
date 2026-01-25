@@ -11,37 +11,27 @@ import { UserMenu } from '@/shared/components/Header';
 export default function Header() {
   const { t } = useTranslation();
   return (
-    <header
-      role="banner"
+    <nav
+      role="navigation"
       aria-label={t('header.ariaLabel', 'Barra de navegación principal')}
-      className="w-full sticky top-0 z-30"
+      className="sticky top-0 z-50 px-6 py-4 border-b border-emerald-100 dark:border-emerald-800/50 bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(2,44,34,0.8)] backdrop-blur-md"
     >
-      <div className="max-w-2xl mx-auto shadow-sm px-2 py-2 flex items-center justify-between gap-2 rounded-b-xl">
-        {/* Left: Logo (icono) + Language */}
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <Logo showText={false} size={40} />
-          <div className="ml-2">
-            <div className="rounded-lg px-1 py-1 transition-colors hover:bg-teal-100 dark:hover:bg-teal-800">
-              <LanguageSelector />
-            </div>
-          </div>
+
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            FRI<span className="text-yellow-400">€</span>NDS
+          </h1>
         </div>
 
-        {/* Center: (opcional) título de página */}
-        <div className="flex-1 flex justify-center items-center min-w-0">
-          {/* Aquí podría ir el título de la página si se desea */}
-        </div>
-
-        {/* Right: Theme toggle + User menu */}
-        <div className="flex items-center gap-2">
-          <div className="rounded-lg p-1 transition-colors hover:bg-teal-100 dark:hover:bg-teal-800">
-            <ThemeToggle />
-          </div>
-          <div className="rounded-lg p-1 transition-colors hover:bg-teal-100 dark:hover:bg-teal-800">
-            <UserMenu />
-          </div>
+        <div className="flex items-center gap-2 md:gap-4">
+          <LanguageSelector />
+          <ThemeToggle />
+          <div className="h-8 w-px bg-emerald-100 dark:bg-emerald-800 mx-2" />
+          <UserMenu />
         </div>
       </div>
-    </header>
+    </nav>
   );
 }

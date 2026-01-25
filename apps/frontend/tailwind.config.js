@@ -16,5 +16,12 @@ module.exports = {
     'text-red-800',
     'text-green-800',
   ],
-  plugins: [],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [require('tailwindcss-animate')],
 };
