@@ -4,12 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { showLogoutToast } from '@/shared/utils/toastUtils';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
 import { MdExpandMore } from 'react-icons/md';
-
-function stringAvatar(name?: string, email?: string) {
-  if (name) return name[0].toUpperCase();
-  if (email) return email[0].toUpperCase();
-  return '?';
-}
+import { stringAvatar } from '@/shared/utils';
 
 export default function UserMenu() {
   const { user, logout, loading } = useAuth();

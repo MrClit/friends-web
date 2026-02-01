@@ -1,5 +1,12 @@
 import { useTranslation } from 'react-i18next';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/shared/components/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogCloseButton,
+  DialogPrimaryButton,
+} from '@/shared/components/ui';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -28,24 +35,12 @@ export default function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
-      <DialogContent className="z-60">
+      <DialogContent className="z-60 p-5">
         <DialogTitle>{resolvedTitle}</DialogTitle>
         <DialogDescription className="text-teal-800 dark:text-teal-100 mb-6">{message}</DialogDescription>
         <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-teal-700 text-teal-800 dark:text-teal-100 hover:bg-gray-300 dark:hover:bg-teal-800 cursor-pointer"
-            onClick={onCancel}
-          >
-            {resolvedCancel}
-          </button>
-          <button
-            type="button"
-            className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-600 text-white font-bold cursor-pointer"
-            onClick={onConfirm}
-          >
-            {resolvedConfirm}
-          </button>
+          <DialogCloseButton onClick={onCancel}>{resolvedCancel}</DialogCloseButton>
+          <DialogPrimaryButton onClick={onConfirm}>{resolvedConfirm}</DialogPrimaryButton>
         </div>
       </DialogContent>
     </Dialog>

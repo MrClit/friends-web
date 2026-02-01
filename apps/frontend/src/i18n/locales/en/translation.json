@@ -22,6 +22,7 @@
   },
   "common": {
     "loading": "Loading...",
+    "close": "Close",
     "error": "Error",
     "errorLoading": "Could not load data. Please try again."
   },
@@ -44,6 +45,9 @@
   },
   "eventForm": {
     "titleLabel": "Title",
+    "iconLabel": "Event icon",
+    "descriptionLabel": "Description (optional)",
+    "descriptionPlaceholder": "Add details about the event...",
     "titlePlaceholder": "Event name",
     "update": "Update Event",
     "create": "Create Event",
@@ -52,7 +56,7 @@
   "participantsInput": {
     "label": "Participants",
     "addAria": "Add participant",
-    "placeholder": "Participant {{number}}",
+    "placeholder": "Name or email...",
     "deleteAria": "Delete participant"
   },
   "eventDetail": {

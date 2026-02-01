@@ -350,27 +350,6 @@ export class CreateEventDto {
 
 ---
 
-## 📦 Shared Packages
-
-### @friends/shared-types (Planned)
-
-**Purpose:** Single source of truth for data structures between frontend and backend
-
-**Structure:**
-
-```typescript
-packages/shared-types/src/
-├── event.types.ts         # Event, EventParticipant, DTOs
-├── transaction.types.ts   # Transaction, PaymentType, DTOs
-├── kpi.types.ts          # KPIType, KPIConfig
-├── common.types.ts       # ApiResponse, PaginatedResponse
-└── index.ts              # Barrel export
-```
-
-**Usage:** `import { Event, Transaction } from '@friends/shared-types'`
-
----
-
 ## 🔀 Git & CI/CD
 
 **Commit Convention:**
@@ -452,6 +431,28 @@ CORS_ORIGIN=http://localhost:5173
 
 ## 🤖 Copilot Code Generation Workflow
 
+### Code Documentation Standards
+
+**Language:** All code comments, documentation, and JSDoc annotations must be written in **English**.
+
+- Inline comments: `// Calculate total balance`
+- Block comments: `/* ... */`
+- JSDoc: `/** @param {string} id - The event ID */`
+- Component documentation: Always in English
+- Function/method descriptions: Always in English
+
+This applies to:
+
+- Source code comments (TypeScript, JavaScript)
+- Component documentation headers
+- Function/method documentation
+- Type definitions and interfaces
+- README files and inline docs
+
+**Exception:** User-facing content (i18n translation files) should remain in their respective languages.
+
+---
+
 When generating an implementation plan for a new feature, refactor, or fix involving multiple files, the documentation in `/docs` must follow this standard structure to maximize clarity, reproducibility, and navigability for both LLMs and human developers:
 
 ### Required Implementation Plan Structure
@@ -502,22 +503,7 @@ When generating an implementation plan for a new feature, refactor, or fix invol
 - Explain the motivation for the structure at the end of the document.
 - The level of detail must allow any LLM or developer to implement the feature without ambiguity or context switching.
 
-#### Example section outline:
-
-```
-# Implementation Plan: [Feature Name]
-
-## Table of Contents
-1. Motivation and Objectives
-2. System Overview and Requirements
-3. Solution Design
-   3.1. ...
-...
-```
-
-The above structure replaces the previous, less prescriptive format. All new implementation plans must follow this template to ensure consistency and developer/LLM friendliness.
-
 ---
 
 **Last Updated:** January 12, 2026  
-**Status:** Frontend ✅ Active • Backend ✅ Active • Shared-types 🚧 Planned
+**Status:** Frontend ✅ Active • Backend ✅ Active

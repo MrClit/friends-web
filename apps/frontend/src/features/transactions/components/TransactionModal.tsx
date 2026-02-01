@@ -7,6 +7,8 @@ import ConfirmDialog from '../../../shared/components/ConfirmDialog';
 import { useTranslation } from 'react-i18next';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../../../hooks/api/useTransactions';
 
+// TODO: Adaptar a Dialog de shared/components/ui
+
 interface TransactionModalProps {
   open: boolean;
   onClose: () => void;

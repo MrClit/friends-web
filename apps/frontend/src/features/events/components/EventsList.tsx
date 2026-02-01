@@ -4,6 +4,7 @@ import EventsListSkeleton from './EventsListSkeleton';
 import { EventCard } from './EventCard';
 import { CreateEventCard } from './CreateEventCard';
 import { useNavigate } from 'react-router-dom';
+import useEventFormModalStore from '@/shared/store/useEventFormModalStore';
 
 /**
  * Events list component with consistent layout for all states.
@@ -13,6 +14,9 @@ export default function EventsList() {
   const { data: events, isLoading, error } = useEvents();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const openModal = useEventFormModalStore((s) => s.openModal);
+
+  const onNewEvent = () => openModal();
 
   if (isLoading) {
     return <EventsListSkeleton />;
@@ -33,7 +37,7 @@ export default function EventsList() {
       <div className="w-full max-w-7xl mx-auto mt-4 sm:mt-8">
         <div className="flex flex-col items-center justify-center py-12 px-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
           <p className="text-emerald-600 dark:text-emerald-400 text-lg font-medium mb-2">{t('eventsList.noEvents')}</p>
-          <CreateEventCard onClick={() => navigate('/event/new')} />
+          <CreateEventCard onClick={onNewEvent} />
         </div>
       </div>
     );
@@ -63,7 +67,7 @@ export default function EventsList() {
             style={{ animationDelay: `${idx * 75}ms`, animationFillMode: 'backwards' }}
           />
         ))}
-        <CreateEventCard onClick={() => navigate('/event/new')} />
+        <CreateEventCard onClick={onNewEvent} />
       </div>
     </div>
   );

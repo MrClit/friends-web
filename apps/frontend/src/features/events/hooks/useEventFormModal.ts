@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateEvent } from '../../../hooks/api/useEvents';
 import type { Event, EventParticipant } from '../types';
+import { useAuth } from '@/features/auth/useAuth';
 
 /**
  * Helper function to check if form data has changed from original event
@@ -10,13 +11,14 @@ function checkIsDirty(
   event: Event | undefined,
   title: string,
   participants: EventParticipant[],
+  icon: string | undefined,
   open: boolean,
 ): boolean {
   if (!open) return false;
 
   if (!event) {
     // If creating a new event, check if title or any participant name is dirty
-    return Boolean(title.trim() || participants.some((p) => p.name.trim()));
+    return Boolean(title.trim() || participants.some((p) => p.name.trim()) || Boolean(icon));
   }
 
   // Check if title has changed
@@ -37,6 +39,8 @@ function checkIsDirty(
       return true;
     }
   }
+  // Compare icon
+  // if ((icon ?? '') !== (event.icon ?? '')) return true;
 
   return false;
 }
@@ -49,8 +53,13 @@ interface UseEventFormModalProps {
 }
 
 export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFormModalProps) {
+  const { user } = useAuth();
+
   const [title, setTitle] = useState('');
-  const [participants, setParticipants] = useState<EventParticipant[]>([{ id: crypto.randomUUID(), name: '' }]);
+  const [participants, setParticipants] = useState<EventParticipant[]>([
+    { id: user?.id ?? '', name: user?.name ?? '' },
+  ]);
+  const [icon, setIcon] = useState<string>(event?.icon ?? 'flight');
   const [showConfirm, setShowConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const createEvent = useCreateEvent();
@@ -59,9 +68,10 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
   // Centralized reset function to avoid duplication
   const resetForm = useCallback(() => {
     setTitle(event ? event.title : '');
-    setParticipants(event ? event.participants : [{ id: crypto.randomUUID(), name: '' }]);
+    setParticipants(event ? event.participants : [{ id: user?.id ?? '', name: user?.name ?? '' }]);
+    setIcon(event ? (event.icon ?? 'flight') : 'flight');
     setErrorMessage(null);
-  }, [event]);
+  }, [event, user?.id, user?.name]);
 
   useEffect(() => {
     if (open) {
@@ -79,7 +89,10 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
   const canSubmit = useMemo(() => !!title.trim() && cleanParticipants.length > 0, [title, cleanParticipants]);
 
   // Check if form has unsaved changes
-  const isDirty = useMemo(() => checkIsDirty(event, title, participants, open), [event, title, participants, open]);
+  const isDirty = useMemo(
+    () => checkIsDirty(event, title, participants, icon, open),
+    [event, title, participants, icon, open],
+  );
 
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
@@ -113,11 +126,13 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
 
       setErrorMessage(null);
       const trimmedTitle = title.trim();
-      const eventData = { id: event?.id, title: trimmedTitle, participants: cleanParticipants };
+      const eventData = { id: event?.id, title: trimmedTitle, participants: cleanParticipants, icon };
 
       if (onSubmit) {
         // Custom submit handler (used for edit mode)
         onSubmit(eventData);
+        // Ensure any pending "confirm" flag is cleared before closing
+        setShowConfirm(false);
         resetForm();
         onClose();
       } else {
@@ -126,6 +141,8 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
           { title: trimmedTitle, participants: cleanParticipants },
           {
             onSuccess: () => {
+              // Clear confirm state then close to avoid race with Radix onOpenChange
+              setShowConfirm(false);
               resetForm();
               onClose();
             },
@@ -137,7 +154,7 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
         );
       }
     },
-    [canSubmit, title, event?.id, cleanParticipants, onSubmit, resetForm, onClose, createEvent, t],
+    [canSubmit, title, event?.id, cleanParticipants, icon, onSubmit, resetForm, onClose, createEvent, t],
   );
 
   const isLoading = createEvent.isPending;
@@ -148,6 +165,8 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
     setTitle,
     participants,
     setParticipants,
+    icon,
+    setIcon,
     showConfirm,
     errorMessage,
     // Computed

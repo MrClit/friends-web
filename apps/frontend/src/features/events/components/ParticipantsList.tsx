@@ -2,6 +2,8 @@ import { MdDelete, MdPersonAdd } from 'react-icons/md';
 import type { EventParticipant } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useParticipantsList } from '../hooks/useParticipantsList';
+import { stringAvatar } from '@/shared/utils/stringAvatar';
+import { cn } from '@/shared/utils/cn';
 
 interface ParticipantsListProps {
   participants: EventParticipant[];
@@ -10,27 +12,75 @@ interface ParticipantsListProps {
 
 export default function ParticipantsList({ participants, setParticipants }: ParticipantsListProps) {
   const { t } = useTranslation();
-  const { inputRefs, canAddParticipant, handleAddParticipant, handleParticipantChange, handleDeleteParticipant } =
-    useParticipantsList({ participants, setParticipants });
+  const {
+    newParticipantName,
+    setNewParticipantName,
+    canAddParticipant,
+    handleAddParticipant,
+    handleNewParticipantKeyDown,
+    handleDeleteParticipant,
+  } = useParticipantsList({ setParticipants });
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="block text-teal-700 dark:text-teal-100 font-medium">{t('participantsInput.label')}</span>
+      <div className="block text-slate-700 dark:text-emerald-100 font-medium mb-2">{t('participantsInput.label')}</div>
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <MdPersonAdd className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
+          <input
+            type="text"
+            className="w-full pl-11 pr-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
+            placeholder={t('participantsInput.placeholder')}
+            value={newParticipantName}
+            onChange={(e) => setNewParticipantName(e.target.value)}
+            onKeyDown={handleNewParticipantKeyDown}
+          />
+        </div>
+
         <button
           type="button"
           aria-label={t('participantsInput.addAria')}
-          className="ml-2 p-1 rounded-full hover:bg-teal-200 dark:hover:bg-teal-700 text-teal-600 dark:text-teal-200 transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+          className="bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-600 px-5 rounded-2xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleAddParticipant}
           disabled={!canAddParticipant}
         >
-          <MdPersonAdd className="text-2xl" />
+          Añadir
         </button>
       </div>
-      <div id="participants-group" className="space-y-4">
+      <div id="participants-group" className="space-y-3 pt-2">
         {participants.map((participant, idx) => (
-          <div key={participant.id} className="relative">
-            <input
+          <div
+            key={participant.id}
+            className={cn(
+              'flex items-center justify-between p-3 rounded-2xl ',
+              idx === 0
+                ? 'bg-emerald-50/50 dark:bg-emerald-900/20 border border-emerald-100/50 dark:border-emerald-800/30'
+                : 'hover:bg-slate-50 dark:hover:bg-emerald-900/10 transition-colors',
+            )}
+          >
+            <div className="flex items-center gap-3">
+              {/* TODO: Añadir Avatar cuando este disponible igual que se hace en el Header */}
+              <span
+                className={cn(
+                  'w-10 h-10 rounded-full object-cover border-2 border-emerald-600/30 bg-emerald-600/10 font-bold',
+                  'flex items-center justify-center',
+                )}
+              >
+                {stringAvatar(participant.name)}
+              </span>
+              <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{participant.name}</p>
+            </div>
+
+            {idx !== 0 && (
+              <button
+                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
+                onClick={() => handleDeleteParticipant(idx)}
+              >
+                <MdDelete className="text-xl" />
+              </button>
+            )}
+
+            {/* <div
               id={participant.id}
               name={participant.id}
               ref={(el) => {
@@ -38,12 +88,16 @@ export default function ParticipantsList({ participants, setParticipants }: Part
               }}
               type="text"
               className="block w-full px-4 py-2 rounded-lg border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-800 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400 pr-10"
-              placeholder={t('participantsInput.placeholder', { number: idx + 1 })}
+              placeholder={t('participantsInput.placeholder')}
               value={participant.name}
               onChange={(e) => handleParticipantChange(idx, e.target.value)}
               required={idx === 0}
-            />
-            {participants.length > 1 && (
+            >
+              <img></img>
+              <div>{participant.name}</div>
+            </div> */}
+
+            {/* {participants.length > 1 && (
               <div className="absolute right-2 top-1.5">
                 <button
                   type="button"
@@ -54,7 +108,7 @@ export default function ParticipantsList({ participants, setParticipants }: Part
                   <MdDelete className="text-red-600 dark:text-red-400 text-lg" />
                 </button>
               </div>
-            )}
+            )} */}
           </div>
         ))}
       </div>

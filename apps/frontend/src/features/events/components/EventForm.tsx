@@ -1,5 +1,6 @@
 import type { EventParticipant } from '../types';
 import ParticipantsList from './ParticipantsList';
+import IconPicker from './IconPicker';
 import { useTranslation } from 'react-i18next';
 
 interface EventFormProps {
@@ -11,6 +12,8 @@ interface EventFormProps {
   canSubmit: boolean;
   isLoading: boolean;
   mode: 'edit' | 'create';
+  icon?: string;
+  setIcon?: (key: string) => void;
 }
 
 export default function EventForm({
@@ -19,21 +22,24 @@ export default function EventForm({
   participants,
   setParticipants,
   onSubmit,
-  canSubmit,
-  isLoading,
-  mode = 'create',
+  // canSubmit,
+  // isLoading,
+  // mode = 'create',
+  icon,
+  setIcon,
 }: EventFormProps) {
   const { t } = useTranslation();
   return (
-    <form className="space-y-6" onSubmit={onSubmit}>
+    <form id="event-form" className="space-y-6" onSubmit={onSubmit}>
+      {setIcon && <IconPicker selected={icon} onSelect={setIcon} />}
       <div>
-        <label htmlFor="event-title" className="block text-teal-700 dark:text-teal-100 font-medium mb-1">
+        <label htmlFor="event-title" className="block text-slate-700 dark:text-emerald-100 font-medium mb-2">
           {t('eventForm.titleLabel')}
         </label>
         <input
           id="event-title"
           type="text"
-          className="w-full px-4 py-2 rounded-lg border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-800 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+          className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
           placeholder={t('eventForm.titlePlaceholder')}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -41,14 +47,19 @@ export default function EventForm({
           autoFocus
         />
       </div>
+      <div>
+        <label htmlFor="event-description" className="block text-slate-700 dark:text-emerald-100 font-medium mb-2">
+          {t('eventForm.descriptionLabel')}
+        </label>
+        <textarea
+          id="event-description"
+          className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 resize-none font-medium"
+          placeholder={t('eventForm.descriptionPlaceholder')}
+          rows={2}
+        />
+      </div>
       <ParticipantsList participants={participants} setParticipants={setParticipants} />
-      <button
-        type="submit"
-        className="w-full py-2 rounded-lg bg-teal-500 hover:bg-teal-600 text-white font-bold text-lg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-        disabled={!canSubmit || isLoading}
-      >
-        {isLoading ? t('eventForm.saving') : mode === 'edit' ? t('eventForm.update') : t('eventForm.create')}
-      </button>
+      {/* Submit button moved to modal footer via <button form="event-form" type="submit"> to match design */}
     </form>
   );
 }

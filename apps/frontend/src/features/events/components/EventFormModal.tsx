@@ -1,19 +1,23 @@
-import { Dialog, DialogBottomSheet, DialogTitle } from '@/shared/components/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogHeader,
+  DialogFooter,
+  DialogCloseButton,
+  DialogBody,
+  DialogPrimaryButton,
+} from '@/shared/components/ui';
 import ConfirmDialog from '../../../shared/components/ConfirmDialog';
 import EventForm from './EventForm';
-import type { Event, EventParticipant } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useEventFormModal } from '../hooks/useEventFormModal';
+import useEventFormModalStore from '@/shared/store/useEventFormModalStore';
 
-interface EventFormModalProps {
-  open: boolean;
-  onClose: () => void;
-  event?: Event; // If provided, modal is in edit mode
-  onSubmit?: (event: { id?: string; title: string; participants: EventParticipant[] }) => void;
-}
-
-export default function EventFormModal({ open, onClose, event, onSubmit }: EventFormModalProps) {
+export default function EventFormModal() {
   const { t } = useTranslation();
+  const { open, closeModal, event, onSubmit } = useEventFormModalStore();
+
   const {
     title,
     setTitle,
@@ -27,12 +31,19 @@ export default function EventFormModal({ open, onClose, event, onSubmit }: Event
     handleConfirmClose,
     handleCancelClose,
     handleSubmit,
-  } = useEventFormModal({ open, event, onClose, onSubmit });
+    icon,
+    setIcon,
+  } = useEventFormModal({
+    open: open,
+    event: event ?? undefined,
+    onClose: closeModal,
+    onSubmit: onSubmit,
+  });
 
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogBottomSheet
+        <DialogContent
           onInteractOutside={(e) => {
             // Prevent main dialog from closing when ConfirmDialog is open
             if (showConfirm) {
@@ -46,33 +57,47 @@ export default function EventFormModal({ open, onClose, event, onSubmit }: Event
             }
           }}
         >
-          <div className="flex justify-between items-center mb-4">
+          <DialogHeader className="px-8 pt-8 pb-4 flex justify-between items-center border-b border-transparent">
             <DialogTitle>{event ? t('eventFormModal.editTitle') : t('eventFormModal.newTitle')}</DialogTitle>
-            <button
+            <DialogCloseButton
               onClick={() => handleOpenChange(false)}
-              className="text-2xl text-teal-400 hover:text-teal-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               disabled={isLoading || showConfirm}
-              aria-label="Close"
-            >
-              &times;
-            </button>
-          </div>
-          {errorMessage && (
-            <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg text-red-800 dark:text-red-200 text-sm">
-              {errorMessage}
+              aria-label={t('common.close')}
+            />
+          </DialogHeader>
+
+          <DialogBody>
+            <div>
+              {errorMessage && (
+                <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg text-red-800 dark:text-red-200 text-sm">
+                  {errorMessage}
+                </div>
+              )}
+
+              <EventForm
+                title={title}
+                setTitle={setTitle}
+                participants={participants}
+                setParticipants={setParticipants}
+                onSubmit={handleSubmit}
+                canSubmit={canSubmit}
+                isLoading={isLoading}
+                mode={event ? 'edit' : 'create'}
+                icon={icon}
+                setIcon={setIcon}
+              />
             </div>
-          )}
-          <EventForm
-            title={title}
-            setTitle={setTitle}
-            participants={participants}
-            setParticipants={setParticipants}
-            onSubmit={handleSubmit}
-            canSubmit={canSubmit}
-            isLoading={isLoading}
-            mode={event ? 'edit' : 'create'}
-          />
-        </DialogBottomSheet>
+          </DialogBody>
+
+          <DialogFooter className="px-8 py-6 bg-slate-50 dark:bg-emerald-900/20 flex items-center justify-end gap-3 border-t border-emerald-100 dark:border-emerald-800/30">
+            <DialogCloseButton onClick={() => handleOpenChange(false)} disabled={isLoading || showConfirm}>
+              {t('eventFormModal.cancel')}
+            </DialogCloseButton>
+            <DialogPrimaryButton form="event-form" type="submit" disabled={!canSubmit || isLoading}>
+              {isLoading ? t('eventForm.saving') : event ? t('eventForm.update') : t('eventForm.create')}
+            </DialogPrimaryButton>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
       <ConfirmDialog
         open={showConfirm}

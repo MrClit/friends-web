@@ -22,6 +22,7 @@
   },
   "common": {
     "loading": "Cargando...",
+    "close": "Cerrar",
     "error": "Error",
     "errorLoading": "No se pudo cargar los datos. Por favor, intenta de nuevo."
   },
@@ -44,6 +45,9 @@
   },
   "eventForm": {
     "titleLabel": "Título",
+    "iconLabel": "Icono del evento",
+    "descriptionLabel": "Descripción (opcional)",
+    "descriptionPlaceholder": "Añade detalles sobre el evento...",
     "titlePlaceholder": "Nombre del evento",
     "update": "Actualizar Evento",
     "create": "Crear Evento",
@@ -52,7 +56,7 @@
   "participantsInput": {
     "label": "Participantes",
     "addAria": "Añadir participante",
-    "placeholder": "Participante {{number}}",
+    "placeholder": "Nombre o email...",
     "deleteAria": "Eliminar participante"
   },
   "eventDetail": {

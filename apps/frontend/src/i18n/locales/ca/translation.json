@@ -22,6 +22,7 @@
   },
   "common": {
     "loading": "Carregant...",
+    "close": "Tancar",
     "error": "Error",
     "errorLoading": "No s'han pogut carregar les dades. Si us plau, torna-ho a provar."
   },
@@ -44,6 +45,9 @@
   },
   "eventForm": {
     "titleLabel": "Títol",
+    "iconLabel": "Icona de l'esdeveniment",
+    "descriptionLabel": "Descripció (opcional)",
+    "descriptionPlaceholder": "Afegeix detalls sobre l'esdeveniment...",
     "titlePlaceholder": "Nom de l'esdeveniment",
     "update": "Actualitza l'esdeveniment",
     "create": "Crear Esdeveniment",
@@ -52,7 +56,7 @@
   "participantsInput": {
     "label": "Participants",
     "addAria": "Afegeix participant",
-    "placeholder": "Participant {{number}}",
+    "placeholder": "Nom o email...",
     "deleteAria": "Elimina participant"
   },
   "eventDetail": {

@@ -1,43 +1,25 @@
-import { useRef, useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import type { EventParticipant } from '../types';
 
 interface UseParticipantsListParams {
-  participants: EventParticipant[];
   setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
 }
 
-export function useParticipantsList({ participants, setParticipants }: UseParticipantsListParams) {
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+export function useParticipantsList({ setParticipants }: UseParticipantsListParams) {
+  const [newParticipantName, setNewParticipantName] = useState('');
 
   // Memoize validation for add button
-  const canAddParticipant = useMemo(
-    () => participants.length > 0 && !!participants[participants.length - 1]?.name.trim(),
-    [participants],
-  );
-
-  // Focus on last input when a new participant is added
-  useEffect(() => {
-    if (participants.length > 1) {
-      const lastIndex = participants.length - 1;
-      inputRefs.current[lastIndex]?.focus();
-    }
-  }, [participants.length]);
-
-  // Cleanup refs array to match participants length
-  useEffect(() => {
-    inputRefs.current = inputRefs.current.slice(0, participants.length);
-  }, [participants.length]);
+  const canAddParticipant = useMemo(() => {
+    return newParticipantName.trim().length > 0;
+  }, [newParticipantName]);
 
   const handleAddParticipant = useCallback(() => {
-    setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: '' }]);
-  }, [setParticipants]);
+    const trimmedName = newParticipantName.trim();
+    if (!trimmedName) return;
 
-  const handleParticipantChange = useCallback(
-    (idx: number, name: string) => {
-      setParticipants((prev) => prev.map((p, i) => (i === idx ? { ...p, name } : p)));
-    },
-    [setParticipants],
-  );
+    setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: trimmedName }]);
+    setNewParticipantName('');
+  }, [newParticipantName, setParticipants]);
 
   const handleDeleteParticipant = useCallback(
     (idx: number) => {
@@ -46,11 +28,22 @@ export function useParticipantsList({ participants, setParticipants }: UsePartic
     [setParticipants],
   );
 
+  const handleNewParticipantKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && canAddParticipant) {
+        e.preventDefault();
+        handleAddParticipant();
+      }
+    },
+    [canAddParticipant, handleAddParticipant],
+  );
+
   return {
-    inputRefs,
+    newParticipantName,
+    setNewParticipantName,
     canAddParticipant,
     handleAddParticipant,
-    handleParticipantChange,
+    handleNewParticipantKeyDown,
     handleDeleteParticipant,
   };
 }

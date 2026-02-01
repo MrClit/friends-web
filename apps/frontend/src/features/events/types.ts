@@ -8,5 +8,6 @@ export interface Event {
   id: string;
   title: string;
   participants: EventParticipant[];
-  // Puedes agregar más campos aquí
+  // Icon key for the event (optional, maps to IconPicker choices)
+  icon?: string;
 }
