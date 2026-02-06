@@ -67,7 +67,7 @@ const DialogContent = React.forwardRef<
           'w-full max-w-xl',
           'flex flex-col max-h-[90vh] overflow-hidden',
           // Visuals
-          'bg-white dark:bg-teal-900 rounded-4xl shadow-lg',
+          'bg-white dark:bg-emerald-950 rounded-4xl shadow-lg',
           className,
         )}
         {...props}

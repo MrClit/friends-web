@@ -13,12 +13,28 @@ function checkIsDirty(
   participants: EventParticipant[],
   icon: string | undefined,
   open: boolean,
+  userId?: string,
+  userName?: string,
 ): boolean {
   if (!open) return false;
 
   if (!event) {
     // If creating a new event, check if title or any participant name is dirty
-    return Boolean(title.trim() || participants.some((p) => p.name.trim()) || Boolean(icon));
+    // Treat the default icon ("flight") as not a user change
+    const DEFAULT_ICON = 'flight';
+    const iconDirty = Boolean(icon && icon !== DEFAULT_ICON);
+
+    // If the only participant is the default user (pre-filled), don't treat it as a change.
+    const hasNonDefaultParticipant = participants.some((p) => {
+      const name = (p.name || '').trim();
+      if (!name) return false;
+      if (participants.length === 1 && userId && userName && p.id === userId && name === userName.trim()) {
+        return false;
+      }
+      return true;
+    });
+
+    return Boolean(title.trim() || hasNonDefaultParticipant || iconDirty);
   }
 
   // Check if title has changed
@@ -90,8 +106,8 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
 
   // Check if form has unsaved changes
   const isDirty = useMemo(
-    () => checkIsDirty(event, title, participants, icon, open),
-    [event, title, participants, icon, open],
+    () => checkIsDirty(event, title, participants, icon, open, user?.id, user?.name),
+    [event, title, participants, icon, open, user?.id, user?.name],
   );
 
   const handleOpenChange = useCallback(

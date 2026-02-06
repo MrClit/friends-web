@@ -64,6 +64,7 @@ export default function ParticipantsList({ participants, setParticipants }: Part
                 className={cn(
                   'w-10 h-10 rounded-full object-cover border-2 border-emerald-600/30 bg-emerald-600/10 font-bold',
                   'flex items-center justify-center',
+                  'dark:bg-emerald-900/20 dark:border-emerald-800/30 dark:text-white',
                 )}
               >
                 {stringAvatar(participant.name)}
@@ -79,36 +80,6 @@ export default function ParticipantsList({ participants, setParticipants }: Part
                 <MdDelete className="text-xl" />
               </button>
             )}
-
-            {/* <div
-              id={participant.id}
-              name={participant.id}
-              ref={(el) => {
-                inputRefs.current[idx] = el;
-              }}
-              type="text"
-              className="block w-full px-4 py-2 rounded-lg border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-800 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400 pr-10"
-              placeholder={t('participantsInput.placeholder')}
-              value={participant.name}
-              onChange={(e) => handleParticipantChange(idx, e.target.value)}
-              required={idx === 0}
-            >
-              <img></img>
-              <div>{participant.name}</div>
-            </div> */}
-
-            {/* {participants.length > 1 && (
-              <div className="absolute right-2 top-1.5">
-                <button
-                  type="button"
-                  aria-label={t('participantsInput.deleteAria')}
-                  className="bg-white dark:bg-teal-900 shadow rounded p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
-                  onClick={() => handleDeleteParticipant(idx)}
-                >
-                  <MdDelete className="text-red-600 dark:text-red-400 text-lg" />
-                </button>
-              </div>
-            )} */}
           </div>
         ))}
       </div>
