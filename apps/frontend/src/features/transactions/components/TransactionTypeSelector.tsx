@@ -1,6 +1,7 @@
 import type { PaymentType } from '../types';
 import { useTranslation } from 'react-i18next';
 import { PAYMENT_TYPES, PAYMENT_TYPE_CONFIG } from '../constants';
+import { cn } from '@/shared/utils';
 
 interface TransactionTypeSelectorProps {
   value: PaymentType;
@@ -11,27 +12,27 @@ export default function TransactionTypeSelector({ value, onChange }: Transaction
   const { t } = useTranslation();
   return (
     <div className="flex justify-center w-full">
-      <div className="flex w-full bg-teal-50 dark:bg-teal-800 rounded-full p-1 shadow-inner border border-teal-200 dark:border-teal-700">
+      <div className="flex p-1.5 bg-slate-100/80 dark:bg-emerald-900/40 rounded-2xl w-full max-w-md mx-auto">
         {PAYMENT_TYPES.map((type) => {
           const config = PAYMENT_TYPE_CONFIG[type];
           const IconComponent = config.IconComponent;
+          const isActive = value === type;
+
           return (
             <button
               key={type}
-              className={`flex-1 flex  items-center justify-center gap-2 px-2 py-2 rounded-full font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:z-10 text-xs sm:text-sm
-                ${
-                  value === type
-                    ? 'bg-white dark:bg-teal-600 text-teal-700 dark:text-white shadow-md scale-105'
-                    : 'bg-transparent text-teal-500 dark:text-teal-200 hover:bg-teal-100 dark:hover:bg-teal-700'
-                }`}
+              className={cn(
+                'flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300',
+                'flex-1 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:z-10',
+                isActive && 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 ring-1 ring-white/10',
+                !isActive &&
+                  'text-slate-500 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-white hover:bg-white/50 dark:hover:bg-emerald-800/30',
+              )}
               onClick={() => onChange(type)}
               type="button"
-              style={{ minWidth: 0 }}
             >
-              <span className="text-base flex items-center">
-                <IconComponent className={config.colorLight} />
-              </span>
-              <span>{t(`transactionTypeSelector.${type}`)}</span>
+              <IconComponent className="text-base" />
+              <span className={cn(!isActive && 'hidden sm:inline')}>{t(`transactionTypeSelector.${type}`)}</span>
             </button>
           );
         })}

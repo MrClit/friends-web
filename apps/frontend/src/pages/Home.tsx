@@ -22,7 +22,6 @@ export default function Home() {
         actionIcon={<MdAdd size={22} />}
       />
       <EventsList />
-      {/* <FloatingActionButton onClick={eventFormModal.open} translationKey="home.newEvent" icon={'+'} /> */}
       <EventFormModal />
     </MainLayout>
   );

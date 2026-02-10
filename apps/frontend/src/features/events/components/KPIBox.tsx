@@ -1,36 +1,45 @@
 import { formatAmount } from '@/shared/utils/format';
+import { cn } from '@/shared/utils/cn';
 
 interface KPIBoxProps {
   label: string;
   value: number;
-  colorClass?: string; // Nueva prop para clases de color
-  onClick?: () => void; // Prop opcional para manejar clics
-  style?: React.CSSProperties; // Prop opcional para estilos en línea
-  labelClassName?: string; // Nueva prop para clases del label
-  valueClassName?: string; // Nueva prop para clases del value
+  icon?: React.ReactNode;
+  borderColorClass: string;
+  labelColorClass: string;
+  onClick?: () => void;
 }
 
-export default function KPIBox({
-  label,
-  value,
-  colorClass,
-  onClick,
-  style,
-  labelClassName,
-  valueClassName,
-}: KPIBoxProps) {
+export default function KPIBox({ label, value, icon, borderColorClass, labelColorClass, onClick }: KPIBoxProps) {
   return (
     <div
-      className={`rounded-xl shadow p-4 flex flex-col items-center ${colorClass || 'bg-white dark:bg-teal-800'}`}
+      className={cn(
+        'bg-white dark:bg-emerald-950',
+        'p-3 sm:p-4',
+        'rounded-xl shadow-sm',
+        'border-l-4',
+        borderColorClass,
+        'relative overflow-hidden',
+        'group hover:shadow-md transition-shadow',
+        onClick && 'cursor-pointer',
+      )}
       onClick={onClick}
-      style={style}
-      tabIndex={onClick ? 0 : undefined} // Hace que el div sea enfocablesi onClick está presente
-      role={onClick ? 'button' : undefined} // Establece el rol como botón si onClick está presente
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? 'button' : undefined}
     >
-      <span className={`text-xs mb-1 font-medium uppercase tracking-wide whitespace-nowrap ${labelClassName || ''}`}>
-        {label}
-      </span>
-      <span className={`text-2xl font-bold ${valueClassName || ''}`}>{formatAmount(value)}</span>
+      <div className="relative z-10">
+        <div
+          className={cn(
+            'flex items-center gap-1.5',
+            'font-semibold text-[11px] uppercase tracking-wider mb-1',
+            labelColorClass,
+          )}
+        >
+          {icon}
+          {label}
+        </div>
+        <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{formatAmount(value)}</div>
+      </div>
     </div>
   );
 }

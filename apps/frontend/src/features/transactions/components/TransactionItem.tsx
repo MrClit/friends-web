@@ -5,6 +5,7 @@ import { PAYMENT_TYPE_CONFIG, POT_CONFIG } from '../constants';
 import { formatAmount } from '@/shared/utils/format';
 import PaymentIcon from './PaymentIcon';
 import { isPotExpense } from '../utils';
+import { cn } from '@/shared/utils/cn';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -22,45 +23,61 @@ function TransactionItem({ transaction, onClick, participantsMap }: TransactionI
 
   const isPot = isPotExpense(transaction);
 
-  // Determine icon to display
-  const icon = isPot ? (
-    <POT_CONFIG.IconComponent className={POT_CONFIG.colorClass} />
-  ) : (
-    <PaymentIcon type={transaction.paymentType} />
-  );
+  // Select color palette based on transaction type or pot
+  const colors = isPot ? POT_CONFIG.colors : PAYMENT_TYPE_CONFIG[transaction.paymentType].colors;
 
   // Get participant name with fallback
   const participantName = isPot
     ? t('transactionsList.potLabel')
     : participantsMap.get(transaction.participantId) || t('transactionsList.unknownParticipant');
 
-  // TODO: revisar esto porque no se que hace ni si esta bien
-  // Determine amount color class with fallback for unknown payment types
-  const amountColorClass = isPot
-    ? POT_CONFIG.colorClass
-    : PAYMENT_TYPE_CONFIG[transaction.paymentType]?.colorStrong || 'text-gray-800 dark:text-gray-200';
+  // Determine icon to display
+  const icon = isPot ? (
+    <POT_CONFIG.IconComponent className="text-xl" />
+  ) : (
+    <PaymentIcon type={transaction.paymentType} />
+  );
 
   return (
     <li
-      className="flex items-center gap-3 bg-white dark:bg-teal-950 rounded-lg px-4 py-3 
-        shadow-sm cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900 
-        transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+      className={cn(
+        'flex items-center justify-between gap-3',
+        'bg-slate-50 dark:bg-emerald-950 p-3 rounded-xl',
+        'shadow-sm border border-slate-100 dark:border-slate-700/50',
+        'hover:shadow-md transition-all cursor-pointer',
+        colors.hover.light,
+        colors.hover.dark,
+        'focus:outline-none focus:ring-2 focus:ring-teal-500',
+      )}
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
       role="button"
       tabIndex={0}
       aria-label={`${transaction.title}, ${formatAmount(transaction.amount)}`}
     >
-      <span className="text-xl" aria-hidden="true">
-        {icon}
-      </span>
-      <div className="flex-1">
-        <div className="font-semibold text-teal-900 dark:text-teal-100">{transaction.title}</div>
-        <div className="text-xs text-teal-500">
-          {t(`transactionsList.participantPrefix.${transaction.paymentType}`)} {participantName}
+      <div className="flex items-center gap-3">
+        <div
+          className={cn(
+            'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+            colors.bg.light,
+            colors.bg.dark,
+            colors.text.light,
+            colors.text.dark,
+          )}
+          aria-hidden="true"
+        >
+          {icon}
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">{transaction.title}</h4>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            {t(`transactionsList.participantPrefix.${transaction.paymentType}`)} {participantName}
+          </p>
         </div>
       </div>
-      <div className={`font-bold text-lg tabular-nums ${amountColorClass}`}>{formatAmount(transaction.amount)}</div>
+      <div className={cn('font-bold text-base tabular-nums', colors.amount.light, colors.amount.dark)}>
+        {formatAmount(transaction.amount)}
+      </div>
     </li>
   );
 }

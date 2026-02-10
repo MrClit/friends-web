@@ -94,7 +94,10 @@
   "transactionModal": {
     "addTitle": "Afegir Transacció",
     "editTitle": "Editar Transacció",
+    "save": "Desar",
+    "saving": "Desant...",
     "delete": "Esborrar",
+    "deleting": "Esborrant...",
     "deleteTitle": "Eliminar transacció",
     "deleteMessage": "Segur que vols esborrar aquesta transacció? Aquesta acció no es pot desfer.",
     "cancel": "Cancel·lar"
@@ -106,6 +109,7 @@
   },
   "transactionForm": {
     "titleLabel": "Títol",
+    "titlePlaceholder": "Ex. Sopar al port",
     "amountLabel": "Import",
     "dateLabel": "Data",
     "participantLabel": {

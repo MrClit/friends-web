@@ -190,7 +190,7 @@ const DialogCloseButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAt
         ref={ref}
         type="button"
         className={cn(
-          'px-6 py-3.5 rounded-2xl font-bold text-slate-600 dark:text-emerald-300 hover:bg-slate-200 dark:hover:bg-emerald-800/50 transition-colors cursor-pointer',
+          'px-6 py-3.5 rounded-2xl font-bold text-slate-600 dark:text-emerald-300 hover:bg-slate-200 dark:hover:bg-emerald-800/50 transition-colors cursor-pointer text-xl',
           className,
         )}
         {...props}

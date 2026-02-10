@@ -1,5 +1,5 @@
-import { MdArrowBack } from 'react-icons/md';
-import EventContextMenu from './EventContextMenu';
+import { MdArrowBack, MdEdit, MdDelete } from 'react-icons/md';
+import { cn } from '@/shared/utils/cn';
 
 interface EventDetailHeaderProps {
   eventId: string;
@@ -10,26 +10,65 @@ interface EventDetailHeaderProps {
 }
 
 export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: EventDetailHeaderProps) {
-  const showContextMenu = onEdit && onDelete;
-
   return (
-    <div className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
-      <button
-        type="button"
-        onClick={onBack}
-        className="p-2 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors cursor-pointer"
-        aria-label="Volver"
-      >
-        <MdArrowBack className="text-teal-900 dark:text-teal-100 text-2xl" />
-      </button>
-      <h1 className="text-2xl md:text-3xl font-bold text-center flex-1 truncate text-teal-900 dark:text-teal-100">
-        {eventTitle}
-      </h1>
-      {showContextMenu ? (
-        <EventContextMenu onEdit={onEdit} onDelete={onDelete} />
-      ) : (
-        <div className="w-10" /> /* Spacer for centering */
-      )}
-    </div>
+    // <section className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
+    <section className="mb-6">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+          <button
+            type="button"
+            onClick={onBack}
+            className={cn(
+              'bg-white dark:bg-emerald-950',
+              'p-2 rounded-xl shadow-sm',
+              'border border-slate-100 dark:border-slate-700',
+              'hover:bg-slate-50 dark:hover:bg-slate-700',
+              'transition group shrink-0',
+            )}
+          >
+            <MdArrowBack className={cn('text-slate-500 dark:text-slate-400', 'group-hover:text-emerald-500')} />
+          </button>
+          <h1 className="text-xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
+            {eventTitle}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onEdit}
+            className={cn(
+              'flex items-center justify-center gap-2',
+              'p-2 sm:px-4 sm:py-2',
+              'bg-white dark:bg-emerald-950',
+              'border border-slate-200 dark:border-slate-700',
+              'rounded-lg',
+              'text-slate-600 dark:text-slate-300',
+              'hover:border-emerald-500 hover:text-emerald-500 dark:hover:text-emerald-400',
+              'transition shadow-sm text-sm font-medium',
+            )}
+          >
+            <MdEdit size={20} />
+            <span className="hidden sm:inline">Editar</span>
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
+            className={cn(
+              'flex items-center justify-center gap-2',
+              'p-2 sm:px-4 sm:py-2',
+              'bg-white dark:bg-emerald-950',
+              'border border-slate-200 dark:border-slate-700',
+              'rounded-lg',
+              'text-red-500',
+              'hover:bg-red-50 dark:hover:bg-red-900/50 hover:border-red-200',
+              'transition shadow-sm text-sm font-medium',
+            )}
+          >
+            <MdDelete size={20} />
+            <span className="hidden sm:inline">Eliminar</span>
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }

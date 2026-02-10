@@ -2,11 +2,12 @@ import type { Transaction } from '../types';
 import type { Event } from '../../events/types';
 import TransactionModal from './TransactionModal';
 import TransactionItem from './TransactionItem';
-import { useState, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { formatDateLong } from '@/shared/utils/format';
 import { useTranslation } from 'react-i18next';
 import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
-import { useInfiniteScroll, useModalState } from '@/hooks/common';
+import { useInfiniteScroll } from '@/hooks/common';
+import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
 
 interface TransactionsListProps {
   event: Event;
@@ -23,8 +24,7 @@ function groupByDate(transactions: Transaction[]) {
 }
 
 export default function TransactionsList({ event }: TransactionsListProps) {
-  const transactionModal = useModalState();
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const transactionModalStore = useTransactionModalStore();
   const { t } = useTranslation();
 
   // Use React Query infinite query for pagination
@@ -59,17 +59,10 @@ export default function TransactionsList({ event }: TransactionsListProps) {
   // Handler for clicking on a transaction
   const handleTransactionClick = useCallback(
     (transaction: Transaction) => {
-      setSelectedTransaction(transaction);
-      transactionModal.open();
+      transactionModalStore.openModal(event, transaction);
     },
-    [transactionModal],
+    [transactionModalStore, event],
   );
-
-  // Handler for closing modal
-  const handleCloseModal = useCallback(() => {
-    transactionModal.close();
-    setSelectedTransaction(null);
-  }, [transactionModal]);
 
   if (isLoading) {
     return <div className="w-full max-w-2xl mb-8 text-center text-teal-400 py-8">{t('common.loading')}</div>;
@@ -84,13 +77,13 @@ export default function TransactionsList({ event }: TransactionsListProps) {
   }
 
   return (
-    <div className="w-full max-w-2xl mb-8">
+    <section className="space-y-6 pb-24">
       {dates.length === 0 && (
         <div className="text-center text-teal-400 py-8">{t('transactionsList.noTransactions')}</div>
       )}
       {dates.map((date) => (
         <div key={date} className="mb-6">
-          <div className="text-sm text-teal-500 font-semibold mb-1 border-b border-teal-100 dark:border-teal-800 pb-1">
+          <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 px-1 uppercase tracking-wide">
             {formatDateLong(date)}
           </div>
           <ul className="flex flex-col gap-2">
@@ -126,12 +119,7 @@ export default function TransactionsList({ event }: TransactionsListProps) {
         </div>
       )}
 
-      <TransactionModal
-        open={transactionModal.isOpen}
-        onClose={handleCloseModal}
-        event={event}
-        transaction={selectedTransaction ?? undefined}
-      />
-    </div>
+      <TransactionModal />
+    </section>
   );
 }

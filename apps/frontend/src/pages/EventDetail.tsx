@@ -2,13 +2,15 @@ import MainLayout from './MainLayout';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEventDetail } from '@/features/events/hooks';
-import { useModalState, useConfirmDialog } from '@/hooks/common';
+import { useConfirmDialog } from '@/hooks/common';
 import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
 import useEventFormModalStore from '@/shared/store/useEventFormModalStore';
+import useTransactionModalStore from '@/shared/store/useTransactionModalStore';
 import TransactionModal from '../features/transactions/components/TransactionModal';
 import TransactionsList from '../features/transactions/components/TransactionsList';
-import FloatingActionButton from '../shared/components/FloatingActionButton';
+import ActionButton from '@/shared/components/ActionButton';
 import { ConfirmDialog } from '@/shared/components';
+import { MdAdd } from 'react-icons/md';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +19,7 @@ export default function EventDetail() {
 
   // UI state management
   const eventFormModalStore = useEventFormModalStore();
-  const transactionModal = useModalState(); // TODO: Replace with Zustand store
+  const transactionModalStore = useTransactionModalStore();
   const deleteDialog = useConfirmDialog();
 
   // Validate id after all hooks
@@ -78,11 +80,15 @@ export default function EventDetail() {
         pendingToCompensate={kpis?.pendingToCompensate ?? 0}
       />
 
-      {/* Lista de transacciones */}
       <TransactionsList event={event} />
-      <FloatingActionButton onClick={transactionModal.open} translationKey="eventDetail.addTransaction" icon={'+'} />
+      <ActionButton
+        onClick={() => transactionModalStore.openModal(event)}
+        actionLabel={t('eventDetail.addTransaction')}
+        actionIcon={<MdAdd size={22} />}
+        className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2"
+      />
       <EventFormModal />
-      <TransactionModal open={transactionModal.isOpen} onClose={transactionModal.close} event={event} />
+      <TransactionModal />
       <ConfirmDialog
         open={deleteDialog.isOpen}
         title={t('eventDetail.deleteTitle')}

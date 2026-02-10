@@ -3,6 +3,7 @@ import type { PaymentType } from '../types';
 import type { EventParticipant } from '../../events/types';
 import { useTranslation } from 'react-i18next';
 import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
+import { FaUser, FaChevronDown } from 'react-icons/fa';
 
 interface TransactionFormProps {
   type: PaymentType;
@@ -33,73 +34,85 @@ export default function TransactionForm({
 }: TransactionFormProps) {
   const { t } = useTranslation();
   return (
-    <form className="flex flex-col gap-4 flex-1" onSubmit={onSubmit}>
-      <div>
-        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">
+    <form id="transaction-form" className="space-y-8 pb-6" onSubmit={onSubmit}>
+      {/* Title input */}
+      <div className="space-y-2">
+        <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
           {t('transactionForm.titleLabel')}
         </label>
         <input
-          className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+          className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
+          placeholder={t('transactionForm.titlePlaceholder')}
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          required
         />
       </div>
-      <div>
-        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">
-          {t('transactionForm.amountLabel')}
-        </label>
-        <input
-          className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
-          type="number"
-          min="0"
-          step="0.01"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
+
+      {/* Amount + Date grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* Amount input with € symbol */}
+        <div className="space-y-2">
+          <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
+            {t('transactionForm.amountLabel')}
+          </label>
+          <div className="relative">
+            <input
+              className="w-full pl-5 pr-12 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
+              placeholder="0,00"
+              type="number"
+              min="0"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <span className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-slate-400">€</span>
+          </div>
+        </div>
+
+        {/* Date input */}
+        <div className="space-y-2">
+          <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
+            {t('transactionForm.dateLabel')}
+          </label>
+          <input
+            className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
       </div>
-      <div>
-        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">
-          {t('transactionForm.dateLabel')}
-        </label>
-        <input
-          className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-teal-700 dark:text-teal-200 font-medium mb-1">
+
+      {/* Participant select with icons */}
+      <div className="space-y-2">
+        <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
           {t(`transactionForm.participantLabel.${type}`)}
         </label>
-        <select
-          className="w-full px-3 py-2 rounded border border-teal-200 dark:border-teal-700 bg-teal-50 dark:bg-teal-950 text-teal-900 dark:text-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
-          value={from}
-          onChange={(e) => setParticipantId(e.target.value)}
-          required
-        >
-          <option value="" disabled>
-            {t('transactionForm.participantPlaceholder')}
-          </option>
-          {type === 'expense' && <option value={POT_PARTICIPANT_ID}>{t('transactionForm.potOption')}</option>}
-          {participants.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
+        <div className="relative group">
+          <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors">
+            <FaUser className="text-[18px]" />
+          </div>
+          <select
+            className="w-full pl-12 pr-12 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium appearance-none cursor-pointer"
+            value={from}
+            onChange={(e) => setParticipantId(e.target.value)}
+          >
+            <option value="" disabled>
+              {t('transactionForm.participantPlaceholder')}
             </option>
-          ))}
-        </select>
+            {type === 'expense' && <option value={POT_PARTICIPANT_ID}>{t('transactionForm.potOption')}</option>}
+            {participants.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+            <FaChevronDown className="text-[14px]" />
+          </div>
+        </div>
       </div>
-      <button
-        type="submit"
-        className="mt-4 py-2 rounded bg-teal-500 hover:bg-teal-600 text-white font-bold text-lg transition-all focus:outline-none focus:ring-2 focus:ring-teal-300"
-        disabled={!title || !amount || !date || !from}
-      >
-        {t('transactionForm.save')}
-      </button>
     </form>
   );
 }

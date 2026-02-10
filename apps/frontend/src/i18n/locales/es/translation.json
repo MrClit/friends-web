@@ -94,7 +94,10 @@
   "transactionModal": {
     "addTitle": "Añadir Transacción",
     "editTitle": "Editar Transacción",
+    "save": "Guardar",
+    "saving": "Guardando...",
     "delete": "Borrar",
+    "deleting": "Eliminando...",
     "deleteTitle": "Eliminar transacción",
     "deleteMessage": "¿Seguro que quieres borrar esta transacción? Esta acción no se puede deshacer.",
     "cancel": "Cancelar"
@@ -106,6 +109,7 @@
   },
   "transactionForm": {
     "titleLabel": "Título",
+    "titlePlaceholder": "Ej. Cena en el puerto",
     "amountLabel": "Importe",
     "dateLabel": "Fecha",
     "participantLabel": {
