@@ -100,6 +100,9 @@
     "deleting": "Deleting...",
     "deleteTitle": "Delete transaction",
     "deleteMessage": "Are you sure you want to delete this transaction? This action cannot be undone.",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "You have unsaved changes. Are you sure you want to discard them?",
+    "discard": "Discard",
     "cancel": "Cancel"
   },
   "transactionTypeSelector": {

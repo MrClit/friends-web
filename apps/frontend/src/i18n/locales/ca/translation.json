@@ -100,6 +100,9 @@
     "deleting": "Esborrant...",
     "deleteTitle": "Eliminar transacció",
     "deleteMessage": "Segur que vols esborrar aquesta transacció? Aquesta acció no es pot desfer.",
+    "discardTitle": "Descartar canvis?",
+    "discardMessage": "Tens canvis sense desar. Estàs segur que vols descartar-los?",
+    "discard": "Descartar",
     "cancel": "Cancel·lar"
   },
   "transactionTypeSelector": {

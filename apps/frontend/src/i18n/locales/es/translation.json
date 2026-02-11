@@ -100,6 +100,9 @@
     "deleting": "Eliminando...",
     "deleteTitle": "Eliminar transacción",
     "deleteMessage": "¿Seguro que quieres borrar esta transacción? Esta acción no se puede deshacer.",
+    "discardTitle": "¿Descartar cambios?",
+    "discardMessage": "Tienes cambios sin guardar. ¿Estás seguro de que quieres descartarlos?",
+    "discard": "Descartar",
     "cancel": "Cancelar"
   },
   "transactionTypeSelector": {
