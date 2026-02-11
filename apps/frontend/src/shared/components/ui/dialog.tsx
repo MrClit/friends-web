@@ -33,6 +33,8 @@ const DialogOverlay = React.forwardRef<
       'fixed inset-0 z-50 flex items-center justify-center p-4',
       // Visuals
       'bg-[rgba(2,44,34,0.4)] backdrop-blur-sm',
+      // Animations
+      'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300 motion-reduce:animate-none',
       className,
     )}
     {...props}
@@ -68,6 +70,8 @@ const DialogContent = React.forwardRef<
           'flex flex-col max-h-[90vh] overflow-hidden',
           // Visuals
           'bg-white dark:bg-emerald-950 rounded-4xl shadow-lg',
+          // Animations
+          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 duration-300 motion-reduce:animate-none',
           className,
         )}
         {...props}

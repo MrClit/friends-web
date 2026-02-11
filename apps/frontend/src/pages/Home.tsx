@@ -1,5 +1,4 @@
 import { EventsList, EventFormModal } from '../features/events/components';
-// import { useModalState } from '@/hooks/common';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 import MainLayout from './MainLayout';
 // import FloatingActionButton from '../shared/components/FloatingActionButton';
@@ -8,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { MdAdd } from 'react-icons/md';
 
 export default function Home() {
-  // const eventFormModal = useModalState(); // TODO: Borrar cuando use Zustand en todas partes
   const { openModal } = useEventFormModalStore();
   const { t } = useTranslation();
 

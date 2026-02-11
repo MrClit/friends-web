@@ -11,7 +11,6 @@ interface EventDetailHeaderProps {
 
 export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: EventDetailHeaderProps) {
   return (
-    // <section className="flex items-center justify-between w-full max-w-2xl mt-8 mb-4 gap-2">
     <section className="mb-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
