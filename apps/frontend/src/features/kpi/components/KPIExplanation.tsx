@@ -6,6 +6,8 @@ interface KPIExplanationProps {
   kpiType: KPIType;
 }
 
+// TODO: DELETE
+
 /**
  * Explanation component for KPI detail pages
  * Shows translated notes explaining what each KPI means

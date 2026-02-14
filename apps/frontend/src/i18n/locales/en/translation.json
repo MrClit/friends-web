@@ -132,6 +132,12 @@
       "expenses": "Total Expenses",
       "pending": "Pending to Pay"
     },
+    "description": {
+      "balance": "Money available in the common fund.",
+      "contributions": "Sum of contributions by each participant.",
+      "expenses": "Total spent by each participant.",
+      "pending": "Amount each participant owes or is owed."
+    },
     "participants": "Participants",
     "noteTitle": "Note:",
     "noteBalance": "Money available in the common fund.",

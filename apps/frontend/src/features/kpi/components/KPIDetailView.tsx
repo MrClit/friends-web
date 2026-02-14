@@ -63,6 +63,8 @@ export default function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: strin
   const participantsData = kpis[KPI_CONFIG[kpi].kpiKey];
   const items = buildKPIItems(participantsData, event, kpi, KPI_CONFIG, kpis.potExpenses, t);
 
+  console.log(items);
+
   return (
     <KPIDetailContent
       event={event}

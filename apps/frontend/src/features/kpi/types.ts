@@ -22,6 +22,10 @@ export interface KPIParticipantItem {
   name: string; // Display name
   value: string; // Formatted amount (formatAmount already applied)
   isPot?: boolean; // Indicates if this is the Pot
+  avatar?: string; // Avatar URL or initials
+  percentage?: number; // Progress bar percentage (0-100)
+  bgColor?: string; // Background color for avatar (when no image)
+  textColor?: string; // Text color for avatar initials
 }
 
 /**
@@ -30,5 +34,8 @@ export interface KPIParticipantItem {
 export interface KPIConfig {
   label: string;
   colorClass: string;
+  borderColorClass: string;
+  descriptionKey: string;
+  IconComponent: React.ComponentType<{ className?: string }>;
   includePot: boolean; // Whether to show Pot in the list
 }

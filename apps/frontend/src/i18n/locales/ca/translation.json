@@ -132,6 +132,12 @@
       "expenses": "Despesa Total",
       "pending": "Pendent de Pagar"
     },
+    "description": {
+      "balance": "Diners disponibles al fons comú.",
+      "contributions": "Suma d'aportacions de cada participant.",
+      "expenses": "Total gastat per cada participant.",
+      "pending": "Quantitat que cada participant deu o li deuen."
+    },
     "participants": "Participants",
     "noteTitle": "Nota:",
     "noteBalance": "Diners disponibles al fons comú.",

@@ -1,4 +1,5 @@
 import { type TFunction } from 'i18next';
+import { MdAccountBalanceWallet, MdVolunteerActivism, MdShoppingBag, MdCreditCard } from 'react-icons/md';
 import type { KPIType } from './types';
 import { KPI_SPEC } from './types';
 
@@ -20,25 +21,37 @@ export const getKPIConfig = (t: TFunction) =>
   ({
     balance: {
       label: t('kpiDetail.kpi.balance'),
-      colorClass: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      colorClass: 'bg-white text-green-800 dark:bg-emerald-950 dark:text-green-200',
+      borderColorClass: 'border-emerald-200 dark:border-emerald-700/50',
+      descriptionKey: 'kpiDetail.description.balance',
+      IconComponent: MdAccountBalanceWallet,
       kpiKey: 'participantBalances' as const,
       includePot: false, // Pot doesn't have a balance
     },
     contributions: {
       label: t('kpiDetail.kpi.contributions'),
-      colorClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      colorClass: 'bg-white text-blue-800 dark:bg-emerald-950 dark:text-blue-200',
+      borderColorClass: 'border-blue-200 dark:border-blue-700/50',
+      descriptionKey: 'kpiDetail.description.contributions',
+      IconComponent: MdVolunteerActivism,
       kpiKey: 'participantContributions' as const,
       includePot: false, // Pot doesn't receive contributions
     },
     expenses: {
       label: t('kpiDetail.kpi.expenses'),
-      colorClass: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      colorClass: 'bg-white text-red-800 dark:bg-emerald-950 dark:text-red-200',
+      borderColorClass: 'border-red-200 dark:border-red-700/50',
+      descriptionKey: 'kpiDetail.description.expenses',
+      IconComponent: MdShoppingBag,
       kpiKey: 'participantExpenses' as const,
       includePot: true, // ⭐ POT CAN HAVE EXPENSES
     },
     pending: {
       label: t('kpiDetail.kpi.pending'),
-      colorClass: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      colorClass: 'bg-white text-yellow-800 dark:bg-emerald-950 dark:text-yellow-200',
+      borderColorClass: 'border-yellow-200 dark:border-yellow-700/50',
+      descriptionKey: 'kpiDetail.description.pending',
+      IconComponent: MdCreditCard,
       kpiKey: 'participantPending' as const,
       includePot: false, // Pot doesn't have pending amounts
     },

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Visualización de Impacto por Amigo - Gestión de Gastos</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#4db6ac',
+              'mint-50': '#f0fdf9',
+              'mint-100': '#ccfbf1',
+              'mint-500': '#14b8a6',
+              'mint-600': '#0d9488',
+              'background-light': '#f5fbf9',
+              'background-dark': '#0f172a',
+            },
+            fontFamily: {
+              display: ['Inter', 'sans-serif'],
+            },
+            borderRadius: {
+              DEFAULT: '1rem',
+              xl: '1rem',
+              '2xl': '1.5rem',
+              '3xl': '2rem',
+            },
+            boxShadow: {
+              soft: '0 10px 40px -10px rgba(0,0,0,0.05)',
+              glow: '0 0 20px rgba(77, 182, 172, 0.3)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .bg-gradient-header {
+        background: linear-gradient(135deg, #ccfbf1 0%, #ffffff 100%);
+      }
+      .dark .bg-gradient-header {
+        background: linear-gradient(135deg, #134e4a 0%, #0f172a 100%);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark min-h-screen text-slate-800 dark:text-slate-200 transition-colors duration-300"
+  >
+    <nav
+      class="sticky top-0 z-50 px-4 py-3 mb-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800"
+    >
+      <div class="max-w-4xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-mint-500 to-primary flex items-center justify-center text-white shadow-glow"
+          >
+            <span class="material-symbols-outlined">euro</span>
+          </div>
+          <div
+            class="hidden sm:flex items-center bg-mint-50 dark:bg-slate-800 border border-mint-100 dark:border-slate-700 rounded-full px-3 py-1 gap-2 text-mint-600 dark:text-mint-400 font-semibold text-sm"
+          >
+            <span class="material-symbols-outlined text-base">language</span>
+            <span>ES</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            class="p-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-primary transition-all"
+            onclick="document.documentElement.classList.toggle('dark')"
+          >
+            <span class="material-symbols-outlined">dark_mode</span>
+          </button>
+          <div
+            class="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full pl-1 pr-4 py-1 shadow-sm"
+          >
+            <img
+              alt="Avatar de Victor"
+              class="w-8 h-8 rounded-full object-cover ring-2 ring-white dark:ring-slate-700"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCfJDzDXwi9bJT-SKE1eX3Fdq0-l8t_dsnhWH12BefijBok8WFJpLLBAcOFwAadffIj7xDpJ85Ssv99vfL-tS7TcvphTfvg-X64b8jLP89_tfmNbAOcTBhYMbs3vv0LvlREFGw5Ve2_oVUNpA-qAa8RPjvGvj5inPUmr0Hcd0b2WV0tkz4tY8el0ToV5wztFzJBg5NS9ZKjTT5lvOtMwX2JCuJhVuPzMrL-aMG_DsYeUHEaIN8ew5UVVEnTEWR-AqbTyuRQ_o2k08"
+            />
+            <span class="hidden sm:inline text-sm font-bold text-slate-700 dark:text-slate-200">Victor Sales</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <main class="max-w-4xl mx-auto px-4 pb-24">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
+        <div class="flex items-center gap-4 w-full sm:w-auto">
+          <button
+            class="p-3 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all group shrink-0"
+          >
+            <span
+              class="material-symbols-outlined text-slate-600 dark:text-slate-400 group-hover:-translate-x-1 transition-transform"
+              >arrow_back</span
+            >
+          </button>
+          <div class="flex-1">
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Desglose de Impacto</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Evento: Viaje a la Costa</p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-800/50 backdrop-blur-sm p-6 sm:p-8 mb-10 shadow-soft border border-mint-100 dark:border-slate-700/50"
+      >
+        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-mint-400/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-primary/20 rounded-full blur-2xl"></div>
+        <div
+          class="relative z-10 flex flex-col md:flex-row items-center md:items-end justify-between gap-6 text-center md:text-left"
+        >
+          <div>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-800 dark:text-white tracking-tight">
+              Total Contribución
+            </h2>
+            <p class="text-slate-600 dark:text-slate-300 mt-2 max-w-md mx-auto md:mx-0">
+              Suma acumulada de todos los participantes para este evento.
+            </p>
+          </div>
+          <div class="text-center md:text-right">
+            <div
+              class="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-mint-600 to-primary dark:from-mint-300 dark:to-teal-200"
+            >
+              850,00 €
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-6">
+        <div class="flex items-center justify-between px-2">
+          <h3 class="text-lg font-bold text-slate-800 dark:text-white">Desglose por Identidad</h3>
+          <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">3 Participantes</span>
+        </div>
+        <div
+          class="bg-white dark:bg-slate-800 rounded-2xl shadow-soft overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-slate-100 dark:border-slate-700 p-4 sm:p-6 hover:border-primary/30"
+        >
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
+            <div class="flex items-center gap-3 w-full sm:w-1/4 sm:min-w-[180px]">
+              <div class="relative shrink-0">
+                <img
+                  alt="Victor"
+                  class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-700"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0vYNjsz9dZsWSeTuNLncqcRtAebLcPAFuclMGJHPJU6i2dxNp1zvJR8-4jCKkSseZ5w__GUkUpuUINMTIGZz2Er8aaUOGa7XLSV2eLoON6v2RoGNXaGYlmgshhHy6T9pYEWazSq12Sx9-3sjMbRgP_pHA2-d_pLs-prhTD00NWOtwRtv4QABIonWc21tFZVfLG-9qq6vRLCemB0mL1vHdk1QTDlPjqncIHITIjgp0X0uWPqntkxzhNTCXhqA91X-AwhBTl57X4Pg"
+                />
+              </div>
+              <div class="flex flex-col justify-center">
+                <h4 class="font-bold text-slate-900 dark:text-white text-base leading-tight">Victor Sales</h4>
+              </div>
+              <div class="sm:hidden ml-auto">
+                <div class="text-lg font-bold text-slate-800 dark:text-white">400,00 €</div>
+              </div>
+            </div>
+            <div class="flex-1 w-full sm:px-4">
+              <div class="relative w-full h-3 sm:h-4 bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden">
+                <div
+                  class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-mint-400 to-mint-500 rounded-full"
+                  style="width: 47%"
+                ></div>
+              </div>
+            </div>
+            <div class="hidden sm:block text-right w-24 shrink-0">
+              <div class="text-xl font-bold text-slate-800 dark:text-white">400,00 €</div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="bg-white dark:bg-slate-800 rounded-2xl shadow-soft overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-slate-100 dark:border-slate-700 p-4 sm:p-6 hover:border-primary/30"
+        >
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
+            <div class="flex items-center gap-3 w-full sm:w-1/4 sm:min-w-[180px]">
+              <div class="relative shrink-0">
+                <div
+                  class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-sm ring-2 ring-slate-100 dark:ring-slate-700"
+                >
+                  MG
+                </div>
+              </div>
+              <div class="flex flex-col justify-center">
+                <h4 class="font-bold text-slate-900 dark:text-white text-base leading-tight">María García</h4>
+              </div>
+              <div class="sm:hidden ml-auto">
+                <div class="text-lg font-bold text-slate-800 dark:text-white">300,00 €</div>
+              </div>
+            </div>
+            <div class="flex-1 w-full sm:px-4">
+              <div class="relative w-full h-3 sm:h-4 bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden">
+                <div
+                  class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-indigo-400 to-indigo-500 rounded-full"
+                  style="width: 35%"
+                ></div>
+              </div>
+            </div>
+            <div class="hidden sm:block text-right w-24 shrink-0">
+              <div class="text-xl font-bold text-slate-800 dark:text-white">300,00 €</div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="bg-white dark:bg-slate-800 rounded-2xl shadow-soft overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-slate-100 dark:border-slate-700 p-4 sm:p-6 hover:border-primary/30"
+        >
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
+            <div class="flex items-center gap-3 w-full sm:w-1/4 sm:min-w-[180px]">
+              <div class="relative shrink-0">
+                <div
+                  class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 dark:text-pink-300 font-bold text-sm ring-2 ring-slate-100 dark:ring-slate-700"
+                >
+                  JL
+                </div>
+              </div>
+              <div class="flex flex-col justify-center">
+                <h4 class="font-bold text-slate-900 dark:text-white text-base leading-tight">Jorge López</h4>
+              </div>
+              <div class="sm:hidden ml-auto">
+                <div class="text-lg font-bold text-slate-800 dark:text-white">150,00 €</div>
+              </div>
+            </div>
+            <div class="flex-1 w-full sm:px-4">
+              <div class="relative w-full h-3 sm:h-4 bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden">
+                <div
+                  class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-pink-400 to-pink-500 rounded-full"
+                  style="width: 18%"
+                ></div>
+              </div>
+            </div>
+            <div class="hidden sm:block text-right w-24 shrink-0">
+              <div class="text-xl font-bold text-slate-800 dark:text-white">150,00 €</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

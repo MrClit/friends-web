@@ -22,6 +22,11 @@ export function buildKPIItems(
   potExpenses: number,
   t: TFunction,
 ): KPIParticipantItem[] {
+  // Calculate total amount including pot if needed
+  const totalAmount =
+    Object.values(participantsData).reduce((sum, val) => sum + val, 0) +
+    (kpiConfig[kpi].includePot && potExpenses > 0 ? potExpenses : 0);
+
   // Build participant items
   const items: KPIParticipantItem[] = Object.entries(participantsData).map(([participantId, total]) => {
     const participant = event.participants.find((p) => p.id === participantId);
@@ -30,6 +35,7 @@ export function buildKPIItems(
       name: participant?.name || participantId,
       value: formatAmount(total as number),
       isPot: false,
+      percentage: totalAmount > 0 ? (total / totalAmount) * 100 : 0,
     };
   });
 
@@ -40,6 +46,7 @@ export function buildKPIItems(
       name: t('transactionsList.potLabel'),
       value: formatAmount(potExpenses),
       isPot: true,
+      percentage: totalAmount > 0 ? (potExpenses / totalAmount) * 100 : 0,
     });
   }
 
