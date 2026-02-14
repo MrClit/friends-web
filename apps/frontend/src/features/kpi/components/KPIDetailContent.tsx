@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { EventDetailHeader } from '@/features/events';
 import { KPIParticipantsList } from '../index';
-import type { Event } from '@/api/types';
+import type { Event } from '@/features/events/types';
 import type { KPIType, KPIParticipantItem } from '../types';
 import { getKPIConfig } from '../index';
 import KPIBoxDetail from './KPIBoxDetail';

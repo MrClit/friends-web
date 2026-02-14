@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateEvent } from '../../../hooks/api/useEvents';
-import type { Event, EventParticipant } from '../types';
+import type { CreateEventInput, Event, EventFormData, EventParticipant } from '../types';
 import { useAuth } from '@/features/auth/useAuth';
+import { DEFAULT_EVENT_ICON } from '../constants';
+
+function buildDefaultParticipant(user?: { id?: string; name?: string } | null): EventParticipant {
+  return { id: user?.id ?? '', name: user?.name ?? '' };
+}
 
 /**
  * Helper function to check if form data has changed from original event
@@ -10,6 +15,7 @@ import { useAuth } from '@/features/auth/useAuth';
 function checkIsDirty(
   event: Event | undefined,
   title: string,
+  description: string,
   participants: EventParticipant[],
   icon: string | undefined,
   open: boolean,
@@ -21,8 +27,7 @@ function checkIsDirty(
   if (!event) {
     // If creating a new event, check if title or any participant name is dirty
     // Treat the default icon ("flight") as not a user change
-    const DEFAULT_ICON = 'flight';
-    const iconDirty = Boolean(icon && icon !== DEFAULT_ICON);
+    const iconDirty = Boolean(icon && icon !== DEFAULT_EVENT_ICON);
 
     // If the only participant is the default user (pre-filled), don't treat it as a change.
     const hasNonDefaultParticipant = participants.some((p) => {
@@ -34,7 +39,7 @@ function checkIsDirty(
       return true;
     });
 
-    return Boolean(title.trim() || hasNonDefaultParticipant || iconDirty);
+    return Boolean(title.trim() || description.trim() || hasNonDefaultParticipant || iconDirty);
   }
 
   // Check if title has changed
@@ -55,8 +60,6 @@ function checkIsDirty(
       return true;
     }
   }
-  // Compare icon
-  // if ((icon ?? '') !== (event.icon ?? '')) return true;
 
   return false;
 }
@@ -65,17 +68,16 @@ interface UseEventFormModalProps {
   open: boolean;
   event?: Event;
   onClose: () => void;
-  onSubmit?: (event: { id?: string; title: string; participants: EventParticipant[] }) => void;
+  onSubmit?: (event: EventFormData) => void;
 }
 
 export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFormModalProps) {
   const { user } = useAuth();
 
   const [title, setTitle] = useState('');
-  const [participants, setParticipants] = useState<EventParticipant[]>([
-    { id: user?.id ?? '', name: user?.name ?? '' },
-  ]);
-  const [icon, setIcon] = useState<string>(event?.icon ?? 'flight');
+  const [description, setDescription] = useState('');
+  const [icon, setIcon] = useState<string>(event?.icon ?? DEFAULT_EVENT_ICON);
+  const [participants, setParticipants] = useState<EventParticipant[]>([buildDefaultParticipant(user)]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const createEvent = useCreateEvent();
@@ -84,10 +86,11 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
   // Centralized reset function to avoid duplication
   const resetForm = useCallback(() => {
     setTitle(event ? event.title : '');
-    setParticipants(event ? event.participants : [{ id: user?.id ?? '', name: user?.name ?? '' }]);
-    setIcon(event ? (event.icon ?? 'flight') : 'flight');
+    setDescription(event && event.description ? event.description : '');
+    setParticipants(event ? event.participants : [buildDefaultParticipant(user)]);
+    setIcon(event ? (event.icon ?? DEFAULT_EVENT_ICON) : DEFAULT_EVENT_ICON);
     setErrorMessage(null);
-  }, [event, user?.id, user?.name]);
+  }, [event, user]);
 
   useEffect(() => {
     if (open) {
@@ -106,8 +109,8 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
 
   // Check if form has unsaved changes
   const isDirty = useMemo(
-    () => checkIsDirty(event, title, participants, icon, open, user?.id, user?.name),
-    [event, title, participants, icon, open, user?.id, user?.name],
+    () => checkIsDirty(event, title, description, participants, icon, open, user?.id, user?.name),
+    [event, title, description, participants, icon, open, user?.id, user?.name],
   );
 
   const handleOpenChange = useCallback(
@@ -142,7 +145,14 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
 
       setErrorMessage(null);
       const trimmedTitle = title.trim();
-      const eventData = { id: event?.id, title: trimmedTitle, participants: cleanParticipants, icon };
+      const trimmedDescription = description.trim();
+      const eventData: EventFormData = {
+        id: event?.id,
+        title: trimmedTitle,
+        description: trimmedDescription || undefined,
+        participants: cleanParticipants,
+        icon,
+      };
 
       if (onSubmit) {
         // Custom submit handler (used for edit mode)
@@ -152,25 +162,28 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
         resetForm();
         onClose();
       } else {
+        const createPayload: CreateEventInput = {
+          title: trimmedTitle,
+          description: trimmedDescription || undefined,
+          participants: cleanParticipants,
+          icon,
+        };
         // Create event via API
-        createEvent.mutate(
-          { title: trimmedTitle, participants: cleanParticipants },
-          {
-            onSuccess: () => {
-              // Clear confirm state then close to avoid race with Radix onOpenChange
-              setShowConfirm(false);
-              resetForm();
-              onClose();
-            },
-            onError: (error) => {
-              const message = error instanceof Error ? error.message : t('common.errorLoading');
-              setErrorMessage(message);
-            },
+        createEvent.mutate(createPayload, {
+          onSuccess: () => {
+            // Clear confirm state then close to avoid race with Radix onOpenChange
+            setShowConfirm(false);
+            resetForm();
+            onClose();
           },
-        );
+          onError: (error) => {
+            const message = error instanceof Error ? error.message : t('common.errorLoading');
+            setErrorMessage(message);
+          },
+        });
       }
     },
-    [canSubmit, title, event?.id, cleanParticipants, icon, onSubmit, resetForm, onClose, createEvent, t],
+    [canSubmit, title, description, event?.id, cleanParticipants, icon, onSubmit, resetForm, onClose, createEvent, t],
   );
 
   const isLoading = createEvent.isPending;
@@ -179,6 +192,8 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
     // State
     title,
     setTitle,
+    description,
+    setDescription,
     participants,
     setParticipants,
     icon,

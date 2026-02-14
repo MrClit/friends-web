@@ -14,6 +14,12 @@ export class Event {
   @Column({ length: 255 })
   title: string;
 
+  @Column({ length: 255, nullable: true })
+  description: string;
+
+  @Column({ length: 50, nullable: true })
+  icon: string;
+
   @Column('jsonb')
   participants: EventParticipant[];
 

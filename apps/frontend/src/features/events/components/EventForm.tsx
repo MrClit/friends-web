@@ -6,12 +6,11 @@ import { useTranslation } from 'react-i18next';
 interface EventFormProps {
   title: string;
   setTitle: (title: string) => void;
+  description: string;
+  setDescription: (description: string) => void;
   participants: EventParticipant[];
   setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
   onSubmit: (e: React.FormEvent) => void;
-  canSubmit: boolean;
-  isLoading: boolean;
-  mode: 'edit' | 'create';
   icon?: string;
   setIcon?: (key: string) => void;
 }
@@ -19,12 +18,11 @@ interface EventFormProps {
 export default function EventForm({
   title,
   setTitle,
+  description,
+  setDescription,
   participants,
   setParticipants,
   onSubmit,
-  // canSubmit,
-  // isLoading,
-  // mode = 'create',
   icon,
   setIcon,
 }: EventFormProps) {
@@ -55,6 +53,8 @@ export default function EventForm({
           id="event-description"
           className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 resize-none font-medium"
           placeholder={t('eventForm.descriptionPlaceholder')}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           rows={2}
         />
       </div>

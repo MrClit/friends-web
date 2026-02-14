@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { Event } from '@/api/types';
+import type { Event } from '@/features/events/types';
 import { formatAmount } from '@/shared/utils/format';
 import type { KPIParticipantItem, KPIType } from '@/features/kpi/types';
 import { getKPIConfig } from '@/features/kpi/constants';

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { eventsApi } from '@/api/events.api';
 import { queryKeys } from './keys';
-import type { UpdateEventDto } from '@/api/types';
+import type { UpdateEventInput } from '@/features/events/types';
 import { useDeletingStore } from '@/shared/store/useDeletingStore';
 
 /**
@@ -21,13 +21,14 @@ export function useEvents() {
  * @param id - Event ID
  * @returns Query result with event detail, loading state, and error
  */
-export function useEvent(id: string) {
+export function useEvent(id?: string) {
   const isDeleting = useDeletingStore((state) => state.isDeleting);
+  const eventId = id ?? '';
 
   return useQuery({
-    queryKey: queryKeys.events.detail(id),
-    queryFn: () => eventsApi.getById(id),
-    enabled: !!id && !isDeleting, // Only fetch if ID is provided and not deleting
+    queryKey: queryKeys.events.detail(eventId),
+    queryFn: () => eventsApi.getById(eventId),
+    enabled: !!eventId && !isDeleting, // Only fetch if ID is provided and not deleting
     retry: false, // Disable retry to prevent refetch after deletion
     staleTime: Infinity, // Never mark as stale to prevent automatic refetch
   });
@@ -59,7 +60,7 @@ export function useUpdateEvent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateEventDto }) => eventsApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateEventInput }) => eventsApi.update(id, data),
     onSuccess: (_, { id }) => {
       // Invalidate both list and specific event detail
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
@@ -90,8 +91,13 @@ export function useDeleteEvent() {
       queryClient.removeQueries({ queryKey: ['events', deletedId], exact: false });
       queryClient.removeQueries({ queryKey: ['transactions', 'event', deletedId], exact: false });
     },
-    onSuccess: async () => {
+    onSuccess: async (_, deletedId) => {
       // Note: Don't clear deleting state here to prevent re-enabling queries before unmount
+
+      // Remove specific queries from cache to prevent stale data
+      queryClient.removeQueries({ queryKey: queryKeys.events.detail(deletedId) });
+      queryClient.removeQueries({ queryKey: queryKeys.events.kpis(deletedId) });
+      queryClient.removeQueries({ queryKey: queryKeys.transactions.byEvent(deletedId) });
 
       // Invalidate lists to trigger refetch for unrelated queries
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });

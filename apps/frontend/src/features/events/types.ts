@@ -1,13 +1,16 @@
-// Tipos relacionados con eventos
-export interface EventParticipant {
-  id: string;
-  name: string;
-}
+// Event types aligned with backend API contracts
+import type { CreateEventDto, Event as ApiEvent, EventParticipantDto, UpdateEventDto } from '@/api/types';
 
-export interface Event {
-  id: string;
+export type EventParticipant = EventParticipantDto;
+export type Event = ApiEvent;
+
+export type EventFormData = {
+  id?: string;
   title: string;
-  participants: EventParticipant[];
-  // Icon key for the event (optional, maps to IconPicker choices)
+  description?: string;
   icon?: string;
-}
+  participants: EventParticipant[];
+};
+
+export type CreateEventInput = CreateEventDto;
+export type UpdateEventInput = UpdateEventDto;

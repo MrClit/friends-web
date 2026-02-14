@@ -5,6 +5,7 @@ import { EventCard } from './EventCard';
 import { CreateEventCard } from './CreateEventCard';
 import { useNavigate } from 'react-router-dom';
 import useEventFormModalStore from '@/shared/store/useEventFormModalStore';
+import { getEventIconComponent } from '../constants';
 
 /**
  * Events list component with consistent layout for all states.
@@ -52,7 +53,7 @@ export default function EventsList() {
             event={{
               id: event.id,
               title: event.title,
-              // description: 'Event description',
+              description: event.description,
               // status: 'active',
               participants:
                 event.participants?.map((p) => ({
@@ -60,7 +61,10 @@ export default function EventsList() {
                   avatarUrl: '',
                 })) || [],
               lastModified: event.updatedAt ? t('event.card.lastModified', { date: event.updatedAt }) : undefined,
-              // icon: ... // Opcional: lógica para icono según tipo de evento
+              icon: (() => {
+                const IconComponent = getEventIconComponent(event.icon);
+                return IconComponent ? <IconComponent fontSize={32} /> : undefined;
+              })(),
             }}
             onClick={() => navigate(`/event/${event.id}`)}
             className="animate-in fade-in duration-500"

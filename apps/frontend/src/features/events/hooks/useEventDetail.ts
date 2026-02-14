@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEvent, useUpdateEvent, useDeleteEvent } from '@/hooks/api/useEvents';
 import { useEventKPIs } from '@/hooks/api/useEventKPIs';
-import type { EventParticipant } from '@/features/events/types';
+import type { EventFormData } from '@/features/events/types';
 
 /**
  * Custom hook for managing EventDetail page business logic
@@ -12,30 +12,19 @@ export function useEventDetail(id: string | undefined) {
   const navigate = useNavigate();
 
   // React Query hooks for data fetching and mutations
-  const { data: event, isLoading, error } = useEvent(id ?? '');
+  const { data: event, isLoading, error } = useEvent(id);
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
-  const { data: kpis } = useEventKPIs(id ?? '');
+  const { data: kpis } = useEventKPIs(id);
 
   /**
    * Handles event update submission
    * Note: Caller is responsible for closing the modal on success
    */
-  const handleEditSubmit = (
-    {
-      id,
-      title,
-      participants,
-    }: {
-      id?: string;
-      title: string;
-      participants: EventParticipant[];
-    },
-    onSuccess?: () => void,
-  ) => {
+  const handleEditSubmit = ({ id, title, description, icon, participants }: EventFormData, onSuccess?: () => void) => {
     if (id) {
       updateEvent.mutate(
-        { id, data: { title, participants } },
+        { id, data: { title, description, icon, participants } },
         {
           onSuccess: () => {
             // Let the caller handle UI state (closing modal)

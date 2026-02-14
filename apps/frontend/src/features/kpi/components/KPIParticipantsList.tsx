@@ -17,6 +17,7 @@ export default function KPIParticipantsList({ items, title }: KPIParticipantsLis
   const participantCount = items.length;
 
   const getGradientClass = (index: number) => {
+    // TODO: Aplicar unos colores alienados con cada KPI (balance=green, contributions=blue, expenses=red, pending=yellow)
     const gradients = ['from-emerald-400 to-emerald-500', 'from-indigo-400 to-indigo-500', 'from-pink-400 to-pink-500'];
     return gradients[index % gradients.length];
   };

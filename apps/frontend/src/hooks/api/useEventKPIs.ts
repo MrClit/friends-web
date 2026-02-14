@@ -8,12 +8,13 @@ import { useDeletingStore } from '@/shared/store/useDeletingStore';
  * @param eventId - Event ID
  * @returns Object with KPIs and loading state
  */
-export function useEventKPIs(eventId: string) {
+export function useEventKPIs(eventId?: string) {
   const isDeleting = useDeletingStore((state) => state.isDeleting);
+  const safeEventId = eventId ?? '';
 
   return useQuery({
-    queryKey: queryKeys.events.kpis(eventId),
-    queryFn: () => eventsApi.getKPIs(eventId),
-    enabled: !!eventId && !isDeleting,
+    queryKey: queryKeys.events.kpis(safeEventId),
+    queryFn: () => eventsApi.getKPIs(safeEventId),
+    enabled: !!safeEventId && !isDeleting,
   });
 }

@@ -13,6 +13,8 @@ export interface EventParticipantDto {
 export interface Event {
   id: string;
   title: string;
+  description?: string;
+  icon?: string;
   participants: EventParticipantDto[];
   createdAt: string;
   updatedAt: string;
@@ -20,11 +22,15 @@ export interface Event {
 
 export interface CreateEventDto {
   title: string;
+  description?: string;
+  icon?: string;
   participants: EventParticipantDto[];
 }
 
 export interface UpdateEventDto {
   title?: string;
+  description?: string;
+  icon?: string;
   participants?: EventParticipantDto[];
 }
 

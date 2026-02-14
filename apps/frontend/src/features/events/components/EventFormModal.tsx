@@ -21,6 +21,8 @@ export default function EventFormModal() {
   const {
     title,
     setTitle,
+    description,
+    setDescription,
     participants,
     setParticipants,
     showConfirm,
@@ -77,12 +79,11 @@ export default function EventFormModal() {
               <EventForm
                 title={title}
                 setTitle={setTitle}
+                description={description}
+                setDescription={setDescription}
                 participants={participants}
                 setParticipants={setParticipants}
                 onSubmit={handleSubmit}
-                canSubmit={canSubmit}
-                isLoading={isLoading}
-                mode={event ? 'edit' : 'create'}
                 icon={icon}
                 setIcon={setIcon}
               />
