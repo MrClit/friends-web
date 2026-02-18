@@ -55,9 +55,11 @@
   },
   "participantsInput": {
     "label": "Participants",
+    "add": "Add",
     "addAria": "Add participant",
     "placeholder": "Name or email...",
-    "deleteAria": "Delete participant"
+    "deleteAria": "Delete participant",
+    "potName": "Shared pot"
   },
   "eventDetail": {
     "invalidId": "Invalid event ID",

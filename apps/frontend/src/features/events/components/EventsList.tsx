@@ -6,6 +6,7 @@ import { CreateEventCard } from './CreateEventCard';
 import { useNavigate } from 'react-router-dom';
 import useEventFormModalStore from '@/shared/store/useEventFormModalStore';
 import { getEventIconComponent } from '../constants';
+import { getParticipantAvatar, getParticipantName } from '../utils/participants';
 
 /**
  * Events list component with consistent layout for all states.
@@ -57,8 +58,8 @@ export default function EventsList() {
               // status: 'active',
               participants:
                 event.participants?.map((p) => ({
-                  name: p.name,
-                  avatarUrl: '',
+                  name: getParticipantName(p, t),
+                  avatarUrl: getParticipantAvatar(p) ?? undefined,
                 })) || [],
               lastModified: event.updatedAt ? t('event.card.lastModified', { date: event.updatedAt }) : undefined,
               icon: (() => {

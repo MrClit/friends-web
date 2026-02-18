@@ -4,11 +4,30 @@
  */
 
 // ============= Event Types =============
+// Participant que es una referencia a un User existente
+export interface UserParticipant {
+  type: 'user';
+  id: string; // UUID del User
+  name?: string | undefined;
+  email?: string | undefined;
+  avatar?: string | undefined;
+}
 
-export interface EventParticipantDto {
+// Participant que es un invitado (sin cuenta)
+export interface GuestParticipant {
+  type: 'guest';
   id: string;
   name: string;
 }
+
+// Participant especial para el POT (gasto compartido)
+export interface PotParticipant {
+  type: 'pot';
+  id: '0'; // Siempre será '0'
+}
+
+// Union type para participants
+export type EventParticipantDto = UserParticipant | GuestParticipant | PotParticipant;
 
 export interface Event {
   id: string;

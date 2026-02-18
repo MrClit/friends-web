@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { EventsService } from './events.service';
 import { Event } from './entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -11,29 +12,25 @@ import { EventKPIsService } from './services/event-kpis.service';
 describe('EventsService', () => {
   let service: EventsService;
 
-  const mockRepository = {
-    find: jest.fn(),
-    findOne: jest.fn(),
-    create: jest.fn(),
-    save: jest.fn(),
-    merge: jest.fn(),
-    delete: jest.fn(),
+  let mockRepository: {
+    find: jest.Mock;
+    findOne: jest.Mock;
+    create: jest.Mock;
+    save: jest.Mock;
+    merge: jest.Mock;
+    delete: jest.Mock;
   };
-
-  const mockTransactionsService = {
-    findByEvent: jest.fn(),
-  };
-
-  const mockEventKPIsService = {
-    getKPIs: jest.fn(),
-  };
+  let mockTransactionsService: { findByEvent: jest.Mock };
+  let mockEventKPIsService: { getKPIs: jest.Mock };
 
   const mockEvent: Event = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Test Event',
+    description: '',
+    icon: '',
     participants: [
-      { id: '1', name: 'Alice' },
-      { id: '2', name: 'Bob' },
+      { type: 'guest', id: '1', name: 'Alice' },
+      { type: 'guest', id: '2', name: 'Bob' },
     ],
     transactions: [],
     createdAt: new Date('2026-01-01'),
@@ -41,20 +38,38 @@ describe('EventsService', () => {
   };
 
   beforeEach(async () => {
+    // create fresh mocks for each test to avoid shared state
+    mockRepository = {
+      find: jest.fn(),
+      findOne: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      merge: jest.fn(),
+      delete: jest.fn(),
+    };
+
+    mockTransactionsService = {
+      findByEvent: jest.fn(),
+    };
+
+    mockEventKPIsService = {
+      getKPIs: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EventsService,
         {
           provide: getRepositoryToken(Event),
-          useValue: mockRepository,
+          useValue: mockRepository as unknown as Repository<Event>,
         },
         {
           provide: TransactionsService,
-          useValue: mockTransactionsService,
+          useValue: mockTransactionsService as unknown as TransactionsService,
         },
         {
           provide: EventKPIsService,
-          useValue: mockEventKPIsService,
+          useValue: mockEventKPIsService as unknown as EventKPIsService,
         },
       ],
     }).compile();
@@ -129,7 +144,7 @@ describe('EventsService', () => {
     it('should create and return a new event', async () => {
       const createDto: CreateEventDto = {
         title: 'New Event',
-        participants: [{ id: '1', name: 'Alice' }],
+        participants: [{ type: 'guest', id: '1', name: 'Alice' }],
       };
 
       mockRepository.create.mockReturnValue(mockEvent);
@@ -142,10 +157,28 @@ describe('EventsService', () => {
       expect(mockRepository.save).toHaveBeenCalledWith(mockEvent);
     });
 
+    it('should call create then save exactly once during create', async () => {
+      const createDto: CreateEventDto = {
+        title: 'New Event',
+        participants: [{ type: 'guest', id: '1', name: 'Alice' }],
+      };
+
+      mockRepository.create.mockReturnValue(mockEvent);
+      mockRepository.save.mockResolvedValue(mockEvent);
+
+      await service.create(createDto);
+
+      const createOrder = mockRepository.create.mock.invocationCallOrder[0];
+      const saveOrder = mockRepository.save.mock.invocationCallOrder[0];
+
+      expect(createOrder).toBeLessThan(saveOrder);
+      expect(mockRepository.save).toHaveBeenCalledTimes(1);
+    });
+
     it('should throw InternalServerErrorException on save error', async () => {
       const createDto: CreateEventDto = {
         title: 'New Event',
-        participants: [{ id: '1', name: 'Alice' }],
+        participants: [{ type: 'guest', id: '1', name: 'Alice' }],
       };
 
       mockRepository.create.mockReturnValue(mockEvent);
@@ -177,6 +210,41 @@ describe('EventsService', () => {
       expect(mockRepository.save).toHaveBeenCalledWith(updatedEvent);
     });
 
+    it('should call save exactly once during update', async () => {
+      const updateDto: UpdateEventDto = {
+        title: 'Updated Event',
+      };
+
+      const updatedEvent = { ...mockEvent, ...updateDto };
+
+      mockRepository.findOne.mockResolvedValue(mockEvent);
+      mockRepository.merge.mockReturnValue(updatedEvent);
+      mockRepository.save.mockResolvedValue(updatedEvent);
+
+      await service.update(mockEvent.id, updateDto);
+
+      expect(mockRepository.save).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call findOne exactly once during update', async () => {
+      const updateDto: UpdateEventDto = {
+        title: 'Updated Event',
+      };
+
+      const updatedEvent = { ...mockEvent, ...updateDto };
+
+      mockRepository.findOne.mockResolvedValue(mockEvent);
+      mockRepository.merge.mockReturnValue(updatedEvent);
+      mockRepository.save.mockResolvedValue(updatedEvent);
+
+      await service.update(mockEvent.id, updateDto);
+
+      expect(mockRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: mockEvent.id },
+      });
+    });
+
     it('should throw NotFoundException when event not found', async () => {
       const updateDto: UpdateEventDto = {
         title: 'Updated Event',
@@ -190,8 +258,8 @@ describe('EventsService', () => {
     it('should update participants when provided', async () => {
       const updateDto: UpdateEventDto = {
         participants: [
-          { id: '1', name: 'Alice' },
-          { id: '3', name: 'Charlie' },
+          { type: 'guest', id: '1', name: 'Alice' },
+          { type: 'guest', id: '3', name: 'Charlie' },
         ],
       };
 

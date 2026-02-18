@@ -17,7 +17,7 @@ export function useParticipantsList({ setParticipants }: UseParticipantsListPara
     const trimmedName = newParticipantName.trim();
     if (!trimmedName) return;
 
-    setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), name: trimmedName }]);
+    setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), type: 'guest', name: trimmedName }]);
     setNewParticipantName('');
   }, [newParticipantName, setParticipants]);
 

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { showLogoutToast } from '@/shared/utils/toastUtils';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
 import { MdExpandMore } from 'react-icons/md';
-import { stringAvatar } from '@/shared/utils';
+import Avatar from '@/shared/components/Avatar';
 
 export default function UserMenu() {
   const { user, logout, loading } = useAuth();
@@ -25,17 +25,14 @@ export default function UserMenu() {
           className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-white dark:hover:bg-emerald-900/50 transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-800 cursor-pointer"
           aria-label={t('user.menu', 'Opciones de usuario')}
         >
-          {user.avatar && user.avatar.trim() !== '' ? (
-            <img
-              src={user.avatar}
-              alt={user.name || user.email || 'User'}
-              className="w-8 h-8 rounded-full object-cover border-2 border-teal-400 dark:border-teal-700 shadow"
-            />
-          ) : (
-            <span className="hidden sm:block font-semibold text-teal-900 dark:text-teal-100 text-sm max-w-30 truncate">
-              {stringAvatar(user.name, user.email)}
-            </span>
-          )}
+          <Avatar
+            avatar={user.avatar}
+            name={user.name}
+            email={user.email}
+            alt={user.name || user.email || 'User'}
+            imageClassName="w-8 h-8 rounded-full object-cover border-2 border-teal-400 dark:border-teal-700 shadow"
+            fallbackClassName="hidden sm:block font-semibold text-teal-900 dark:text-teal-100 text-sm max-w-30 truncate"
+          />
           <span className="hidden sm:block font-semibold text-teal-900 dark:text-teal-100 text-sm max-w-30 truncate">
             {user.name || user.email}
           </span>

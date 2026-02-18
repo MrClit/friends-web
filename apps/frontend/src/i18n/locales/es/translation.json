@@ -55,9 +55,11 @@
   },
   "participantsInput": {
     "label": "Participantes",
+    "add": "Añadir",
     "addAria": "Añadir participante",
     "placeholder": "Nombre o email...",
-    "deleteAria": "Eliminar participante"
+    "deleteAria": "Eliminar participante",
+    "potName": "Fondo común"
   },
   "eventDetail": {
     "invalidId": "ID de evento inválido",

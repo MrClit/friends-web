@@ -3,10 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useCreateEvent } from '../../../hooks/api/useEvents';
 import type { CreateEventInput, Event, EventFormData, EventParticipant } from '../types';
 import { useAuth } from '@/features/auth/useAuth';
-import { DEFAULT_EVENT_ICON } from '../constants';
 
-function buildDefaultParticipant(user?: { id?: string; name?: string } | null): EventParticipant {
-  return { id: user?.id ?? '', name: user?.name ?? '' };
+const DEFAULT_ICON = 'flight';
+
+function buildDefaultParticipant(
+  user?: { id?: string; type?: string; name?: string; email?: string } | null,
+): EventParticipant {
+  return { id: user?.id ?? '', type: 'user', name: user?.name ?? '', email: user?.email ?? '' };
 }
 
 /**
@@ -20,23 +23,33 @@ function checkIsDirty(
   icon: string | undefined,
   open: boolean,
   userId?: string,
-  userName?: string,
 ): boolean {
   if (!open) return false;
 
   if (!event) {
     // If creating a new event, check if title or any participant name is dirty
     // Treat the default icon ("flight") as not a user change
-    const iconDirty = Boolean(icon && icon !== DEFAULT_EVENT_ICON);
+    const iconDirty = Boolean(icon && icon !== DEFAULT_ICON);
 
     // If the only participant is the default user (pre-filled), don't treat it as a change.
+    // New participant shape: { type: 'user'|'guest'|'pot', id, name? }
     const hasNonDefaultParticipant = participants.some((p) => {
-      const name = (p.name || '').trim();
-      if (!name) return false;
-      if (participants.length === 1 && userId && userName && p.id === userId && name === userName.trim()) {
-        return false;
+      if (p.type === 'guest') {
+        const name = (p.name || '').trim();
+        return Boolean(name);
       }
-      return true;
+      if (p.type === 'pot') {
+        return true;
+      }
+      if (p.type === 'user') {
+        // If single prefilled user equals current user, ignore
+        if (participants.length === 1 && userId && p.id === userId) {
+          return false;
+        }
+        // Any additional user (other than current) counts as change
+        return true;
+      }
+      return false;
     });
 
     return Boolean(title.trim() || description.trim() || hasNonDefaultParticipant || iconDirty);
@@ -50,14 +63,14 @@ function checkIsDirty(
 
   // Compare by id and name, regardless of order
   for (const current of participants) {
-    const original = event.participants.find((p) => p.id === current.id);
-    if (
-      !original ||
-      typeof current.name !== 'string' ||
-      typeof original.name !== 'string' ||
-      current.name.trim() !== original.name.trim()
-    ) {
-      return true;
+    const original = event.participants.find((p) => p.type === current.type && p.id === current.id);
+    if (!original) return true;
+
+    // For guest participants we must compare names as well
+    if (current.type === 'guest') {
+      const curName = (current.name || '').trim();
+      const origName = (original.type === 'guest' ? original.name || '' : '').trim();
+      if (curName !== origName) return true;
     }
   }
 
@@ -76,7 +89,7 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [icon, setIcon] = useState<string>(event?.icon ?? DEFAULT_EVENT_ICON);
+  const [icon, setIcon] = useState<string>(event?.icon ?? DEFAULT_ICON);
   const [participants, setParticipants] = useState<EventParticipant[]>([buildDefaultParticipant(user)]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -88,7 +101,7 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
     setTitle(event ? event.title : '');
     setDescription(event && event.description ? event.description : '');
     setParticipants(event ? event.participants : [buildDefaultParticipant(user)]);
-    setIcon(event ? (event.icon ?? DEFAULT_EVENT_ICON) : DEFAULT_EVENT_ICON);
+    setIcon(event ? (event.icon ?? DEFAULT_ICON) : DEFAULT_ICON);
     setErrorMessage(null);
   }, [event, user]);
 
@@ -99,18 +112,27 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
   }, [open, resetForm]);
 
   // Memoize clean participants (trim and filter empty)
-  const cleanParticipants = useMemo(
-    () => participants.map((p) => ({ ...p, name: p.name.trim() })).filter((p) => p.name),
-    [participants],
-  );
+  const cleanParticipants = useMemo(() => {
+    return participants
+      .map((p) => {
+        if (p.type === 'guest') {
+          return { ...p, name: (p.name || '').trim() };
+        }
+        return p;
+      })
+      .filter((p) => {
+        if (p.type === 'guest') return Boolean(p.name);
+        return true;
+      });
+  }, [participants]);
 
   // Memoize form validation
   const canSubmit = useMemo(() => !!title.trim() && cleanParticipants.length > 0, [title, cleanParticipants]);
 
   // Check if form has unsaved changes
   const isDirty = useMemo(
-    () => checkIsDirty(event, title, description, participants, icon, open, user?.id, user?.name),
-    [event, title, description, participants, icon, open, user?.id, user?.name],
+    () => checkIsDirty(event, title, description, participants, icon, open, user?.id),
+    [event, title, description, participants, icon, open, user?.id],
   );
 
   const handleOpenChange = useCallback(

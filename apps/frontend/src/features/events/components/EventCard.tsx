@@ -1,6 +1,7 @@
-import { MdEvent, MdPerson } from 'react-icons/md';
+import { MdEvent } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 import type { FC } from 'react';
+import Avatar from '@/shared/components/Avatar';
 
 export interface EventCardParticipant {
   avatarUrl?: string;
@@ -67,7 +68,7 @@ export const EventCard: FC<EventCardProps> = ({ event, onClick, className, style
         <div
           className={cn(
             'w-14 h-14 bg-emerald-50 dark:bg-emerald-900/40 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300',
-            // status === 'archived' && 'text-emerald-600',
+            status === 'archived' && 'text-emerald-600',
           )}
         >
           {icon || <MdEvent size={32} />}
@@ -87,29 +88,24 @@ export const EventCard: FC<EventCardProps> = ({ event, onClick, className, style
       <p className="text-slate-500 dark:text-emerald-200/60 text-sm mb-8 leading-relaxed">{description}</p>
       <div className="mt-auto flex items-center justify-between pt-6 border-t border-emerald-50 dark:border-emerald-800/50">
         <div className="flex -space-x-3">
-          {participants.slice(0, 3).map((p, i) =>
-            p.avatarUrl ? (
-              <img
-                key={i}
-                alt={p.name || 'Participante'}
-                className="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 object-cover"
-                src={p.avatarUrl}
-              />
-            ) : (
-              <div
-                key={i}
-                className="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 bg-emerald-50 dark:bg-emerald-900 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-300"
-              >
-                <MdPerson size={20} />
-              </div>
-            ),
-          )}
+          {participants.slice(0, 3).map((p, i) => (
+            <Avatar
+              key={i}
+              avatar={p.avatarUrl}
+              name={p.name}
+              alt={p.name || 'Participante'}
+              className="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950"
+              imageClassName="object-cover"
+              fallbackClassName="bg-emerald-50 dark:bg-emerald-900 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-300"
+            />
+          ))}
           {participants.length > 3 && (
             <div className="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950 bg-emerald-50 dark:bg-emerald-900 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-300">
               +{participants.length - 3}
             </div>
           )}
         </div>
+        {/* TODO: integrar fecha de último cambio */}
         <div className="text-right">
           <p className="text-[10px] font-bold text-emerald-600/50 dark:text-emerald-400/50 uppercase tracking-widest">
             {status === 'archived' ? 'Fecha' : 'Último cambio'}

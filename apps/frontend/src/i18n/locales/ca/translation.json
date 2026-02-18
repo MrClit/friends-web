@@ -55,9 +55,11 @@
   },
   "participantsInput": {
     "label": "Participants",
+    "add": "Afegir",
     "addAria": "Afegeix participant",
     "placeholder": "Nom o email...",
-    "deleteAria": "Elimina participant"
+    "deleteAria": "Elimina participant",
+    "potName": "Fons comun"
   },
   "eventDetail": {
     "invalidId": "ID d'esdeveniment invàlid",
