@@ -18,7 +18,14 @@
   "user": {
     "menu": "Opcions d'usuari",
     "logout": "Tanca la sessió",
-    "logout_success": "Sessió tancada correctament"
+    "logout_success": "Sessió tancada correctament",
+    "auth": {
+      "loginWithGoogle": "Iniciar sessió amb Google"
+    }
+  },
+  "auth": {
+    "loginWithGoogle": "Iniciar sessió amb Google",
+    "loading": "Carregant autenticació..."
   },
   "common": {
     "loading": "Carregant...",
@@ -59,7 +66,7 @@
     "addAria": "Afegeix participant",
     "placeholder": "Nom o email...",
     "deleteAria": "Elimina participant",
-    "potName": "Fons comun"
+    "potName": "Fons comú"
   },
   "eventDetail": {
     "invalidId": "ID d'esdeveniment invàlid",
@@ -154,6 +161,7 @@
   },
   "events": {
     "createEventCard": {
+      "ariaLabel": "Crear nou esdeveniment",
       "title": "Crear nou esdeveniment",
       "subtitle": "Comença a dividir despeses amb els teus amics ara mateix."
     }

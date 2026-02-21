@@ -28,8 +28,6 @@ export default function Avatar({
   const hasAvatar = Boolean(avatar && avatar.trim() !== '' && !hasError);
   const resolvedAlt = alt ?? name ?? email ?? 'User';
 
-  console.log('Avatar rendered with:', { avatar, name, email, hasAvatar, hasError }); // Debug log to check props and state
-
   if (hasAvatar) {
     return (
       <img

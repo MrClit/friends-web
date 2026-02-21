@@ -2,6 +2,7 @@ import { MdEvent } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 import type { FC } from 'react';
 import Avatar from '@/shared/components/Avatar';
+import { formatDateShort } from '@/shared/utils/format';
 
 export interface EventCardParticipant {
   avatarUrl?: string;
@@ -105,12 +106,15 @@ export const EventCard: FC<EventCardProps> = ({ event, onClick, className, style
             </div>
           )}
         </div>
-        {/* TODO: integrar fecha de último cambio */}
         <div className="text-right">
           <p className="text-[10px] font-bold text-emerald-600/50 dark:text-emerald-400/50 uppercase tracking-widest">
-            {status === 'archived' ? 'Fecha' : 'Último cambio'}
+            {status === 'archived' ? 'Archivado' : 'Último cambio'}
           </p>
-          {lastModified && <p className="text-sm font-semibold text-slate-600 dark:text-emerald-200">{lastModified}</p>}
+          {lastModified && formatDateShort(lastModified) && (
+            <p className="text-sm font-semibold text-slate-600 dark:text-emerald-200">
+              {formatDateShort(lastModified)}
+            </p>
+          )}
         </div>
       </div>
     </div>

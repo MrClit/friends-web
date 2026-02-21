@@ -18,7 +18,14 @@
   "user": {
     "menu": "User options",
     "logout": "Log out",
-    "logout_success": "Logged out successfully"
+    "logout_success": "Logged out successfully",
+    "auth": {
+      "loginWithGoogle": "Login with Google"
+    }
+  },
+  "auth": {
+    "loginWithGoogle": "Login with Google",
+    "loading": "Loading authentication..."
   },
   "common": {
     "loading": "Loading...",
@@ -154,6 +161,7 @@
   },
   "events": {
     "createEventCard": {
+      "ariaLabel": "Create new event",
       "title": "Create new event",
       "subtitle": "Start splitting expenses with your friends right now."
     }

@@ -55,13 +55,13 @@ export default function EventsList() {
               id: event.id,
               title: event.title,
               description: event.description,
-              // status: 'active',
+              status: event.status || 'active',
               participants:
                 event.participants?.map((p) => ({
                   name: getParticipantName(p, t),
                   avatarUrl: getParticipantAvatar(p) ?? undefined,
                 })) || [],
-              lastModified: event.updatedAt ? t('event.card.lastModified', { date: event.updatedAt }) : undefined,
+              lastModified: event.lastModified || event.updatedAt,
               icon: (() => {
                 const IconComponent = getEventIconComponent(event.icon);
                 return IconComponent ? <IconComponent fontSize={32} /> : undefined;

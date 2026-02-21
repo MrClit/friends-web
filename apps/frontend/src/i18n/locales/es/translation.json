@@ -18,7 +18,14 @@
   "user": {
     "menu": "Opciones de usuario",
     "logout": "Cerrar sesión",
-    "logout_success": "Sesión cerrada correctamente"
+    "logout_success": "Sesión cerrada correctamente",
+    "auth": {
+      "loginWithGoogle": "Iniciar sesión con Google"
+    }
+  },
+  "auth": {
+    "loginWithGoogle": "Iniciar sesión con Google",
+    "loading": "Cargando autenticación..."
   },
   "common": {
     "loading": "Cargando...",
@@ -154,6 +161,7 @@
   },
   "events": {
     "createEventCard": {
+      "ariaLabel": "Crear nuevo evento",
       "title": "Crear nuevo evento",
       "subtitle": "Empieza a dividir gastos con tus amigos ahora mismo."
     }

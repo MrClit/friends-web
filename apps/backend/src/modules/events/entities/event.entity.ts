@@ -1,5 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Transaction } from '../../transactions/entities/transaction.entity';
+import { ApiProperty } from '@nestjs/swagger';
+
+export enum EventStatus {
+  ACTIVE = 'active',
+  ARCHIVED = 'archived',
+}
 
 // Participant que es una referencia a un User existente
 export interface UserParticipant {
@@ -41,6 +47,18 @@ export class Event {
   @Column({ length: 50, nullable: true })
   icon: string;
 
+  @ApiProperty({
+    enum: EventStatus,
+    default: EventStatus.ACTIVE,
+    description: 'Event status: active or archived',
+  })
+  @Column({
+    type: 'enum',
+    enum: EventStatus,
+    default: EventStatus.ACTIVE,
+  })
+  status: EventStatus;
+
   @Column('jsonb')
   participants: EventParticipant[];
 
@@ -54,4 +72,6 @@ export class Event {
     cascade: true,
   })
   transactions: Transaction[];
+
+  lastModified?: Date;
 }

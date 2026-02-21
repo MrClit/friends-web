@@ -1,3 +1,5 @@
+import { t } from 'i18next';
+
 const GOOGLE_AUTH_URL = `${import.meta.env.VITE_API_URL || '/api'}/auth/google`;
 
 export function GoogleLoginButton() {
@@ -13,7 +15,7 @@ export function GoogleLoginButton() {
       aria-label="Login with Google"
     >
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-      <span>Login con Google</span>
+      <span>{t('auth.loginWithGoogle')}</span>
     </button>
   );
 }

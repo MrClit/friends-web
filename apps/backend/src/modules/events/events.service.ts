@@ -7,13 +7,24 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, DeepPartial } from 'typeorm';
-import { Event, EventParticipant } from './entities/event.entity';
+import { Event, EventParticipant, EventStatus } from './entities/event.entity';
 import { User } from '../users/user.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { TransactionsService } from '../transactions/transactions.service';
 import { EventKPIsService } from './services/event-kpis.service';
 import { EventKPIsDto } from './dto/event-kpis.dto';
+
+// Interface for raw query result with lastModified calculation
+interface LastModifiedResult {
+  lastModified: Date | string;
+}
+
+// Interface for batch lastModified query result
+interface BatchLastModifiedResult {
+  eventId: string;
+  lastModified: Date | string;
+}
 
 @Injectable()
 export class EventsService {
@@ -74,6 +85,59 @@ export class EventsService {
       }
     } catch (err) {
       this.logger.warn(`Failed to enrich participants: ${(err as Error).message}`);
+    }
+  }
+
+  /**
+   * Calculate lastModified for event(s) as the greatest between event.updatedAt and max(transactions.updatedAt)
+   * Works with one or multiple events, batching database queries for efficiency
+   * @param events - Event or array of events to calculate lastModified
+   */
+  private async calculateLastModified(events: Event | Event[]): Promise<void> {
+    const eventArray = Array.isArray(events) ? events : [events];
+    if (eventArray.length === 0) return;
+
+    try {
+      // For single event, use direct query
+      if (eventArray.length === 1) {
+        const event = eventArray[0];
+        const result = await this.eventRepository
+          .createQueryBuilder('event')
+          .leftJoin('event.transactions', 'tx')
+          .where('event.id = :id', { id: event.id })
+          .select('GREATEST(event.updated_at, COALESCE(MAX(tx.updated_at), event.updated_at))', 'lastModified')
+          .groupBy('event.id')
+          .getRawOne<LastModifiedResult>();
+
+        event.lastModified = result?.lastModified ? new Date(result.lastModified) : event.updatedAt;
+        return;
+      }
+
+      // For multiple events, batch query with IN clause
+      const eventIds = eventArray.map((e) => e.id);
+      const results = await this.eventRepository
+        .createQueryBuilder('event')
+        .leftJoin('event.transactions', 'tx')
+        .where('event.id IN (:...ids)', { ids: eventIds })
+        .select('event.id', 'eventId')
+        .addSelect('GREATEST(event.updated_at, COALESCE(MAX(tx.updated_at), event.updated_at))', 'lastModified')
+        .groupBy('event.id')
+        .getRawMany<BatchLastModifiedResult>();
+
+      // Map results to events
+      const lastModifiedMap = new Map(
+        results.map((r) => [r.eventId, r.lastModified ? new Date(r.lastModified) : null]),
+      );
+
+      for (const event of eventArray) {
+        event.lastModified = lastModifiedMap.get(event.id) ?? event.updatedAt;
+      }
+    } catch (err) {
+      this.logger.warn(`Failed to calculate lastModified: ${(err as Error).message}`);
+      // Fallback: use updatedAt
+      for (const event of eventArray) {
+        event.lastModified = event.updatedAt;
+      }
     }
   }
 
@@ -144,11 +208,16 @@ export class EventsService {
   /**
    * Get all events ordered by creation date (newest first)
    * Enriches user participants with name/email/avatar from users table
+   * Calculates lastModified considering event and transaction updates
+   * @param status - Optional filter by status (active/archived), defaults to 'active'
    */
-  async findAll(): Promise<Event[]> {
+  async findAll(status?: EventStatus): Promise<Event[]> {
     try {
       this.logger.log('Fetching all events');
+
+      const whereCondition = status ? { status } : { status: EventStatus.ACTIVE };
       const events = await this.eventRepository.find({
+        where: whereCondition,
         order: {
           createdAt: 'DESC',
         },
@@ -156,6 +225,9 @@ export class EventsService {
 
       // Enrich all events' participants in one batch
       await this.enrichParticipants(events);
+
+      // Calculate lastModified in batch
+      await this.calculateLastModified(events);
 
       return events;
     } catch (error) {
@@ -168,6 +240,7 @@ export class EventsService {
   /**
    * Get a single event by ID
    * Enriches user participants with name/email/avatar from users table
+   * Calculates lastModified considering event and transaction updates
    */
   async findOne(id: string): Promise<Event> {
     try {
@@ -182,6 +255,9 @@ export class EventsService {
 
       // Enrich participants
       await this.enrichParticipants(event);
+
+      // Calculate lastModified
+      await this.calculateLastModified(event);
 
       return event;
     } catch (error) {
@@ -214,6 +290,10 @@ export class EventsService {
       } as DeepPartial<Event>);
 
       const savedEvent = await this.eventRepository.save(event);
+
+      // Set lastModified to createdAt for new events (no transactions yet)
+      savedEvent.lastModified = savedEvent.updatedAt;
+
       this.logger.log(`Event created successfully with ID: ${savedEvent.id}`);
       return savedEvent;
     } catch (error) {
@@ -246,6 +326,9 @@ export class EventsService {
 
       const updatedEvent = this.eventRepository.merge(event, cleanUpdate);
       const savedEvent = await this.eventRepository.save(updatedEvent);
+
+      // Calculate lastModified
+      await this.calculateLastModified(savedEvent);
 
       this.logger.log(`Event ${id} updated successfully`);
       return savedEvent;

@@ -10,8 +10,9 @@ import {
   HttpStatus,
   ParseUUIDPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -20,6 +21,7 @@ import { Event } from './entities/event.entity';
 import { EventKPIsDto } from './dto/event-kpis.dto';
 import { RolesGuard } from '../auth/roles.guard';
 import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
+import { EventStatus } from './entities/event.entity';
 
 @ApiTags('Events')
 @Controller('events')
@@ -33,9 +35,15 @@ export class EventsController {
    */
   @Get()
   @ApiOperation({ summary: 'Get all events' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: EventStatus,
+    description: 'Filter events by status (active/archived). Defaults to active.',
+  })
   @ApiStandardResponse(200, 'Events retrieved successfully', Event, true)
-  findAll() {
-    return this.eventsService.findAll();
+  findAll(@Query('status') status?: EventStatus) {
+    return this.eventsService.findAll(status);
   }
 
   /**

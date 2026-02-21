@@ -29,20 +29,25 @@ export interface PotParticipant {
 // Union type para participants
 export type EventParticipantDto = UserParticipant | GuestParticipant | PotParticipant;
 
+export type EventStatus = 'active' | 'archived';
+
 export interface Event {
   id: string;
   title: string;
   description?: string;
   icon?: string;
+  status: EventStatus;
   participants: EventParticipantDto[];
   createdAt: string;
   updatedAt: string;
+  lastModified: string;
 }
 
 export interface CreateEventDto {
   title: string;
   description?: string;
   icon?: string;
+  status?: EventStatus;
   participants: EventParticipantDto[];
 }
 
@@ -50,6 +55,7 @@ export interface UpdateEventDto {
   title?: string;
   description?: string;
   icon?: string;
+  status?: EventStatus;
   participants?: EventParticipantDto[];
 }
 
@@ -66,6 +72,7 @@ export interface Transaction {
   title: string;
   date: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateTransactionDto {
