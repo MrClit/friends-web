@@ -1,0 +1,36 @@
+###############################################
+# USERS MODULE - API ENDPOINTS - EXAMPLE FILE
+###############################################
+# Copy this file to users.http and configure tokens in .vscode/settings.json
+# users.http is gitignored for security
+
+###############################################
+# GET ALL USERS
+###############################################
+# Retrieve all users (for participant selection)
+# @returns List of all users with basic info (id, email, name, avatar, role)
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+###############################################
+# SEARCH USERS
+###############################################
+# Search users by name or email
+# @param q - Search query string
+# @returns Filtered list of users matching the query
+
+### Search by name
+GET {{baseUrl}}/users/search?q=john
+Authorization: Bearer {{token}}
+
+### Search by email
+GET {{baseUrl}}/users/search?q=john@example.com
+Authorization: Bearer {{token}}
+
+### Search with partial match
+GET {{baseUrl}}/users/search?q=gma
+Authorization: Bearer {{token}}
+
+### Search with empty query (should return all users or empty)
+GET {{baseUrl}}/users/search?q=
+Authorization: Bearer {{token}}

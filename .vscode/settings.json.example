@@ -1,0 +1,42 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // REST Client Configuration
+  // Copy this file to settings.json and replace tokens with real values
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "contentType": "application/json"
+    },
+    "development": {
+      "baseUrl": "http://localhost:3000/api",
+      "token": "YOUR_JWT_TOKEN_HERE",
+      "eventId": "YOUR_EVENT_ID_HERE"
+    },
+    "production": {
+      "baseUrl": "https://api.friends.example.com",
+      "token": "YOUR_PROD_JWT_TOKEN_HERE",
+      "eventId": "YOUR_PROD_EVENT_ID_HERE"
+    }
+  }
+}

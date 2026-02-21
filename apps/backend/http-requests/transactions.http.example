@@ -1,0 +1,122 @@
+###############################################
+# TRANSACTIONS API - EXAMPLE FILE
+###############################################
+# Copy this file to transactions.http and configure tokens in .vscode/settings.json
+# transactions.http is gitignored for security
+
+###############################################
+# 1. LIST TRANSACTIONS BY EVENT
+###############################################
+GET {{baseUrl}}/events/{{eventId}}/transactions
+Authorization: Bearer {{token}}
+
+###############################################
+# 2. CREATE TRANSACTION - Contribución
+###############################################
+# @name createContribution
+
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Aportación inicial",
+  "paymentType": "contribution",
+  "amount": 50.00,
+  "participantId": "1",
+  "date": "2026-01-15"
+}
+
+### Guardar ID de la transacción
+@transactionId = {{createContribution.response.body.data.id}}
+
+###############################################
+# 3. CREATE TRANSACTION - Gasto
+###############################################
+
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Cena del grupo",
+  "paymentType": "expense",
+  "amount": 120.50,
+  "participantId": "2",
+  "date": "2026-01-16"
+}
+
+###############################################
+# 4. CREATE TRANSACTION - Gasto desde POT
+###############################################
+
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Taxi compartido",
+  "paymentType": "expense",
+  "amount": 25.00,
+  "participantId": "0",
+  "date": "2026-01-16"
+}
+
+###############################################
+# 5. CREATE TRANSACTION - Compensación
+###############################################
+
+POST {{baseUrl}}/events/{{eventId}}/transactions
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Devolución a Alice",
+  "paymentType": "compensation",
+  "amount": 30.00,
+  "participantId": "1",
+  "date": "2026-01-17"
+}
+
+###############################################
+# 6. UPDATE TRANSACTION
+###############################################
+
+PATCH {{baseUrl}}/transactions/{{transactionId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Aportación inicial actualizada",
+  "amount": 60.00
+}
+
+###############################################
+# 7. DELETE TRANSACTION
+###############################################
+
+DELETE {{baseUrl}}/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# 8. LIST TRANSACTIONS WITH PAGINATION
+###############################################
+
+GET {{baseUrl}}/events/{{eventId}}/transactions?page=1&limit=20
+Authorization: Bearer {{token}}
+
+###############################################
+# 9. LIST TRANSACTIONS WITH FILTERS
+###############################################
+
+### Filter by payment type
+GET {{baseUrl}}/events/{{eventId}}/transactions?paymentType=contribution
+Authorization: Bearer {{token}}
+
+### Filter by participant
+GET {{baseUrl}}/events/{{eventId}}/transactions?participantId=1
+Authorization: Bearer {{token}}
+
+### Combined filters
+GET {{baseUrl}}/events/{{eventId}}/transactions?paymentType=expense&participantId=2
+Authorization: Bearer {{token}}

@@ -1,0 +1,83 @@
+###############################################
+# EVENTS API - EXAMPLE FILE
+###############################################
+# Copy this file to events.http and configure tokens in .vscode/settings.json
+# events.http is gitignored for security
+
+###############################################
+# 1. LIST ALL EVENTS
+###############################################
+GET {{baseUrl}}/events
+Authorization: Bearer {{token}}
+
+###############################################
+# 2. CREATE EVENT
+###############################################
+# @name createEvent
+POST {{baseUrl}}/events
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Cena en Barcelona",
+  "participants": [
+    { "id": "1", "name": "Alice" },
+    { "id": "2", "name": "Bob" },
+    { "id": "3", "name": "Charlie" }
+  ]
+}
+
+### Guardar el ID del evento creado
+@createdEventId = {{createEvent.response.body.data.id}}
+
+###############################################
+# 3. GET EVENT BY ID
+###############################################
+GET {{baseUrl}}/events/{{createdEventId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# 4. UPDATE EVENT - Solo título
+###############################################
+PATCH {{baseUrl}}/events/{{createdEventId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "title": "Cena actualizada en Barcelona"
+}
+
+###############################################
+# 5. UPDATE EVENT - Agregar participante
+###############################################
+PATCH {{baseUrl}}/events/{{createdEventId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "participants": [
+    { "id": "1", "name": "Alice" },
+    { "id": "2", "name": "Bob" },
+    { "id": "3", "name": "Charlie" },
+    { "id": "4", "name": "Diana" }
+  ]
+}
+
+###############################################
+# 6. DELETE EVENT
+###############################################
+DELETE {{baseUrl}}/events/{{createdEventId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# 7. GET EVENT TRANSACTIONS (Paginated)
+###############################################
+GET {{baseUrl}}/events/{{eventId}}/transactions?page=1&limit=10
+Authorization: Bearer {{token}}
+
+###############################################
+# 8. GET EVENT WITH SPECIFIC ID
+###############################################
+# Usa tu propio ID de evento o configúralo en .vscode/settings.json
+GET {{baseUrl}}/events/{{eventId}}
+Authorization: Bearer {{token}}

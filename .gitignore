@@ -24,6 +24,8 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json.example
+.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -34,3 +36,7 @@ dist-ssr
 
 # HTTP Client private environment variables
 http-client.private.env.json
+
+# HTTP requests with sensitive tokens (keep .example files)
+apps/backend/http-requests/*.http
+!apps/backend/http-requests/*.http.example

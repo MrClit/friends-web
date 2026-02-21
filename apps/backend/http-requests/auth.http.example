@@ -1,0 +1,22 @@
+###############################################
+# AUTH API - EXAMPLE FILE
+###############################################
+# Copy this file to auth.http and replace tokens with real values
+# auth.http is gitignored for security
+
+### 1. Iniciar login con Google (redirige a Google)
+GET {{baseUrl}}/auth/google
+
+### 2. Callback de Google (este endpoint es llamado por Google tras login)
+# NOTA: Este endpoint requiere que completes el login en Google y Google te redirigirá aquí.
+# Puedes copiar la URL de redirección y pegarla en el navegador para probar manualmente.
+GET {{baseUrl}}/auth/google/callback
+
+### 3. Obtener perfil del usuario autenticado (requiere JWT)
+# Configura tu token en .vscode/settings.json
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### 4. Logout (opcional, según implementación)
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
