@@ -3,6 +3,7 @@ import { eventsApi } from '@/api/events.api';
 import { queryKeys } from './keys';
 import type { UpdateEventInput } from '@/features/events/types';
 import { useDeletingStore } from '@/shared/store/useDeletingStore';
+import { useToast } from '@/shared/hooks/useToast';
 
 /**
  * Query hook to fetch all events
@@ -40,13 +41,18 @@ export function useEvent(id?: string) {
  * @returns Mutation object with mutate function and status
  */
 export function useCreateEvent() {
+  const { success, error } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: eventsApi.create,
     onSuccess: () => {
+      success('events.create_success');
       // Invalidate events list to trigger refetch
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+    },
+    onError: () => {
+      error('events.create_error');
     },
   });
 }
@@ -57,14 +63,19 @@ export function useCreateEvent() {
  * @returns Mutation object with mutate function and status
  */
 export function useUpdateEvent() {
+  const { success, error } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEventInput }) => eventsApi.update(id, data),
     onSuccess: (_, { id }) => {
+      success('events.update_success');
       // Invalidate both list and specific event detail
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(id) });
+    },
+    onError: () => {
+      error('events.update_error');
     },
   });
 }
@@ -76,6 +87,7 @@ export function useUpdateEvent() {
  * @returns Mutation object with mutate function and status
  */
 export function useDeleteEvent() {
+  const { success, error } = useToast();
   const queryClient = useQueryClient();
   const setDeleting = useDeletingStore((state) => state.setDeleting);
 
@@ -92,6 +104,7 @@ export function useDeleteEvent() {
       queryClient.removeQueries({ queryKey: ['transactions', 'event', deletedId], exact: false });
     },
     onSuccess: async (_, deletedId) => {
+      success('events.delete_success');
       // Note: Don't clear deleting state here to prevent re-enabling queries before unmount
 
       // Remove specific queries from cache to prevent stale data
@@ -105,6 +118,7 @@ export function useDeleteEvent() {
     onError: () => {
       // Clear deleting state on error
       setDeleting(false);
+      error('events.delete_error');
     },
   });
 }

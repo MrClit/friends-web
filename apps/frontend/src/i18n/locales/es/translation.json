@@ -31,6 +31,9 @@
     "loading": "Cargando...",
     "close": "Cerrar",
     "error": "Error",
+    "success": "Exitoso",
+    "validation_error": "Por favor, completa todos los campos",
+    "network_error": "Error de conexión. Intenta de nuevo",
     "errorLoading": "No se pudo cargar los datos. Por favor, intenta de nuevo."
   },
   "eventsList": {
@@ -162,10 +165,24 @@
     "cancel": "Cancelar"
   },
   "events": {
+    "create_success": "Evento creado",
+    "create_error": "Error al crear evento",
+    "update_success": "Evento actualizado",
+    "update_error": "Error al actualizar evento",
+    "delete_success": "Evento eliminado",
+    "delete_error": "Error al eliminar evento",
     "createEventCard": {
       "ariaLabel": "Crear nuevo evento",
       "title": "Crear nuevo evento",
       "subtitle": "Empieza a dividir gastos con tus amigos ahora mismo."
     }
+  },
+  "transactions": {
+    "create_success": "Transacción creada",
+    "create_error": "Error al crear transacción",
+    "update_success": "Transacción actualizada",
+    "update_error": "Error al actualizar transacción",
+    "delete_success": "Transacción eliminada",
+    "delete_error": "Error al eliminar transacción"
   }
 }

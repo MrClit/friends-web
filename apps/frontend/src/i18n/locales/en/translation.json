@@ -31,6 +31,9 @@
     "loading": "Loading...",
     "close": "Close",
     "error": "Error",
+    "success": "Success",
+    "validation_error": "Please complete all fields",
+    "network_error": "Connection error. Please try again",
     "errorLoading": "Could not load data. Please try again."
   },
   "eventsList": {
@@ -162,10 +165,24 @@
     "cancel": "Cancel"
   },
   "events": {
+    "create_success": "Event created",
+    "create_error": "Error creating event",
+    "update_success": "Event updated",
+    "update_error": "Error updating event",
+    "delete_success": "Event deleted",
+    "delete_error": "Error deleting event",
     "createEventCard": {
       "ariaLabel": "Create new event",
       "title": "Create new event",
       "subtitle": "Start splitting expenses with your friends right now."
     }
+  },
+  "transactions": {
+    "create_success": "Transaction created",
+    "create_error": "Error creating transaction",
+    "update_success": "Transaction updated",
+    "update_error": "Error updating transaction",
+    "delete_success": "Transaction deleted",
+    "delete_error": "Error deleting transaction"
   }
 }

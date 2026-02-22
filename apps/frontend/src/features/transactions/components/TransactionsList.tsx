@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
 import { useInfiniteScroll } from '@/hooks/common';
 import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
+import { getParticipantName } from '@/features/events/utils/participants';
 
 interface TransactionsListProps {
   event: Event;
@@ -37,7 +38,10 @@ export default function TransactionsList({ event }: TransactionsListProps) {
   const allTransactions = useMemo(() => data?.pages.flatMap((page) => page.transactions) ?? [], [data]);
 
   // Create participants map for O(1) lookup
-  const participantsMap = useMemo(() => new Map(event.participants.map((p) => [p.id, p.name])), [event.participants]);
+  const participantsMap = useMemo(
+    () => new Map(event.participants.map((participant) => [participant.id, getParticipantName(participant, t)])),
+    [event.participants, t],
+  );
 
   // Infinite scroll handler
   const loadMore = useCallback(() => {

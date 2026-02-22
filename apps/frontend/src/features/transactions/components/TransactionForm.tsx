@@ -4,6 +4,7 @@ import type { EventParticipant } from '../../events/types';
 import { useTranslation } from 'react-i18next';
 import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
 import { FaUser, FaChevronDown } from 'react-icons/fa';
+import { getParticipantName } from '@/features/events/utils/participants';
 
 interface TransactionFormProps {
   type: PaymentType;
@@ -104,7 +105,7 @@ export default function TransactionForm({
             {type === 'expense' && <option value={POT_PARTICIPANT_ID}>{t('transactionForm.potOption')}</option>}
             {participants.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name}
+                {getParticipantName(p, t)}
               </option>
             ))}
           </select>

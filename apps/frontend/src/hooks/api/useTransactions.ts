@@ -3,6 +3,7 @@ import { transactionsApi } from '@/api/transactions.api';
 import { queryKeys } from './keys';
 import type { CreateTransactionDto, UpdateTransactionDto } from '@/api/types';
 import { useDeletingStore } from '@/shared/store/useDeletingStore';
+import { useToast } from '@/shared/hooks/useToast';
 
 /**
  * Query hook to fetch all transactions for a specific event
@@ -67,11 +68,13 @@ export function useTransaction(id: string) {
  * @returns Mutation object with mutate function and status
  */
 export function useCreateTransaction(eventId: string) {
+  const { success, error } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: CreateTransactionDto) => transactionsApi.create(eventId, data),
     onSuccess: () => {
+      success('transactions.create_success');
       // Invalidate transactions for this event
       queryClient.invalidateQueries({
         queryKey: queryKeys.transactions.byEvent(eventId),
@@ -80,6 +83,9 @@ export function useCreateTransaction(eventId: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.events.detail(eventId),
       });
+    },
+    onError: () => {
+      error('transactions.create_error');
     },
   });
 }
@@ -90,11 +96,13 @@ export function useCreateTransaction(eventId: string) {
  * @returns Mutation object with mutate function and status
  */
 export function useUpdateTransaction() {
+  const { success, error } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTransactionDto }) => transactionsApi.update(id, data),
     onSuccess: (transaction) => {
+      success('transactions.update_success');
       // Invalidate transactions for the event
       queryClient.invalidateQueries({
         queryKey: queryKeys.transactions.byEvent(transaction.eventId),
@@ -108,6 +116,9 @@ export function useUpdateTransaction() {
         queryKey: queryKeys.events.detail(transaction.eventId),
       });
     },
+    onError: () => {
+      error('transactions.update_error');
+    },
   });
 }
 
@@ -117,14 +128,19 @@ export function useUpdateTransaction() {
  * @returns Mutation object with mutate function and status
  */
 export function useDeleteTransaction() {
+  const { success, error } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => transactionsApi.delete(id),
     onSuccess: () => {
+      success('transactions.delete_success');
       // Invalidate all transaction queries
       // This ensures all related data is refreshed
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+    },
+    onError: () => {
+      error('transactions.delete_error');
     },
   });
 }

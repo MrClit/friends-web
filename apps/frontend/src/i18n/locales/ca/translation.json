@@ -31,6 +31,9 @@
     "loading": "Carregant...",
     "close": "Tancar",
     "error": "Error",
+    "success": "Èxit",
+    "validation_error": "Si us plau, completa tots els camps",
+    "network_error": "Error de connexió. Torna-ho a provar",
     "errorLoading": "No s'han pogut carregar les dades. Si us plau, torna-ho a provar."
   },
   "eventsList": {
@@ -162,10 +165,24 @@
     "cancel": "Cancel·lar"
   },
   "events": {
+    "create_success": "Esdeveniment creat",
+    "create_error": "Error en crear l'esdeveniment",
+    "update_success": "Esdeveniment actualitzat",
+    "update_error": "Error en actualitzar l'esdeveniment",
+    "delete_success": "Esdeveniment eliminat",
+    "delete_error": "Error en eliminar l'esdeveniment",
     "createEventCard": {
       "ariaLabel": "Crear nou esdeveniment",
       "title": "Crear nou esdeveniment",
       "subtitle": "Comença a dividir despeses amb els teus amics ara mateix."
     }
+  },
+  "transactions": {
+    "create_success": "Transacció creada",
+    "create_error": "Error en crear la transacció",
+    "update_success": "Transacció actualitzada",
+    "update_error": "Error en actualitzar la transacció",
+    "delete_success": "Transacció eliminada",
+    "delete_error": "Error en eliminar la transacció"
   }
 }

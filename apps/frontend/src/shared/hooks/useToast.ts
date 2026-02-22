@@ -11,14 +11,14 @@ export function useToast() {
         type: 'success',
         message: t(messageKey),
         description: descriptionKey ? t(descriptionKey) : undefined,
-        duration: duration ?? 3000,
+        duration: duration ?? 4000,
       }),
     error: (messageKey: string, descriptionKey?: string) =>
       addToast({
         type: 'error',
         message: t(messageKey),
         description: descriptionKey ? t(descriptionKey) : undefined,
-        duration: 5000,
+        duration: 6000,
       }),
     info: (messageKey: string, descriptionKey?: string) =>
       addToast({

@@ -15,8 +15,11 @@ export default function UserMenu() {
   if (!user) return null;
 
   const handleLogout = () => {
-    logout();
     success('user.logout_success');
+
+    setTimeout(() => {
+      logout();
+    }, 500);
   };
 
   return (

@@ -3,6 +3,7 @@ import type { Event } from '@/features/events/types';
 import { formatAmount } from '@/shared/utils/format';
 import type { KPIParticipantItem, KPIType } from '@/features/kpi/types';
 import { getKPIConfig } from '@/features/kpi/constants';
+import { getParticipantName } from '@/features/events/utils/participants';
 
 /**
  * Build KPI participant items list including pot if needed
@@ -32,7 +33,7 @@ export function buildKPIItems(
     const participant = event.participants.find((p) => p.id === participantId);
     return {
       id: participantId,
-      name: participant?.name || participantId,
+      name: participant ? getParticipantName(participant, t) : participantId,
       value: formatAmount(total as number),
       isPot: false,
       percentage: totalAmount > 0 ? (total / totalAmount) * 100 : 0,
