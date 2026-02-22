@@ -8,3 +8,4 @@ export { default as Skeleton } from './Skeleton';
 export { default as Logo } from './Logo';
 export { default as Avatar } from './Avatar';
 export { default as ThemeInitializer } from './ThemeInitializer';
+export { default as Toast } from './Toast';

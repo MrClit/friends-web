@@ -1,7 +1,7 @@
 import { useAuth } from '@/features/auth/useAuth';
 import { MdLogout, MdAccountCircle } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { showLogoutToast } from '@/shared/utils/toastUtils';
+import { useToast } from '@/shared/hooks/useToast';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
 import { MdExpandMore } from 'react-icons/md';
 import Avatar from '@/shared/components/Avatar';
@@ -9,13 +9,14 @@ import Avatar from '@/shared/components/Avatar';
 export default function UserMenu() {
   const { user, logout, loading } = useAuth();
   const { t } = useTranslation();
+  const { success } = useToast();
 
   if (loading) return null;
   if (!user) return null;
 
   const handleLogout = () => {
     logout();
-    showLogoutToast(t);
+    success('user.logout_success');
   };
 
   return (
