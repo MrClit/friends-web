@@ -29,4 +29,23 @@ export class UsersService {
     }
     return user;
   }
+
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find({
+      select: ['id', 'email', 'name', 'avatar', 'role'],
+      order: { name: 'ASC' },
+    });
+  }
+
+  async search(query: string): Promise<User[]> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .where('user.name ILIKE :query OR user.email ILIKE :query', {
+        query: `%${query}%`,
+      })
+      .select(['user.id', 'user.email', 'user.name', 'user.avatar', 'user.role'])
+      .orderBy('user.name', 'ASC')
+      .limit(20)
+      .getMany();
+  }
 }

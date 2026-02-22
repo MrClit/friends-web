@@ -3,7 +3,21 @@
 > Agregar funcionalidad de autocomplete con lista de usuarios del backend al seleccionar participantes en eventos
 >
 > **Fecha:** 21 de febrero de 2026  
-> **Status:** Pendiente de implementación
+> **Status:** ✅ **REVISADO Y AJUSTADO** - Listo para implementación  
+> **Última actualización:** Post-revisión de código contra arquitectura actual
+
+---
+
+## 🔔 CAMBIOS POST-REVISIÓN
+
+El plan ha sido revisado contra el código actual. Cambios clave:
+
+| Cambio                                  | Razón                                        | Impacto                     |
+| --------------------------------------- | -------------------------------------------- | --------------------------- |
+| **✅ Instalar @radix-ui/react-popover** | No estaba en dependencias                    | Requiere `pnpm add`         |
+| **✅ Backend: Proteger con JWT**        | Seguridad + consistencia con otros endpoints | Agregar `@UseGuards`        |
+| **✅ Búsqueda LOCAL (no remota)**       | Usuarios no cambian frecuentemente           | Eliminar `useSearchUsers()` |
+| **✅ Entity + Service ya existen**      | No necesitamos crearlos                      | Solo crear Controller       |
 
 ---
 
@@ -229,13 +243,52 @@ export class UsersController {
 }
 ```
 
-**Nota:** El módulo `users` ya existe, solo necesitamos exponer el controller.
+**Actualizaciones en `UsersService`:**
+
+```typescript
+// AGREGAR estos métodos a UsersService
+async findAll(): Promise<User[]> {
+  return this.userRepository.find({
+    select: ['id', 'email', 'name', 'avatar', 'role'],
+    order: { name: 'ASC' },
+  });
+}
+
+async search(query: string): Promise<User[]> {
+  return this.userRepository
+    .createQueryBuilder('user')
+    .where('user.name ILIKE :query OR user.email ILIKE :query', {
+      query: `%${query}%`,
+    })
+    .select(['user.id', 'user.email', 'user.name', 'user.avatar', 'user.role'])
+    .orderBy('user.name', 'ASC')
+    .limit(20)
+    .getMany();
+}
+```
+
+**Actualización en `users.module.ts`:**
+
+```typescript
+// Agregar el import y exportar en controllers
+import { UsersController } from './users.controller';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([User])],
+  providers: [UsersService],
+  controllers: [UsersController], // AGREGAR
+  exports: [UsersService],
+})
+export class UsersModule {}
+```
 
 ---
 
 ### 2. Frontend: Hook de TanStack Query
 
-**Ubicación:** `apps/frontend/src/hooks/api/useUsers.ts`
+**Ubicación:** `apps/frontend/src/hooks/api/useUsers.ts` (CREAR)
+
+> **⚠️ CAMBIO:** Solo creamos `useUsers()` - búsqueda es LOCAL en el componente
 
 ```typescript
 import { useQuery } from '@tanstack/react-query';
@@ -244,29 +297,17 @@ import { queryKeys } from './keys';
 
 /**
  * Query hook to fetch all users for participant selection
+ * Usuarios se cachean por 10 minutos (no cambian frecuentemente)
+ * La búsqueda es LOCAL en el componente (array.filter)
+ *
  * @returns Query result with users list, loading state, and error
  */
 export function useUsers() {
   return useQuery({
     queryKey: queryKeys.users.all,
     queryFn: usersApi.getAll,
-    staleTime: 10 * 60 * 1000, // 10 minutes - users don't change often
+    staleTime: 10 * 60 * 1000, // 10 minutes
     retry: 2,
-  });
-}
-
-/**
- * Query hook to search users by name or email
- * @param query - Search query string
- * @returns Query result with filtered users
- */
-export function useSearchUsers(query: string) {
-  return useQuery({
-    queryKey: queryKeys.users.search(query),
-    queryFn: () => usersApi.search(query),
-    enabled: query.length > 0, // Only fetch if query has content
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1,
   });
 }
 ```
@@ -275,53 +316,27 @@ export function useSearchUsers(query: string) {
 
 ### 3. Query Keys: Extensión
 
-**Ubicación:** `apps/frontend/src/hooks/api/keys.ts`
+**Ubicación:** `apps/frontend/src/hooks/api/keys.ts` (ACTUALIZAR)
 
 ```typescript
-export const queryKeys = {
-  // ... eventos y transactions ...
-
-  users: {
-    /**
-     * Key for all users (participant selection)
-     */
-    all: ['users'] as const,
-
-    /**
-     * Key for user search
-     * @param query - Search string
-     */
-    search: (query: string) => ['users', 'search', query] as const,
-  },
-};
+// Agregar al final del objeto queryKeys:
+users: {
+  all: ['users'] as const,
+},
 ```
 
 ---
 
 ### 4. API Client: Users API
 
-**Ubicación:** `apps/frontend/src/api/users.api.ts` (NUEVO)
+**Ubicación:** `apps/frontend/src/api/users.api.ts` (CREAR)
 
 ```typescript
 import { apiRequest } from './client';
 import type { User } from '@/features/auth/types';
 
-/**
- * Users API endpoints
- */
 export const usersApi = {
-  /**
-   * Get all users for participant selection
-   * @returns List of all users
-   */
   getAll: () => apiRequest<User[]>('/users'),
-
-  /**
-   * Search users by name or email
-   * @param query - Search query string
-   * @returns Filtered list of users
-   */
-  search: (query: string) => apiRequest<User[]>(`/users/search?q=${encodeURIComponent(query)}`),
 };
 ```
 
@@ -329,7 +344,9 @@ export const usersApi = {
 
 ### 5. Componente: ParticipantsCombobox
 
-**Ubicación:** `apps/frontend/src/features/events/components/ParticipantsCombobox.tsx` (NUEVO)
+**Ubicación:** `apps/frontend/src/features/events/components/ParticipantsCombobox.tsx` (CREAR)
+
+> **Búsqueda LOCAL:** Con `useMemo` filtramos los usuarios descargados (sin API call)
 
 ```typescript
 import { useState, useCallback, useMemo } from 'react';
@@ -368,7 +385,7 @@ export default function ParticipantsCombobox({
     return users.filter(user => !existingIds.has(user.id));
   }, [users, existingParticipants]);
 
-  // Filter users by input
+  // LOCAL SEARCH: Filter users by input (no API call)
   const filteredUsers = useMemo(() => {
     if (!inputValue.trim()) return availableUsers;
 
@@ -511,45 +528,64 @@ Se integra el combobox y mantiene la lógica actual de lista.
 
 ## Plan de Implementación Paso a Paso
 
-### **Fase 1: Backend (30 min)**
+> **⚠️ ACTUALIZACIÓN POST-REVISIÓN:** El plan ha sido revisado contra el código actual. Ver sección "Cambios clave del plan revisado" arriba.
 
-- [ ] **1.1** Revisar `UsersController` y crear si no existe
-- [ ] **1.2** Agregar método `findAll()` que devuelve todos los usuarios
-- [ ] **1.3** Agregar método `search(query: string)` que filtra por nombre/email
-- [ ] **1.4** Agregar DTOs para respuesta (UserDto)
-- [ ] **1.5** Probar en Swagger: `GET /api/users` y `GET /api/users/search?q=test`
+### **Fase 0: Preparación (5 min) - NUEVA**
 
-### **Fase 2: Frontend - Hooks y API (45 min)**
+- [x] **0.1** Instalar `@radix-ui/react-popover`
+  ```bash
+  pnpm --filter @friends/frontend add @radix-ui/react-popover
+  ```
 
-- [ ] **2.1** Crear archivo `apps/frontend/src/api/users.api.ts`
+### **Fase 1: Backend - Controllers (45 min)**
+
+**Status:** 70% listo (Entity + Service ya existen)
+
+- [ ] **1.1** Crear archivo `apps/backend/src/modules/users/users.controller.ts`
+- [ ] **1.2** Implementar método `@Get() findAll()` con `@UseGuards(AuthGuard('jwt'), RolesGuard)`
+- [ ] **1.3** Implementar métodos en `UsersService`: `findAll()` y `search(query: string)`
+- [ ] **1.4** Crear DTO `UserDto` (excluir datos sensibles)
+- [ ] **1.5** Agregar decoradores Swagger: `@ApiStandardResponse`, `@ApiOperation`
+- [ ] **1.6** Actualizar `users.module.ts` para exportar el controller
+- [ ] **1.7** Verificar en Swagger que `GET /api/users` funciona
+- [ ] **1.8** (OPCIONAL) `GET /api/users/search?q=test` si quieres búsqueda remota futura
+
+### **Fase 2: Frontend - API y Hooks (30 min)**
+
+- [ ] **2.1** Crear archivo `apps/frontend/src/api/users.api.ts` con método `getAll()`
 - [ ] **2.2** Crear hook `useUsers()` en `apps/frontend/src/hooks/api/useUsers.ts`
-- [ ] **2.3** Crear hook `useSearchUsers()` en mismo archivo
-- [ ] **2.4** Actualizar `queryKeys` en `apps/frontend/src/hooks/api/keys.ts`
-- [ ] **2.5** Actualizar i18n con claves nuevas
-- [ ] **2.6** Verificar en React DevTools que TanStack Query cache funciona
+  - Configurar `staleTime: 10 * 60 * 1000` (10 min - usuarios no cambian frecuentemente)
+  - Configurar `retry: 2`
+- [ ] **2.3** Actualizar `apps/frontend/src/hooks/api/keys.ts` con `queryKeys.users.all`
+- [ ] **2.4** Actualizar i18n (agregar 2 keys en 3 idiomas):
+  - `participantsInput.noUsers`
+  - `participantsInput.createNew`
+- [ ] **2.5** Verificar en React DevTools que cache de TanStack Query funciona
 
 ### **Fase 3: Frontend - Componente Combobox (60 min)**
 
-- [ ] **3.1** Instalar `@radix-ui/react-popover` si falta
-- [ ] **3.2** Crear componente `ParticipantsCombobox.tsx`
-- [ ] **3.3** Implementar filtrado de usuarios
-- [ ] **3.4** Implementar selección de usuario existente
-- [ ] **3.5** Implementar creación de nuevo usuario
-- [ ] **3.6** Estilos con Tailwind (dark mode)
+- [ ] **3.1** Crear componente `ParticipantsCombobox.tsx`
+- [ ] **3.2** Implementar Radix UI `Popover` (trigger + content)
+- [ ] **3.3** Implementar filtrado LOCAL con `array.filter()` en `useMemo`
+- [ ] **3.4** Implementar selección de usuario existente → `onSelect()` con tipo `'user'`
+- [ ] **3.5** Implementar creación de nuevo usuario → `onSelect()` con tipo `'guest'`
+- [ ] **3.6** Implementar UI loading/empty states
+- [ ] **3.7** Estilos con Tailwind (responsive + dark mode)
+- [ ] **3.8** Verificar accesibilidad básica (ARIA labels, keyboard navigation)
 
 ### **Fase 4: Integración (30 min)**
 
 - [ ] **4.1** Actualizar `ParticipantsList.tsx` para usar `ParticipantsCombobox`
-- [ ] **4.2** Actualizar `useParticipantsList` hook si es necesario
-- [ ] **4.3** Pruebas manuales end-to-end
-- [ ] **4.4** Verificar accesibilidad (keyboard navigation, screen readers)
+- [ ] **4.2** Adaptar lógica de `useParticipantsList` hook si es necesario
+- [ ] **4.3** Pruebas manuales: agregar usuario existente + nuevo usuario
+- [ ] **4.4** Pruebas manuales: validar dark mode, responsive, keyboard nav
 
 ### **Fase 5: Testing (30 min)**
 
-- [ ] **5.1** Tests unitarios para `useUsers` hook
+- [ ] **5.1** Tests unitarios para `useUsers()` hook
 - [ ] **5.2** Tests para filtrado en `ParticipantsCombobox`
-- [ ] **5.3** Tests para selección de usuario/nuevo usuario
-- [ ] **5.4** Tests de integración: crear evento con participantes
+- [ ] **5.3** Tests para selección (usuario existente vs nuevo)
+- [ ] **5.4** Tests E2E: crear evento con mix de usuarios
 
 ---
 
@@ -851,6 +887,23 @@ Una vez implementado, posibles mejoras:
 
 ---
 
-**Última actualización:** 21 de febrero de 2026  
+**Última actualización:** 21 de febrero de 2026 (POST-REVISIÓN)  
 **Autor:** Assistant (GitHub Copilot)  
-**Estado:** Listo para implementación
+**Estado:** ✅ Listo para implementación - Todas las decisiones validadas contra código actual
+
+---
+
+## Siguientes Pasos
+
+El plan está completo y validado. Para comenzar la implementación:
+
+1. **Fase 0:** Instalar dependencia (5 min)
+2. **Fase 1:** Backend Controller (45 min)
+3. **Fase 2:** Frontend API + Hooks (30 min)
+4. **Fase 3:** ParticipantsCombobox (60 min)
+5. **Fase 4:** Integración (30 min)
+6. **Fase 5:** Testing (30 min)
+
+**Tiempo total estimado:** 3.5-4 horas
+
+¿Listo para comenzar? 🚀

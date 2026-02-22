@@ -66,7 +66,9 @@
     "addAria": "Añadir participante",
     "placeholder": "Nombre o email...",
     "deleteAria": "Eliminar participante",
-    "potName": "Fondo común"
+    "potName": "Fondo común",
+    "noUsers": "No se encontraron usuarios",
+    "createNew": "Añadir como invitado"
   },
   "eventDetail": {
     "invalidId": "ID de evento inválido",

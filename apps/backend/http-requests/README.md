@@ -6,9 +6,9 @@ The `.http` files in this directory may contain sensitive information like JWT t
 
 ## 📝 Setup Instructions
 
-### 1. Copy Example Files
+### Quick Start (Recommended)
 
-Copy the `.http.example` files to create your local `.http` files:
+**1. Copy Example Files:**
 
 ```bash
 cd apps/backend/http-requests
@@ -18,9 +18,35 @@ cp transactions.http.example transactions.http
 cp users.http.example users.http
 ```
 
-### 2. Configure VS Code Settings
+**2. Get Your JWT Token:**
 
-Edit `.vscode/settings.json` in the project root and add your tokens:
+```bash
+# Start backend
+pnpm dev:backend
+
+# Visit http://localhost:3000/api/auth/google
+# Complete login and copy the JWT token
+```
+
+**3. Update Variables in .http Files:**
+
+Edit each `.http` file and replace the `@token` variable at the top:
+
+```http
+@baseUrl = http://localhost:3000/api
+@token = YOUR_ACTUAL_JWT_TOKEN_HERE  # ← Replace this
+@eventId = YOUR_ACTUAL_EVENT_ID_HERE
+```
+
+**4. Send Requests:**
+
+Click "Send Request" above any HTTP request in VS Code.
+
+---
+
+### Alternative: VS Code Settings (Optional)
+
+If you prefer centralized configuration, edit `.vscode/settings.json`:
 
 ```json
 {
@@ -34,19 +60,12 @@ Edit `.vscode/settings.json` in the project root and add your tokens:
 }
 ```
 
-**Important:** `.vscode/settings.json` is gitignored to protect your credentials.
+Then select "development" environment:
 
-### 3. Get Your JWT Token
+- `Cmd+Shift+P` → `REST Client: Switch Environment` → `development`
 
-1. Start the backend server: `pnpm dev:backend`
-2. Navigate to `http://localhost:3000/api/auth/google`
-3. Complete the Google OAuth login
-4. Copy the JWT token from the response
-5. Paste it in `.vscode/settings.json` under `token`
+**Note:** `.vscode/settings.json` is gitignored to protect credentials.
 
-### 4. Use the HTTP Files
-
-Open any `.http` file and use the REST Client extension:
 - Click "Send Request" above each request
 - Or use `Cmd+Alt+R` (Mac) / `Ctrl+Alt+R` (Windows/Linux)
 

@@ -1,8 +1,17 @@
 ###############################################
 # EVENTS API - EXAMPLE FILE
 ###############################################
-# Copy this file to events.http and configure tokens in .vscode/settings.json
+# Copy this file to events.http and replace with your real values
 # events.http is gitignored for security
+
+# Option 1: Define variables locally (recommended)
+@baseUrl = http://localhost:3000/api
+@token = YOUR_JWT_TOKEN_HERE
+@contentType = application/json
+@eventId = YOUR_EVENT_ID_HERE
+
+# Option 2: Use .vscode/settings.json variables
+# Select environment in VS Code: Cmd+Shift+P → "REST Client: Switch Environment"
 
 ###############################################
 # 1. LIST ALL EVENTS

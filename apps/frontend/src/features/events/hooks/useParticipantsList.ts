@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { EventParticipant } from '../types';
 
 interface UseParticipantsListParams {
@@ -6,21 +6,23 @@ interface UseParticipantsListParams {
 }
 
 export function useParticipantsList({ setParticipants }: UseParticipantsListParams) {
-  const [newParticipantName, setNewParticipantName] = useState('');
+  const [inputValue, setInputValue] = useState('');
 
-  // Memoize validation for add button
-  const canAddParticipant = useMemo(() => {
-    return newParticipantName.trim().length > 0;
-  }, [newParticipantName]);
+  /**
+   * Add a participant (from combobox selection or manual input)
+   * Handles both existing users and new guests
+   */
+  const handleAddParticipant = useCallback(
+    (participant: EventParticipant) => {
+      setParticipants((p: EventParticipant[]) => [...p, participant]);
+    },
+    [setParticipants],
+  );
 
-  const handleAddParticipant = useCallback(() => {
-    const trimmedName = newParticipantName.trim();
-    if (!trimmedName) return;
-
-    setParticipants((p: EventParticipant[]) => [...p, { id: crypto.randomUUID(), type: 'guest', name: trimmedName }]);
-    setNewParticipantName('');
-  }, [newParticipantName, setParticipants]);
-
+  /**
+   * Remove a participant by index
+   * Cannot remove the first participant (organizer/POT)
+   */
   const handleDeleteParticipant = useCallback(
     (idx: number) => {
       setParticipants((prev) => prev.filter((_, i) => i !== idx));
@@ -28,22 +30,10 @@ export function useParticipantsList({ setParticipants }: UseParticipantsListPara
     [setParticipants],
   );
 
-  const handleNewParticipantKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter' && canAddParticipant) {
-        e.preventDefault();
-        handleAddParticipant();
-      }
-    },
-    [canAddParticipant, handleAddParticipant],
-  );
-
   return {
-    newParticipantName,
-    setNewParticipantName,
-    canAddParticipant,
+    inputValue,
+    setInputValue,
     handleAddParticipant,
-    handleNewParticipantKeyDown,
     handleDeleteParticipant,
   };
 }

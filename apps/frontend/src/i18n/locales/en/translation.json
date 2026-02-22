@@ -66,7 +66,9 @@
     "addAria": "Add participant",
     "placeholder": "Name or email...",
     "deleteAria": "Delete participant",
-    "potName": "Shared pot"
+    "potName": "Shared pot",
+    "noUsers": "No users found",
+    "createNew": "Add as guest"
   },
   "eventDetail": {
     "invalidId": "Invalid event ID",
