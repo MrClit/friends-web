@@ -27,6 +27,7 @@ export const getKPIConfig = (t: TFunction) =>
       IconComponent: MdAccountBalanceWallet,
       kpiKey: 'participantBalances' as const,
       includePot: false, // Pot doesn't have a balance
+      gradients: ['from-emerald-400 to-emerald-500', 'from-teal-400 to-teal-500', 'from-green-400 to-green-500'],
     },
     contributions: {
       label: t('kpiDetail.kpi.contributions'),
@@ -36,6 +37,7 @@ export const getKPIConfig = (t: TFunction) =>
       IconComponent: MdVolunteerActivism,
       kpiKey: 'participantContributions' as const,
       includePot: false, // Pot doesn't receive contributions
+      gradients: ['from-blue-400 to-blue-500', 'from-indigo-400 to-indigo-500', 'from-cyan-400 to-cyan-500'],
     },
     expenses: {
       label: t('kpiDetail.kpi.expenses'),
@@ -45,6 +47,7 @@ export const getKPIConfig = (t: TFunction) =>
       IconComponent: MdShoppingBag,
       kpiKey: 'participantExpenses' as const,
       includePot: true, // ⭐ POT CAN HAVE EXPENSES
+      gradients: ['from-red-400 to-red-500', 'from-rose-400 to-rose-500', 'from-pink-400 to-pink-500'],
     },
     pending: {
       label: t('kpiDetail.kpi.pending'),
@@ -54,6 +57,7 @@ export const getKPIConfig = (t: TFunction) =>
       IconComponent: MdCreditCard,
       kpiKey: 'participantPending' as const,
       includePot: false, // Pot doesn't have pending amounts
+      gradients: ['from-yellow-400 to-yellow-500', 'from-amber-400 to-amber-500', 'from-orange-400 to-orange-500'],
     },
   }) as const;
 

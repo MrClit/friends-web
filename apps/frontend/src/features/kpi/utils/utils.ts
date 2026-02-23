@@ -28,28 +28,45 @@ export function buildKPIItems(
     Object.values(participantsData).reduce((sum, val) => sum + val, 0) +
     (kpiConfig[kpi].includePot && potExpenses > 0 ? potExpenses : 0);
 
-  // Build participant items
-  const items: KPIParticipantItem[] = Object.entries(participantsData).map(([participantId, total]) => {
-    const participant = event.participants.find((p) => p.id === participantId);
-    return {
+  const sortableItems: Array<{ id: string; total: number; isPot: boolean }> = Object.entries(participantsData).map(
+    ([participantId, total]) => ({
       id: participantId,
-      name: participant ? getParticipantName(participant, t) : participantId,
-      value: formatAmount(total as number),
+      total,
+      isPot: false,
+    }),
+  );
+
+  if (kpiConfig[kpi].includePot && potExpenses > 0) {
+    sortableItems.push({
+      id: '0',
+      total: potExpenses,
+      isPot: true,
+    });
+  }
+
+  sortableItems.sort((a, b) => b.total - a.total);
+
+  return sortableItems.map(({ id, total, isPot }) => {
+    if (isPot) {
+      return {
+        id,
+        name: t('transactionsList.potLabel'),
+        value: formatAmount(total),
+        isPot: true,
+        percentage: totalAmount > 0 ? (total / totalAmount) * 100 : 0,
+      };
+    }
+
+    const participant = event.participants.find((p) => p.id === id);
+    const avatar = participant && 'avatar' in participant ? participant.avatar : undefined;
+
+    return {
+      id,
+      name: participant ? getParticipantName(participant, t) : id,
+      avatar,
+      value: formatAmount(total),
       isPot: false,
       percentage: totalAmount > 0 ? (total / totalAmount) * 100 : 0,
     };
   });
-
-  // Add Pot item if needed (only for expenses KPI)
-  if (kpiConfig[kpi].includePot && potExpenses > 0) {
-    items.push({
-      id: '0',
-      name: t('transactionsList.potLabel'),
-      value: formatAmount(potExpenses),
-      isPot: true,
-      percentage: totalAmount > 0 ? (potExpenses / totalAmount) * 100 : 0,
-    });
-  }
-
-  return items;
 }

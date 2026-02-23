@@ -38,4 +38,5 @@ export interface KPIConfig {
   descriptionKey: string;
   IconComponent: React.ComponentType<{ className?: string }>;
   includePot: boolean; // Whether to show Pot in the list
+  gradients: readonly string[]; // Gradient classes for progress bar (3 variants for cycling through participants)
 }

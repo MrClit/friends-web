@@ -27,7 +27,7 @@ export default function KPIDetailContent({ event, kpi, items, kpiValue, kpiConfi
     <div>
       <EventDetailHeader eventId={event.id} eventTitle={event.title} onBack={onBack} />
       <KPIBoxDetail kpi={kpi} kpiValue={kpiValue} kpiConfig={kpiConfig} />
-      <KPIParticipantsList items={items} title={t('kpiDetail.participants')} />
+      <KPIParticipantsList items={items} title={t('kpiDetail.participants')} kpiConfig={kpiConfig[kpi]} />
     </div>
   );
 }
