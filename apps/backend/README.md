@@ -112,8 +112,10 @@ Este proyecto utiliza diferentes archivos `.env` según el ambiente.
 
 ```
 .env.development    # Variables de desarrollo (local)
+.env.test           # Variables para tests automatizados (local)
 .env.production     # Variables de producción (servidor)
 .env.example        # Plantilla con todas las variables
+.env.test.example   # Plantilla para entorno de tests
 ```
 
 ### Cómo Funciona
@@ -234,8 +236,13 @@ pnpm start:prod     # Ejecutar en producción
 
 # Testing
 pnpm test           # Run unit tests
+pnpm test:unit      # Run unit tests (alias explícito)
 pnpm test:watch     # Tests en watch mode
+pnpm test:all       # Run unit + integration + e2e
+pnpm test:e2e       # Run e2e smoke tests (requiere PostgreSQL)
+pnpm test:run       # Run unit tests in CI mode
 pnpm test:coverage  # Generar coverage report
+pnpm check:backend  # Lint + full backend test suite
 
 # Code Quality
 pnpm lint           # Lint code
@@ -542,15 +549,39 @@ const transactions = await getTransactionsByDates(eventId, dates);
 # Unit tests
 pnpm test
 
+# Full backend test suite (unit + integration + e2e)
+pnpm test:all
+
+# Unit tests (CI mode)
+pnpm test:run
+
 # Watch mode
 pnpm test:watch
+
+# E2E smoke tests (JWT real + DB real)
+pnpm test:e2e
 
 # Coverage report
 pnpm test:coverage
 
+# Pre-PR local check (lint + unit + integration + e2e)
+pnpm check:backend
+
 # Debug tests
 pnpm test:debug
 ```
+
+Preparación recomendada para e2e:
+
+```bash
+# 1) Crea tu archivo de entorno de tests
+cp .env.test.example .env.test
+
+# 2) Crea la base de datos de tests (una vez)
+docker exec -it friends-postgres createdb -U postgres friends_db_test
+```
+
+> Si la base ya existe, el comando `createdb` puede devolver error y se puede ignorar.
 
 ---
 
@@ -567,8 +598,13 @@ pnpm start:prod     # Ejecutar en producción
 
 # Testing
 pnpm test           # Run unit tests
+pnpm test:unit      # Run unit tests (alias explícito)
 pnpm test:watch     # Tests en watch mode
+pnpm test:all       # Run unit + integration + e2e
+pnpm test:e2e       # Run e2e smoke tests (requiere PostgreSQL)
+pnpm test:run       # Run unit tests in CI mode
 pnpm test:coverage  # Generar coverage report
+pnpm check:backend  # Lint + full backend test suite
 
 # Code Quality
 pnpm lint           # Lint code

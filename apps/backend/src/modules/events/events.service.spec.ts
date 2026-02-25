@@ -4,10 +4,12 @@ import { NotFoundException, InternalServerErrorException } from '@nestjs/common'
 import { Repository } from 'typeorm';
 import { EventsService } from './events.service';
 import { Event } from './entities/event.entity';
+import { EventStatus } from './entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { TransactionsService } from '../transactions/transactions.service';
 import { EventKPIsService } from './services/event-kpis.service';
+import { User } from '../users/user.entity';
 
 describe('EventsService', () => {
   let service: EventsService;
@@ -22,12 +24,14 @@ describe('EventsService', () => {
   };
   let mockTransactionsService: { findByEvent: jest.Mock };
   let mockEventKPIsService: { getKPIs: jest.Mock };
+  let mockUserRepository: { find: jest.Mock };
 
   const mockEvent: Event = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Test Event',
     description: '',
     icon: '',
+    status: EventStatus.ACTIVE,
     participants: [
       { type: 'guest', id: '1', name: 'Alice' },
       { type: 'guest', id: '2', name: 'Bob' },
@@ -56,6 +60,10 @@ describe('EventsService', () => {
       getKPIs: jest.fn(),
     };
 
+    mockUserRepository = {
+      find: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EventsService,
@@ -66,6 +74,10 @@ describe('EventsService', () => {
         {
           provide: TransactionsService,
           useValue: mockTransactionsService as unknown as TransactionsService,
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockUserRepository as unknown as Repository<User>,
         },
         {
           provide: EventKPIsService,
@@ -93,6 +105,7 @@ describe('EventsService', () => {
 
       expect(result).toEqual(events);
       expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { status: 'active' },
         order: { createdAt: 'DESC' },
       });
     });

@@ -24,7 +24,7 @@ interface RankedTransactionRow {
   date: Date;
   created_at: Date;
   date_rank: number;
-  total_dates: number;
+  total_dates: number | string;
 }
 
 @Injectable()
@@ -167,7 +167,7 @@ export class TransactionPaginationService {
     offset: number,
     numberOfDates: number,
   ): { totalDates: number; hasMore: boolean; loadedDates: number } {
-    const totalDates = rawResults.length > 0 ? rawResults[0].total_dates : 0;
+    const totalDates = rawResults.length > 0 ? Number(rawResults[0].total_dates) : 0;
     const uniqueDatesLoaded = new Set(transactions.map((t) => t.date.toISOString().split('T')[0])).size;
     const hasMore = offset + numberOfDates < totalDates;
 

@@ -1,0 +1,66 @@
+name: Backend Tests (Manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: friends_db_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.27.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create backend test environment
+        run: |
+          cat > apps/backend/.env.test <<'EOF'
+          PORT=3001
+          NODE_ENV=test
+          DATABASE_HOST=localhost
+          DATABASE_PORT=5432
+          DATABASE_USER=postgres
+          DATABASE_PASSWORD=postgres
+          DATABASE_NAME=friends_db_test
+          DATABASE_SSL=false
+          TYPEORM_SYNC=true
+          TYPEORM_LOGGING=false
+          CORS_ORIGIN=http://localhost:5173
+          JWT_SECRET=test-secret-key
+          JWT_EXPIRATION=1h
+          GOOGLE_CLIENT_ID=test-client-id
+          GOOGLE_CLIENT_SECRET=test-client-secret
+          GOOGLE_CALLBACK_URL=http://localhost:3001/api/auth/google/callback
+          FRONTEND_URL=http://localhost:5173/friends-web/#
+          EOF
+
+      - name: Run backend test suite
+        run: pnpm --filter @friends/backend test:all

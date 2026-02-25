@@ -18,9 +18,10 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
+    "types": ["node", "jest"],
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
   },
-  "include": ["src/**/*", "src/types/express.d.ts"]
+  "include": ["src/**/*", "src/types/express.d.ts", "test/**/*.ts"]
 }
