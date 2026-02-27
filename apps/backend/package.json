@@ -13,6 +13,7 @@
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:debug": "NODE_ENV=development nest start --debug --watch",
     "start:prod": "NODE_ENV=production node dist/main",
+    "start:prod:migrate": "NODE_ENV=production pnpm migration:run:prod && NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "NODE_ENV=test jest --config ./test/jest.unit.json",
@@ -27,8 +28,11 @@
     "test:debug": "NODE_ENV=test node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --config ./test/jest.unit.json --runInBand",
     "clean": "rm -rf dist",
     "migration:generate": "typeorm migration:generate src/migrations/InitSchema --dataSource src/data-source.ts --require ts-node/register",
-    "migration:run": "typeorm migration:run --dataSource src/data-source.ts",
-    "migration:revert": "typeorm migration:revert --dataSource src/data-source.ts",
+    "migration:run": "pnpm migration:run:local",
+    "migration:run:local": "typeorm migration:run --dataSource src/data-source.ts",
+    "migration:run:prod": "typeorm migration:run --dataSource dist/data-source.js",
+    "migration:revert": "pnpm migration:revert:local",
+    "migration:revert:local": "typeorm migration:revert --dataSource src/data-source.ts",
     "typeorm": "typeorm"
   },
   "dependencies": {

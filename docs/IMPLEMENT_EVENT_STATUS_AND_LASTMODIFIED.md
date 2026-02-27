@@ -816,11 +816,14 @@ export class AddEventStatusAndTransactionUpdatedAt1708359600000 implements Migra
 
 ```bash
 # Desde la raíz del monorepo
-pnpm --filter @friends/backend run migration:run
+pnpm --filter @friends/backend run migration:run:local
 
 # O desde apps/backend/
 cd apps/backend
-pnpm run typeorm migration:run -d src/data-source.ts
+pnpm run migration:run:local
+
+# Producción (Render, tras build)
+pnpm run migration:run:prod
 ```
 
 ### 5.3. Verificar migration aplicada
@@ -844,8 +847,10 @@ SELECT id, title, created_at, updated_at FROM transactions LIMIT 5;
 
 ```bash
 # Desde la raíz del monorepo
-pnpm --filter @friends/backend run migration:revert
+pnpm --filter @friends/backend run migration:revert:local
 ```
+
+> Nota: `migration:run` y `migration:revert` siguen existiendo como alias de compatibilidad hacia `:local`.
 
 ---
 

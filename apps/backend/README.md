@@ -11,6 +11,7 @@ Backend RESTful API built with NestJS, TypeScript, PostgreSQL and TypeORM. Provi
 - [Tech Stack](#-tech-stack)
 - [Quick Start](#-quick-start)
 - [Available Scripts](#%EF%B8%8F-available-scripts)
+- [Migrations by Environment](#-migrations-by-environment)
 - [Project Structure](#-project-structure)
 - [API Documentation](#-api-documentation)
 - [Database](#%EF%B8%8F-database)
@@ -251,6 +252,29 @@ pnpm lint:fix       # Lint y auto-fix
 # Utilidades
 pnpm clean          # Limpiar directorio dist
 ```
+
+---
+
+## 🗃️ Migrations by Environment
+
+Usamos comandos explícitos por entorno para evitar confusiones entre código fuente TypeScript (`src`) y build de producción (`dist`).
+
+```bash
+# Local (TypeScript datasource)
+pnpm migration:run:local
+pnpm migration:revert:local
+
+# Producción (Render, después de build)
+pnpm migration:run:prod
+
+# Start de producción con migraciones automáticas
+pnpm start:prod:migrate
+```
+
+Notas:
+
+- `migration:run` y `migration:revert` siguen disponibles como alias de compatibilidad hacia `:local`.
+- En producción mantener `TYPEORM_SYNC=false` y aplicar cambios de esquema solo con migraciones versionadas.
 
 ---
 
