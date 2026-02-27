@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "@friends/backend",
   "version": "0.0.1",
   "description": "Friends Backend API - NestJS RESTful API",
