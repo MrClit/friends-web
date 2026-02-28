@@ -13,7 +13,7 @@ interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
  * Used for header controls like dark mode toggle and language selector.
  * Supports all native button props for compatibility with Radix UI asChild pattern.
  */
-export default function IconButton({ ariaLabel, children, className, variant = 'default', ...props }: IconButtonProps) {
+export function IconButton({ ariaLabel, children, className, variant = 'default', ...props }: IconButtonProps) {
   const baseStyles =
     'cursor-pointer rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-teal-400 h-10 flex items-center justify-center hover:bg-teal-100 dark:hover:bg-teal-800 transition-colors';
 

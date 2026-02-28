@@ -25,7 +25,9 @@
   },
   "auth": {
     "loginWithGoogle": "Iniciar sessió amb Google",
-    "loading": "Carregant autenticació..."
+    "loading": "Carregant autenticació...",
+    "error": "No s'ha pogut verificar la sessió. Comprova la connexió i torna-ho a provar.",
+    "retry": "Reintentar"
   },
   "common": {
     "loading": "Carregant...",
@@ -34,7 +36,11 @@
     "success": "Èxit",
     "validation_error": "Si us plau, completa tots els camps",
     "network_error": "Error de connexió. Torna-ho a provar",
-    "errorLoading": "No s'han pogut carregar les dades. Si us plau, torna-ho a provar."
+    "errorLoading": "No s'han pogut carregar les dades. Si us plau, torna-ho a provar.",
+    "retry": "Reintentar",
+    "back": "Tornar",
+    "edit": "Editar",
+    "delete": "Esborrar"
   },
   "eventsList": {
     "noEvents": "Encara no hi ha esdeveniments.",
@@ -184,5 +190,16 @@
     "update_error": "Error en actualitzar la transacció",
     "delete_success": "Transacció eliminada",
     "delete_error": "Error en eliminar la transacció"
+  },
+  "errorBoundary": {
+    "title": "Alguna cosa ha fallat",
+    "message": "S'ha produït un error inesperat. Pots provar de recarregar la pàgina.",
+    "reload": "Recarregar pàgina",
+    "details": "Detalls de l'error"
+  },
+  "notFound": {
+    "title": "Pàgina no trobada",
+    "message": "La pàgina que busques no existeix o s'ha mogut.",
+    "goHome": "Anar a l'inici"
   }
 }

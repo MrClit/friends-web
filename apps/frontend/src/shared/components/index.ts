@@ -1,11 +1,15 @@
 // Barrel file para componentes compartidos
 export * from './Header';
-export { default as ActionButton } from './ActionButton';
-export { default as ConfirmDialog } from './ConfirmDialog';
-export { default as IconButton } from './IconButton';
-export { default as HeaderSection } from './HeaderSection';
-export { default as Skeleton } from './Skeleton';
-export { default as Logo } from './Logo';
-export { default as Avatar } from './Avatar';
-export { default as ThemeInitializer } from './ThemeInitializer';
-export { default as Toast } from './Toast';
+export { ActionButton } from './ActionButton';
+export { ConfirmDialog } from './ConfirmDialog';
+export { IconButton } from './IconButton';
+export { HeaderSection } from './HeaderSection';
+export { Skeleton } from './Skeleton';
+export { Logo } from './Logo';
+export { Avatar } from './Avatar';
+export { ThemeInitializer } from './ThemeInitializer';
+export { Toast } from './Toast';
+export { ErrorBoundary } from './ErrorBoundary';
+export { AppLoadingFallback } from './AppLoadingFallback';
+export { ErrorState } from './ErrorState';
+export { FormErrorAlert } from './FormErrorAlert';

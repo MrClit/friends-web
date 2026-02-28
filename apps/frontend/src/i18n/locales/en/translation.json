@@ -25,7 +25,9 @@
   },
   "auth": {
     "loginWithGoogle": "Login with Google",
-    "loading": "Loading authentication..."
+    "loading": "Loading authentication...",
+    "error": "Could not verify your session. Please check your connection and try again.",
+    "retry": "Retry"
   },
   "common": {
     "loading": "Loading...",
@@ -34,7 +36,11 @@
     "success": "Success",
     "validation_error": "Please complete all fields",
     "network_error": "Connection error. Please try again",
-    "errorLoading": "Could not load data. Please try again."
+    "errorLoading": "Could not load data. Please try again.",
+    "retry": "Retry",
+    "back": "Back",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "eventsList": {
     "noEvents": "No events yet.",
@@ -184,5 +190,16 @@
     "update_error": "Error updating transaction",
     "delete_success": "Transaction deleted",
     "delete_error": "Error deleting transaction"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred. You can try reloading the page.",
+    "reload": "Reload page",
+    "details": "Error details"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The page you're looking for doesn't exist or has been moved.",
+    "goHome": "Go to home"
   }
 }

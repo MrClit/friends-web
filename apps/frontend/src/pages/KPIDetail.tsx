@@ -1,12 +1,12 @@
 import { useParams } from 'react-router-dom';
 import { KPIDetailView } from '@/features/kpi';
-import MainLayout from './MainLayout';
+import { MainLayout } from './MainLayout';
 
 /**
  * KPI Detail Page
  * Router wrapper that extracts the event ID and KPI type, then delegates to KPIDetailView
  */
-export default function KPIDetail() {
+export function KPIDetail() {
   const { id, kpi } = useParams<{ id: string; kpi: string }>();
 
   if (!id || !kpi) {

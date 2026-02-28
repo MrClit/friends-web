@@ -1,32 +1,28 @@
 import type { EventParticipant } from '../types';
-import ParticipantsList from './ParticipantsList';
-import IconPicker from './IconPicker';
+import { ParticipantsList } from './ParticipantsList';
+import { IconPicker } from './IconPicker';
 import { useTranslation } from 'react-i18next';
 
-interface EventFormProps {
+export interface EventFormState {
   title: string;
   setTitle: (title: string) => void;
   description: string;
   setDescription: (description: string) => void;
   participants: EventParticipant[];
   setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
-  onSubmit: (e: React.FormEvent) => void;
   icon?: string;
   setIcon?: (key: string) => void;
 }
 
-export default function EventForm({
-  title,
-  setTitle,
-  description,
-  setDescription,
-  participants,
-  setParticipants,
-  onSubmit,
-  icon,
-  setIcon,
-}: EventFormProps) {
+interface EventFormProps {
+  fields: EventFormState;
+  onSubmit: (e: React.FormEvent) => void;
+}
+
+export function EventForm({ fields, onSubmit }: EventFormProps) {
   const { t } = useTranslation();
+  const { title, setTitle, description, setDescription, participants, setParticipants, icon, setIcon } = fields;
+
   return (
     <form id="event-form" className="space-y-6" onSubmit={onSubmit}>
       {setIcon && <IconPicker selected={icon} onSelect={setIcon} />}

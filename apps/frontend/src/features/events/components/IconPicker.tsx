@@ -8,7 +8,7 @@ interface IconPickerProps {
   onSelect: (key: string) => void;
 }
 
-export default function IconPicker({ selected, onSelect }: IconPickerProps) {
+export function IconPicker({ selected, onSelect }: IconPickerProps) {
   const { t } = useTranslation();
 
   return (

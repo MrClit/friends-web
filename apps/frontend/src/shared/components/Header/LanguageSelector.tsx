@@ -7,7 +7,7 @@ import { LANGUAGES } from '@/i18n/constants';
  * Language selector dropdown with i18n support.
  * Shows language names in dropdown and checkmark for active language.
  */
-export default function LanguageSelector() {
+export function LanguageSelector() {
   const { i18n, t } = useTranslation();
   const current = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0];
 

@@ -2,8 +2,8 @@ import { MdDelete } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { useParticipantsList } from '../hooks/useParticipantsList';
 import { cn } from '@/shared/utils/cn';
-import Avatar from '@/shared/components/Avatar';
-import ParticipantsCombobox from './ParticipantsCombobox';
+import { Avatar } from '@/shared/components/Avatar';
+import { ParticipantsCombobox } from './ParticipantsCombobox';
 import type { EventParticipant } from '../types';
 import { getParticipantAvatar, getParticipantName } from '../utils/participants';
 
@@ -12,7 +12,7 @@ interface ParticipantsListProps {
   setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
 }
 
-export default function ParticipantsList({ participants, setParticipants }: ParticipantsListProps) {
+export function ParticipantsList({ participants, setParticipants }: ParticipantsListProps) {
   const { t } = useTranslation();
   const { inputValue, setInputValue, handleAddParticipant, handleDeleteParticipant } = useParticipantsList({
     setParticipants,

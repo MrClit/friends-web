@@ -12,7 +12,7 @@ export function useEventDetail(id: string | undefined) {
   const navigate = useNavigate();
 
   // React Query hooks for data fetching and mutations
-  const { data: event, isLoading, error } = useEvent(id);
+  const { data: event, isLoading, error, refetch } = useEvent(id);
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
   const { data: kpis } = useEventKPIs(id);
@@ -60,6 +60,7 @@ export function useEventDetail(id: string | undefined) {
     kpis,
     isLoading,
     error,
+    refetch,
     // Handlers
     handleEditSubmit,
     handleDelete,

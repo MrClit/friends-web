@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import * as Progress from '@radix-ui/react-progress';
 import { Avatar } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
@@ -8,7 +9,7 @@ interface KPIParticipantItemProps {
   gradientClass: string;
 }
 
-export default function KPIParticipantItem({ item, gradientClass }: KPIParticipantItemProps) {
+export const KPIParticipantItem = memo(function KPIParticipantItem({ item, gradientClass }: KPIParticipantItemProps) {
   const percentage = item.percentage ?? 0;
   const avatarSrc = item.avatar?.startsWith('http') ? item.avatar : undefined;
 
@@ -55,4 +56,4 @@ export default function KPIParticipantItem({ item, gradientClass }: KPIParticipa
       </div>
     </div>
   );
-}
+});

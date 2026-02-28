@@ -1,12 +1,12 @@
 import { EventsList, EventFormModal } from '../features/events/components';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
-import MainLayout from './MainLayout';
+import { MainLayout } from './MainLayout';
 // import FloatingActionButton from '../shared/components/FloatingActionButton';
-import HeaderSection from '@/shared/components/HeaderSection';
+import { HeaderSection } from '@/shared/components/HeaderSection';
 import { useTranslation } from 'react-i18next';
 import { MdAdd } from 'react-icons/md';
 
-export default function Home() {
+export function Home() {
   const { openModal } = useEventFormModalStore();
   const { t } = useTranslation();
 

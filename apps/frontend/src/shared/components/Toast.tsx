@@ -19,7 +19,7 @@ const bgMap = {
     'bg-yellow-100/95 border-yellow-300 text-yellow-950 dark:bg-yellow-900/85 dark:border-yellow-700 dark:text-yellow-50',
 };
 
-export default function Toast() {
+export function Toast() {
   const { toasts, removeToast } = useToastStore();
 
   return (

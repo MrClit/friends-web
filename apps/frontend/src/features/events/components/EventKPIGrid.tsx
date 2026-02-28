@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MdAccountBalanceWallet, MdVolunteerActivism, MdShoppingBag, MdCreditCard } from 'react-icons/md';
-import KPIBox from './KPIBox';
+import { KPIBox } from './KPIBox';
 
 interface EventKPIGridProps {
   eventId: string;
@@ -55,7 +55,7 @@ const KPI_CONFIG: KPIConfig[] = [
   },
 ];
 
-export default function EventKPIGrid(props: EventKPIGridProps) {
+export function EventKPIGrid(props: EventKPIGridProps) {
   const { eventId } = props;
   const navigate = useNavigate();
   const { t } = useTranslation();

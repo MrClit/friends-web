@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { Transaction } from '../types';
 import { PAYMENT_TYPE_CONFIG, POT_CONFIG } from '../constants';
 import { formatAmount } from '@/shared/utils/format';
-import PaymentIcon from './PaymentIcon';
+import { PaymentIcon } from './PaymentIcon';
 import { isPotExpense } from '../utils';
 import { cn } from '@/shared/utils/cn';
 
@@ -18,7 +18,7 @@ interface TransactionItemProps {
  * Displays transaction info with icon, title, participant, and amount
  * Optimized with React.memo to prevent unnecessary re-renders
  */
-function TransactionItem({ transaction, onClick, participantsMap }: TransactionItemProps) {
+function TransactionItemBase({ transaction, onClick, participantsMap }: TransactionItemProps) {
   const { t } = useTranslation();
 
   const isPot = isPotExpense(transaction);
@@ -83,4 +83,4 @@ function TransactionItem({ transaction, onClick, participantsMap }: TransactionI
 }
 
 // Memoize to prevent unnecessary re-renders
-export default memo(TransactionItem);
+export const TransactionItem = memo(TransactionItemBase);

@@ -8,7 +8,7 @@ interface TransactionTypeSelectorProps {
   onChange: (type: PaymentType) => void;
 }
 
-export default function TransactionTypeSelector({ value, onChange }: TransactionTypeSelectorProps) {
+export function TransactionTypeSelector({ value, onChange }: TransactionTypeSelectorProps) {
   const { t } = useTranslation();
   return (
     <div className="flex justify-center w-full">

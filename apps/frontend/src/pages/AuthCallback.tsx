@@ -14,7 +14,7 @@ function parseQuery(search: string) {
   };
 }
 
-export default function AuthCallback() {
+export function AuthCallback() {
   const navigate = useNavigate();
   const location = useLocation();
   const { setAuth } = useAuth();
@@ -24,13 +24,16 @@ export default function AuthCallback() {
 
     if (token && id && email && role) {
       // Cast types to match User interface
-      setAuth({
-        id: id ?? '',
-        email: email ?? '',
-        name: name ?? undefined,
-        avatar: avatar ?? undefined,
-        role: role as 'admin' | 'user',
-      }, token);
+      setAuth(
+        {
+          id: id ?? '',
+          email: email ?? '',
+          name: name ?? undefined,
+          avatar: avatar ?? undefined,
+          role: role as 'admin' | 'user',
+        },
+        token,
+      );
       navigate('/', { replace: true });
     } else {
       navigate('/', { replace: true });

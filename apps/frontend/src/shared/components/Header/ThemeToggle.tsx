@@ -5,7 +5,7 @@ import { useThemeStore } from '@/shared/store/useThemeStore';
 /**
  * Dark mode toggle button with i18n support and icon animation.
  */
-export default function ThemeToggle() {
+export function ThemeToggle() {
   const { mode, toggle } = useThemeStore();
   const { t } = useTranslation();
 

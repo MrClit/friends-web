@@ -7,7 +7,7 @@ interface EventContextMenuProps {
   onDelete?: () => void;
 }
 
-export default function EventContextMenu({ onEdit, onDelete }: EventContextMenuProps) {
+export function EventContextMenu({ onEdit, onDelete }: EventContextMenuProps) {
   const { t } = useTranslation();
 
   return (

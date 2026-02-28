@@ -8,13 +8,14 @@ import {
   DialogBody,
   DialogPrimaryButton,
 } from '@/shared/components/ui';
-import ConfirmDialog from '../../../shared/components/ConfirmDialog';
-import EventForm from './EventForm';
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
+import { FormErrorAlert } from '@/shared/components/FormErrorAlert';
+import { EventForm } from './EventForm';
 import { useTranslation } from 'react-i18next';
 import { useEventFormModal } from '../hooks/useEventFormModal';
-import useEventFormModalStore from '@/shared/store/useEventFormModalStore';
+import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 
-export default function EventFormModal() {
+export function EventFormModal() {
   const { t } = useTranslation();
   const { open, closeModal, event, onSubmit } = useEventFormModalStore();
 
@@ -70,22 +71,20 @@ export default function EventFormModal() {
 
           <DialogBody>
             <div>
-              {errorMessage && (
-                <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg text-red-800 dark:text-red-200 text-sm">
-                  {errorMessage}
-                </div>
-              )}
+              <FormErrorAlert message={errorMessage} />
 
               <EventForm
-                title={title}
-                setTitle={setTitle}
-                description={description}
-                setDescription={setDescription}
-                participants={participants}
-                setParticipants={setParticipants}
+                fields={{
+                  title,
+                  setTitle,
+                  description,
+                  setDescription,
+                  participants,
+                  setParticipants,
+                  icon,
+                  setIcon,
+                }}
                 onSubmit={handleSubmit}
-                icon={icon}
-                setIcon={setIcon}
               />
             </div>
           </DialogBody>

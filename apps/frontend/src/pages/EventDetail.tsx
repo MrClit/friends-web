@@ -1,21 +1,22 @@
-import MainLayout from './MainLayout';
+import { MainLayout } from './MainLayout';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEventDetail } from '@/features/events/hooks';
 import { useConfirmDialog } from '@/hooks/common';
 import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
-import useEventFormModalStore from '@/shared/store/useEventFormModalStore';
-import useTransactionModalStore from '@/shared/store/useTransactionModalStore';
-import TransactionModal from '../features/transactions/components/TransactionModal';
-import TransactionsList from '../features/transactions/components/TransactionsList';
-import ActionButton from '@/shared/components/ActionButton';
-import { ConfirmDialog } from '@/shared/components';
+import { EventDetailSkeleton } from '@/features/events/components/EventDetailSkeleton';
+import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
+import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
+import { TransactionModal } from '../features/transactions/components/TransactionModal';
+import { TransactionsList } from '../features/transactions/components/TransactionsList';
+import { ActionButton } from '@/shared/components/ActionButton';
+import { ConfirmDialog, ErrorState } from '@/shared/components';
 import { MdAdd } from 'react-icons/md';
 
-export default function EventDetail() {
+export function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
-  const { event, kpis, isLoading, error, handleEditSubmit, handleDelete, handleBack } = useEventDetail(id);
+  const { event, kpis, isLoading, error, refetch, handleEditSubmit, handleDelete, handleBack } = useEventDetail(id);
 
   // UI state management
   const eventFormModalStore = useEventFormModalStore();
@@ -34,7 +35,7 @@ export default function EventDetail() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="text-center mt-10 text-teal-400">{t('common.loading')}</div>
+        <EventDetailSkeleton />
       </MainLayout>
     );
   }
@@ -42,9 +43,7 @@ export default function EventDetail() {
   if (error) {
     return (
       <MainLayout>
-        <div className="text-center mt-10 text-red-400">
-          {t('common.error')}: {error.message}
-        </div>
+        <ErrorState onRetry={() => refetch()} />
       </MainLayout>
     );
   }

@@ -34,5 +34,3 @@ export const useTransactionModalStore = create<State>((set) => ({
       isLoading: false,
     })),
 }));
-
-export default useTransactionModalStore;

@@ -1,5 +1,5 @@
 import type { KPIParticipantItem, KPIConfig } from '../types';
-import KPIParticipantItemRow from './KPIParticipantItem';
+import { KPIParticipantItem as KPIParticipantItemRow } from './KPIParticipantItem';
 
 interface KPIParticipantsListProps {
   items: KPIParticipantItem[];
@@ -13,7 +13,7 @@ interface KPIParticipantsListProps {
  * Pot items are visually differentiated with orange styling
  * Gradient colors are aligned with the KPI type (balance=green, contributions=blue, expenses=red, pending=yellow)
  */
-export default function KPIParticipantsList({ items, title, kpiConfig }: KPIParticipantsListProps) {
+export function KPIParticipantsList({ items, title, kpiConfig }: KPIParticipantsListProps) {
   const participantCount = items.length;
 
   const getGradientClass = (index: number) => {

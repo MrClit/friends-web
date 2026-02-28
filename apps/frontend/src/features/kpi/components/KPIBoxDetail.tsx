@@ -14,7 +14,7 @@ interface KPIBoxDetailProps {
  * Displays KPI value with colors based on the KPI type
  * Supports responsive layout with dynamic styling
  */
-export default function KPIBoxDetail({ kpi, kpiValue, kpiConfig }: KPIBoxDetailProps) {
+export function KPIBoxDetail({ kpi, kpiValue, kpiConfig }: KPIBoxDetailProps) {
   const { t } = useTranslation();
   const config = kpiConfig[kpi];
   const IconComponent = config.IconComponent;

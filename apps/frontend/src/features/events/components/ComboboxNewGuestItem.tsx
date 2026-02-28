@@ -8,7 +8,7 @@ interface ComboboxNewGuestItemProps {
   onHover: () => void;
 }
 
-export default function ComboboxNewGuestItem({ name, isHighlighted, onSelect, onHover }: ComboboxNewGuestItemProps) {
+export function ComboboxNewGuestItem({ name, isHighlighted, onSelect, onHover }: ComboboxNewGuestItemProps) {
   const { t } = useTranslation();
 
   return (

@@ -8,7 +8,7 @@ interface ActionButtonProps {
   className?: string;
 }
 
-export default function ActionButton({ onClick, actionLabel, actionIcon, className }: ActionButtonProps) {
+export function ActionButton({ onClick, actionLabel, actionIcon, className }: ActionButtonProps) {
   return (
     <button
       type="button"

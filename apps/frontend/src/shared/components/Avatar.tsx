@@ -17,16 +17,7 @@ interface AvatarProps {
  * Reusable avatar component that renders the image when available
  * and falls back to the string avatar when not.
  */
-export default function Avatar({
-  avatar,
-  name,
-  email,
-  alt,
-  isPot,
-  className,
-  imageClassName,
-  fallbackClassName,
-}: AvatarProps) {
+export function Avatar({ avatar, name, email, alt, isPot, className, imageClassName, fallbackClassName }: AvatarProps) {
   const [hasError, setHasError] = useState(false);
   const hasAvatar = Boolean(avatar && avatar.trim() !== '' && !hasError);
   const resolvedAlt = alt ?? name ?? email ?? 'User';

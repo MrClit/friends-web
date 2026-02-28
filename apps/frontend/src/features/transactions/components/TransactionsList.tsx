@@ -1,7 +1,7 @@
 import type { Transaction } from '../types';
 import type { Event } from '../../events/types';
-import TransactionModal from './TransactionModal';
-import TransactionItem from './TransactionItem';
+import { TransactionModal } from './TransactionModal';
+import { TransactionItem } from './TransactionItem';
 import { useMemo, useCallback } from 'react';
 import { formatDateLong } from '@/shared/utils/format';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,7 @@ function groupByDate(transactions: Transaction[]) {
   );
 }
 
-export default function TransactionsList({ event }: TransactionsListProps) {
+export function TransactionsList({ event }: TransactionsListProps) {
   const transactionModalStore = useTransactionModalStore();
   const { t } = useTranslation();
 

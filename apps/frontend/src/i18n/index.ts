@@ -50,4 +50,4 @@ export function getCurrentLocale(): string {
   return LOCALE_MAP[language] || 'es-ES';
 }
 
-export default i18n;
+export { i18n };

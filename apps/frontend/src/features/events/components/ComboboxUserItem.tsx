@@ -1,5 +1,5 @@
 import { cn } from '@/shared/utils/cn';
-import Avatar from '@/shared/components/Avatar';
+import { Avatar } from '@/shared/components/Avatar';
 import type { User } from '@/features/auth/types';
 
 interface ComboboxUserItemProps {
@@ -9,7 +9,7 @@ interface ComboboxUserItemProps {
   onHover: () => void;
 }
 
-export default function ComboboxUserItem({ user, isHighlighted, onSelect, onHover }: ComboboxUserItemProps) {
+export function ComboboxUserItem({ user, isHighlighted, onSelect, onHover }: ComboboxUserItemProps) {
   return (
     <button
       type="button"

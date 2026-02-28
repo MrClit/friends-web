@@ -8,7 +8,7 @@ import { UserMenu } from '@/shared/components/Header';
  * Main application header with logo, language selector, theme toggle, and user menu.
  * Responsive and accessible layout.
  */
-export default function Header() {
+export function Header() {
   const { t } = useTranslation();
   return (
     <nav

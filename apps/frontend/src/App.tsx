@@ -3,51 +3,57 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 
 import { QueryProvider } from './providers/QueryProvider';
 import { RequireAuth } from './features/auth/RequireAuth';
-import Toast from './shared/components/Toast';
+import { ErrorBoundary } from './shared/components/ErrorBoundary';
+import { AppLoadingFallback } from './shared/components/AppLoadingFallback';
+import { Toast } from './shared/components/Toast';
 
 // Lazy-loaded components for code-splitting
-const Home = lazy(() => import('./pages/Home'));
-const EventDetail = lazy(() => import('./pages/EventDetail'));
-const KPIDetail = lazy(() => import('./pages/KPIDetail'));
-const AuthCallback = lazy(() => import('./pages/AuthCallback'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
+const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })));
+const EventDetail = lazy(() => import('./pages/EventDetail').then((m) => ({ default: m.EventDetail })));
+const KPIDetail = lazy(() => import('./pages/KPIDetail').then((m) => ({ default: m.KPIDetail })));
+const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })));
+const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })));
 
-export default function App() {
+export function App() {
   return (
     <QueryProvider>
-      <HashRouter>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route
-              path="/"
-              element={
-                <RequireAuth>
-                  <Home />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/event/:id"
-              element={
-                <RequireAuth>
-                  <EventDetail />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/event/:id/kpi/:kpi"
-              element={
-                <RequireAuth>
-                  <KPIDetail />
-                </RequireAuth>
-              }
-            />
-          </Routes>
-          <Toast />
-        </Suspense>
-      </HashRouter>
+      <ErrorBoundary>
+        <HashRouter>
+          <Suspense fallback={<AppLoadingFallback />}>
+            <Routes>
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route
+                path="/"
+                element={
+                  <RequireAuth>
+                    <Home />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/event/:id"
+                element={
+                  <RequireAuth>
+                    <EventDetail />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/event/:id/kpi/:kpi"
+                element={
+                  <RequireAuth>
+                    <KPIDetail />
+                  </RequireAuth>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toast />
+          </Suspense>
+        </HashRouter>
+      </ErrorBoundary>
     </QueryProvider>
   );
 }

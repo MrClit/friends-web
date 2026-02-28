@@ -1,19 +1,25 @@
 import { useEvents } from '@/hooks/api/useEvents';
 import { useTranslation } from 'react-i18next';
-import EventsListSkeleton from './EventsListSkeleton';
+import { EventsListSkeleton } from './EventsListSkeleton';
 import { EventCard } from './EventCard';
 import { CreateEventCard } from './CreateEventCard';
 import { useNavigate } from 'react-router-dom';
-import useEventFormModalStore from '@/shared/store/useEventFormModalStore';
+import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 import { getEventIconComponent } from '../constants';
 import { getParticipantAvatar, getParticipantName } from '../utils/participants';
+import { ErrorState } from '@/shared/components/ErrorState';
+
+function EventIcon({ iconKey }: { iconKey?: string }) {
+  const Comp = getEventIconComponent(iconKey);
+  return Comp ? <Comp fontSize={32} /> : null;
+}
 
 /**
  * Events list component with consistent layout for all states.
  * Displays loading skeleton, error message, empty state, or list of events.
  */
-export default function EventsList() {
-  const { data: events, isLoading, error } = useEvents();
+export function EventsList() {
+  const { data: events, isLoading, error, refetch } = useEvents();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const openModal = useEventFormModalStore((s) => s.openModal);
@@ -25,13 +31,7 @@ export default function EventsList() {
   }
 
   if (error) {
-    return (
-      <div className="w-full max-w-7xl mx-auto mt-4 sm:mt-8">
-        <div className="text-center py-8 px-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-          <p className="text-red-600 dark:text-red-400 font-medium">{t('common.errorLoading')}</p>
-        </div>
-      </div>
-    );
+    return <ErrorState onRetry={() => refetch()} />;
   }
 
   if (!events || events.length === 0) {
@@ -62,10 +62,7 @@ export default function EventsList() {
                   avatarUrl: getParticipantAvatar(p) ?? undefined,
                 })) || [],
               lastModified: event.lastModified || event.updatedAt,
-              icon: (() => {
-                const IconComponent = getEventIconComponent(event.icon);
-                return IconComponent ? <IconComponent fontSize={32} /> : undefined;
-              })(),
+              icon: <EventIcon iconKey={event.icon} />,
             }}
             onClick={() => navigate(`/event/${event.id}`)}
             className="animate-in fade-in duration-500"

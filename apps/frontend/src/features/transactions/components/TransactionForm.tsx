@@ -6,7 +6,7 @@ import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
 import { FaUser, FaChevronDown } from 'react-icons/fa';
 import { getParticipantName } from '@/features/events/utils/participants';
 
-interface TransactionFormProps {
+export interface TransactionFormState {
   type: PaymentType;
   title: string;
   setTitle: (v: string) => void;
@@ -14,26 +14,20 @@ interface TransactionFormProps {
   setAmount: (v: string) => void;
   date: string;
   setDate: (v: string) => void;
-  from: string;
+  participantId: string;
   setParticipantId: (v: string) => void;
+}
+
+interface TransactionFormProps {
+  fields: TransactionFormState;
   participants: EventParticipant[];
   onSubmit: (e: React.FormEvent) => void;
 }
 
-export default function TransactionForm({
-  type,
-  title,
-  setTitle,
-  amount,
-  setAmount,
-  date,
-  setDate,
-  from,
-  setParticipantId,
-  participants,
-  onSubmit,
-}: TransactionFormProps) {
+export function TransactionForm({ fields, participants, onSubmit }: TransactionFormProps) {
   const { t } = useTranslation();
+  const { type, title, setTitle, amount, setAmount, date, setDate, participantId, setParticipantId } = fields;
+
   return (
     <form id="transaction-form" className="space-y-8 pb-6" onSubmit={onSubmit}>
       {/* Title input */}
@@ -96,7 +90,7 @@ export default function TransactionForm({
           </div>
           <select
             className="w-full pl-12 pr-12 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium appearance-none cursor-pointer"
-            value={from}
+            value={participantId}
             onChange={(e) => setParticipantId(e.target.value)}
           >
             <option value="" disabled>

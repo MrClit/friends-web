@@ -1,6 +1,7 @@
-import TransactionForm from './TransactionForm';
-import TransactionTypeSelector from './TransactionTypeSelector';
-import ConfirmDialog from '../../../shared/components/ConfirmDialog';
+import { TransactionForm } from './TransactionForm';
+import { TransactionTypeSelector } from './TransactionTypeSelector';
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
+import { FormErrorAlert } from '@/shared/components/FormErrorAlert';
 import { useTranslation } from 'react-i18next';
 import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
 import { useTransactionModal } from '../hooks/useTransactionModal';
@@ -15,7 +16,7 @@ import {
   DialogPrimaryButton,
 } from '@/shared/components/ui';
 
-export default function TransactionModal() {
+export function TransactionModal() {
   const { open, event, transaction, closeModal } = useTransactionModalStore();
   const { t } = useTranslation();
 
@@ -81,12 +82,7 @@ export default function TransactionModal() {
           {/* Body with scroll */}
           <DialogBody className="flex-1 overflow-y-auto px-6 sm:px-8 py-2 custom-scrollbar">
             <div className="space-y-8 pb-6">
-              {/* Error message */}
-              {errorMessage && (
-                <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg text-red-800 dark:text-red-200 text-sm">
-                  {errorMessage}
-                </div>
-              )}
+              <FormErrorAlert message={errorMessage} />
 
               {/* TransactionTypeSelector */}
               <div className="flex justify-center">
@@ -95,15 +91,17 @@ export default function TransactionModal() {
 
               {/* TransactionForm (without submit button) */}
               <TransactionForm
-                type={type}
-                title={title}
-                setTitle={setTitle}
-                amount={amount}
-                setAmount={setAmount}
-                date={date}
-                setDate={setDate}
-                from={participantId}
-                setParticipantId={setParticipantId}
+                fields={{
+                  type,
+                  title,
+                  setTitle,
+                  amount,
+                  setAmount,
+                  date,
+                  setDate,
+                  participantId,
+                  setParticipantId,
+                }}
                 participants={event.participants}
                 onSubmit={handleSubmit}
               />

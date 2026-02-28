@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/hooks/api/useTransactions';
+import { useModalForm } from '@/hooks/common';
 import type { Transaction, PaymentType } from '../types';
 import type { Event } from '@/features/events/types';
 
@@ -94,12 +95,8 @@ export function useTransactionModal({
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [participantId, setParticipantId] = useState('');
 
-  // Confirmation dialogs state
+  // Delete confirmation state (separate from discard)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
-
-  // Error state
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { t } = useTranslation();
 
@@ -125,15 +122,7 @@ export function useTransactionModal({
       setDate(new Date().toISOString().slice(0, 10));
       setParticipantId('');
     }
-    setErrorMessage(null);
   }, [transaction]);
-
-  // Reset form when modal opens
-  useEffect(() => {
-    if (open) {
-      resetForm();
-    }
-  }, [open, resetForm]);
 
   // Computed values (must be declared before handlers that use them)
   const canSubmit = useMemo(
@@ -148,13 +137,22 @@ export function useTransactionModal({
 
   const isLoading = createTransaction.isPending || updateTransaction.isPending || deleteTransaction.isPending;
 
+  // Shared modal lifecycle (discard confirmation, error, reset-on-open)
+  const modal = useModalForm({
+    open,
+    isDirty,
+    resetForm,
+    onClose,
+    extraBlockers: [showDeleteConfirm],
+  });
+
   // Handlers
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (!canSubmit || !event) return;
 
-      setErrorMessage(null);
+      modal.setErrorMessage(null);
 
       if (transaction) {
         // Update existing transaction
@@ -171,13 +169,11 @@ export function useTransactionModal({
           },
           {
             onSuccess: () => {
-              setShowDiscardConfirm(false);
-              resetForm();
-              onClose();
+              modal.closeAndReset();
             },
             onError: (error) => {
               const message = error instanceof Error ? error.message : t('common.errorLoading');
-              setErrorMessage(message);
+              modal.setErrorMessage(message);
             },
           },
         );
@@ -193,13 +189,11 @@ export function useTransactionModal({
           },
           {
             onSuccess: () => {
-              setShowDiscardConfirm(false);
-              resetForm();
-              onClose();
+              modal.closeAndReset();
             },
             onError: (error) => {
               const message = error instanceof Error ? error.message : t('common.errorLoading');
-              setErrorMessage(message);
+              modal.setErrorMessage(message);
             },
           },
         );
@@ -216,8 +210,7 @@ export function useTransactionModal({
       date,
       updateTransaction,
       createTransaction,
-      resetForm,
-      onClose,
+      modal,
       t,
     ],
   );
@@ -231,45 +224,18 @@ export function useTransactionModal({
       deleteTransaction.mutate(transaction.id, {
         onSuccess: () => {
           setShowDeleteConfirm(false);
-          setShowDiscardConfirm(false);
-          resetForm();
-          onClose();
+          modal.closeAndReset();
         },
         onError: (error) => {
           const message = error instanceof Error ? error.message : t('common.errorLoading');
-          setErrorMessage(message);
+          modal.setErrorMessage(message);
         },
       });
     }
-  }, [transaction, deleteTransaction, resetForm, onClose, t]);
+  }, [transaction, deleteTransaction, modal, t]);
 
   const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(false);
-  }, []);
-
-  const handleOpenChange = useCallback(
-    (isOpen: boolean) => {
-      // Don't allow closing if ConfirmDialog is already open
-      if (!isOpen && !showDiscardConfirm && !showDeleteConfirm) {
-        if (isDirty) {
-          setShowDiscardConfirm(true);
-        } else {
-          resetForm();
-          onClose();
-        }
-      }
-    },
-    [isDirty, showDiscardConfirm, showDeleteConfirm, resetForm, onClose],
-  );
-
-  const handleConfirmDiscard = useCallback(() => {
-    setShowDiscardConfirm(false);
-    resetForm();
-    onClose();
-  }, [resetForm, onClose]);
-
-  const handleCancelDiscard = useCallback(() => {
-    setShowDiscardConfirm(false);
   }, []);
 
   return {
@@ -287,21 +253,21 @@ export function useTransactionModal({
 
     // Confirmation dialogs
     showDeleteConfirm,
-    showDiscardConfirm,
+    showDiscardConfirm: modal.showDiscardConfirm,
 
     // Computed
     isLoading,
     canSubmit,
     isDirty,
-    errorMessage,
+    errorMessage: modal.errorMessage,
 
     // Handlers
     handleSubmit,
     handleDelete,
     handleConfirmDelete,
     handleCancelDelete,
-    handleOpenChange,
-    handleConfirmDiscard,
-    handleCancelDiscard,
+    handleOpenChange: modal.handleOpenChange,
+    handleConfirmDiscard: modal.handleConfirmDiscard,
+    handleCancelDiscard: modal.handleCancelDiscard,
   };
 }

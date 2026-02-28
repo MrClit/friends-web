@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { formatDateLong } from './formatDateLong';
-import i18n from '@/i18n';
+import { i18n } from '@/i18n';
 
 /**
  * Tests for the formatDateLong utility

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useThemeStore } from '../store/useThemeStore';
 import type { ThemeState } from '../store/useThemeStore';
 
-export default function ThemeInitializer() {
+export function ThemeInitializer() {
   const init = useThemeStore((state: ThemeState) => state.init);
   useEffect(() => {
     init();

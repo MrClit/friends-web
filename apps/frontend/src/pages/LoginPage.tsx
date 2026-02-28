@@ -1,7 +1,7 @@
 import { GoogleLoginButton } from '@/features/auth/GoogleLoginButton';
 import { Logo } from '@/shared/components';
 
-export default function LoginPage() {
+export function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-b from-teal-100 to-teal-300 dark:from-teal-900 dark:to-teal-950">
       <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 flex flex-col items-center">

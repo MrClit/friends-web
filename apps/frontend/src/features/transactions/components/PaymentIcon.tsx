@@ -9,7 +9,7 @@ interface PaymentIconProps {
  * Helper component to render the appropriate icon for a payment type
  * Uses centralized configuration from constants
  */
-export default function PaymentIcon({ type }: PaymentIconProps) {
+export function PaymentIcon({ type }: PaymentIconProps) {
   const config = PAYMENT_TYPE_CONFIG[type];
 
   // Fallback if type is invalid

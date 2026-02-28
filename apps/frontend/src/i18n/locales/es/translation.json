@@ -25,7 +25,9 @@
   },
   "auth": {
     "loginWithGoogle": "Iniciar sesión con Google",
-    "loading": "Cargando autenticación..."
+    "loading": "Cargando autenticación...",
+    "error": "No se pudo verificar tu sesión. Comprueba tu conexión e inténtalo de nuevo.",
+    "retry": "Reintentar"
   },
   "common": {
     "loading": "Cargando...",
@@ -34,7 +36,11 @@
     "success": "Exitoso",
     "validation_error": "Por favor, completa todos los campos",
     "network_error": "Error de conexión. Intenta de nuevo",
-    "errorLoading": "No se pudo cargar los datos. Por favor, intenta de nuevo."
+    "errorLoading": "No se pudo cargar los datos. Por favor, intenta de nuevo.",
+    "retry": "Reintentar",
+    "back": "Volver",
+    "edit": "Editar",
+    "delete": "Borrar"
   },
   "eventsList": {
     "noEvents": "No hay eventos aún.",
@@ -184,5 +190,16 @@
     "update_error": "Error al actualizar transacción",
     "delete_success": "Transacción eliminada",
     "delete_error": "Error al eliminar transacción"
+  },
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "message": "Ha ocurrido un error inesperado. Puedes intentar recargar la página.",
+    "reload": "Recargar página",
+    "details": "Detalles del error"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "message": "La página que buscas no existe o ha sido movida.",
+    "goHome": "Ir al inicio"
   }
 }

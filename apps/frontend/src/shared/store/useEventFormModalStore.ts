@@ -21,5 +21,3 @@ export const useEventFormModalStore = create<State>((set) => ({
   setEvent: (e) => set(() => ({ event: e ?? null })),
   reset: () => set(() => ({ open: false, event: null, onSubmit: undefined })),
 }));
-
-export default useEventFormModalStore;

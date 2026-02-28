@@ -1,5 +1,5 @@
 import React from 'react';
-import ActionButton from './ActionButton';
+import { ActionButton } from './ActionButton';
 
 interface HeaderSectionProps {
   title: string;
@@ -9,7 +9,7 @@ interface HeaderSectionProps {
   actionIcon?: React.ReactNode;
 }
 
-export default function HeaderSection({ title, subtitle, onNewEvent, actionLabel, actionIcon }: HeaderSectionProps) {
+export function HeaderSection({ title, subtitle, onNewEvent, actionLabel, actionIcon }: HeaderSectionProps) {
   return (
     <section className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
       <div>

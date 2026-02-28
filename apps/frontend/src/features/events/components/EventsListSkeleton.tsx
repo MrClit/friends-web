@@ -1,10 +1,10 @@
-import Skeleton from '@/shared/components/Skeleton';
+import { Skeleton } from '@/shared/components/Skeleton';
 
 /**
  * Skeleton loader for EventsList component.
  * Shows 3 placeholder cards while events are loading.
  */
-export default function EventsListSkeleton() {
+export function EventsListSkeleton() {
   return (
     <div className="w-full max-w-2xl mt-4 sm:mt-8">
       <Skeleton className="h-7 w-32 mb-4" />

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateEvent } from '../../../hooks/api/useEvents';
+import { useModalForm } from '@/hooks/common';
 import type { CreateEventInput, Event, EventFormData, EventParticipant } from '../types';
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -91,8 +92,6 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState<string>(event?.icon ?? DEFAULT_ICON);
   const [participants, setParticipants] = useState<EventParticipant[]>([buildDefaultParticipant(user)]);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const createEvent = useCreateEvent();
   const { t } = useTranslation();
 
@@ -102,14 +101,7 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
     setDescription(event && event.description ? event.description : '');
     setParticipants(event ? event.participants : [buildDefaultParticipant(user)]);
     setIcon(event ? (event.icon ?? DEFAULT_ICON) : DEFAULT_ICON);
-    setErrorMessage(null);
   }, [event, user]);
-
-  useEffect(() => {
-    if (open) {
-      resetForm();
-    }
-  }, [open, resetForm]);
 
   // Memoize clean participants (trim and filter empty)
   const cleanParticipants = useMemo(() => {
@@ -135,37 +127,20 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
     [event, title, description, participants, icon, open, user?.id],
   );
 
-  const handleOpenChange = useCallback(
-    (isOpen: boolean) => {
-      // Don't allow closing if ConfirmDialog is already open
-      if (!isOpen && !showConfirm) {
-        if (isDirty) {
-          setShowConfirm(true);
-        } else {
-          resetForm();
-          onClose();
-        }
-      }
-    },
-    [isDirty, showConfirm, resetForm, onClose],
-  );
-
-  const handleConfirmClose = useCallback(() => {
-    setShowConfirm(false);
-    resetForm();
-    onClose();
-  }, [resetForm, onClose]);
-
-  const handleCancelClose = useCallback(() => {
-    setShowConfirm(false);
-  }, []);
+  // Shared modal lifecycle (discard confirmation, error, reset-on-open)
+  const modal = useModalForm({
+    open,
+    isDirty,
+    resetForm,
+    onClose,
+  });
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (!canSubmit) return;
 
-      setErrorMessage(null);
+      modal.setErrorMessage(null);
       const trimmedTitle = title.trim();
       const trimmedDescription = description.trim();
       const eventData: EventFormData = {
@@ -179,10 +154,7 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
       if (onSubmit) {
         // Custom submit handler (used for edit mode)
         onSubmit(eventData);
-        // Ensure any pending "confirm" flag is cleared before closing
-        setShowConfirm(false);
-        resetForm();
-        onClose();
+        modal.closeAndReset();
       } else {
         const createPayload: CreateEventInput = {
           title: trimmedTitle,
@@ -193,19 +165,16 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
         // Create event via API
         createEvent.mutate(createPayload, {
           onSuccess: () => {
-            // Clear confirm state then close to avoid race with Radix onOpenChange
-            setShowConfirm(false);
-            resetForm();
-            onClose();
+            modal.closeAndReset();
           },
           onError: (error) => {
             const message = error instanceof Error ? error.message : t('common.errorLoading');
-            setErrorMessage(message);
+            modal.setErrorMessage(message);
           },
         });
       }
     },
-    [canSubmit, title, description, event?.id, cleanParticipants, icon, onSubmit, resetForm, onClose, createEvent, t],
+    [canSubmit, title, description, event?.id, cleanParticipants, icon, onSubmit, modal, createEvent, t],
   );
 
   const isLoading = createEvent.isPending;
@@ -220,15 +189,15 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
     setParticipants,
     icon,
     setIcon,
-    showConfirm,
-    errorMessage,
+    showConfirm: modal.showDiscardConfirm,
+    errorMessage: modal.errorMessage,
     // Computed
     isLoading,
     canSubmit,
     // Handlers
-    handleOpenChange,
-    handleConfirmClose,
-    handleCancelClose,
+    handleOpenChange: modal.handleOpenChange,
+    handleConfirmClose: modal.handleConfirmDiscard,
+    handleCancelClose: modal.handleCancelDiscard,
     handleSubmit,
   };
 }

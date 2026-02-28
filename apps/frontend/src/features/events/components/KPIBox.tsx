@@ -10,7 +10,7 @@ interface KPIBoxProps {
   onClick?: () => void;
 }
 
-export default function KPIBox({ label, value, icon, borderColorClass, labelColorClass, onClick }: KPIBoxProps) {
+export function KPIBox({ label, value, icon, borderColorClass, labelColorClass, onClick }: KPIBoxProps) {
   return (
     <div
       className={cn(

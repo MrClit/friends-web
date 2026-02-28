@@ -7,14 +7,14 @@ import { isValidKPI, getKPIConfig, buildKPIItems } from '../index';
 import { useEvent } from '../../../hooks/api/useEvents';
 import { useEventKPIs } from '../../../hooks/api/useEventKPIs';
 
-import KPIDetailContent from './KPIDetailContent.tsx';
+import { KPIDetailContent } from './KPIDetailContent.tsx';
 
 /**
  * KPI Detail View Container
  * Handles all business logic: data fetching, validation, state management
  * Renders KPIDetailContent for presentation
  */
-export default function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: string }) {
+export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: string }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 

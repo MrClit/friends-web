@@ -58,6 +58,14 @@ src/features/{feature}/
   └─ index.ts         # Barrel exports
 ```
 
+**Export Convention: Named Exports Only**
+
+- Always use **named exports** (`export function`, `export const`). Never use `export default`.
+- Barrel files (`index.ts`) re-export with `export { X } from './X'` (not `export { default as X }`).
+- For `React.memo` components, export as named const: `export const Foo = memo(function Foo() { ... })`.
+- For `React.lazy`, use the adapter pattern: `lazy(() => import('./Foo').then(m => ({ default: m.Foo })))`.
+- JSON file imports are the only exception (e.g., i18n translation files).
+
 **State Management:**
 
 - **Server State:** TanStack Query hooks in `src/hooks/api/` (queries, mutations, cache invalidation) - fully API-backed

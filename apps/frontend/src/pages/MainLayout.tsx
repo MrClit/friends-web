@@ -1,6 +1,6 @@
 import { Header } from '@/shared/components/Header';
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-radial from-emerald-100 via-emerald-50 to-white dark:from-emerald-900 dark:via-emerald-900 dark:to-emerald-900 transition-colors duration-300">
       <Header />

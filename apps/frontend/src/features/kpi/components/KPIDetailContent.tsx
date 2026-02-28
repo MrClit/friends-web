@@ -4,7 +4,7 @@ import { KPIParticipantsList } from '../index';
 import type { Event } from '@/features/events/types';
 import type { KPIType, KPIParticipantItem } from '../types';
 import { getKPIConfig } from '../index';
-import KPIBoxDetail from './KPIBoxDetail';
+import { KPIBoxDetail } from './KPIBoxDetail';
 
 interface KPIDetailContentProps {
   event: Event;
@@ -20,7 +20,7 @@ interface KPIDetailContentProps {
  * Renders the KPI detail UI
  * All logic is handled by the container (KPIDetailView)
  */
-export default function KPIDetailContent({ event, kpi, items, kpiValue, kpiConfig, onBack }: KPIDetailContentProps) {
+export function KPIDetailContent({ event, kpi, items, kpiValue, kpiConfig, onBack }: KPIDetailContentProps) {
   const { t } = useTranslation();
 
   return (

@@ -61,7 +61,7 @@ export async function apiRequest<T>(endpoint: string, options?: RequestInit): Pr
 
   // Handle 204 No Content responses
   if (response.status === 204) {
-    return undefined as T;
+    return undefined as unknown as T;
   }
 
   // Backend wraps responses in { data: T }, assume JSON
@@ -69,8 +69,10 @@ export async function apiRequest<T>(endpoint: string, options?: RequestInit): Pr
     const json = await response.json();
     return json.data as T;
   } else {
-    // Fallback to text if not JSON
-    const text = await response.text();
-    return text as unknown as T; // This might not be ideal, but for robustness
+    throw new ApiError(
+      response.status,
+      'UnexpectedContentType',
+      `Expected JSON response but received: ${contentType || 'unknown'}`,
+    );
   }
 }

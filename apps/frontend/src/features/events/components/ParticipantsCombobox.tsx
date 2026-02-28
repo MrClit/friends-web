@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
 import { MdPersonAdd } from 'react-icons/md';
 import { useParticipantsCombobox } from '../hooks/useParticipantsCombobox';
-import ComboboxUserItem from './ComboboxUserItem';
-import ComboboxNewGuestItem from './ComboboxNewGuestItem';
+import { ComboboxUserItem } from './ComboboxUserItem';
+import { ComboboxNewGuestItem } from './ComboboxNewGuestItem';
 import type { EventParticipant } from '../types';
 
 interface ParticipantsComboboxProps {
@@ -14,7 +14,7 @@ interface ParticipantsComboboxProps {
   onInputChange: (value: string) => void;
 }
 
-export default function ParticipantsCombobox({
+export function ParticipantsCombobox({
   onSelect,
   existingParticipants,
   inputValue,

@@ -34,7 +34,7 @@ export function LogoFull() {
  * Logo principal, configurable para mostrar solo icono o icono+texto.
  * @param showText Si true, muestra el texto "FRI€NDS" debajo del icono.
  */
-export default function Logo({ showText = false, size = 40 }: { showText?: boolean; size?: number }) {
+export function Logo({ showText = false, size = 40 }: { showText?: boolean; size?: number }) {
   return (
     <Link
       to="/"

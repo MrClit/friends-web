@@ -1,4 +1,4 @@
-export { default as KPIParticipantsList } from './KPIParticipantsList';
-export { default as KPIParticipantItem } from './KPIParticipantItem';
-export { default as KPIDetailView } from './KPIDetailView';
-export { default as KPIDetailContent } from './KPIDetailContent';
+export { KPIParticipantsList } from './KPIParticipantsList';
+export { KPIParticipantItem } from './KPIParticipantItem';
+export { KPIDetailView } from './KPIDetailView';
+export { KPIDetailContent } from './KPIDetailContent';

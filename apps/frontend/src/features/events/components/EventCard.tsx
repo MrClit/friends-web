@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { MdEvent } from 'react-icons/md';
 import { cn } from '@/shared/utils/cn';
 import type { FC } from 'react';
-import Avatar from '@/shared/components/Avatar';
+import { Avatar } from '@/shared/components/Avatar';
 import { formatDateShort } from '@/shared/utils/format';
 
 export interface EventCardParticipant {
@@ -35,7 +36,7 @@ const statusConfig = {
   },
 };
 
-export const EventCard: FC<EventCardProps> = ({ event, onClick, className, style }) => {
+export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, style }) => {
   const {
     id,
     title,
@@ -119,4 +120,4 @@ export const EventCard: FC<EventCardProps> = ({ event, onClick, className, style
       </div>
     </div>
   );
-};
+});

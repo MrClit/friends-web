@@ -1,4 +1,5 @@
 import { MdArrowBack, MdEdit, MdDelete } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/utils/cn';
 
 interface EventDetailHeaderProps {
@@ -9,7 +10,8 @@ interface EventDetailHeaderProps {
   onDelete?: () => void;
 }
 
-export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: EventDetailHeaderProps) {
+export function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: EventDetailHeaderProps) {
+  const { t } = useTranslation();
   const hasActions = Boolean(onEdit || onDelete);
 
   return (
@@ -19,6 +21,7 @@ export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete
           <button
             type="button"
             onClick={onBack}
+            aria-label={t('common.back')}
             className={cn(
               'bg-white dark:bg-emerald-950',
               'p-2 rounded-xl shadow-sm',
@@ -39,6 +42,7 @@ export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete
               <button
                 type="button"
                 onClick={onEdit}
+                aria-label={t('common.edit')}
                 className={cn(
                   'flex items-center justify-center gap-2',
                   'p-2 sm:px-4 sm:py-2',
@@ -58,6 +62,7 @@ export default function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete
               <button
                 type="button"
                 onClick={onDelete}
+                aria-label={t('common.delete')}
                 className={cn(
                   'flex items-center justify-center gap-2',
                   'p-2 sm:px-4 sm:py-2',
