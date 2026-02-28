@@ -8,8 +8,38 @@ import { i18n } from '@/i18n';
  */
 describe('formatDateLong', () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     // Reset to Spanish by default
     vi.spyOn(i18n, 'language', 'get').mockReturnValue('es');
+  });
+
+  describe('Invalid input handling', () => {
+    it('should return empty string and warn for empty input', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const result = formatDateLong('');
+
+      expect(result).toBe('');
+      expect(warnSpy).toHaveBeenCalledWith('formatDateLong: Invalid input', '');
+    });
+
+    it('should return empty string and warn for invalid date string', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const result = formatDateLong('not-a-date');
+
+      expect(result).toBe('');
+      expect(warnSpy).toHaveBeenCalledWith('formatDateLong: Invalid date string', 'not-a-date');
+    });
+
+    it('should return empty string and warn for non-string input', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const result = formatDateLong(123 as unknown as string);
+
+      expect(result).toBe('');
+      expect(warnSpy).toHaveBeenCalledWith('formatDateLong: Invalid input', 123);
+    });
   });
 
   describe('Spanish locale', () => {
