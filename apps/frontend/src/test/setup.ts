@@ -40,7 +40,7 @@ const localStorageMock = (() => {
   };
 })();
 
-global.localStorage = localStorageMock as Storage;
+globalThis.localStorage = localStorageMock as Storage;
 
 /**
  * Mock crypto.randomUUID for deterministic tests
@@ -49,7 +49,7 @@ global.localStorage = localStorageMock as Storage;
 let uuidCounter = 0;
 
 // Use Object.defineProperty to override the read-only crypto property
-Object.defineProperty(global, 'crypto', {
+Object.defineProperty(globalThis, 'crypto', {
   value: {
     randomUUID: () => {
       uuidCounter++;
