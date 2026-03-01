@@ -191,6 +191,36 @@
     "delete_success": "Transacció eliminada",
     "delete_error": "Error en eliminar la transacció"
   },
+  "adminUsers": {
+    "title": "Gestió d'usuaris",
+    "subtitle": "Administra usuaris i rols",
+    "newUser": "Nou usuari",
+    "menuEntry": "Gestió d'usuaris",
+    "empty": "No s'han trobat usuaris. Crea el primer per començar a gestionar accessos.",
+    "loadedUsers": "{{count}} usuaris carregats",
+    "accessDenied": "Accés denegat",
+    "createTitle": "Crear usuari",
+    "editTitle": "Editar usuari",
+    "deleteTitle": "Eliminar usuari?",
+    "deleteMessage": "Aquesta acció farà un esborrat lògic de l'usuari i no es pot desfer des d'aquesta pantalla.",
+    "createAction": "Crear usuari",
+    "updateAction": "Actualitzar usuari",
+    "creating": "Creant...",
+    "updating": "Actualitzant...",
+    "deleting": "Eliminant...",
+    "createSuccess": "Usuari creat correctament",
+    "createError": "No s'ha pogut crear l'usuari",
+    "updateSuccess": "Usuari actualitzat correctament",
+    "updateError": "No s'ha pogut actualitzar l'usuari",
+    "deleteSuccess": "Usuari eliminat correctament",
+    "deleteError": "No s'ha pogut eliminar l'usuari",
+    "fields": {
+      "email": "Correu electrònic",
+      "name": "Nom",
+      "avatar": "URL de l'avatar",
+      "role": "Rol"
+    }
+  },
   "errorBoundary": {
     "title": "Alguna cosa ha fallat",
     "message": "S'ha produït un error inesperat. Pots provar de recarregar la pàgina.",

@@ -191,6 +191,36 @@
     "delete_success": "Transacción eliminada",
     "delete_error": "Error al eliminar transacción"
   },
+  "adminUsers": {
+    "title": "Gestión de usuarios",
+    "subtitle": "Administra usuarios y roles",
+    "newUser": "Nuevo usuario",
+    "menuEntry": "Gestión de usuarios",
+    "empty": "No se encontraron usuarios. Crea el primero para empezar a gestionar accesos.",
+    "loadedUsers": "{{count}} usuarios cargados",
+    "accessDenied": "Acceso denegado",
+    "createTitle": "Crear usuario",
+    "editTitle": "Editar usuario",
+    "deleteTitle": "¿Eliminar usuario?",
+    "deleteMessage": "Esta acción hará un borrado lógico del usuario y no se puede deshacer desde esta pantalla.",
+    "createAction": "Crear usuario",
+    "updateAction": "Actualizar usuario",
+    "creating": "Creando...",
+    "updating": "Actualizando...",
+    "deleting": "Eliminando...",
+    "createSuccess": "Usuario creado correctamente",
+    "createError": "No se pudo crear el usuario",
+    "updateSuccess": "Usuario actualizado correctamente",
+    "updateError": "No se pudo actualizar el usuario",
+    "deleteSuccess": "Usuario eliminado correctamente",
+    "deleteError": "No se pudo eliminar el usuario",
+    "fields": {
+      "email": "Email",
+      "name": "Nombre",
+      "avatar": "URL del avatar",
+      "role": "Rol"
+    }
+  },
   "errorBoundary": {
     "title": "Algo salió mal",
     "message": "Ha ocurrido un error inesperado. Puedes intentar recargar la página.",

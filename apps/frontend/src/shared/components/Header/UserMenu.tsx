@@ -5,11 +5,15 @@ import { useToast } from '@/shared/hooks/useToast';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
 import { MdExpandMore } from 'react-icons/md';
 import { Avatar } from '@/shared/components/Avatar';
+import { ADMIN_ROLE } from '@/features/auth/types';
+import { useNavigate } from 'react-router-dom';
+import { MdAdminPanelSettings } from 'react-icons/md';
 
 export function UserMenu() {
   const { user, logout, loading } = useAuth();
   const { t } = useTranslation();
   const { success } = useToast();
+  const navigate = useNavigate();
 
   if (loading) return null;
   if (!user) return null;
@@ -52,7 +56,17 @@ export function UserMenu() {
           <MdAccountCircle className="text-xl text-teal-500" />
           <span className="truncate">{user.email}</span>
         </DropdownMenuItem>
-        {/* Futuro: <DropdownMenuItem>Perfil</DropdownMenuItem> */}
+
+        {user.role === ADMIN_ROLE && (
+          <DropdownMenuItem
+            onClick={() => navigate('/admin/users')}
+            className="flex items-center gap-2 text-teal-800 dark:text-teal-200 font-semibold cursor-pointer"
+          >
+            <MdAdminPanelSettings className="text-lg" />
+            {t('adminUsers.menuEntry', 'User Management')}
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuItem
           onClick={handleLogout}
           className="flex items-center gap-2 text-red-700 dark:text-red-300 font-semibold cursor-pointer mt-1"

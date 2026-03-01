@@ -9,6 +9,7 @@ import { EventsModule } from './modules/events/events.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuthModule } from './modules/auth/auth.module';
     TransactionsModule,
     UsersModule,
     AuthModule,
+    AdminModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

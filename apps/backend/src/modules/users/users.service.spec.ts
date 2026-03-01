@@ -96,7 +96,7 @@ describe('UsersService', () => {
 
     expect(result).toEqual(users);
     expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('user');
-    expect(queryBuilder.where).toHaveBeenCalledWith('user.name ILIKE :query OR user.email ILIKE :query', {
+    expect(queryBuilder.where).toHaveBeenCalledWith('(user.name ILIKE :query OR user.email ILIKE :query)', {
       query: '%ali%',
     });
     expect(queryBuilder.select).toHaveBeenCalledWith([

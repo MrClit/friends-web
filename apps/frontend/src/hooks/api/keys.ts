@@ -57,4 +57,8 @@ export const queryKeys = {
   users: {
     all: ['users'] as const,
   },
+
+  adminUsers: {
+    all: ['admin-users'] as const,
+  },
 };

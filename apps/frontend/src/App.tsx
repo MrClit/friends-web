@@ -3,6 +3,8 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 
 import { QueryProvider } from './providers/QueryProvider';
 import { RequireAuth } from './features/auth/RequireAuth';
+import { RequireRole } from './features/auth/RequireRole';
+import { ADMIN_ROLE } from './features/auth/types';
 import { ErrorBoundary } from './shared/components/ErrorBoundary';
 import { AppLoadingFallback } from './shared/components/AppLoadingFallback';
 import { Toast } from './shared/components/Toast';
@@ -13,6 +15,7 @@ const EventDetail = lazy(() => import('./pages/EventDetail').then((m) => ({ defa
 const KPIDetail = lazy(() => import('./pages/KPIDetail').then((m) => ({ default: m.KPIDetail })));
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
 const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })));
 
 export function App() {
@@ -45,6 +48,16 @@ export function App() {
                 element={
                   <RequireAuth>
                     <KPIDetail />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <RequireAuth>
+                    <RequireRole allowedRoles={[ADMIN_ROLE]}>
+                      <AdminUsersPage />
+                    </RequireRole>
                   </RequireAuth>
                 }
               />

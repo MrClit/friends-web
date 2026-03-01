@@ -191,6 +191,36 @@
     "delete_success": "Transaction deleted",
     "delete_error": "Error deleting transaction"
   },
+  "adminUsers": {
+    "title": "User management",
+    "subtitle": "Manage users and roles",
+    "newUser": "New user",
+    "menuEntry": "User management",
+    "empty": "No users found. Create your first user to start managing access.",
+    "loadedUsers": "{{count}} users loaded",
+    "accessDenied": "Access denied",
+    "createTitle": "Create user",
+    "editTitle": "Edit user",
+    "deleteTitle": "Delete user?",
+    "deleteMessage": "This action will soft delete the user and cannot be undone from this screen.",
+    "createAction": "Create user",
+    "updateAction": "Update user",
+    "creating": "Creating...",
+    "updating": "Updating...",
+    "deleting": "Deleting...",
+    "createSuccess": "User created successfully",
+    "createError": "Could not create user",
+    "updateSuccess": "User updated successfully",
+    "updateError": "Could not update user",
+    "deleteSuccess": "User deleted successfully",
+    "deleteError": "Could not delete user",
+    "fields": {
+      "email": "Email",
+      "name": "Name",
+      "avatar": "Avatar URL",
+      "role": "Role"
+    }
+  },
   "errorBoundary": {
     "title": "Something went wrong",
     "message": "An unexpected error occurred. You can try reloading the page.",

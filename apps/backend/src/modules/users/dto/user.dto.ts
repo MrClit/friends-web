@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { USER_ROLES, type UserRole } from '../user-role.constants';
 
 export class UserDto {
   @ApiProperty({ description: 'User UUID' })
@@ -13,6 +14,6 @@ export class UserDto {
   @ApiProperty({ description: 'User avatar URL', required: false })
   avatar?: string;
 
-  @ApiProperty({ description: 'User role', enum: ['admin', 'user'] })
-  role: 'admin' | 'user';
+  @ApiProperty({ description: 'User role', enum: USER_ROLES })
+  role: UserRole;
 }

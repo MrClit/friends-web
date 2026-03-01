@@ -1,6 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-
-export type UserRole = 'admin' | 'user';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import { USER_ROLES, type UserRole } from './user-role.constants';
 
 @Entity('users')
 export class User {
@@ -16,8 +15,11 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column({ type: 'enum', enum: ['admin', 'user'] })
+  @Column({ type: 'enum', enum: USER_ROLES })
   role: UserRole;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
+  deletedAt: Date | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

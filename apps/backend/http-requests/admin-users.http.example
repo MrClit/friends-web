@@ -1,0 +1,121 @@
+###############################################
+# ADMIN USERS API - EXAMPLE FILE
+###############################################
+# Copy this file to admin-users.http and configure tokens in .vscode/settings.json
+# admin-users.http is intended for local testing with real tokens
+
+# Option 1: Define variables locally (recommended for quick test)
+@baseUrl = http://localhost:3000/api
+@token = YOUR_ADMIN_JWT_TOKEN_HERE
+@contentType = application/json
+
+###############################################
+# 0. GET CURRENT AUTH USER (to test safety rules)
+###############################################
+# @name getProfile
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### Save current authenticated admin ID
+@currentUserId = {{getProfile.response.body.data.id}}
+
+###############################################
+# 1. LIST ADMIN USERS
+###############################################
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{token}}
+
+###############################################
+# 2. CREATE USER (role=user)
+###############################################
+# @name createManagedUser
+POST {{baseUrl}}/admin/users
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "email": "admin-managed.user@example.com",
+  "role": "user"
+}
+
+### Save created user ID
+@managedUserId = {{createManagedUser.response.body.data.id}}
+
+###############################################
+# 3. UPDATE USER (email/name/avatar)
+###############################################
+PATCH {{baseUrl}}/admin/users/{{managedUserId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "email": "admin-managed.user.updated@example.com",
+  "name": "Managed User",
+  "avatar": "https://avatars.githubusercontent.com/u/1"
+}
+
+###############################################
+# 4. PROMOTE USER TO ADMIN
+###############################################
+PATCH {{baseUrl}}/admin/users/{{managedUserId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "role": "admin"
+}
+
+###############################################
+# 5. DEMOTE USER BACK TO USER
+###############################################
+PATCH {{baseUrl}}/admin/users/{{managedUserId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "role": "user"
+}
+
+###############################################
+# 6. DELETE USER (SOFT DELETE)
+###############################################
+DELETE {{baseUrl}}/admin/users/{{managedUserId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# 7. SAFETY RULE - BLOCK SELF DEMOTION (422)
+###############################################
+PATCH {{baseUrl}}/admin/users/{{currentUserId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "role": "user"
+}
+
+###############################################
+# 8. SAFETY RULE - BLOCK SELF DELETE (422)
+###############################################
+DELETE {{baseUrl}}/admin/users/{{currentUserId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# 9. AUTH RULE - NON-ADMIN TOKEN SHOULD FAIL (403)
+###############################################
+# Replace with a JWT from a regular user account
+@nonAdminToken = YOUR_NON_ADMIN_JWT_TOKEN_HERE
+
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{nonAdminToken}}
+
+###############################################
+# 10. DUPLICATE EMAIL SHOULD FAIL (409)
+###############################################
+POST {{baseUrl}}/admin/users
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "email": "admin-managed.user.updated@example.com",
+  "role": "user"
+}

@@ -32,6 +32,7 @@ describe('AuthService', () => {
       role: 'user',
       name: '',
       avatar: '',
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -47,6 +48,7 @@ describe('AuthService', () => {
       role: 'user',
       name: '',
       avatar: '',
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

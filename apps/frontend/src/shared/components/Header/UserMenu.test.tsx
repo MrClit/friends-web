@@ -1,0 +1,111 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { UserMenu } from './UserMenu';
+import { useAuth } from '@/features/auth/useAuth';
+
+const navigateMock = vi.fn();
+const successMock = vi.fn();
+
+vi.mock('@/features/auth/useAuth', () => ({
+  useAuth: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useToast', () => ({
+  useToast: () => ({
+    success: successMock,
+  }),
+}));
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => navigateMock,
+  };
+});
+
+describe('UserMenu', () => {
+  const mockedUseAuth = vi.mocked(useAuth);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('shows admin menu entry for admin users', async () => {
+    mockedUseAuth.mockReturnValue({
+      user: {
+        id: 'admin-1',
+        email: 'admin@test.com',
+        name: 'Admin',
+        role: 'admin',
+      },
+      loading: false,
+      logout: vi.fn(),
+      token: 'token',
+      error: null,
+      login: vi.fn(),
+      setAuth: vi.fn(),
+    });
+
+    render(<UserMenu />);
+
+    const trigger = screen.getByRole('button');
+    fireEvent.pointerDown(trigger);
+
+    expect(await screen.findByText(/user management/i)).toBeInTheDocument();
+  });
+
+  it('does not show admin menu entry for non-admin users', async () => {
+    mockedUseAuth.mockReturnValue({
+      user: {
+        id: 'user-1',
+        email: 'user@test.com',
+        name: 'User',
+        role: 'user',
+      },
+      loading: false,
+      logout: vi.fn(),
+      token: 'token',
+      error: null,
+      login: vi.fn(),
+      setAuth: vi.fn(),
+    });
+
+    render(<UserMenu />);
+
+    const trigger = screen.getByRole('button');
+    fireEvent.pointerDown(trigger);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/user management/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it('navigates to admin users page when clicking admin menu entry', async () => {
+    mockedUseAuth.mockReturnValue({
+      user: {
+        id: 'admin-1',
+        email: 'admin@test.com',
+        name: 'Admin',
+        role: 'admin',
+      },
+      loading: false,
+      logout: vi.fn(),
+      token: 'token',
+      error: null,
+      login: vi.fn(),
+      setAuth: vi.fn(),
+    });
+
+    render(<UserMenu />);
+
+    const trigger = screen.getByRole('button');
+    fireEvent.pointerDown(trigger);
+
+    const menuItem = await screen.findByText(/user management/i);
+    fireEvent.click(menuItem);
+
+    expect(navigateMock).toHaveBeenCalledWith('/admin/users');
+  });
+});

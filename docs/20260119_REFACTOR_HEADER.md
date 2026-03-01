@@ -51,7 +51,7 @@
 | Logo icono + texto               | Logo.tsx                        | Icono (div), texto (h1), tipografía y colores según diseño      |
 | Selector de idioma (icono+label) | LanguageSelector.tsx            | Botón con icono y label, clases de borde, hover, etc.           |
 | Botón de tema (icono)            | ThemeToggle.tsx                 | Botón con icono, borde, hover, animación de icono               |
-| Separador vertical               | Header.tsx (inline div)         | `<div className="h-8 w-[1px] ..."></div>`                       |
+| Separador vertical               | Header.tsx (inline div)         | `<div className="h-8 w-px ..."></div>`                          |
 | Avatar, nombre, expand_more      | UserMenu.tsx                    | Botón con img, nombre, icono expand_more, clases hover, border  |
 
 ### 3.2. Ejemplo de estructura JSX esperada
@@ -65,7 +65,7 @@
     <div className="flex items-center gap-2 md:gap-4">
       <LanguageSelector />
       <ThemeToggle />
-      <div className="h-8 w-[1px] bg-emerald-100 dark:bg-emerald-800 mx-2" />
+      <div className="h-8 w-px bg-emerald-100 dark:bg-emerald-800 mx-2" />
       <UserMenu />
     </div>
   </div>

@@ -1,15 +1,14 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from './useAuth';
+import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { JSX } from 'react';
 import { AppLoadingFallback } from '@/shared/components/AppLoadingFallback';
+import { useAccessGuard } from './useAccessGuard';
 
 export function RequireAuth({ children }: { children: JSX.Element }) {
-  const { user, loading, error } = useAuth();
+  const { error, location, status } = useAccessGuard();
   const { t } = useTranslation();
-  const location = useLocation();
 
-  if (loading) {
+  if (status === 'loading') {
     return <AppLoadingFallback />;
   }
 
@@ -27,7 +26,7 @@ export function RequireAuth({ children }: { children: JSX.Element }) {
     );
   }
 
-  if (!user) {
+  if (status === 'unauthenticated') {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
