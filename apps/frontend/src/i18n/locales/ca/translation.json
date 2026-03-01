@@ -198,6 +198,14 @@
     "menuEntry": "Gestió d'usuaris",
     "empty": "No s'han trobat usuaris. Crea el primer per començar a gestionar accessos.",
     "loadedUsers": "{{count}} usuaris carregats",
+    "stats": {
+      "total": "Total usuaris",
+      "totalShort": "Total",
+      "admin": "Admins",
+      "adminShort": "Admins",
+      "user": "Usuaris",
+      "userShort": "Usuaris"
+    },
     "accessDenied": "Accés denegat",
     "createTitle": "Crear usuari",
     "editTitle": "Editar usuari",

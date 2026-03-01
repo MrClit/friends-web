@@ -198,6 +198,14 @@
     "menuEntry": "User management",
     "empty": "No users found. Create your first user to start managing access.",
     "loadedUsers": "{{count}} users loaded",
+    "stats": {
+      "total": "Total users",
+      "totalShort": "Total",
+      "admin": "Admins",
+      "adminShort": "Admins",
+      "user": "Users",
+      "userShort": "Users"
+    },
     "accessDenied": "Access denied",
     "createTitle": "Create user",
     "editTitle": "Edit user",

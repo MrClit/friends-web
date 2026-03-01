@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { MdPersonAdd } from 'react-icons/md';
 
-import { AdminUsersDialogs, AdminUsersTable, useAdminUsersPage } from '@/features/admin-users';
+import { AdminUsersDialogs, AdminUsersStats, AdminUsersTable, useAdminUsersPage } from '@/features/admin-users';
 import { HeaderSection } from '@/shared/components/HeaderSection';
 
 import { MainLayout } from './MainLayout';
@@ -65,9 +65,7 @@ export function AdminUsersPage() {
 
         {!isLoadingUsers && !usersError && users.length > 0 && (
           <>
-            <p className="mb-4 text-slate-700 dark:text-emerald-100">
-              {t('adminUsers.loadedUsers', '{{count}} users loaded', { count: users.length })}
-            </p>
+            <AdminUsersStats users={users} />
             <AdminUsersTable users={users} disabled={isMutating} onEdit={startEdit} onDelete={requestDelete} />
           </>
         )}

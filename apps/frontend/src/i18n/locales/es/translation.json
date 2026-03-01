@@ -198,6 +198,14 @@
     "menuEntry": "Gestión de usuarios",
     "empty": "No se encontraron usuarios. Crea el primero para empezar a gestionar accesos.",
     "loadedUsers": "{{count}} usuarios cargados",
+    "stats": {
+      "total": "Usuarios Totales",
+      "totalShort": "Total",
+      "admin": "Administradores",
+      "adminShort": "Admins",
+      "user": "Usuarios",
+      "userShort": "Usuarios"
+    },
     "accessDenied": "Acceso denegado",
     "createTitle": "Crear usuario",
     "editTitle": "Editar usuario",

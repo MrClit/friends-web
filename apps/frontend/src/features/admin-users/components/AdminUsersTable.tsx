@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { ADMIN_ROLE, type User, type UserRole } from '@/features/auth/types';
+import { Avatar } from '@/shared/components/Avatar';
 
 interface AdminUsersTableProps {
   users: User[];
@@ -25,21 +26,26 @@ export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: A
       <div className="space-y-3 p-3 md:hidden">
         {users.map((user) => (
           <article key={user.id} className="rounded-md border border-gray-200 p-3 dark:border-gray-800">
-            <div className="mb-2 flex items-start justify-between gap-3">
-              <p className="min-w-0 truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{user.email}</p>
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <Avatar
+                  avatar={user.avatar}
+                  name={user.name}
+                  email={user.email}
+                  className="h-8 w-8 shrink-0 rounded-full object-cover"
+                  fallbackClassName="h-8 w-8 shrink-0 rounded-full bg-gray-200 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-100 flex items-center justify-center"
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name || '—'}</p>
+                  <p className="truncate text-xs text-gray-600 dark:text-gray-300">{user.email}</p>
+                </div>
+              </div>
               <span
                 className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(user.role)}`}
               >
                 {user.role}
               </span>
             </div>
-
-            <dl className="mb-3 space-y-1 text-sm">
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                <dt className="font-medium">{t('adminUsers.fields.name', 'Name')}:</dt>
-                <dd className="truncate text-gray-900 dark:text-gray-100">{user.name || '—'}</dd>
-              </div>
-            </dl>
 
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -68,10 +74,10 @@ export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: A
           <thead className="bg-gray-50 dark:bg-gray-950">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                {t('adminUsers.fields.email', 'Email')}
+                {t('adminUsers.fields.name', 'Name')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                {t('adminUsers.fields.name', 'Name')}
+                {t('adminUsers.fields.email', 'Email')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 {t('adminUsers.fields.role', 'Role')}
@@ -84,10 +90,23 @@ export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: A
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {users.map((user) => (
               <tr key={user.id}>
-                <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{user.email}</td>
-                <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{user.name || '—'}</td>
                 <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                  <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(user.role)}`}>
+                  <div className="flex items-center gap-2">
+                    <Avatar
+                      avatar={user.avatar}
+                      name={user.name}
+                      email={user.email}
+                      className="h-8 w-8 shrink-0 rounded-full object-cover"
+                      fallbackClassName="h-8 w-8 shrink-0 rounded-full bg-gray-200 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-100 flex items-center justify-center"
+                    />
+                    <span className="truncate">{user.name || '—'}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{user.email}</td>
+                <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                  <span
+                    className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(user.role)}`}
+                  >
                     {user.role}
                   </span>
                 </td>
