@@ -9,8 +9,6 @@ import { MainLayout } from './MainLayout';
 export function AdminUsersPage() {
   const { t } = useTranslation();
 
-  // TODO: revisar todas esta pagina y sus componentes para mejorar la experiencia de usuario, especialmente en los estados de carga y error. Agregar skeletons, mensajes de error mas descriptivos, etc.
-
   const {
     users,
     isLoadingUsers,
