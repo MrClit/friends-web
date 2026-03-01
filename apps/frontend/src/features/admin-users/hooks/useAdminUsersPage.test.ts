@@ -14,6 +14,12 @@ const createMutateAsyncMock = vi.fn();
 const updateMutateAsyncMock = vi.fn();
 const deleteMutateAsyncMock = vi.fn();
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, fallback?: string) => fallback ?? key,
+  }),
+}));
+
 vi.mock('@/hooks/api/useAdminUsers', () => ({
   useAdminUsers: vi.fn(),
   useCreateAdminUser: vi.fn(),
