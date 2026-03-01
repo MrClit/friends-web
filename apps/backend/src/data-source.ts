@@ -1,10 +1,14 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
-// No importar entidades directamente, usar rutas glob absolutas
 
-// Usar rutas absolutas para TypeORM CLI
-// Esto asegura que los imports funcionen correctamente desde la raíz
-// Si hay problemas, se puede usar require en vez de import
+// No importar entidades directamente, usar rutas glob absolutas
+// Soporta rutas diferentes para desarrollo (TS) y producción (JS compilado)
+
+const isProd = process.env.NODE_ENV === 'production';
+
+const entitiesPath = isProd ? 'dist/modules/**/entities/*.entity.js' : 'src/modules/**/entities/*.entity.{ts,js}';
+
+const migrationsPath = isProd ? 'dist/migrations/*.js' : 'src/migrations/*{.ts,.js}';
 
 export default new DataSource({
   type: 'postgres',
@@ -13,7 +17,7 @@ export default new DataSource({
   username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
-  entities: ['src/modules/**/entities/*.entity.{ts,js}'],
-  migrations: ['src/migrations/*{.ts,.js}'],
+  entities: [entitiesPath],
+  migrations: [migrationsPath],
   ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
