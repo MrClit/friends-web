@@ -333,13 +333,13 @@ describe('EventsService', () => {
       totalExpenses: 75.0,
       totalContributions: 150.0,
       totalCompensations: 0,
-      potBalance: 75.0,
-      pendingToCompensate: 75.0,
+      potBalance: 125.0,
+      pendingToCompensate: 50.0,
       participantBalances: { '1': 50.0, '2': 50.0 },
       participantContributions: { '1': 100.0, '2': 50.0 },
       participantExpenses: { '1': 50.0, '2': 0 },
       participantCompensations: { '1': 0, '2': 0 },
-      participantPending: { '1': 50.0 },
+      participantPending: { '1': 50.0, '2': 0 },
       potExpenses: 25.0,
     };
 

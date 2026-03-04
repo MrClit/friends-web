@@ -26,7 +26,7 @@ export class EventKPIsDto {
   potBalance: number;
 
   @ApiProperty({
-    description: 'Amount still pending to compensate',
+    description: 'Amount still pending to compensate from participant expenses (excludes pot expenses)',
     example: 100.5,
   })
   pendingToCompensate: number;

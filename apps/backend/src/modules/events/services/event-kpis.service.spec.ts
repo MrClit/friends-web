@@ -78,15 +78,15 @@ describe('EventKPIsService', () => {
       totalExpenses: 60,
       totalCompensations: 10,
       potExpenses: 20,
-      potBalance: 90,
-      pendingToCompensate: 50,
+      potBalance: 130,
+      pendingToCompensate: 30,
     });
 
     expect(result.participantContributions).toEqual({ u1: 100, u2: 60 });
     expect(result.participantExpenses).toEqual({ u1: 40, u2: 0 });
     expect(result.participantCompensations).toEqual({ u1: 10, u2: 0 });
     expect(result.participantBalances).toEqual({ u1: 50, u2: 60 });
-    expect(result.participantPending).toEqual({ u1: 30 });
+    expect(result.participantPending).toEqual({ u1: 30, u2: 0 });
 
     expect(eventRepository.findOne).toHaveBeenCalledWith({ where: { id: 'event-1' } });
     expect(transactionsService.findByEvent).toHaveBeenCalledWith('event-1');

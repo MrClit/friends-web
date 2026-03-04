@@ -41,6 +41,7 @@ export class EventKPIsService {
       const participantContributions: Record<string, number> = {};
       const participantExpenses: Record<string, number> = {};
       const participantCompensations: Record<string, number> = {};
+      const participantPending: Record<string, number> = {};
 
       const POT_PARTICIPANT_ID = '0';
 
@@ -53,11 +54,12 @@ export class EventKPIsService {
         // Skip pot participant for balance calculations
         if (participantId !== POT_PARTICIPANT_ID) {
           // Initialize participant balances if not exists
-          if (!participantBalances[participantId]) {
+          if (participantBalances[participantId] === undefined) {
             participantBalances[participantId] = 0;
             participantContributions[participantId] = 0;
             participantExpenses[participantId] = 0;
             participantCompensations[participantId] = 0;
+            participantPending[participantId] = 0;
           }
 
           // Update balances based on payment type
@@ -71,11 +73,13 @@ export class EventKPIsService {
               totalExpenses += numAmount;
               participantExpenses[participantId] += numAmount;
               participantBalances[participantId] -= numAmount;
+              participantPending[participantId] += numAmount;
               break;
             case 'compensation':
               totalCompensations += numAmount;
               participantCompensations[participantId] += numAmount;
               participantBalances[participantId] -= numAmount;
+              participantPending[participantId] -= numAmount;
               break;
           }
         } else if (paymentType === 'expense') {
@@ -86,17 +90,8 @@ export class EventKPIsService {
       });
 
       // Calculate pot balance and pending compensation
-      const potBalance = totalContributions - totalCompensations - totalExpenses;
-      const pendingToCompensate = totalExpenses - totalCompensations;
-
-      // Calculate pending per participant (expenses - compensations)
-      const participantPending: Record<string, number> = {};
-      Object.keys(participantExpenses).forEach((participantId) => {
-        const pending = participantExpenses[participantId] - (participantCompensations[participantId] || 0);
-        if (pending > 0) {
-          participantPending[participantId] = pending;
-        }
-      });
+      const potBalance = totalContributions - totalCompensations - potExpenses;
+      const pendingToCompensate = totalExpenses - potExpenses - totalCompensations;
 
       return {
         totalExpenses,
