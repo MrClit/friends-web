@@ -22,7 +22,7 @@ export function AdminUserMobileCard({
   onDelete,
 }: AdminUserMobileCardProps) {
   return (
-    <article className="rounded-md border border-gray-200 p-3 dark:border-gray-800">
+    <article className="rounded-md border border-slate-100 bg-white p-3 shadow-sm dark:border-emerald-800/50 dark:bg-emerald-950/60">
       <div className="mb-3 flex items-start justify-between gap-3">
         <AdminUserIdentity user={user} showEmail />
         <AdminUserRoleBadge role={user.role} />

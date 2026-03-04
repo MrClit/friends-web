@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { USER_ROLES, type UserRole } from '@/features/auth/types';
+import * as Select from '@radix-ui/react-select';
 
 import type { CreateAdminUserFormData, EditAdminUserFormData } from '../types';
 
@@ -23,99 +24,148 @@ type AdminUserFormProps = CreateAdminUserFormProps | EditAdminUserFormProps;
 export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminUserFormProps) {
   const { t } = useTranslation();
 
-  if (mode === 'create') {
-    const onRoleChange = (role: string) => {
-      onChange({ ...form, role: role as UserRole });
-    };
+  function TextField({
+    label,
+    type = 'text',
+    value,
+    onChangeField,
+    required = false,
+  }: {
+    label: string;
+    type?: string;
+    value: string;
+    onChangeField: (v: string) => void;
+    required?: boolean;
+  }) {
+    return (
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        {label}
+        <input
+          type={type}
+          className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          value={value}
+          onChange={(e) => onChangeField(e.target.value)}
+          disabled={disabled}
+          required={required}
+        />
+      </label>
+    );
+  }
 
+  function RoleSelect({ value, onChangeValue }: { value: string; onChangeValue: (v: string) => void }) {
+    return (
+      <Select.Root value={value} onValueChange={(v) => onChangeValue(v)} disabled={disabled}>
+        <Select.Trigger
+          aria-label={t('adminUsers.fields.role', 'Role')}
+          className="mt-1 w-full inline-flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+        >
+          <Select.Value placeholder={t('adminUsers.selectRole', 'Select role')} />
+          <Select.Icon>
+            <svg
+              className="h-4 w-4 text-gray-500 dark:text-gray-300"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+              stroke="currentColor"
+              aria-hidden
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </Select.Icon>
+        </Select.Trigger>
+
+        <Select.Portal>
+          <Select.Content className="z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
+            <Select.Viewport className="p-1">
+              {USER_ROLES.map((role) => (
+                <Select.Item
+                  key={role}
+                  value={role}
+                  className="relative flex cursor-default select-none items-center rounded-md pl-8 pr-3 py-2 text-sm text-gray-900 hover:bg-gray-100 data-[disabled]:opacity-50 dark:text-white dark:hover:bg-gray-800"
+                >
+                  <Select.ItemText className="truncate">{role}</Select.ItemText>
+                  <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
+                    <svg
+                      className="h-4 w-4 text-teal-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      aria-hidden
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </Select.ItemIndicator>
+                </Select.Item>
+              ))}
+            </Select.Viewport>
+          </Select.Content>
+        </Select.Portal>
+      </Select.Root>
+    );
+  }
+
+  const onRoleChange = (role: string) => {
+    if (mode === 'create') {
+      onChange({ ...(form as CreateAdminUserFormData), role: role as UserRole });
+      return;
+    }
+
+    // mode === 'edit'
+    onChange({ ...(form as EditAdminUserFormData), role: role as UserRole });
+  };
+
+  if (mode === 'create') {
     return (
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          {t('adminUsers.fields.email', 'Email')}
-          <input
-            type="email"
-            className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-            value={form.email}
-            onChange={(event) => onChange({ ...form, email: event.target.value })}
-            disabled={disabled}
-            required
-          />
-        </label>
+        <TextField
+          label={t('adminUsers.fields.email', 'Email')}
+          type="email"
+          value={form.email}
+          onChangeField={(v) => onChange({ ...form, email: v })}
+          required
+        />
 
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {t('adminUsers.fields.role', 'Role')}
-          <select
-            className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-            value={form.role}
-            onChange={(event) => onRoleChange(event.target.value)}
-            disabled={disabled}
-          >
-            {USER_ROLES.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
+          <RoleSelect value={form.role} onChangeValue={(v) => onRoleChange(v)} />
         </label>
       </div>
     );
   }
 
-  const onRoleChange = (role: string) => {
-    onChange({ ...form, role: role as UserRole });
-  };
-
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {t('adminUsers.fields.email', 'Email')}
-        <input
-          type="email"
-          className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-          value={form.email}
-          onChange={(event) => onChange({ ...form, email: event.target.value })}
-          disabled={disabled}
-          required
-        />
-      </label>
+      <TextField
+        label={t('adminUsers.fields.email', 'Email')}
+        type="email"
+        value={form.email}
+        onChangeField={(v) => onChange({ ...form, email: v })}
+        required
+      />
 
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {t('adminUsers.fields.name', 'Name')}
-        <input
-          type="text"
-          className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-          value={form.name}
-          onChange={(event) => onChange({ ...form, name: event.target.value })}
-          disabled={disabled}
-        />
-      </label>
+      <TextField
+        label={t('adminUsers.fields.name', 'Name')}
+        type="text"
+        value={form.name}
+        onChangeField={(v) => onChange({ ...form, name: v })}
+      />
 
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {t('adminUsers.fields.avatar', 'Avatar URL')}
-        <input
-          type="url"
-          className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-          value={form.avatar}
-          onChange={(event) => onChange({ ...form, avatar: event.target.value })}
-          disabled={disabled}
-        />
-      </label>
+      <TextField
+        label={t('adminUsers.fields.avatar', 'Avatar URL')}
+        type="url"
+        value={form.avatar}
+        onChangeField={(v) => onChange({ ...form, avatar: v })}
+      />
 
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
         {t('adminUsers.fields.role', 'Role')}
-        <select
-          className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-          value={form.role}
-          onChange={(event) => onRoleChange(event.target.value)}
-          disabled={disabled}
-        >
-          {USER_ROLES.map((role) => (
-            <option key={role} value={role}>
-              {role}
-            </option>
-          ))}
-        </select>
+        <RoleSelect value={form.role} onChangeValue={(v) => onRoleChange(v)} />
       </label>
     </div>
   );
 }
+
+export default AdminUserForm;

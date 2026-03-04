@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { MdPersonAdd } from 'react-icons/md';
+import { MdAdd } from 'react-icons/md';
 
 import { AdminUsersDialogs, AdminUsersStats, AdminUsersTable, useAdminUsersPage } from '@/features/admin-users';
 import { HeaderSection } from '@/shared/components/HeaderSection';
@@ -43,10 +43,10 @@ export function AdminUsersPage() {
         subtitle={t('adminUsers.subtitle', 'Manage users and roles')}
         onNewEvent={openCreateDialog}
         actionLabel={t('adminUsers.newUser', 'New User')}
-        actionIcon={<MdPersonAdd size={22} />}
+        actionIcon={<MdAdd size={22} />}
       />
 
-      <section className="rounded-xl border border-emerald-200/70 bg-white/90 p-6 dark:border-emerald-800 dark:bg-emerald-900/30">
+      <section className="space-y-6">
         {isLoadingUsers && <p className="text-slate-600 dark:text-emerald-200">{t('common.loading')}</p>}
 
         {Boolean(usersError) && (

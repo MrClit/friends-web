@@ -18,8 +18,8 @@ export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: A
   const deleteLabel = t('common.delete', 'Delete');
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-      <div className="space-y-3 p-3 md:hidden">
+    <div className="md:rounded-lg md:border md:border-gray-200 md:bg-white md:shadow-sm md:dark:border-gray-800 md:dark:bg-gray-900">
+      <div className="space-y-3 py-3 px-0 md:hidden">
         {users.map((user) => (
           <AdminUserMobileCard
             key={user.id}
