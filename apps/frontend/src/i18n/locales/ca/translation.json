@@ -210,6 +210,7 @@
   "adminUsers": {
     "title": "Gestió d'usuaris",
     "subtitle": "Administra usuaris i rols",
+    "goHome": "Anar a l'inici",
     "newUser": "Nou usuari",
     "menuEntry": "Gestió d'usuaris",
     "empty": "No s'han trobat usuaris. Crea el primer per començar a gestionar accessos.",

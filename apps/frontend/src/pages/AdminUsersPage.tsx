@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { MdAdd } from 'react-icons/md';
+import { Link } from 'react-router-dom';
+import { MdArrowBack, MdAdd } from 'react-icons/md';
 
 import { AdminUsersDialogs, AdminUsersStats, AdminUsersTable, useAdminUsersPage } from '@/features/admin-users';
 import { HeaderSection } from '@/shared/components/HeaderSection';
@@ -39,6 +40,15 @@ export function AdminUsersPage() {
   return (
     <MainLayout>
       <HeaderSection
+        eyebrow={
+          <Link
+            to="/"
+            className="-ml-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm font-semibold text-emerald-700/90 transition-colors hover:text-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:text-emerald-300 dark:hover:text-emerald-100 dark:focus-visible:ring-offset-emerald-950"
+          >
+            <MdArrowBack size={18} aria-hidden />
+            <span>{t('adminUsers.goHome')}</span>
+          </Link>
+        }
         title={t('adminUsers.title', 'User Management')}
         subtitle={t('adminUsers.subtitle', 'Manage users and roles')}
         onNewEvent={openCreateDialog}

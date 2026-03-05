@@ -210,6 +210,7 @@
   "adminUsers": {
     "title": "Gestión de usuarios",
     "subtitle": "Administra usuarios y roles",
+    "goHome": "Ir al inicio",
     "newUser": "Nuevo usuario",
     "menuEntry": "Gestión de usuarios",
     "empty": "No se encontraron usuarios. Crea el primero para empezar a gestionar accesos.",

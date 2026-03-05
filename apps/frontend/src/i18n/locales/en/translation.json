@@ -210,6 +210,7 @@
   "adminUsers": {
     "title": "User management",
     "subtitle": "Manage users and roles",
+    "goHome": "Go to home",
     "newUser": "New user",
     "menuEntry": "User management",
     "empty": "No users found. Create your first user to start managing access.",
