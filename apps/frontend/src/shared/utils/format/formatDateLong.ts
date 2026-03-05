@@ -1,4 +1,5 @@
 import { getCurrentLocale } from '@/i18n';
+import { parseDateForFormatting } from './parseDateForFormatting';
 
 /**
  * Format date in long format using current locale
@@ -12,10 +13,10 @@ export function formatDateLong(dateStr: string): string {
     return '';
   }
 
-  const date = new Date(dateStr);
+  const date = parseDateForFormatting(dateStr);
 
   // Check if date is valid
-  if (isNaN(date.getTime())) {
+  if (!date) {
     console.warn('formatDateLong: Invalid date string', dateStr);
     return '';
   }

@@ -32,6 +32,15 @@ describe('formatDateLong', () => {
       expect(warnSpy).toHaveBeenCalledWith('formatDateLong: Invalid date string', 'not-a-date');
     });
 
+    it('should return empty string and warn for invalid calendar date', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const result = formatDateLong('2025-02-30');
+
+      expect(result).toBe('');
+      expect(warnSpy).toHaveBeenCalledWith('formatDateLong: Invalid date string', '2025-02-30');
+    });
+
     it('should return empty string and warn for non-string input', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

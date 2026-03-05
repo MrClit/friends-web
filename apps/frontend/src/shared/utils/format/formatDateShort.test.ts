@@ -10,6 +10,7 @@ describe('formatDateShort', () => {
   it('returns empty string for invalid input values', () => {
     expect(formatDateShort('')).toBe('');
     expect(formatDateShort('not-a-date')).toBe('');
+    expect(formatDateShort('2025-02-30')).toBe('');
   });
 
   it('formats dates using Spanish locale by default', () => {

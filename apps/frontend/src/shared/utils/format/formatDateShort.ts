@@ -1,4 +1,5 @@
 import { getCurrentLocale } from '@/i18n';
+import { parseDateForFormatting } from './parseDateForFormatting';
 
 /**
  * Format date in short format using current locale
@@ -11,10 +12,10 @@ export function formatDateShort(dateStr: string): string {
     return '';
   }
 
-  const date = new Date(dateStr);
+  const date = parseDateForFormatting(dateStr);
 
   // Check if date is valid
-  if (isNaN(date.getTime())) {
+  if (!date) {
     return '';
   }
 

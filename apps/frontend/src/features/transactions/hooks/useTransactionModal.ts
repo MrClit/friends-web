@@ -2,8 +2,27 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/hooks/api/useTransactions';
 import { useModalForm } from '@/hooks/common';
+import { formatDateToInputValue, parseDateForFormatting } from '@/shared/utils/format';
 import type { Transaction, PaymentType } from '../types';
 import type { Event } from '@/features/events/types';
+
+function getTodayLocalDate(): string {
+  return formatDateToInputValue(new Date());
+}
+
+function normalizeDateForInput(rawDate: string): string {
+  if (!rawDate) {
+    return '';
+  }
+
+  const parsedDate = parseDateForFormatting(rawDate);
+
+  if (!parsedDate) {
+    return rawDate.slice(0, 10);
+  }
+
+  return formatDateToInputValue(parsedDate);
+}
 
 /**
  * Helper function to check if form data has changed from original transaction
@@ -19,7 +38,7 @@ function checkIsDirty(
 ): boolean {
   if (!open) return false;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getTodayLocalDate();
 
   if (!transaction) {
     // Create mode: check if any field is non-default
@@ -38,7 +57,7 @@ function checkIsDirty(
     title.trim() !== transaction.title.trim() ||
     amount !== transaction.amount.toString() ||
     participantId !== (transaction.participantId || '') ||
-    date !== transaction.date.slice(0, 10)
+    date !== normalizeDateForInput(transaction.date)
   );
 }
 
@@ -92,7 +111,7 @@ export function useTransactionModal({
   const [type, setType] = useState<PaymentType>('contribution');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(() => getTodayLocalDate());
   const [participantId, setParticipantId] = useState('');
 
   // Delete confirmation state (separate from discard)
@@ -112,14 +131,14 @@ export function useTransactionModal({
       setType(transaction.paymentType);
       setTitle(transaction.title);
       setAmount(transaction.amount.toString());
-      setDate(transaction.date.slice(0, 10));
+      setDate(normalizeDateForInput(transaction.date));
       setParticipantId(transaction.participantId || '');
     } else {
       // Create mode: reset to default values
       setType('contribution');
       setTitle('');
       setAmount('');
-      setDate(new Date().toISOString().slice(0, 10));
+      setDate(getTodayLocalDate());
       setParticipantId('');
     }
   }, [transaction]);
