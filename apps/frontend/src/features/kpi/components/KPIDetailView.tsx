@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { KPIType } from '../types';
-import { isValidKPI, getKPIConfig, buildKPIItems } from '../index';
+import type { KPIType, KPIParticipantItem } from '../types';
+import { isValidKPI, getKPIConfig, buildBalanceBreakdownData, buildKPIItems } from '../index';
 
 // React Query hooks
 import { useEvent } from '../../../hooks/api/useEvents';
@@ -59,9 +59,16 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
   };
   const kpiValue = kpiValueMap[kpi];
 
-  // Build participants list from KPIs
-  const participantsData = kpis[KPI_CONFIG[kpi].kpiKey];
-  const items = buildKPIItems(participantsData, event, kpi, KPI_CONFIG, kpis.potExpenses, t);
+  const shouldRenderBalanceBreakdown = kpi === 'balance' && Boolean(kpis.balanceBreakdown);
+  const balanceBreakdownData = shouldRenderBalanceBreakdown
+    ? buildBalanceBreakdownData(kpis.balanceBreakdown, event, t)
+    : undefined;
+
+  let items: KPIParticipantItem[] = [];
+  if (!shouldRenderBalanceBreakdown) {
+    const participantsData = kpis[KPI_CONFIG[kpi].kpiKey];
+    items = buildKPIItems(participantsData, event, kpi, KPI_CONFIG, kpis.potExpenses, t);
+  }
 
   return (
     <KPIDetailContent
@@ -70,6 +77,7 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
       items={items}
       kpiValue={kpiValue}
       kpiConfig={KPI_CONFIG}
+      balanceBreakdownData={balanceBreakdownData}
       onBack={() => navigate(`/event/${event.id}`)}
     />
   );

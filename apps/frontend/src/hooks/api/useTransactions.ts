@@ -83,6 +83,10 @@ export function useCreateTransaction(eventId: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.events.detail(eventId),
       });
+      // Invalidate event KPIs
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.events.kpis(eventId),
+      });
     },
     onError: () => {
       error('transactions.create_error');
@@ -115,6 +119,10 @@ export function useUpdateTransaction() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.events.detail(transaction.eventId),
       });
+      // Invalidate event KPIs
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.events.kpis(transaction.eventId),
+      });
     },
     onError: () => {
       error('transactions.update_error');
@@ -127,17 +135,24 @@ export function useUpdateTransaction() {
  * Automatically invalidates all transaction queries on success
  * @returns Mutation object with mutate function and status
  */
-export function useDeleteTransaction() {
+export function useDeleteTransaction(eventId?: string) {
   const { success, error } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => transactionsApi.delete(id),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
       success('transactions.delete_success');
       // Invalidate all transaction queries
-      // This ensures all related data is refreshed
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      // Invalidate specific transaction detail
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.detail(id) });
+      if (eventId) {
+        // Invalidate event-related queries that depend on transactions
+        queryClient.invalidateQueries({ queryKey: queryKeys.transactions.byEvent(eventId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(eventId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.events.kpis(eventId) });
+      }
     },
     onError: () => {
       error('transactions.delete_error');

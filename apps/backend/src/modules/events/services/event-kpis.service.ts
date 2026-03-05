@@ -8,6 +8,8 @@ import { EventKPIsDto } from '../dto/event-kpis.dto';
 @Injectable()
 export class EventKPIsService {
   private readonly logger = new Logger(EventKPIsService.name);
+  private static readonly POT_PARTICIPANT_ID = '0';
+  private static readonly RECONCILIATION_TOLERANCE = 0.000001;
 
   constructor(
     @InjectRepository(Event)
@@ -42,8 +44,7 @@ export class EventKPIsService {
       const participantExpenses: Record<string, number> = {};
       const participantCompensations: Record<string, number> = {};
       const participantPending: Record<string, number> = {};
-
-      const POT_PARTICIPANT_ID = '0';
+      const potExpensesTransactions: Array<{ id: string; title: string; amount: number; date: string }> = [];
 
       // Calculate KPIs from transactions
       transactions.forEach((transaction) => {
@@ -51,8 +52,13 @@ export class EventKPIsService {
         // Ensure amount is a number
         const numAmount = Number(amount);
 
+        if (!Number.isFinite(numAmount)) {
+          this.logger.warn(`Skipping transaction ${transaction.id} due to invalid amount: ${String(amount)}`);
+          return;
+        }
+
         // Skip pot participant for balance calculations
-        if (participantId !== POT_PARTICIPANT_ID) {
+        if (participantId !== EventKPIsService.POT_PARTICIPANT_ID) {
           // Initialize participant balances if not exists
           if (participantBalances[participantId] === undefined) {
             participantBalances[participantId] = 0;
@@ -72,7 +78,7 @@ export class EventKPIsService {
             case 'expense':
               totalExpenses += numAmount;
               participantExpenses[participantId] += numAmount;
-              participantBalances[participantId] -= numAmount;
+              participantBalances[participantId] += numAmount;
               participantPending[participantId] += numAmount;
               break;
             case 'compensation':
@@ -86,12 +92,40 @@ export class EventKPIsService {
           // Pot expenses (special case)
           potExpenses += numAmount;
           totalExpenses += numAmount;
+
+          const dateValue =
+            transaction.date instanceof Date ? transaction.date.toISOString() : String(transaction.date);
+          const normalizedDate = dateValue.includes('T') ? dateValue.split('T')[0] : dateValue;
+
+          potExpensesTransactions.push({
+            id: transaction.id,
+            title: transaction.title,
+            amount: numAmount,
+            date: normalizedDate,
+          });
         }
       });
 
       // Calculate pot balance and pending compensation
       const potBalance = totalContributions - totalCompensations - potExpenses;
       const pendingToCompensate = totalExpenses - potExpenses - totalCompensations;
+
+      const participantNetWithPot: Record<string, number> = {};
+      Object.keys(participantBalances).forEach((participantId) => {
+        participantNetWithPot[participantId] =
+          participantContributions[participantId] - participantCompensations[participantId];
+      });
+
+      const inflowsTotal = totalContributions;
+      const outflowsTotal = totalCompensations + potExpenses;
+      const isConsistent =
+        Math.abs(inflowsTotal - outflowsTotal - potBalance) <= EventKPIsService.RECONCILIATION_TOLERANCE;
+
+      if (!isConsistent) {
+        this.logger.warn(
+          `Pot balance reconciliation mismatch for event ${eventId}: inflows=${inflowsTotal}, outflows=${outflowsTotal}, potBalance=${potBalance}`,
+        );
+      }
 
       return {
         totalExpenses,
@@ -105,6 +139,26 @@ export class EventKPIsService {
         participantCompensations,
         participantPending,
         potExpenses,
+        balanceBreakdown: {
+          inflows: {
+            total: inflowsTotal,
+            contributionsByParticipant: participantContributions,
+          },
+          outflows: {
+            total: outflowsTotal,
+            compensationsTotal: totalCompensations,
+            compensationsByParticipant: participantCompensations,
+            potExpensesTotal: potExpenses,
+            potExpensesTransactions,
+          },
+          participantNetWithPot,
+          reconciliation: {
+            inflows: inflowsTotal,
+            outflows: outflowsTotal,
+            potBalance,
+            isConsistent,
+          },
+        },
       };
     } catch (error) {
       if (error instanceof NotFoundException) {

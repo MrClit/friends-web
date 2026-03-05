@@ -159,6 +159,22 @@
       "pending": "Quantitat que cada participant deu o li deuen."
     },
     "participants": "Participants",
+    "balanceBreakdown": {
+      "summaryTitle": "Com es calcula aquest saldo",
+      "inflowsLabel": "Entrades al pot",
+      "compensationsLabel": "Reemborsaments des del pot",
+      "potExpensesLabel": "Despeses directes del pot",
+      "finalBalanceLabel": "Saldo final del pot",
+      "equation": "Saldo del pot = Entrades - Reemborsaments - Despeses directes",
+      "inconsistentWarning": "Avís: aquest desglossament no quadra exactament amb el saldo mostrat.",
+      "inflowsSectionTitle": "Entrades al pot",
+      "compensationsSectionTitle": "Reemborsaments des del pot",
+      "potExpensesSectionTitle": "Despeses directes del pot",
+      "subtotal": "Subtotal",
+      "emptyInflows": "No hi ha aportacions registrades.",
+      "emptyCompensations": "No hi ha reemborsaments registrats.",
+      "emptyPotExpenses": "No hi ha despeses directes del pot."
+    },
     "noteTitle": "Nota:",
     "noteBalance": "Diners disponibles al fons comú.",
     "noteContributions": "Suma d'aportacions de cada participant.",

@@ -159,6 +159,22 @@
       "pending": "Cantidad que cada participante debe o le deben."
     },
     "participants": "Participantes",
+    "balanceBreakdown": {
+      "summaryTitle": "Cómo se calcula este saldo",
+      "inflowsLabel": "Entradas al bote",
+      "compensationsLabel": "Reembolsos desde el bote",
+      "potExpensesLabel": "Gastos directos del bote",
+      "finalBalanceLabel": "Saldo final del bote",
+      "equation": "Saldo del bote = Entradas - Reembolsos - Gastos directos",
+      "inconsistentWarning": "Advertencia: este desglose no cuadra exactamente con el saldo mostrado.",
+      "inflowsSectionTitle": "Entradas al bote",
+      "compensationsSectionTitle": "Reembolsos desde el bote",
+      "potExpensesSectionTitle": "Gastos directos del bote",
+      "subtotal": "Subtotal",
+      "emptyInflows": "No hay aportaciones registradas.",
+      "emptyCompensations": "No hay reembolsos registrados.",
+      "emptyPotExpenses": "No hay gastos directos del bote."
+    },
     "noteTitle": "Nota:",
     "noteBalance": "Dinero disponible en el fondo común.",
     "noteContributions": "Suma de aportaciones de cada participante.",

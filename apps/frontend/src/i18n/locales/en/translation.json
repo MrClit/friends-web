@@ -159,6 +159,22 @@
       "pending": "Amount each participant owes or is owed."
     },
     "participants": "Participants",
+    "balanceBreakdown": {
+      "summaryTitle": "How this balance is calculated",
+      "inflowsLabel": "Inflows to pot",
+      "compensationsLabel": "Compensations from pot",
+      "potExpensesLabel": "Direct pot expenses",
+      "finalBalanceLabel": "Final pot balance",
+      "equation": "Pot balance = Inflows - Compensations - Direct expenses",
+      "inconsistentWarning": "Warning: this breakdown does not reconcile exactly with the displayed balance.",
+      "inflowsSectionTitle": "Inflows to pot",
+      "compensationsSectionTitle": "Compensations from pot",
+      "potExpensesSectionTitle": "Direct pot expenses",
+      "subtotal": "Subtotal",
+      "emptyInflows": "No contributions recorded.",
+      "emptyCompensations": "No compensations recorded.",
+      "emptyPotExpenses": "No direct pot expenses recorded."
+    },
     "noteTitle": "Note:",
     "noteBalance": "Money available in the common fund.",
     "noteContributions": "Sum of contributions by each participant.",

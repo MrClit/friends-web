@@ -341,6 +341,33 @@ describe('EventsService', () => {
       participantCompensations: { '1': 0, '2': 0 },
       participantPending: { '1': 50.0, '2': 0 },
       potExpenses: 25.0,
+      balanceBreakdown: {
+        inflows: {
+          total: 150.0,
+          contributionsByParticipant: { '1': 100.0, '2': 50.0 },
+        },
+        outflows: {
+          total: 25.0,
+          compensationsTotal: 0,
+          compensationsByParticipant: { '1': 0, '2': 0 },
+          potExpensesTotal: 25.0,
+          potExpensesTransactions: [
+            {
+              id: 'tx-pot-1',
+              title: 'Shared expense',
+              amount: 25.0,
+              date: '2026-01-01',
+            },
+          ],
+        },
+        participantNetWithPot: { '1': 100.0, '2': 50.0 },
+        reconciliation: {
+          inflows: 150.0,
+          outflows: 25.0,
+          potBalance: 125.0,
+          isConsistent: true,
+        },
+      },
     };
 
     it('should calculate KPIs correctly', async () => {

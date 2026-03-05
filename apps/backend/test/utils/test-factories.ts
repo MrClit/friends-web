@@ -1,7 +1,8 @@
 import { Repository } from 'typeorm';
 import { Event, EventParticipant, EventStatus } from '../../src/modules/events/entities/event.entity';
 import { Transaction, PaymentType } from '../../src/modules/transactions/entities/transaction.entity';
-import { User, UserRole } from '../../src/modules/users/user.entity';
+import { User } from '../../src/modules/users/user.entity';
+import { UserRole } from '../../src/modules/users/user-role.constants';
 
 interface CreateUserInput {
   email: string;

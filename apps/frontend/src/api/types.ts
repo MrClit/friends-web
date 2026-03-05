@@ -102,6 +102,34 @@ export interface PaginatedTransactionsResponse {
 
 // ============= KPI Types =============
 
+export interface PotExpenseTransactionBreakdown {
+  id: string;
+  title: string;
+  amount: number;
+  date: string;
+}
+
+export interface EventKPIBalanceBreakdown {
+  inflows: {
+    total: number;
+    contributionsByParticipant: Record<string, number>;
+  };
+  outflows: {
+    total: number;
+    compensationsTotal: number;
+    compensationsByParticipant: Record<string, number>;
+    potExpensesTotal: number;
+    potExpensesTransactions: PotExpenseTransactionBreakdown[];
+  };
+  participantNetWithPot: Record<string, number>;
+  reconciliation: {
+    inflows: number;
+    outflows: number;
+    potBalance: number;
+    isConsistent: boolean;
+  };
+}
+
 export interface EventKPIs {
   totalExpenses: number;
   totalContributions: number;
@@ -114,4 +142,5 @@ export interface EventKPIs {
   participantCompensations: Record<string, number>;
   participantPending: Record<string, number>;
   potExpenses: number;
+  balanceBreakdown: EventKPIBalanceBreakdown;
 }

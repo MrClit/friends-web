@@ -28,6 +28,31 @@ export interface KPIParticipantItem {
   textColor?: string; // Text color for avatar initials
 }
 
+export interface KPIBalanceParticipantAmountItem {
+  id: string;
+  name: string;
+  amount: number;
+}
+
+export interface KPIBalancePotExpenseItem {
+  id: string;
+  title: string;
+  amount: number;
+  date: string;
+}
+
+export interface KPIBalanceBreakdownViewModel {
+  inflowsTotal: number;
+  compensationsTotal: number;
+  potExpensesTotal: number;
+  outflowsTotal: number;
+  potBalance: number;
+  isConsistent: boolean;
+  inflowItems: KPIBalanceParticipantAmountItem[];
+  compensationItems: KPIBalanceParticipantAmountItem[];
+  potExpenseItems: KPIBalancePotExpenseItem[];
+}
+
 /**
  * Configuration for each KPI type
  */

@@ -103,7 +103,7 @@ export function useTransactionModal({
   // Mutations
   const createTransaction = useCreateTransaction(event?.id ?? '');
   const updateTransaction = useUpdateTransaction();
-  const deleteTransaction = useDeleteTransaction();
+  const deleteTransaction = useDeleteTransaction(event?.id);
 
   // Centralized reset function to avoid duplication
   const resetForm = useCallback(() => {
