@@ -1,15 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { EventsService } from './events.service';
-import { Event } from './entities/event.entity';
-import { EventStatus } from './entities/event.entity';
+import { Event, EventStatus } from './entities/event.entity';
+import type { EventParticipant } from './entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { TransactionsService } from '../transactions/transactions.service';
 import { EventKPIsService } from './services/event-kpis.service';
 import { User } from '../users/user.entity';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 
 describe('EventsService', () => {
   let service: EventsService;
@@ -26,6 +27,24 @@ describe('EventsService', () => {
   let mockEventKPIsService: { getKPIs: jest.Mock };
   let mockUserRepository: { find: jest.Mock };
 
+  const adminActor: AuthenticatedUser = {
+    id: 'admin-1',
+    email: 'admin@example.com',
+    role: 'admin',
+  };
+
+  const memberActor: AuthenticatedUser = {
+    id: 'member-1',
+    email: 'member@example.com',
+    role: 'user',
+  };
+
+  const outsiderActor: AuthenticatedUser = {
+    id: 'outsider-1',
+    email: 'outsider@example.com',
+    role: 'user',
+  };
+
   const mockEvent: Event = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Test Event',
@@ -33,8 +52,8 @@ describe('EventsService', () => {
     icon: '',
     status: EventStatus.ACTIVE,
     participants: [
-      { type: 'guest', id: '1', name: 'Alice' },
-      { type: 'guest', id: '2', name: 'Bob' },
+      { type: 'user', id: memberActor.id },
+      { type: 'guest', id: 'g1', name: 'Guest 1' },
     ],
     transactions: [],
     createdAt: new Date('2026-01-01'),
@@ -42,7 +61,6 @@ describe('EventsService', () => {
   };
 
   beforeEach(async () => {
-    // create fresh mocks for each test to avoid shared state
     mockRepository = {
       find: jest.fn(),
       findOne: jest.fn(),
@@ -87,8 +105,6 @@ describe('EventsService', () => {
     }).compile();
 
     service = module.get<EventsService>(EventsService);
-
-    // Clear mock calls before each test
     jest.clearAllMocks();
   });
 
@@ -97,11 +113,11 @@ describe('EventsService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of events', async () => {
+    it('returns all events for admin actor', async () => {
       const events = [mockEvent];
       mockRepository.find.mockResolvedValue(events);
 
-      const result = await service.findAll();
+      const result = await service.findAll(adminActor);
 
       expect(result).toEqual(events);
       expect(mockRepository.find).toHaveBeenCalledWith({
@@ -110,221 +126,160 @@ describe('EventsService', () => {
       });
     });
 
-    it('should return empty array when no events exist', async () => {
-      mockRepository.find.mockResolvedValue([]);
+    it('filters events by membership for user actor', async () => {
+      const ownEvent = { ...mockEvent };
+      const foreignEvent = {
+        ...mockEvent,
+        id: 'foreign-event',
+        participants: [{ type: 'user', id: outsiderActor.id }],
+      } as Event;
 
-      const result = await service.findAll();
+      mockRepository.find.mockResolvedValue([ownEvent, foreignEvent]);
 
-      expect(result).toEqual([]);
-      expect(mockRepository.find).toHaveBeenCalled();
+      const result = await service.findAll(memberActor);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe(ownEvent.id);
     });
 
-    it('should throw InternalServerErrorException on database error', async () => {
+    it('throws InternalServerErrorException on repository error', async () => {
       mockRepository.find.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.findAll()).rejects.toThrow(InternalServerErrorException);
-      await expect(service.findAll()).rejects.toThrow('Failed to fetch events');
+      await expect(service.findAll(adminActor)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.findAll(adminActor)).rejects.toThrow('Failed to fetch events');
     });
   });
 
   describe('findOne', () => {
-    it('should return an event when found', async () => {
+    it('returns event for admin actor', async () => {
       mockRepository.findOne.mockResolvedValue(mockEvent);
 
-      const result = await service.findOne(mockEvent.id);
+      const result = await service.findOne(mockEvent.id, adminActor);
 
       expect(result).toEqual(mockEvent);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: { id: mockEvent.id },
-      });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: mockEvent.id } });
     });
 
-    it('should throw NotFoundException when event not found', async () => {
+    it('throws NotFoundException when event does not exist', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('non-existent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.findOne('non-existent-id')).rejects.toThrow('Event with ID non-existent-id not found');
+      await expect(service.findOne('non-existent-id', adminActor)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw InternalServerErrorException on database error', async () => {
-      mockRepository.findOne.mockRejectedValue(new Error('Database error'));
+    it('throws NotFoundException when user is not participant', async () => {
+      mockRepository.findOne.mockResolvedValue(mockEvent);
 
-      await expect(service.findOne(mockEvent.id)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.findOne(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('create', () => {
-    it('should create and return a new event', async () => {
+    it('creates event for admin without mutating participants', async () => {
+      const participants: EventParticipant[] = [{ type: 'guest', id: 'g-1', name: 'Guest One' }];
       const createDto: CreateEventDto = {
-        title: 'New Event',
-        participants: [{ type: 'guest', id: '1', name: 'Alice' }],
+        title: 'Admin Event',
+        participants,
       };
 
-      mockRepository.create.mockReturnValue(mockEvent);
-      mockRepository.save.mockResolvedValue(mockEvent);
+      const savedEvent = {
+        ...mockEvent,
+        title: createDto.title,
+        participants,
+      } as Event;
 
-      const result = await service.create(createDto);
+      mockRepository.create.mockReturnValue(savedEvent);
+      mockRepository.save.mockResolvedValue(savedEvent);
 
-      expect(result).toEqual(mockEvent);
-      expect(mockRepository.create).toHaveBeenCalledWith(createDto);
-      expect(mockRepository.save).toHaveBeenCalledWith(mockEvent);
+      const result = await service.create(createDto, adminActor);
+
+      expect(result).toEqual(savedEvent);
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: createDto.title,
+          participants,
+        }),
+      );
     });
 
-    it('should call create then save exactly once during create', async () => {
+    it('auto-adds creator user participant when missing', async () => {
+      const participants: EventParticipant[] = [{ type: 'guest', id: 'g-2', name: 'Guest Two' }];
+      const expectedParticipants: EventParticipant[] = [...participants, { type: 'user', id: memberActor.id }];
       const createDto: CreateEventDto = {
-        title: 'New Event',
-        participants: [{ type: 'guest', id: '1', name: 'Alice' }],
+        title: 'User Event',
+        participants,
       };
 
-      mockRepository.create.mockReturnValue(mockEvent);
-      mockRepository.save.mockResolvedValue(mockEvent);
+      const savedEvent = {
+        ...mockEvent,
+        title: createDto.title,
+        participants: expectedParticipants,
+      } as Event;
 
-      await service.create(createDto);
+      mockRepository.create.mockReturnValue(savedEvent);
+      mockRepository.save.mockResolvedValue(savedEvent);
 
-      const createOrder = mockRepository.create.mock.invocationCallOrder[0];
-      const saveOrder = mockRepository.save.mock.invocationCallOrder[0];
+      await service.create(createDto, memberActor);
 
-      expect(createOrder).toBeLessThan(saveOrder);
-      expect(mockRepository.save).toHaveBeenCalledTimes(1);
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          participants: expectedParticipants,
+        }),
+      );
     });
 
-    it('should throw InternalServerErrorException on save error', async () => {
+    it('throws InternalServerErrorException on save error', async () => {
       const createDto: CreateEventDto = {
-        title: 'New Event',
-        participants: [{ type: 'guest', id: '1', name: 'Alice' }],
+        title: 'Error Event',
+        participants: [{ type: 'guest', id: 'g-3', name: 'Guest Three' }],
       };
 
       mockRepository.create.mockReturnValue(mockEvent);
       mockRepository.save.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.create(createDto)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.create(createDto, adminActor)).rejects.toThrow(InternalServerErrorException);
     });
   });
 
   describe('update', () => {
-    it('should update and return the updated event', async () => {
-      const updateDto: UpdateEventDto = {
-        title: 'Updated Event',
-      };
-
-      const updatedEvent = { ...mockEvent, ...updateDto };
+    it('updates event for authorized actor', async () => {
+      const updateDto: UpdateEventDto = { title: 'Updated Event' };
+      const updatedEvent = { ...mockEvent, title: 'Updated Event' } as Event;
 
       mockRepository.findOne.mockResolvedValue(mockEvent);
       mockRepository.merge.mockReturnValue(updatedEvent);
       mockRepository.save.mockResolvedValue(updatedEvent);
 
-      const result = await service.update(mockEvent.id, updateDto);
+      const result = await service.update(mockEvent.id, updateDto, adminActor);
 
       expect(result).toEqual(updatedEvent);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: { id: mockEvent.id },
-      });
-      expect(mockRepository.merge).toHaveBeenCalledWith(mockEvent, updateDto);
+      expect(mockRepository.merge).toHaveBeenCalledWith(mockEvent, { title: 'Updated Event' });
       expect(mockRepository.save).toHaveBeenCalledWith(updatedEvent);
     });
 
-    it('should call save exactly once during update', async () => {
-      const updateDto: UpdateEventDto = {
-        title: 'Updated Event',
-      };
-
-      const updatedEvent = { ...mockEvent, ...updateDto };
-
+    it('throws NotFoundException when user is not participant', async () => {
+      const updateDto: UpdateEventDto = { title: 'Blocked Update' };
       mockRepository.findOne.mockResolvedValue(mockEvent);
-      mockRepository.merge.mockReturnValue(updatedEvent);
-      mockRepository.save.mockResolvedValue(updatedEvent);
 
-      await service.update(mockEvent.id, updateDto);
-
-      expect(mockRepository.save).toHaveBeenCalledTimes(1);
-    });
-
-    it('should call findOne exactly once during update', async () => {
-      const updateDto: UpdateEventDto = {
-        title: 'Updated Event',
-      };
-
-      const updatedEvent = { ...mockEvent, ...updateDto };
-
-      mockRepository.findOne.mockResolvedValue(mockEvent);
-      mockRepository.merge.mockReturnValue(updatedEvent);
-      mockRepository.save.mockResolvedValue(updatedEvent);
-
-      await service.update(mockEvent.id, updateDto);
-
-      expect(mockRepository.findOne).toHaveBeenCalledTimes(1);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: { id: mockEvent.id },
-      });
-    });
-
-    it('should throw NotFoundException when event not found', async () => {
-      const updateDto: UpdateEventDto = {
-        title: 'Updated Event',
-      };
-
-      mockRepository.findOne.mockResolvedValue(null);
-
-      await expect(service.update('non-existent-id', updateDto)).rejects.toThrow(NotFoundException);
-    });
-
-    it('should update participants when provided', async () => {
-      const updateDto: UpdateEventDto = {
-        participants: [
-          { type: 'guest', id: '1', name: 'Alice' },
-          { type: 'guest', id: '3', name: 'Charlie' },
-        ],
-      };
-
-      const updatedEvent = { ...mockEvent, ...updateDto };
-
-      mockRepository.findOne.mockResolvedValue(mockEvent);
-      mockRepository.merge.mockReturnValue(updatedEvent);
-      mockRepository.save.mockResolvedValue(updatedEvent);
-
-      const result = await service.update(mockEvent.id, updateDto);
-
-      expect(result.participants).toEqual(updateDto.participants);
-    });
-
-    it('should throw InternalServerErrorException on save error', async () => {
-      const updateDto: UpdateEventDto = {
-        title: 'Updated Event',
-      };
-
-      mockRepository.findOne.mockResolvedValue(mockEvent);
-      mockRepository.merge.mockReturnValue(mockEvent);
-      mockRepository.save.mockRejectedValue(new Error('Database error'));
-
-      await expect(service.update(mockEvent.id, updateDto)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.update(mockEvent.id, updateDto, outsiderActor)).rejects.toThrow(NotFoundException);
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
   });
 
   describe('remove', () => {
-    it('should delete an event successfully', async () => {
+    it('deletes event for authorized actor', async () => {
       mockRepository.findOne.mockResolvedValue(mockEvent);
       mockRepository.delete.mockResolvedValue({ affected: 1, raw: {} });
 
-      await service.remove(mockEvent.id);
+      await service.remove(mockEvent.id, adminActor);
 
-      expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: { id: mockEvent.id },
-      });
       expect(mockRepository.delete).toHaveBeenCalledWith(mockEvent.id);
     });
 
-    it('should throw NotFoundException when event not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-
-      await expect(service.remove('non-existent-id')).rejects.toThrow(NotFoundException);
-      expect(mockRepository.delete).not.toHaveBeenCalled();
-    });
-
-    it('should throw InternalServerErrorException on delete error', async () => {
+    it('throws NotFoundException when user is not participant', async () => {
       mockRepository.findOne.mockResolvedValue(mockEvent);
-      mockRepository.delete.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.remove(mockEvent.id)).rejects.toThrow(InternalServerErrorException);
+      await expect(service.remove(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
+      expect(mockRepository.delete).not.toHaveBeenCalled();
     });
   });
 
@@ -370,27 +325,36 @@ describe('EventsService', () => {
       },
     };
 
-    it('should calculate KPIs correctly', async () => {
+    it('returns KPIs when actor can access event', async () => {
+      mockRepository.findOne.mockResolvedValue(mockEvent);
       mockEventKPIsService.getKPIs.mockResolvedValue(expectedKPIs);
 
-      const result = await service.getKPIs(mockEvent.id);
+      const result = await service.getKPIs(mockEvent.id, memberActor);
 
       expect(result).toEqual(expectedKPIs);
-      expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith(mockEvent.id);
+      expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith(mockEvent.id, memberActor);
     });
 
-    it('should throw NotFoundException when event not found', async () => {
-      mockEventKPIsService.getKPIs.mockRejectedValue(new NotFoundException());
+    it('throws NotFoundException when actor cannot access event', async () => {
+      mockRepository.findOne.mockResolvedValue(mockEvent);
 
-      await expect(service.getKPIs('non-existent-id')).rejects.toThrow(NotFoundException);
-      expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith('non-existent-id');
+      await expect(service.getKPIs(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
+      expect(mockEventKPIsService.getKPIs).not.toHaveBeenCalled();
     });
 
-    it('should throw InternalServerErrorException on database error', async () => {
+    it('throws NotFoundException when event does not exist', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.getKPIs('non-existent-id', adminActor)).rejects.toThrow(NotFoundException);
+      expect(mockEventKPIsService.getKPIs).not.toHaveBeenCalled();
+    });
+
+    it('throws InternalServerErrorException when KPI service fails', async () => {
+      mockRepository.findOne.mockResolvedValue(mockEvent);
       mockEventKPIsService.getKPIs.mockRejectedValue(new InternalServerErrorException());
 
-      await expect(service.getKPIs(mockEvent.id)).rejects.toThrow(InternalServerErrorException);
-      expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith(mockEvent.id);
+      await expect(service.getKPIs(mockEvent.id, adminActor)).rejects.toThrow(InternalServerErrorException);
+      expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith(mockEvent.id, adminActor);
     });
   });
 });

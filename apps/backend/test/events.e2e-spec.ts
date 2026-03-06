@@ -9,7 +9,7 @@ import { Event } from '../src/modules/events/entities/event.entity';
 import { User } from '../src/modules/users/user.entity';
 import { applyAppTestConfig } from './utils/test-app-config';
 import { createUser } from './utils/test-factories';
-import { buildAuthHeader, getDataObjectFromBody } from './utils/test-http-helpers';
+import { buildAuthHeader, getDataFromBody, getDataObjectFromBody } from './utils/test-http-helpers';
 
 describe('Events API (e2e)', () => {
   let app: INestApplication;
@@ -127,5 +127,158 @@ describe('Events API (e2e)', () => {
       path: '/api/events/11111111-1111-1111-1111-111111111111',
       method: 'GET',
     });
+  });
+
+  it('GET /api/events returns all events for admin and only participant events for user', async () => {
+    const admin = await createUser(userRepository, {
+      email: 'events-admin@example.com',
+      name: 'Events Admin',
+      role: 'admin',
+    });
+    const userA = await createUser(userRepository, {
+      email: 'events-user-a@example.com',
+      name: 'Events User A',
+    });
+    const userB = await createUser(userRepository, {
+      email: 'events-user-b@example.com',
+      name: 'Events User B',
+    });
+
+    const userAEvent = await eventRepository.save({
+      title: 'User A Event',
+      participants: [{ type: 'user', id: userA.id }],
+    });
+
+    const userBEvent = await eventRepository.save({
+      title: 'User B Event',
+      participants: [{ type: 'user', id: userB.id }],
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+
+    const userResponse = await request(httpServer)
+      .get('/api/events')
+      .set('Authorization', buildAuthHeader(jwtService, userA))
+      .expect(200);
+
+    const userEvents = getDataFromBody(userResponse.body) as Array<Record<string, unknown>>;
+    expect(userEvents).toHaveLength(1);
+    expect(userEvents[0].id).toBe(userAEvent.id);
+
+    const adminResponse = await request(httpServer)
+      .get('/api/events')
+      .set('Authorization', buildAuthHeader(jwtService, admin))
+      .expect(200);
+
+    const adminEvents = getDataFromBody(adminResponse.body) as Array<Record<string, unknown>>;
+    const adminEventIds = adminEvents.map((event) => String(event.id));
+    expect(adminEventIds).toEqual(expect.arrayContaining([userAEvent.id, userBEvent.id]));
+  });
+
+  it('GET /api/events/:id returns 404 when user is not a participant', async () => {
+    const userA = await createUser(userRepository, {
+      email: 'events-user-access-a@example.com',
+      name: 'Events User Access A',
+    });
+    const userB = await createUser(userRepository, {
+      email: 'events-user-access-b@example.com',
+      name: 'Events User Access B',
+    });
+
+    const event = await eventRepository.save({
+      title: 'Restricted Event',
+      participants: [{ type: 'user', id: userB.id }],
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(httpServer)
+      .get(`/api/events/${event.id}`)
+      .set('Authorization', buildAuthHeader(jwtService, userA))
+      .expect(404);
+
+    expect(response.body).toMatchObject({
+      statusCode: 404,
+      path: `/api/events/${event.id}`,
+      method: 'GET',
+    });
+  });
+
+  it('POST /api/events auto-adds current user as participant when missing', async () => {
+    const user = await createUser(userRepository, {
+      email: 'events-auto-participant@example.com',
+      name: 'Auto Participant User',
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    const createResponse = await request(httpServer)
+      .post('/api/events')
+      .set('Authorization', buildAuthHeader(jwtService, user))
+      .send({
+        title: 'Auto Participant Event',
+        participants: [{ type: 'guest', id: 'g-100', name: 'Guest 100' }],
+      })
+      .expect(201);
+
+    const createData = getDataObjectFromBody(createResponse.body);
+    const participants = (createData.participants ?? []) as Array<Record<string, unknown>>;
+
+    expect(participants).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'guest', id: 'g-100' }),
+        expect.objectContaining({ type: 'user', id: user.id }),
+      ]),
+    );
+  });
+
+  it('PATCH /api/events/:id allows user self-removal and access is revoked afterwards', async () => {
+    const user = await createUser(userRepository, {
+      email: 'events-self-removal@example.com',
+      name: 'Self Removal User',
+    });
+
+    const event = await eventRepository.save({
+      title: 'Self Removal Event',
+      participants: [
+        { type: 'user', id: user.id },
+        { type: 'guest', id: 'g-200', name: 'Guest 200' },
+      ],
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+
+    await request(httpServer)
+      .patch(`/api/events/${event.id}`)
+      .set('Authorization', buildAuthHeader(jwtService, user))
+      .send({
+        participants: [{ type: 'guest', id: 'g-200', name: 'Guest 200' }],
+      })
+      .expect(200);
+
+    await request(httpServer)
+      .get(`/api/events/${event.id}`)
+      .set('Authorization', buildAuthHeader(jwtService, user))
+      .expect(404);
+  });
+
+  it('GET /api/events/:id/kpis returns 404 when user is not a participant', async () => {
+    const userA = await createUser(userRepository, {
+      email: 'events-kpi-access-a@example.com',
+      name: 'KPI Access User A',
+    });
+    const userB = await createUser(userRepository, {
+      email: 'events-kpi-access-b@example.com',
+      name: 'KPI Access User B',
+    });
+
+    const event = await eventRepository.save({
+      title: 'KPI Restricted Event',
+      participants: [{ type: 'user', id: userB.id }],
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(httpServer)
+      .get(`/api/events/${event.id}/kpis`)
+      .set('Authorization', buildAuthHeader(jwtService, userA))
+      .expect(404);
   });
 });

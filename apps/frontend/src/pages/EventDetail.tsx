@@ -1,6 +1,7 @@
 import { MainLayout } from './MainLayout';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ApiError } from '@/api/client';
 import { useEventDetail } from '@/features/events/hooks';
 import { useConfirmDialog } from '@/hooks/common';
 import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
@@ -41,9 +42,14 @@ export function EventDetail() {
   }
 
   if (error) {
+    const isNotFoundOrNoAccess = error instanceof ApiError && error.status === 404;
+
     return (
       <MainLayout>
-        <ErrorState onRetry={() => refetch()} />
+        <ErrorState
+          message={isNotFoundOrNoAccess ? t('common.notFoundOrNoAccess') : undefined}
+          onRetry={isNotFoundOrNoAccess ? undefined : () => void refetch()}
+        />
       </MainLayout>
     );
   }

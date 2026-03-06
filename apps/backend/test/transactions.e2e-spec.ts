@@ -81,7 +81,10 @@ describe('Transactions API (e2e)', () => {
       title: 'DTO Validation Event',
       description: 'DTO test',
       status: EventStatus.ACTIVE,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+      participants: [
+        { type: 'user', id: user.id },
+        { type: 'guest', id: 'g1', name: 'Guest 1' },
+      ],
     });
 
     const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
@@ -139,7 +142,10 @@ describe('Transactions API (e2e)', () => {
       title: 'Transaction Contract Event',
       description: 'Contract test',
       status: EventStatus.ACTIVE,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+      participants: [
+        { type: 'user', id: user.id },
+        { type: 'guest', id: 'g1', name: 'Guest 1' },
+      ],
     });
 
     const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
@@ -198,7 +204,10 @@ describe('Transactions API (e2e)', () => {
       title: 'Pagination Validation Event',
       description: 'Pagination test',
       status: EventStatus.ACTIVE,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+      participants: [
+        { type: 'user', id: user.id },
+        { type: 'guest', id: 'g1', name: 'Guest 1' },
+      ],
     });
 
     const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
@@ -224,7 +233,10 @@ describe('Transactions API (e2e)', () => {
       title: 'Single Tx Event',
       description: 'Single tx read',
       status: EventStatus.ACTIVE,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+      participants: [
+        { type: 'user', id: user.id },
+        { type: 'guest', id: 'g1', name: 'Guest 1' },
+      ],
     });
 
     const created = await createTransaction(transactionRepository, {
@@ -281,7 +293,10 @@ describe('Transactions API (e2e)', () => {
       title: 'Patch Tx Event',
       description: 'Patch tx',
       status: EventStatus.ACTIVE,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+      participants: [
+        { type: 'user', id: user.id },
+        { type: 'guest', id: 'g1', name: 'Guest 1' },
+      ],
     });
 
     const created = await createTransaction(transactionRepository, {
@@ -342,7 +357,10 @@ describe('Transactions API (e2e)', () => {
       title: 'Delete Tx Event',
       description: 'Delete tx',
       status: EventStatus.ACTIVE,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+      participants: [
+        { type: 'user', id: user.id },
+        { type: 'guest', id: 'g1', name: 'Guest 1' },
+      ],
     });
 
     const created = await createTransaction(transactionRepository, {
@@ -381,5 +399,94 @@ describe('Transactions API (e2e)', () => {
       path: `/api/transactions/${missingId}`,
       method: 'DELETE',
     });
+  });
+
+  it('GET /api/transactions/:id returns 401 without JWT', async () => {
+    const event = await createEvent(eventRepository, {
+      title: 'No Auth Single Tx Event',
+      description: 'No auth single tx',
+      status: EventStatus.ACTIVE,
+      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+    });
+
+    const created = await createTransaction(transactionRepository, {
+      title: 'No Auth Tx',
+      paymentType: 'expense',
+      amount: 9,
+      participantId: 'g1',
+      eventId: event.id,
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(httpServer).get(`/api/transactions/${created.id}`).expect(401);
+
+    expect(response.body).toMatchObject({
+      statusCode: 401,
+      path: `/api/transactions/${created.id}`,
+      method: 'GET',
+    });
+  });
+
+  it('returns 404 for user not participating in event transactions while admin keeps global access', async () => {
+    const owner = await createUser(userRepository, {
+      email: 'tx-owner-access@example.com',
+      name: 'Tx Owner Access',
+    });
+    const outsider = await createUser(userRepository, {
+      email: 'tx-outsider-access@example.com',
+      name: 'Tx Outsider Access',
+    });
+    const admin = await createUser(userRepository, {
+      email: 'tx-admin-access@example.com',
+      name: 'Tx Admin Access',
+      role: 'admin',
+    });
+
+    const event = await createEvent(eventRepository, {
+      title: 'Restricted Transaction Event',
+      description: 'Restricted tx access',
+      status: EventStatus.ACTIVE,
+      participants: [
+        { type: 'user', id: owner.id },
+        { type: 'guest', id: 'g1', name: 'Guest 1' },
+      ],
+    });
+
+    const transaction = await createTransaction(transactionRepository, {
+      title: 'Owner Expense',
+      paymentType: 'expense',
+      amount: 55,
+      participantId: 'g1',
+      eventId: event.id,
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+
+    await request(httpServer)
+      .get(`/api/events/${event.id}/transactions`)
+      .set('Authorization', buildAuthHeader(jwtService, outsider))
+      .expect(404);
+
+    await request(httpServer)
+      .post(`/api/events/${event.id}/transactions`)
+      .set('Authorization', buildAuthHeader(jwtService, outsider))
+      .send({
+        title: 'Outsider Attempt',
+        paymentType: 'expense',
+        amount: 10,
+        participantId: 'g1',
+        date: '2026-03-01',
+      })
+      .expect(404);
+
+    await request(httpServer)
+      .get(`/api/transactions/${transaction.id}`)
+      .set('Authorization', buildAuthHeader(jwtService, outsider))
+      .expect(404);
+
+    await request(httpServer)
+      .get(`/api/transactions/${transaction.id}`)
+      .set('Authorization', buildAuthHeader(jwtService, admin))
+      .expect(200);
   });
 });

@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ApiError } from '@/api/client';
+import { ErrorState } from '@/shared/components';
 import type { KPIType, KPIParticipantItem } from '../types';
 import { isValidKPI, getKPIConfig, buildBalanceBreakdownData, buildKPIItems } from '../index';
 
@@ -19,8 +21,8 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
   const { t } = useTranslation();
 
   // React Query hooks - MUST be called before any early returns
-  const { data: event, isLoading: isLoadingEvent, error: eventError } = useEvent(eventId);
-  const { data: kpis, isLoading: isLoadingKPIs } = useEventKPIs(eventId);
+  const { data: event, isLoading: isLoadingEvent, error: eventError, refetch: refetchEvent } = useEvent(eventId);
+  const { data: kpis, isLoading: isLoadingKPIs, error: kpisError, refetch: refetchKPIs } = useEventKPIs(eventId);
 
   // Validate KPI parameter early (after hooks)
   if (!rawKpi || !isValidKPI(rawKpi)) {
@@ -38,11 +40,22 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
   }
 
   // Error state
-  if (eventError) {
+  const requestError = eventError ?? kpisError;
+  if (requestError) {
+    const isNotFoundOrNoAccess = requestError instanceof ApiError && requestError.status === 404;
+
     return (
-      <div className="text-center mt-10">
-        {t('common.error')}: {eventError.message}
-      </div>
+      <ErrorState
+        message={isNotFoundOrNoAccess ? t('common.notFoundOrNoAccess') : undefined}
+        onRetry={
+          isNotFoundOrNoAccess
+            ? undefined
+            : () => {
+                void refetchEvent();
+                void refetchKPIs();
+              }
+        }
+      />
     );
   }
 

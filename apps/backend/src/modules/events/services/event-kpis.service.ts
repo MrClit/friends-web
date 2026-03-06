@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { Event } from '../entities/event.entity';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { EventKPIsDto } from '../dto/event-kpis.dto';
@@ -20,7 +21,7 @@ export class EventKPIsService {
   /**
    * Get KPIs for a specific event
    */
-  async getKPIs(eventId: string): Promise<EventKPIsDto> {
+  async getKPIs(eventId: string, actor: AuthenticatedUser): Promise<EventKPIsDto> {
     try {
       this.logger.log(`Calculating KPIs for event: ${eventId}`);
 
@@ -31,7 +32,7 @@ export class EventKPIsService {
       }
 
       // Get all transactions for the event
-      const transactions = await this.transactionsService.findByEvent(eventId);
+      const transactions = await this.transactionsService.findByEvent(eventId, actor);
 
       // Initialize KPI values
       let totalExpenses = 0;

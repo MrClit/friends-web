@@ -6,11 +6,17 @@ import { Event } from '../entities/event.entity';
 import { Transaction } from '../../transactions/entities/transaction.entity';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { EventKPIsService } from './event-kpis.service';
+import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 
 describe('EventKPIsService', () => {
   let service: EventKPIsService;
   let eventRepository: { findOne: jest.Mock };
   let transactionsService: { findByEvent: jest.Mock };
+  const actor: AuthenticatedUser = {
+    id: 'user-1',
+    email: 'user-1@example.com',
+    role: 'user',
+  };
 
   beforeEach(async () => {
     eventRepository = {
@@ -86,7 +92,7 @@ describe('EventKPIsService', () => {
 
     transactionsService.findByEvent.mockResolvedValue(transactions);
 
-    const result = await service.getKPIs('event-1');
+    const result = await service.getKPIs('event-1', actor);
 
     expect(result).toMatchObject({
       totalContributions: 160,
@@ -132,7 +138,7 @@ describe('EventKPIsService', () => {
     });
 
     expect(eventRepository.findOne).toHaveBeenCalledWith({ where: { id: 'event-1' } });
-    expect(transactionsService.findByEvent).toHaveBeenCalledWith('event-1');
+    expect(transactionsService.findByEvent).toHaveBeenCalledWith('event-1', actor);
   });
 
   it('builds balance breakdown correctly when only contributions exist', async () => {
@@ -148,7 +154,7 @@ describe('EventKPIsService', () => {
       },
     ] as Transaction[]);
 
-    const result = await service.getKPIs('event-2');
+    const result = await service.getKPIs('event-2', actor);
 
     expect(result.potBalance).toBe(50);
     expect(result.balanceBreakdown.outflows.total).toBe(0);
@@ -174,7 +180,7 @@ describe('EventKPIsService', () => {
       },
     ] as Transaction[]);
 
-    const result = await service.getKPIs('event-3');
+    const result = await service.getKPIs('event-3', actor);
 
     expect(result.totalContributions).toBe(0);
     expect(result.potExpenses).toBe(30);
@@ -211,7 +217,7 @@ describe('EventKPIsService', () => {
   it('throws NotFoundException when event does not exist', async () => {
     eventRepository.findOne.mockResolvedValue(null);
 
-    await expect(service.getKPIs('missing-event')).rejects.toThrow(NotFoundException);
+    await expect(service.getKPIs('missing-event', actor)).rejects.toThrow(NotFoundException);
     expect(transactionsService.findByEvent).not.toHaveBeenCalled();
   });
 
@@ -219,7 +225,7 @@ describe('EventKPIsService', () => {
     eventRepository.findOne.mockResolvedValue({ id: 'event-1' } as Event);
     transactionsService.findByEvent.mockRejectedValue(new Error('DB failure'));
 
-    await expect(service.getKPIs('event-1')).rejects.toThrow(InternalServerErrorException);
-    await expect(service.getKPIs('event-1')).rejects.toThrow('Failed to calculate KPIs');
+    await expect(service.getKPIs('event-1', actor)).rejects.toThrow(InternalServerErrorException);
+    await expect(service.getKPIs('event-1', actor)).rejects.toThrow('Failed to calculate KPIs');
   });
 });

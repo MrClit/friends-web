@@ -5,9 +5,11 @@ import { TransactionItem } from './TransactionItem';
 import { useMemo, useCallback } from 'react';
 import { formatDateLong } from '@/shared/utils/format';
 import { useTranslation } from 'react-i18next';
+import { ApiError } from '@/api/client';
 import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
 import { useInfiniteScroll } from '@/hooks/common';
 import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
+import { ErrorState } from '@/shared/components';
 import { getParticipantName } from '@/features/events/utils/participants';
 
 interface TransactionsListProps {
@@ -29,7 +31,7 @@ export function TransactionsList({ event }: TransactionsListProps) {
   const { t } = useTranslation();
 
   // Use React Query infinite query for pagination
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } = useTransactionsPaginated(
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error, refetch } = useTransactionsPaginated(
     event.id,
     3,
   );
@@ -73,10 +75,13 @@ export function TransactionsList({ event }: TransactionsListProps) {
   }
 
   if (error) {
+    const isNotFoundOrNoAccess = error instanceof ApiError && error.status === 404;
+
     return (
-      <div className="w-full max-w-2xl mb-8 text-center text-red-400 py-8">
-        {t('common.error')}: {error.message}
-      </div>
+      <ErrorState
+        message={isNotFoundOrNoAccess ? t('common.notFoundOrNoAccess') : undefined}
+        onRetry={isNotFoundOrNoAccess ? undefined : () => void refetch()}
+      />
     );
   }
 

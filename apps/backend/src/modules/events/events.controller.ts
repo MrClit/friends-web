@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -42,8 +44,8 @@ export class EventsController {
     description: 'Filter events by status (active/archived). Defaults to active.',
   })
   @ApiStandardResponse(200, 'Events retrieved successfully', Event, true)
-  findAll(@Query('status') status?: EventStatus) {
-    return this.eventsService.findAll(status);
+  findAll(@CurrentUser() user: AuthenticatedUser, @Query('status') status?: EventStatus) {
+    return this.eventsService.findAll(user, status);
   }
 
   /**
@@ -60,8 +62,8 @@ export class EventsController {
   })
   @ApiStandardResponse(200, 'Event retrieved successfully', Event)
   @ApiResponse({ status: 404, description: 'Event not found' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.eventsService.findOne(id);
+  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.eventsService.findOne(id, user);
   }
 
   /**
@@ -73,8 +75,8 @@ export class EventsController {
   @ApiOperation({ summary: 'Create a new event' })
   @ApiStandardResponse(201, 'Event created successfully', Event)
   @ApiResponse({ status: 400, description: 'Invalid input' })
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
+  create(@Body() createEventDto: CreateEventDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.eventsService.create(createEventDto, user);
   }
 
   /**
@@ -92,8 +94,12 @@ export class EventsController {
   @ApiStandardResponse(200, 'Event updated successfully', Event)
   @ApiResponse({ status: 400, description: 'Invalid input' })
   @ApiResponse({ status: 404, description: 'Event not found' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventsService.update(id, updateEventDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateEventDto: UpdateEventDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.eventsService.update(id, updateEventDto, user);
   }
 
   /**
@@ -114,8 +120,8 @@ export class EventsController {
     description: 'Event deleted successfully',
   })
   @ApiResponse({ status: 404, description: 'Event not found' })
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
-    await this.eventsService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    await this.eventsService.remove(id, user);
   }
 
   /**
@@ -132,7 +138,7 @@ export class EventsController {
   })
   @ApiStandardResponse(200, 'KPIs retrieved successfully', EventKPIsDto)
   @ApiResponse({ status: 404, description: 'Event not found' })
-  getKPIs(@Param('id', ParseUUIDPipe) id: string) {
-    return this.eventsService.getKPIs(id);
+  getKPIs(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.eventsService.getKPIs(id, user);
   }
 }

@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
@@ -49,8 +51,12 @@ export class EventTransactionsController {
   @ApiStandardResponse(200, 'Paginated transactions retrieved successfully')
   @ApiResponse({ status: 404, description: 'Event not found' })
   @ApiResponse({ status: 400, description: 'Invalid query parameters' })
-  findByEventPaginated(@Param('eventId', ParseUUIDPipe) eventId: string, @Query() query: PaginationQueryDto) {
-    return this.transactionsService.findByEventPaginated(eventId, query.numberOfDates, query.offset);
+  findByEventPaginated(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @Query() query: PaginationQueryDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.transactionsService.findByEventPaginated(eventId, query.numberOfDates, query.offset, user);
   }
 
   /**
@@ -67,8 +73,8 @@ export class EventTransactionsController {
   })
   @ApiStandardResponse(200, 'Transactions retrieved successfully', Transaction, true)
   @ApiResponse({ status: 404, description: 'Event not found' })
-  findByEvent(@Param('eventId', ParseUUIDPipe) eventId: string) {
-    return this.transactionsService.findByEvent(eventId);
+  findByEvent(@Param('eventId', ParseUUIDPipe) eventId: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.transactionsService.findByEvent(eventId, user);
   }
 
   /**
@@ -87,8 +93,12 @@ export class EventTransactionsController {
   @ApiStandardResponse(201, 'Transaction created successfully', Transaction)
   @ApiResponse({ status: 400, description: 'Invalid input' })
   @ApiResponse({ status: 404, description: 'Event not found' })
-  create(@Param('eventId', ParseUUIDPipe) eventId: string, @Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(eventId, createTransactionDto);
+  create(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @Body() createTransactionDto: CreateTransactionDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.transactionsService.create(eventId, createTransactionDto, user);
   }
 }
 
@@ -98,6 +108,7 @@ export class EventTransactionsController {
  */
 @ApiTags('Transactions')
 @Controller('transactions')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
@@ -115,8 +126,8 @@ export class TransactionsController {
   })
   @ApiStandardResponse(200, 'Transaction retrieved successfully', Transaction)
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.transactionsService.findOne(id);
+  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.transactionsService.findOne(id, user);
   }
 
   /**
@@ -134,8 +145,12 @@ export class TransactionsController {
   @ApiStandardResponse(200, 'Transaction updated successfully', Transaction)
   @ApiResponse({ status: 400, description: 'Invalid input' })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-    return this.transactionsService.update(id, updateTransactionDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateTransactionDto: UpdateTransactionDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.transactionsService.update(id, updateTransactionDto, user);
   }
 
   /**
@@ -156,7 +171,7 @@ export class TransactionsController {
     description: 'Transaction deleted successfully',
   })
   @ApiResponse({ status: 404, description: 'Transaction not found' })
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
-    await this.transactionsService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    await this.transactionsService.remove(id, user);
   }
 }

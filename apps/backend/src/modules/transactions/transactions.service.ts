@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { Transaction } from './entities/transaction.entity';
 import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -14,6 +15,7 @@ import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { PaginatedTransactionsResponseDto } from './dto/paginated-transactions-response.dto';
 import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
+import { ADMIN_ROLE } from '../users/user-role.constants';
 
 @Injectable()
 export class TransactionsService {
@@ -28,21 +30,67 @@ export class TransactionsService {
     private readonly transactionPaginationService: TransactionPaginationService,
   ) {}
 
+  private isAdmin(actor: AuthenticatedUser): boolean {
+    return actor.role === ADMIN_ROLE;
+  }
+
+  private isUserParticipant(event: Event, userId: string): boolean {
+    return (event.participants ?? []).some((participant) => participant.type === 'user' && participant.id === userId);
+  }
+
+  private ensureCanAccessEvent(event: Event, actor: AuthenticatedUser): void {
+    if (this.isAdmin(actor)) {
+      return;
+    }
+
+    if (!this.isUserParticipant(event, actor.id)) {
+      throw new NotFoundException(`Event with ID ${event.id} not found`);
+    }
+  }
+
+  private async findEventOrThrow(eventId: string): Promise<Event> {
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+
+    return event;
+  }
+
+  private async findTransactionOrThrow(id: string): Promise<Transaction> {
+    const transaction = await this.transactionRepository.findOne({ where: { id } });
+
+    if (!transaction) {
+      throw new NotFoundException(`Transaction with ID ${id} not found`);
+    }
+
+    return transaction;
+  }
+
+  private async ensureCanAccessTransaction(transaction: Transaction, actor: AuthenticatedUser): Promise<void> {
+    if (this.isAdmin(actor)) {
+      return;
+    }
+
+    const event = await this.eventRepository.findOne({ where: { id: transaction.eventId } });
+    if (!event || !this.isUserParticipant(event, actor.id)) {
+      throw new NotFoundException(`Transaction with ID ${transaction.id} not found`);
+    }
+  }
+
   /**
    * Get all transactions for a specific event
    */
-  async findByEvent(eventId: string): Promise<Transaction[]> {
+  async findByEvent(eventId: string, actor: AuthenticatedUser): Promise<Transaction[]> {
     try {
       this.logger.log(`Fetching transactions for event: ${eventId}`);
 
       // Verify event exists
-      const event = await this.eventRepository.findOne({
-        where: { id: eventId },
-      });
-
-      if (!event) {
-        throw new NotFoundException(`Event with ID ${eventId} not found`);
-      }
+      const event = await this.findEventOrThrow(eventId);
+      this.ensureCanAccessEvent(event, actor);
 
       const transactions = await this.transactionRepository.find({
         where: { eventId },
@@ -75,23 +123,21 @@ export class TransactionsService {
     eventId: string,
     numberOfDates: number,
     offset: number,
+    actor: AuthenticatedUser,
   ): Promise<PaginatedTransactionsResponseDto> {
+    const event = await this.findEventOrThrow(eventId);
+    this.ensureCanAccessEvent(event, actor);
     return this.transactionPaginationService.findByEventPaginated(eventId, numberOfDates, offset);
   }
 
   /**
    * Get a single transaction by ID
    */
-  async findOne(id: string): Promise<Transaction> {
+  async findOne(id: string, actor: AuthenticatedUser): Promise<Transaction> {
     try {
       this.logger.log(`Fetching transaction with ID: ${id}`);
-      const transaction = await this.transactionRepository.findOne({
-        where: { id },
-      });
-
-      if (!transaction) {
-        throw new NotFoundException(`Transaction with ID ${id} not found`);
-      }
+      const transaction = await this.findTransactionOrThrow(id);
+      await this.ensureCanAccessTransaction(transaction, actor);
 
       return transaction;
     } catch (error) {
@@ -108,18 +154,17 @@ export class TransactionsService {
    * Create a new transaction
    * Validates that participantId exists in event participants or is '0' (POT)
    */
-  async create(eventId: string, createTransactionDto: CreateTransactionDto): Promise<Transaction> {
+  async create(
+    eventId: string,
+    createTransactionDto: CreateTransactionDto,
+    actor: AuthenticatedUser,
+  ): Promise<Transaction> {
     try {
       this.logger.log(`Creating new transaction for event ${eventId}: ${createTransactionDto.title}`);
 
       // Verify event exists
-      const event = await this.eventRepository.findOne({
-        where: { id: eventId },
-      });
-
-      if (!event) {
-        throw new NotFoundException(`Event with ID ${eventId} not found`);
-      }
+      const event = await this.findEventOrThrow(eventId);
+      this.ensureCanAccessEvent(event, actor);
 
       // Validate participantId
       this.participantValidationService.validateParticipantId(createTransactionDto.participantId, event.participants);
@@ -146,12 +191,13 @@ export class TransactionsService {
   /**
    * Update a transaction
    */
-  async update(id: string, updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
+  async update(id: string, updateTransactionDto: UpdateTransactionDto, actor: AuthenticatedUser): Promise<Transaction> {
     try {
       this.logger.log(`Updating transaction with ID: ${id}`);
 
       // Verify transaction exists
-      const transaction = await this.findOne(id);
+      const transaction = await this.findTransactionOrThrow(id);
+      await this.ensureCanAccessTransaction(transaction, actor);
 
       // If participantId is being updated, validate it
       if (updateTransactionDto.participantId) {
@@ -168,7 +214,7 @@ export class TransactionsService {
 
       // Update transaction
       await this.transactionRepository.update(id, updateTransactionDto);
-      const updatedTransaction = await this.findOne(id);
+      const updatedTransaction = await this.findOne(id, actor);
 
       this.logger.log(`Transaction ${id} updated successfully`);
       return updatedTransaction;
@@ -185,12 +231,13 @@ export class TransactionsService {
   /**
    * Delete a transaction
    */
-  async remove(id: string): Promise<void> {
+  async remove(id: string, actor: AuthenticatedUser): Promise<void> {
     try {
       this.logger.log(`Deleting transaction with ID: ${id}`);
 
       // Verify transaction exists
-      await this.findOne(id);
+      const transaction = await this.findTransactionOrThrow(id);
+      await this.ensureCanAccessTransaction(transaction, actor);
 
       // Delete transaction
       await this.transactionRepository.delete(id);

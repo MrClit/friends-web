@@ -37,6 +37,7 @@
     "validation_error": "Si us plau, completa tots els camps",
     "network_error": "Error de connexió. Torna-ho a provar",
     "errorLoading": "No s'han pogut carregar les dades. Si us plau, torna-ho a provar.",
+    "notFoundOrNoAccess": "No s'ha trobat el recurs o no hi tens accés.",
     "retry": "Reintentar",
     "back": "Tornar",
     "edit": "Editar",

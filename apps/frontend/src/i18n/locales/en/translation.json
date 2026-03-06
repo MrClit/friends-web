@@ -37,6 +37,7 @@
     "validation_error": "Please complete all fields",
     "network_error": "Connection error. Please try again",
     "errorLoading": "Could not load data. Please try again.",
+    "notFoundOrNoAccess": "Resource not found or you do not have access.",
     "retry": "Retry",
     "back": "Back",
     "edit": "Edit",

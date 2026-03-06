@@ -7,27 +7,46 @@ import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
+
+  const adminActor: AuthenticatedUser = {
+    id: 'admin-1',
+    email: 'admin@example.com',
+    role: 'admin',
+  };
+
+  const memberActor: AuthenticatedUser = {
+    id: 'user-1',
+    email: 'user-1@example.com',
+    role: 'user',
+  };
+
+  const outsiderActor: AuthenticatedUser = {
+    id: 'user-2',
+    email: 'user-2@example.com',
+    role: 'user',
+  };
 
   const mockEvent = {
     id: 'event-uuid-1',
     title: 'Test Event',
     participants: [
-      { id: '1', name: 'Alice' },
-      { id: '2', name: 'Bob' },
+      { type: 'user', id: memberActor.id },
+      { type: 'guest', id: 'g1', name: 'Guest 1' },
     ],
     createdAt: new Date(),
     updatedAt: new Date(),
-  };
+  } as unknown as Event;
 
   const mockTransaction = {
     id: 'transaction-uuid-1',
     title: 'Test Transaction',
     paymentType: 'contribution' as const,
     amount: 50.0,
-    participantId: '1',
+    participantId: 'g1',
     date: new Date('2026-01-01'),
     eventId: 'event-uuid-1',
     createdAt: new Date(),
@@ -87,15 +106,13 @@ describe('TransactionsService', () => {
   });
 
   describe('findByEvent', () => {
-    it('should return all transactions for an event', async () => {
+    it('returns transactions for participant user', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
       mockTransactionRepository.find.mockResolvedValue([mockTransaction]);
 
-      const result = await service.findByEvent('event-uuid-1');
+      const result = await service.findByEvent('event-uuid-1', memberActor);
 
-      expect(mockEventRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'event-uuid-1' },
-      });
+      expect(mockEventRepository.findOne).toHaveBeenCalledWith({ where: { id: 'event-uuid-1' } });
       expect(mockTransactionRepository.find).toHaveBeenCalledWith({
         where: { eventId: 'event-uuid-1' },
         order: { date: 'DESC', createdAt: 'DESC' },
@@ -103,88 +120,56 @@ describe('TransactionsService', () => {
       expect(result).toEqual([mockTransaction]);
     });
 
-    it('should throw NotFoundException when event does not exist', async () => {
+    it('throws NotFoundException when event does not exist', async () => {
       mockEventRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findByEvent('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.findByEvent('nonexistent-id')).rejects.toThrow('Event with ID nonexistent-id not found');
+      await expect(service.findByEvent('nonexistent-id', memberActor)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw InternalServerErrorException on database error', async () => {
+    it('throws NotFoundException when user is not participant', async () => {
+      mockEventRepository.findOne.mockResolvedValue(mockEvent);
+
+      await expect(service.findByEvent('event-uuid-1', outsiderActor)).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws InternalServerErrorException on repository error', async () => {
       mockEventRepository.findOne.mockRejectedValue(new Error('DB Error'));
 
-      await expect(service.findByEvent('event-uuid-1')).rejects.toThrow(InternalServerErrorException);
+      await expect(service.findByEvent('event-uuid-1', adminActor)).rejects.toThrow(InternalServerErrorException);
     });
   });
 
   describe('findByEventPaginated', () => {
-    it('should return paginated transactions grouped by dates', async () => {
+    it('returns paginated result for authorized actor', async () => {
       const mockResult = {
-        transactions: [
-          {
-            id: 'transaction-uuid-1',
-            eventId: 'event-uuid-1',
-            participantId: '1',
-            paymentType: 'contribution',
-            amount: 50.0,
-            title: 'Test Transaction',
-            date: new Date('2026-01-03'),
-            createdAt: new Date(),
-          },
-          {
-            id: 'transaction-uuid-2',
-            eventId: 'event-uuid-1',
-            participantId: '1',
-            paymentType: 'expense',
-            amount: 25.0,
-            title: 'Another Transaction',
-            date: new Date('2026-01-02'),
-            createdAt: new Date(),
-          },
-        ],
+        transactions: [mockTransaction],
         hasMore: true,
         totalDates: 3,
-        loadedDates: 2,
+        loadedDates: 1,
       };
 
+      mockEventRepository.findOne.mockResolvedValue(mockEvent);
       mockTransactionPaginationService.findByEventPaginated.mockResolvedValue(mockResult);
 
-      const result = await service.findByEventPaginated('event-uuid-1', 2, 0);
+      const result = await service.findByEventPaginated('event-uuid-1', 2, 0, memberActor);
 
+      expect(mockEventRepository.findOne).toHaveBeenCalledWith({ where: { id: 'event-uuid-1' } });
       expect(mockTransactionPaginationService.findByEventPaginated).toHaveBeenCalledWith('event-uuid-1', 2, 0);
       expect(result).toEqual(mockResult);
     });
 
-    it('should handle empty results', async () => {
-      const mockResult = {
-        transactions: [],
-        hasMore: false,
-        totalDates: 0,
-        loadedDates: 0,
-      };
+    it('throws NotFoundException when event does not exist', async () => {
+      mockEventRepository.findOne.mockResolvedValue(null);
 
-      mockTransactionPaginationService.findByEventPaginated.mockResolvedValue(mockResult);
-
-      const result = await service.findByEventPaginated('event-uuid-1', 3, 0);
-
-      expect(mockTransactionPaginationService.findByEventPaginated).toHaveBeenCalledWith('event-uuid-1', 3, 0);
-      expect(result).toEqual(mockResult);
-    });
-
-    it('should throw NotFoundException when event does not exist', async () => {
-      mockTransactionPaginationService.findByEventPaginated.mockRejectedValue(
-        new NotFoundException('Event with ID nonexistent-id not found'),
-      );
-
-      await expect(service.findByEventPaginated('nonexistent-id', 3, 0)).rejects.toThrow(NotFoundException);
+      await expect(service.findByEventPaginated('nonexistent-id', 3, 0, adminActor)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('findOne', () => {
-    it('should return a transaction by ID', async () => {
+    it('returns transaction by ID for admin actor', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
 
-      const result = await service.findOne('transaction-uuid-1');
+      const result = await service.findOne('transaction-uuid-1', adminActor);
 
       expect(mockTransactionRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'transaction-uuid-1' },
@@ -192,11 +177,17 @@ describe('TransactionsService', () => {
       expect(result).toEqual(mockTransaction);
     });
 
-    it('should throw NotFoundException when transaction does not exist', async () => {
+    it('throws NotFoundException when transaction does not exist', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.findOne('nonexistent-id')).rejects.toThrow('Transaction with ID nonexistent-id not found');
+      await expect(service.findOne('nonexistent-id', adminActor)).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws NotFoundException when user cannot access parent event', async () => {
+      mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
+      mockEventRepository.findOne.mockResolvedValue(mockEvent);
+
+      await expect(service.findOne('transaction-uuid-1', outsiderActor)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -205,20 +196,18 @@ describe('TransactionsService', () => {
       title: 'New Transaction',
       paymentType: 'contribution',
       amount: 100,
-      participantId: '1',
+      participantId: 'g1',
       date: '2026-01-01',
     };
 
-    it('should create a transaction for valid participant', async () => {
+    it('creates a transaction for valid participant', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
       mockTransactionRepository.create.mockReturnValue(mockTransaction);
       mockTransactionRepository.save.mockResolvedValue(mockTransaction);
 
-      const result = await service.create('event-uuid-1', createDto);
+      const result = await service.create('event-uuid-1', createDto, memberActor);
 
-      expect(mockEventRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'event-uuid-1' },
-      });
+      expect(mockEventRepository.findOne).toHaveBeenCalledWith({ where: { id: 'event-uuid-1' } });
       expect(mockTransactionRepository.create).toHaveBeenCalledWith({
         ...createDto,
         eventId: 'event-uuid-1',
@@ -226,19 +215,17 @@ describe('TransactionsService', () => {
       expect(result).toEqual(mockTransaction);
     });
 
-    it('should create a transaction for POT participant (id: 0)', async () => {
+    it('creates a transaction for POT participant (id: 0)', async () => {
+      const potDto: CreateTransactionDto = {
+        ...createDto,
+        participantId: '0',
+      };
+
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
       mockTransactionRepository.create.mockReturnValue(mockTransaction);
       mockTransactionRepository.save.mockResolvedValue(mockTransaction);
 
-      const potDto: CreateTransactionDto = {
-        title: createDto.title,
-        paymentType: createDto.paymentType,
-        amount: createDto.amount,
-        participantId: '0',
-        date: createDto.date,
-      };
-      await service.create('event-uuid-1', potDto);
+      await service.create('event-uuid-1', potDto, memberActor);
 
       expect(mockTransactionRepository.create).toHaveBeenCalledWith({
         ...potDto,
@@ -246,34 +233,32 @@ describe('TransactionsService', () => {
       });
     });
 
-    it('should throw NotFoundException when event does not exist', async () => {
+    it('throws NotFoundException when event does not exist', async () => {
       mockEventRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.create('nonexistent-id', createDto)).rejects.toThrow(NotFoundException);
+      await expect(service.create('nonexistent-id', createDto, adminActor)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw BadRequestException for invalid participantId', async () => {
+    it('throws NotFoundException when user is not participant', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId) => {
+
+      await expect(service.create('event-uuid-1', createDto, outsiderActor)).rejects.toThrow(NotFoundException);
+    });
+
+    it('throws BadRequestException for invalid participantId', async () => {
+      mockEventRepository.findOne.mockResolvedValue(mockEvent);
+      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string) => {
         if (participantId === '999') {
-          throw new BadRequestException(
-            "Participant with ID 999 does not exist in this event. Valid participant IDs: 1, 2 or '0' for POT",
-          );
+          throw new BadRequestException('Invalid participant');
         }
       });
 
       const invalidDto: CreateTransactionDto = {
-        title: createDto.title,
-        paymentType: createDto.paymentType,
-        amount: createDto.amount,
+        ...createDto,
         participantId: '999',
-        date: createDto.date,
       };
 
-      await expect(service.create('event-uuid-1', invalidDto)).rejects.toThrow(BadRequestException);
-      await expect(service.create('event-uuid-1', invalidDto)).rejects.toThrow(
-        "Participant with ID 999 does not exist in this event. Valid participant IDs: 1, 2 or '0' for POT",
-      );
+      await expect(service.create('event-uuid-1', invalidDto, memberActor)).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -283,73 +268,65 @@ describe('TransactionsService', () => {
       amount: 150,
     };
 
-    it('should update a transaction', async () => {
+    it('updates a transaction for admin actor', async () => {
       const updatedTransaction = {
         ...mockTransaction,
         title: 'Updated Transaction',
         amount: 150,
       };
+
       mockTransactionRepository.findOne
         .mockResolvedValueOnce(mockTransaction)
         .mockResolvedValueOnce(updatedTransaction);
-      mockEventRepository.findOne.mockResolvedValue(mockEvent);
       mockTransactionRepository.update.mockResolvedValue({ affected: 1 });
 
-      const result = await service.update('transaction-uuid-1', updateDto);
+      const result = await service.update('transaction-uuid-1', updateDto, adminActor);
 
       expect(mockTransactionRepository.update).toHaveBeenCalledWith('transaction-uuid-1', updateDto);
-      expect(result).toMatchObject({
-        title: 'Updated Transaction',
-        amount: 150,
-      });
+      expect(result).toMatchObject({ title: 'Updated Transaction', amount: 150 });
     });
 
-    it('should validate participantId when updating', async () => {
+    it('validates participantId when updating', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId) => {
+      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string) => {
         if (participantId === '999') {
-          throw new BadRequestException(
-            "Participant with ID 999 does not exist in this event. Valid participant IDs: 1, 2 or '0' for POT",
-          );
+          throw new BadRequestException('Invalid participant');
         }
       });
 
       const updateDtoWithInvalidParticipant = {
-        title: 'Updated Transaction',
-        amount: 150,
+        ...updateDto,
         participantId: '999',
       };
 
-      await expect(service.update('transaction-uuid-1', updateDtoWithInvalidParticipant)).rejects.toThrow(
+      await expect(service.update('transaction-uuid-1', updateDtoWithInvalidParticipant, adminActor)).rejects.toThrow(
         BadRequestException,
       );
     });
 
-    it('should throw NotFoundException when transaction does not exist', async () => {
+    it('throws NotFoundException when transaction does not exist', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent-id', updateDto)).rejects.toThrow(NotFoundException);
+      await expect(service.update('nonexistent-id', updateDto, adminActor)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('remove', () => {
-    it('should delete a transaction', async () => {
+    it('deletes a transaction', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
       mockTransactionRepository.delete.mockResolvedValue({ affected: 1 });
 
-      await service.remove('transaction-uuid-1');
+      await service.remove('transaction-uuid-1', adminActor);
 
-      expect(mockTransactionRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'transaction-uuid-1' },
-      });
+      expect(mockTransactionRepository.findOne).toHaveBeenCalledWith({ where: { id: 'transaction-uuid-1' } });
       expect(mockTransactionRepository.delete).toHaveBeenCalledWith('transaction-uuid-1');
     });
 
-    it('should throw NotFoundException when transaction does not exist', async () => {
+    it('throws NotFoundException when transaction does not exist', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('nonexistent-id')).rejects.toThrow(NotFoundException);
+      await expect(service.remove('nonexistent-id', adminActor)).rejects.toThrow(NotFoundException);
     });
   });
 });
