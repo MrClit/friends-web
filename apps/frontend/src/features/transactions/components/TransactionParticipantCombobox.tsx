@@ -5,6 +5,7 @@ import { FaChevronDown } from 'react-icons/fa';
 import type { EventParticipant } from '@/features/events/types';
 import { getParticipantAvatar, getParticipantName } from '@/features/events/utils/participants';
 import { Avatar } from '@/shared/components/Avatar';
+import { ComboboxOptionItem } from '@/shared/components/ComboboxOptionItem';
 import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
 import { cn } from '@/shared/utils/cn';
 import type { PaymentType } from '../types';
@@ -158,36 +159,16 @@ export function TransactionParticipantCombobox({
             <div className="p-3 text-sm text-slate-500">{t('transactionForm.noParticipantsFound')}</div>
           ) : (
             filteredOptions.map((option, index) => (
-              <button
+              <ComboboxOptionItem
                 key={option.id}
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleSelectOption(option)}
-                onMouseEnter={() => setHighlightedIndex(index)}
-                className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors',
-                  highlightedIndex === index
-                    ? 'bg-slate-100 dark:bg-emerald-900/30'
-                    : 'hover:bg-slate-100 dark:hover:bg-emerald-900/30',
-                )}
-              >
-                <Avatar
-                  avatar={option.avatar}
-                  name={option.label}
-                  isPot={option.isPot}
-                  className="w-8 h-8 rounded-full text-xs shrink-0"
-                  fallbackClassName={cn(
-                    'flex items-center justify-center font-bold',
-                    !option.isPot && 'bg-emerald-50 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300',
-                  )}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 dark:text-white truncate">{option.label}</p>
-                  {option.description && (
-                    <p className="text-xs text-slate-500 dark:text-emerald-400 truncate">{option.description}</p>
-                  )}
-                </div>
-              </button>
+                avatar={option.avatar}
+                label={option.label}
+                description={option.description}
+                isPot={option.isPot}
+                isHighlighted={highlightedIndex === index}
+                onSelect={() => handleSelectOption(option)}
+                onHover={() => setHighlightedIndex(index)}
+              />
             ))
           )}
         </div>

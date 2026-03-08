@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
 import { MdPersonAdd } from 'react-icons/md';
 import { useParticipantsCombobox } from '../hooks/useParticipantsCombobox';
-import { ComboboxUserItem } from './ComboboxUserItem';
+import { ComboboxUserOptionItem } from './ComboboxUserOptionItem';
 import { ComboboxNewGuestItem } from './ComboboxNewGuestItem';
 import type { EventParticipant } from '../types';
 
@@ -94,7 +94,7 @@ export function ParticipantsCombobox({
           ) : (
             <>
               {filteredUsers.map((user, index) => (
-                <ComboboxUserItem
+                <ComboboxUserOptionItem
                   key={user.id}
                   user={user}
                   isHighlighted={highlightedIndex === index}

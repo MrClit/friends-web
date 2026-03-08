@@ -7,6 +7,7 @@ export { HeaderSection } from './HeaderSection';
 export { Skeleton } from './Skeleton';
 export { Logo } from './Logo';
 export { Avatar } from './Avatar';
+export { ComboboxOptionItem } from './ComboboxOptionItem';
 export { ThemeInitializer } from './ThemeInitializer';
 export { Toast } from './Toast';
 export { ErrorBoundary } from './ErrorBoundary';
