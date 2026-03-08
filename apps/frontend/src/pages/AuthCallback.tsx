@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { isUserRole } from '@/features/auth/types';
 
@@ -16,6 +17,7 @@ function parseQuery(search: string) {
 }
 
 export function AuthCallback() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { setAuth } = useAuth();
@@ -43,7 +45,7 @@ export function AuthCallback() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <span className="text-lg">Procesando autenticación...</span>
+      <span className="text-lg">{t('auth.loading')}</span>
     </div>
   );
 }

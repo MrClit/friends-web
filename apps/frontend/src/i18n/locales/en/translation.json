@@ -25,6 +25,13 @@
   },
   "auth": {
     "loginWithGoogle": "Login with Google",
+    "googleIconAlt": "Google logo",
+    "loginPage": {
+      "title": "Welcome to Friends",
+      "description": "Share expenses and manage events easily.",
+      "continueWithGoogle": "Sign in with Google to continue.",
+      "footer": "Powered by Fri€nds • {{year}}"
+    },
     "loading": "Loading authentication...",
     "error": "Could not verify your session. Please check your connection and try again.",
     "retry": "Retry"

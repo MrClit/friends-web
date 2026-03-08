@@ -25,6 +25,13 @@
   },
   "auth": {
     "loginWithGoogle": "Iniciar sessió amb Google",
+    "googleIconAlt": "Logotip de Google",
+    "loginPage": {
+      "title": "Benvingut a Friends",
+      "description": "Comparteix despeses i gestiona esdeveniments fàcilment.",
+      "continueWithGoogle": "Inicia sessió amb Google per continuar.",
+      "footer": "Desenvolupat per Fri€nds • {{year}}"
+    },
     "loading": "Carregant autenticació...",
     "error": "No s'ha pogut verificar la sessió. Comprova la connexió i torna-ho a provar.",
     "retry": "Reintentar"
