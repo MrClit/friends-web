@@ -149,6 +149,8 @@
       "compensation": "Pagat a"
     },
     "participantPlaceholder": "Selecciona un participant",
+    "searchParticipantPlaceholder": "Cercar participant...",
+    "noParticipantsFound": "No s'han trobat participants",
     "potOption": "POT (Pot Comú)",
     "save": "Desar"
   },

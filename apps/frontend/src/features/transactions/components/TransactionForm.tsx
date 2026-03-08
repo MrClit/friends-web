@@ -2,9 +2,7 @@ import React from 'react';
 import type { PaymentType } from '../types';
 import type { EventParticipant } from '../../events/types';
 import { useTranslation } from 'react-i18next';
-import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
-import { FaUser, FaChevronDown } from 'react-icons/fa';
-import { getParticipantName } from '@/features/events/utils/participants';
+import { TransactionParticipantCombobox } from './TransactionParticipantCombobox';
 
 export interface TransactionFormState {
   type: PaymentType;
@@ -79,34 +77,17 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
         </div>
       </div>
 
-      {/* Participant select with icons */}
+      {/* Participant combobox */}
       <div className="space-y-2">
         <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
           {t(`transactionForm.participantLabel.${type}`)}
         </label>
-        <div className="relative group">
-          <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors">
-            <FaUser className="text-[18px]" />
-          </div>
-          <select
-            className="w-full pl-12 pr-12 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium appearance-none cursor-pointer"
-            value={participantId}
-            onChange={(e) => setParticipantId(e.target.value)}
-          >
-            <option value="" disabled>
-              {t('transactionForm.participantPlaceholder')}
-            </option>
-            {type === 'expense' && <option value={POT_PARTICIPANT_ID}>{t('transactionForm.potOption')}</option>}
-            {participants.map((p) => (
-              <option key={p.id} value={p.id}>
-                {getParticipantName(p, t)}
-              </option>
-            ))}
-          </select>
-          <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-            <FaChevronDown className="text-[14px]" />
-          </div>
-        </div>
+        <TransactionParticipantCombobox
+          participants={participants}
+          paymentType={type}
+          value={participantId}
+          onChange={setParticipantId}
+        />
       </div>
     </form>
   );

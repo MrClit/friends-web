@@ -149,6 +149,8 @@
       "compensation": "Paid to"
     },
     "participantPlaceholder": "Select a participant",
+    "searchParticipantPlaceholder": "Search participant...",
+    "noParticipantsFound": "No participants found",
     "potOption": "POT (Common Fund)",
     "save": "Save"
   },

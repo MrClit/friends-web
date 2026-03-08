@@ -149,6 +149,8 @@
       "compensation": "Pagado a"
     },
     "participantPlaceholder": "Selecciona un participante",
+    "searchParticipantPlaceholder": "Buscar participante...",
+    "noParticipantsFound": "No se encontraron participantes",
     "potOption": "BOTE (Bote Común)",
     "save": "Guardar"
   },

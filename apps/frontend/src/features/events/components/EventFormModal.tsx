@@ -42,6 +42,7 @@ export function EventFormModal() {
     onClose: closeModal,
     onSubmit: onSubmit,
   });
+  const submitText = isLoading ? t('eventForm.saving') : event ? t('eventForm.update') : t('eventForm.create');
 
   return (
     <>
@@ -89,13 +90,37 @@ export function EventFormModal() {
             </div>
           </DialogBody>
 
-          <DialogFooter className="px-8 py-6 bg-slate-50 dark:bg-emerald-900/20 flex items-center justify-end gap-3 border-t border-emerald-100 dark:border-emerald-800/30">
-            <DialogCloseButton onClick={() => handleOpenChange(false)} disabled={isLoading || showConfirm}>
-              {t('eventFormModal.cancel')}
-            </DialogCloseButton>
-            <DialogPrimaryButton form="event-form" type="submit" disabled={!canSubmit || isLoading}>
-              {isLoading ? t('eventForm.saving') : event ? t('eventForm.update') : t('eventForm.create')}
-            </DialogPrimaryButton>
+          <DialogFooter className="px-6 sm:px-8 py-6 bg-slate-50 dark:bg-emerald-900/20 border-t border-emerald-100 dark:border-emerald-800/30">
+            {/* Mobile layout: primary action first with clear secondary affordance */}
+            <div className="flex flex-col gap-3 sm:hidden">
+              <DialogPrimaryButton
+                form="event-form"
+                type="submit"
+                disabled={!canSubmit || isLoading}
+                className="w-full"
+              >
+                {submitText}
+              </DialogPrimaryButton>
+
+              <DialogCloseButton
+                onClick={() => handleOpenChange(false)}
+                disabled={isLoading || showConfirm}
+                className="w-full px-6 py-3.5 rounded-2xl font-bold text-slate-600 dark:text-emerald-200 border border-slate-300/80 dark:border-emerald-700/70 bg-white/90 dark:bg-emerald-950/40 active:bg-slate-100 dark:active:bg-emerald-900/40 transition-colors"
+              >
+                {t('eventFormModal.cancel')}
+              </DialogCloseButton>
+            </div>
+
+            {/* Desktop layout */}
+            <div className="hidden sm:flex sm:w-full sm:items-center sm:justify-end sm:gap-3">
+              <DialogCloseButton onClick={() => handleOpenChange(false)} disabled={isLoading || showConfirm}>
+                {t('eventFormModal.cancel')}
+              </DialogCloseButton>
+
+              <DialogPrimaryButton form="event-form" type="submit" disabled={!canSubmit || isLoading}>
+                {submitText}
+              </DialogPrimaryButton>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

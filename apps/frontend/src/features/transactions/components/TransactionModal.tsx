@@ -109,38 +109,77 @@ export function TransactionModal() {
           </DialogBody>
 
           {/* Footer with buttons */}
-          <DialogFooter className="px-6 sm:px-8 py-6 bg-slate-50/50 dark:bg-emerald-900/20 flex flex-col-reverse sm:flex-row items-center gap-3 sm:gap-4 border-t border-emerald-100/50 dark:border-emerald-800/30">
-            {/* Delete button (conditional) */}
-            {transaction && (
-              <button
-                onClick={handleDelete}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-300"
-                disabled={isLoading}
-              >
-                {isLoading ? t('transactionModal.deleting') : t('transactionModal.delete')}
-              </button>
-            )}
-
-            {/* Spacer to push buttons to the right on desktop */}
-            {transaction && <div className="hidden sm:block sm:flex-1" />}
-
-            {/* Cancel + Save */}
-            <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto gap-3">
-              <DialogCloseButton
-                onClick={() => handleOpenChange(false)}
-                disabled={isLoading || showDiscardConfirm || showDeleteConfirm}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl font-bold text-slate-500 dark:text-emerald-300 hover:bg-slate-200/50 dark:hover:bg-emerald-800/50 transition-colors"
-              >
-                {t('transactionModal.cancel')}
-              </DialogCloseButton>
-
+          <DialogFooter className="px-6 sm:px-8 py-6 bg-slate-50/50 dark:bg-emerald-900/20 border-t border-emerald-100/50 dark:border-emerald-800/30">
+            {/* Mobile layout: primary action first, secondary actions grouped */}
+            <div className="flex flex-col gap-3 sm:hidden">
               <DialogPrimaryButton
                 onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
                 disabled={!canSubmit || isLoading}
-                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 sm:px-12 py-3.5 rounded-2xl font-extrabold shadow-lg shadow-emerald-500/25 transition-all active:scale-95"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3.5 rounded-2xl font-extrabold shadow-lg shadow-emerald-500/25 transition-all active:scale-95"
               >
                 {isLoading ? t('transactionModal.saving') : t('transactionModal.save')}
               </DialogPrimaryButton>
+
+              {transaction ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <DialogCloseButton
+                    onClick={() => handleOpenChange(false)}
+                    disabled={isLoading || showDiscardConfirm || showDeleteConfirm}
+                    className="w-full px-6 py-3.5 rounded-2xl font-bold text-slate-600 dark:text-emerald-200 border border-slate-300/80 dark:border-emerald-700/70 bg-white/90 dark:bg-emerald-950/40 active:bg-slate-100 dark:active:bg-emerald-900/40 transition-colors"
+                  >
+                    {t('transactionModal.cancel')}
+                  </DialogCloseButton>
+
+                  <button
+                    onClick={handleDelete}
+                    className="w-full px-6 py-3.5 rounded-2xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-300"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? t('transactionModal.deleting') : t('transactionModal.delete')}
+                  </button>
+                </div>
+              ) : (
+                <DialogCloseButton
+                  onClick={() => handleOpenChange(false)}
+                  disabled={isLoading || showDiscardConfirm || showDeleteConfirm}
+                  className="w-full px-6 py-3.5 rounded-2xl font-bold text-slate-600 dark:text-emerald-200 border border-slate-300/80 dark:border-emerald-700/70 bg-white/90 dark:bg-emerald-950/40 active:bg-slate-100 dark:active:bg-emerald-900/40 transition-colors"
+                >
+                  {t('transactionModal.cancel')}
+                </DialogCloseButton>
+              )}
+            </div>
+
+            {/* Desktop layout */}
+            <div className="hidden sm:flex sm:w-full sm:items-center sm:gap-4">
+              {transaction && (
+                <button
+                  onClick={handleDelete}
+                  className="w-auto px-6 py-3.5 rounded-2xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-300"
+                  disabled={isLoading}
+                >
+                  {isLoading ? t('transactionModal.deleting') : t('transactionModal.delete')}
+                </button>
+              )}
+
+              {transaction && <div className="flex-1" />}
+
+              <div className="flex w-auto flex-row gap-3">
+                <DialogCloseButton
+                  onClick={() => handleOpenChange(false)}
+                  disabled={isLoading || showDiscardConfirm || showDeleteConfirm}
+                  className="w-auto px-6 py-3.5 rounded-2xl font-bold text-slate-500 dark:text-emerald-300 hover:bg-slate-200/50 dark:hover:bg-emerald-800/50 transition-colors"
+                >
+                  {t('transactionModal.cancel')}
+                </DialogCloseButton>
+
+                <DialogPrimaryButton
+                  onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
+                  disabled={!canSubmit || isLoading}
+                  className="w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 sm:px-12 py-3.5 rounded-2xl font-extrabold shadow-lg shadow-emerald-500/25 transition-all active:scale-95"
+                >
+                  {isLoading ? t('transactionModal.saving') : t('transactionModal.save')}
+                </DialogPrimaryButton>
+              </div>
             </div>
           </DialogFooter>
         </DialogContent>
