@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEvent, useUpdateEvent, useDeleteEvent } from '@/hooks/api/useEvents';
 import { useEventKPIs } from '@/hooks/api/useEventKPIs';
 import type { EventFormData } from '@/features/events/types';
+import { useDeletingStore } from '@/shared/store/useDeletingStore';
 
 /**
  * Custom hook for managing EventDetail page business logic
@@ -10,12 +12,20 @@ import type { EventFormData } from '@/features/events/types';
  */
 export function useEventDetail(id: string | undefined) {
   const navigate = useNavigate();
+  const setDeleting = useDeletingStore((state) => state.setDeleting);
 
   // React Query hooks for data fetching and mutations
   const { data: event, isLoading, error, refetch } = useEvent(id);
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
   const { data: kpis } = useEventKPIs(id);
+
+  useEffect(() => {
+    return () => {
+      // Ensure detail queries are re-enabled after leaving the page.
+      setDeleting(false);
+    };
+  }, [setDeleting]);
 
   /**
    * Handles event update submission

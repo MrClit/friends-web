@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '@/api/client';
@@ -8,6 +9,7 @@ import { isValidKPI, getKPIConfig, buildBalanceBreakdownData, buildKPIItems } fr
 // React Query hooks
 import { useEvent } from '../../../hooks/api/useEvents';
 import { useEventKPIs } from '../../../hooks/api/useEventKPIs';
+import { useDeletingStore } from '@/shared/store/useDeletingStore';
 
 import { KPIDetailContent } from './KPIDetailContent.tsx';
 
@@ -19,10 +21,18 @@ import { KPIDetailContent } from './KPIDetailContent.tsx';
 export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: string }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const setDeleting = useDeletingStore((state) => state.setDeleting);
 
   // React Query hooks - MUST be called before any early returns
   const { data: event, isLoading: isLoadingEvent, error: eventError, refetch: refetchEvent } = useEvent(eventId);
   const { data: kpis, isLoading: isLoadingKPIs, error: kpisError, refetch: refetchKPIs } = useEventKPIs(eventId);
+
+  useEffect(() => {
+    return () => {
+      // Ensure detail queries are re-enabled after leaving the page.
+      setDeleting(false);
+    };
+  }, [setDeleting]);
 
   // Validate KPI parameter early (after hooks)
   if (!rawKpi || !isValidKPI(rawKpi)) {
