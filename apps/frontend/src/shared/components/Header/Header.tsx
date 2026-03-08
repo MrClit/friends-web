@@ -18,7 +18,7 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Logo showText={false} size={40} />
+          <Logo showText={false} size={40} rounded="xl" />
 
           <h1 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             FRI<span className="text-yellow-400">€</span>NDS
