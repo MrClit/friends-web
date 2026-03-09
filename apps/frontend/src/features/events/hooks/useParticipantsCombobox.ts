@@ -75,14 +75,14 @@ export function useParticipantsCombobox({
         listRef.current?.querySelectorAll<HTMLButtonElement>('button')[index]?.scrollIntoView({ block: 'nearest' });
       };
 
-      if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
+      if (e.key === 'ArrowDown') {
         e.preventDefault();
         setHighlightedIndex((prev) => {
           const next = prev < optionsCount - 1 ? prev + 1 : 0;
           scrollIntoView(next);
           return next;
         });
-      } else if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
+      } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         setHighlightedIndex((prev) => {
           const next = prev > 0 ? prev - 1 : optionsCount - 1;

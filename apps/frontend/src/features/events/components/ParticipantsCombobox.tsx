@@ -66,11 +66,7 @@ export function ParticipantsCombobox({
             autoCorrect="off"
             spellCheck={false}
             autoCapitalize="off"
-            readOnly
-            onFocus={(e) => {
-              e.target.removeAttribute('readonly');
-              handleInputFocus();
-            }}
+            onFocus={handleInputFocus}
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleInputBlur}
