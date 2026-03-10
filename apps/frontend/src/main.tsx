@@ -6,11 +6,7 @@ import './i18n';
 import { I18nextProvider } from 'react-i18next';
 import { i18n } from './i18n';
 import { ThemeInitializer } from './shared/components/ThemeInitializer';
-import { clearOldStorage } from './shared/utils/clearOldStorage';
 import { AuthProvider } from './features/auth/AuthContext';
-
-// Clean up old localStorage keys from Zustand stores (one-time migration)
-clearOldStorage();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

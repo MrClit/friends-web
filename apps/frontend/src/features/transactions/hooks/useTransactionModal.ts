@@ -86,7 +86,8 @@ interface UseTransactionModalReturn {
   showDiscardConfirm: boolean;
 
   // Computed
-  isLoading: boolean;
+  isSaving: boolean;
+  isDeleting: boolean;
   canSubmit: boolean;
   isDirty: boolean;
   errorMessage: string | null;
@@ -154,7 +155,8 @@ export function useTransactionModal({
     [transaction, type, title, amount, date, participantId, open],
   );
 
-  const isLoading = createTransaction.isPending || updateTransaction.isPending || deleteTransaction.isPending;
+  const isSaving = createTransaction.isPending || updateTransaction.isPending;
+  const isDeleting = deleteTransaction.isPending;
 
   // Shared modal lifecycle (discard confirmation, error, reset-on-open)
   const modal = useModalForm({
@@ -275,7 +277,8 @@ export function useTransactionModal({
     showDiscardConfirm: modal.showDiscardConfirm,
 
     // Computed
-    isLoading,
+    isSaving,
+    isDeleting,
     canSubmit,
     isDirty,
     errorMessage: modal.errorMessage,

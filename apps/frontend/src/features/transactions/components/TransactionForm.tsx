@@ -64,12 +64,12 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
         </div>
 
         {/* Date input */}
-        <div className="space-y-2">
+        <div className="space-y-2 min-w-0">
           <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
             {t('transactionForm.dateLabel')}
           </label>
           <input
-            className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium"
+            className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium min-w-0"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}

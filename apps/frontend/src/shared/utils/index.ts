@@ -1,4 +1,3 @@
-export * from './clearOldStorage';
 export * from './format';
 export * from './cn';
 export * from './humanize';

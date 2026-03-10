@@ -33,7 +33,8 @@ export function TransactionModal() {
     setParticipantId,
     showDeleteConfirm,
     showDiscardConfirm,
-    isLoading,
+    isSaving,
+    isDeleting,
     canSubmit,
     errorMessage,
     handleSubmit,
@@ -74,7 +75,7 @@ export function TransactionModal() {
             <DialogTitle>{transaction ? t('transactionModal.editTitle') : t('transactionModal.addTitle')}</DialogTitle>
             <DialogCloseButton
               onClick={() => handleOpenChange(false)}
-              disabled={isLoading || showDiscardConfirm || showDeleteConfirm}
+              disabled={isSaving || isDeleting || showDiscardConfirm || showDeleteConfirm}
               aria-label={t('common.close')}
             />
           </DialogHeader>
@@ -114,17 +115,17 @@ export function TransactionModal() {
             <div className="flex flex-col gap-3 sm:hidden">
               <DialogPrimaryButton
                 onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
-                disabled={!canSubmit || isLoading}
+                disabled={!canSubmit || isSaving || isDeleting}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3.5 rounded-2xl font-extrabold shadow-lg shadow-emerald-500/25 transition-all active:scale-95"
               >
-                {isLoading ? t('transactionModal.saving') : t('transactionModal.save')}
+                {isSaving ? t('transactionModal.saving') : t('transactionModal.save')}
               </DialogPrimaryButton>
 
               {transaction ? (
                 <div className="grid grid-cols-2 gap-3">
                   <DialogCloseButton
                     onClick={() => handleOpenChange(false)}
-                    disabled={isLoading || showDiscardConfirm || showDeleteConfirm}
+                    disabled={isSaving || isDeleting || showDiscardConfirm || showDeleteConfirm}
                     className="w-full px-6 py-3.5 rounded-2xl font-bold text-slate-600 dark:text-emerald-200 border border-slate-300/80 dark:border-emerald-700/70 bg-white/90 dark:bg-emerald-950/40 active:bg-slate-100 dark:active:bg-emerald-900/40 transition-colors"
                   >
                     {t('transactionModal.cancel')}
@@ -133,15 +134,15 @@ export function TransactionModal() {
                   <button
                     onClick={handleDelete}
                     className="w-full px-6 py-3.5 rounded-2xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-300"
-                    disabled={isLoading}
+                    disabled={isSaving || isDeleting}
                   >
-                    {isLoading ? t('transactionModal.deleting') : t('transactionModal.delete')}
+                    {isDeleting ? t('transactionModal.deleting') : t('transactionModal.delete')}
                   </button>
                 </div>
               ) : (
                 <DialogCloseButton
                   onClick={() => handleOpenChange(false)}
-                  disabled={isLoading || showDiscardConfirm || showDeleteConfirm}
+                  disabled={isSaving || isDeleting || showDiscardConfirm || showDeleteConfirm}
                   className="w-full px-6 py-3.5 rounded-2xl font-bold text-slate-600 dark:text-emerald-200 border border-slate-300/80 dark:border-emerald-700/70 bg-white/90 dark:bg-emerald-950/40 active:bg-slate-100 dark:active:bg-emerald-900/40 transition-colors"
                 >
                   {t('transactionModal.cancel')}
@@ -155,9 +156,9 @@ export function TransactionModal() {
                 <button
                   onClick={handleDelete}
                   className="w-auto px-6 py-3.5 rounded-2xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-300"
-                  disabled={isLoading}
+                  disabled={isSaving || isDeleting}
                 >
-                  {isLoading ? t('transactionModal.deleting') : t('transactionModal.delete')}
+                  {isDeleting ? t('transactionModal.deleting') : t('transactionModal.delete')}
                 </button>
               )}
 
@@ -166,7 +167,7 @@ export function TransactionModal() {
               <div className="flex w-auto flex-row gap-3">
                 <DialogCloseButton
                   onClick={() => handleOpenChange(false)}
-                  disabled={isLoading || showDiscardConfirm || showDeleteConfirm}
+                  disabled={isSaving || isDeleting || showDiscardConfirm || showDeleteConfirm}
                   className="w-auto px-6 py-3.5 rounded-2xl font-bold text-slate-500 dark:text-emerald-300 hover:bg-slate-200/50 dark:hover:bg-emerald-800/50 transition-colors"
                 >
                   {t('transactionModal.cancel')}
@@ -174,10 +175,10 @@ export function TransactionModal() {
 
                 <DialogPrimaryButton
                   onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
-                  disabled={!canSubmit || isLoading}
+                  disabled={!canSubmit || isSaving || isDeleting}
                   className="w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 sm:px-12 py-3.5 rounded-2xl font-extrabold shadow-lg shadow-emerald-500/25 transition-all active:scale-95"
                 >
-                  {isLoading ? t('transactionModal.saving') : t('transactionModal.save')}
+                  {isSaving ? t('transactionModal.saving') : t('transactionModal.save')}
                 </DialogPrimaryButton>
               </div>
             </div>
