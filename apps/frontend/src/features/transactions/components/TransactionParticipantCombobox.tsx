@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
 import { FaChevronDown } from 'react-icons/fa';
@@ -84,11 +84,6 @@ export function TransactionParticipantCombobox({
     onChange,
   });
 
-  useEffect(() => {
-    if (!open) return;
-    searchInputRef.current?.focus();
-  }, [open]);
-
   return (
     <Popover.Root open={open} onOpenChange={handleOpenChange}>
       <div className="relative group">
@@ -142,7 +137,7 @@ export function TransactionParticipantCombobox({
           <input
             ref={searchInputRef}
             type="text"
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-emerald-800 bg-white dark:bg-emerald-950 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 text-sm"
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-emerald-800 bg-white dark:bg-emerald-950 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 text-base sm:text-sm"
             placeholder={t('transactionForm.searchParticipantPlaceholder')}
             value={searchValue}
             onChange={(e) => handleSearchChange(e.target.value)}
