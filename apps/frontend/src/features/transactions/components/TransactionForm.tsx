@@ -2,6 +2,8 @@ import React from 'react';
 import type { PaymentType } from '../types';
 import type { EventParticipant } from '../../events/types';
 import { useTranslation } from 'react-i18next';
+import { FaRegCalendarAlt } from 'react-icons/fa';
+import { cn } from '@/shared/utils/cn';
 import { TransactionParticipantCombobox } from './TransactionParticipantCombobox';
 
 export interface TransactionFormState {
@@ -25,6 +27,16 @@ interface TransactionFormProps {
 export function TransactionForm({ fields, participants, onSubmit }: TransactionFormProps) {
   const { t } = useTranslation();
   const { type, title, setTitle, amount, setAmount, date, setDate, participantId, setParticipantId } = fields;
+  const showCustomCalendarIcon = React.useMemo(() => {
+    if (typeof navigator === 'undefined') return false;
+
+    const userAgent = navigator.userAgent;
+    const isIOSDevice =
+      /iPad|iPhone|iPod/i.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isSafari = /Safari/i.test(userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS|Chrome|Chromium/i.test(userAgent);
+
+    return isIOSDevice && isSafari;
+  }, []);
 
   return (
     <form id="transaction-form" className="space-y-8 pb-6" onSubmit={onSubmit}>
@@ -64,16 +76,27 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
         </div>
 
         {/* Date input */}
-        <div className="space-y-2 min-w-0">
+        <div className="space-y-2 min-w-0 w-full">
           <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
             {t('transactionForm.dateLabel')}
           </label>
-          <input
-            className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium min-w-0"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
+          <div className="relative">
+            <input
+              className={cn(
+                'w-full max-w-full pl-3 sm:pl-5 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium min-w-0 box-border ios-date-input-fix',
+                showCustomCalendarIcon ? 'pr-11 sm:pr-12 ios-date-input-force-custom' : 'pr-3 sm:pr-5',
+              )}
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+            {showCustomCalendarIcon && (
+              <FaRegCalendarAlt
+                aria-hidden
+                className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-emerald-300/70"
+              />
+            )}
+          </div>
         </div>
       </div>
 

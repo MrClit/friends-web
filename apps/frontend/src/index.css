@@ -42,3 +42,25 @@ body {
 .dark .custom-scrollbar {
   scrollbar-color: rgba(4, 120, 87, 0.45) transparent;
 }
+
+/* iOS Safari can render date inputs with intrinsic width larger than containers. */
+.ios-date-input-fix {
+  display: block;
+  width: 100%;
+  inline-size: 100%;
+  max-width: 100%;
+  max-inline-size: 100%;
+  min-width: 0;
+  min-inline-size: 0;
+  -webkit-min-logical-width: 0;
+  box-sizing: border-box;
+}
+
+.ios-date-input-force-custom {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.ios-date-input-force-custom::-webkit-date-and-time-value {
+  text-align: left;
+}
