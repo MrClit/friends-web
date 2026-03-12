@@ -51,7 +51,8 @@ src/config/env.ts        → Validated env vars (VITE_API_URL, VITE_ENABLE_DEVTO
 - **Server state:** TanStack Query hooks in `src/hooks/api/` with centralized query keys (`keys.ts`)
 - **UI state:** Zustand stores for modals, theme, toast, delete loading state
 - **API client:** `src/api/client.ts` — unwraps `{ data: T }` responses automatically
-- **Styling:** `cn()` helper from `@/lib/utils`, dark mode via `useThemeStore`, teal primary
+- **Styling:** `cn()` helper from `@/shared/utils`, dark mode via `useThemeStore`, teal primary
+- **Tailwind className readability:** prefer `cn()` when a `className` has 8+ utilities or combines state/theme/responsive variants (`hover:`, `focus:`, `data-*`, `aria-*`, `dark:`, `sm:`+). Keep class groups ordered by concern: layout, spacing, typography, visual, interaction, state/theme, responsive.
 - **Semantic colors:** blue=contributions, red/rose=expenses, green/emerald=compensations, amber/orange=pot
 
 ### Routes

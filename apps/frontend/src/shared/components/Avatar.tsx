@@ -26,7 +26,10 @@ export function Avatar({ avatar, name, email, alt, isPot, className, imageClassN
     return (
       <div
         className={cn(
-          'rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 font-bold',
+          'flex items-center justify-center rounded-full',
+          'font-bold text-orange-600',
+          'bg-orange-100',
+          'dark:text-orange-400 dark:bg-orange-900/30',
           className,
           fallbackClassName,
         )}
