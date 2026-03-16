@@ -9,6 +9,7 @@ interface UseParticipantsComboboxProps {
   inputValue: string;
   onInputChange: (value: string) => void;
   onSelect: (participant: EventParticipant) => void;
+  allowCreateGuest?: boolean;
 }
 
 export function useParticipantsCombobox({
@@ -16,6 +17,7 @@ export function useParticipantsCombobox({
   inputValue,
   onInputChange,
   onSelect,
+  allowCreateGuest = true,
 }: UseParticipantsComboboxProps) {
   const { data: users = [], isLoading } = useUsers();
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -40,8 +42,10 @@ export function useParticipantsCombobox({
   // Check if input matches no existing user (would create a new guest)
   const isNewUser = useMemo(
     () =>
-      inputValue.trim().length > 0 && !filteredUsers.some((u) => u.name?.toLowerCase() === inputValue.toLowerCase()),
-    [inputValue, filteredUsers],
+      allowCreateGuest &&
+      inputValue.trim().length > 0 &&
+      !filteredUsers.some((u) => u.name?.toLowerCase() === inputValue.toLowerCase()),
+    [allowCreateGuest, inputValue, filteredUsers],
   );
 
   const optionsCount = filteredUsers.length + (isNewUser ? 1 : 0);

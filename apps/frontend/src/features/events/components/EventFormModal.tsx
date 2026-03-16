@@ -26,6 +26,7 @@ export function EventFormModal() {
     setDescription,
     participants,
     setParticipants,
+    setParticipantReplacements,
     showConfirm,
     errorMessage,
     isLoading,
@@ -82,6 +83,7 @@ export function EventFormModal() {
                   setDescription,
                   participants,
                   setParticipants,
+                  setParticipantReplacements,
                   icon,
                   setIcon,
                 }}

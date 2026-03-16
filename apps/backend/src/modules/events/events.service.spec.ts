@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import type { Repository } from 'typeorm';
 import { EventsService } from './events.service';
 import { Event, EventStatus } from './entities/event.entity';
 import type { EventParticipant } from './entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
-import { TransactionsService } from '../transactions/transactions.service';
 import { EventKPIsService } from './services/event-kpis.service';
-import { User } from '../users/user.entity';
+import { EventQueryService } from './services/event-query.service';
+import { EventParticipantsService } from './services/event-participants.service';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 
 describe('EventsService', () => {
@@ -17,15 +17,30 @@ describe('EventsService', () => {
 
   let mockRepository: {
     find: jest.Mock;
-    findOne: jest.Mock;
     create: jest.Mock;
     save: jest.Mock;
     merge: jest.Mock;
     delete: jest.Mock;
+    manager: {
+      transaction: jest.Mock;
+    };
   };
-  let mockTransactionsService: { findByEvent: jest.Mock };
+  let mockTransactionalEventRepository: {
+    findOne: jest.Mock;
+    merge: jest.Mock;
+    save: jest.Mock;
+  };
+  let mockEventQueryService: {
+    findEventOrThrow: jest.Mock;
+    calculateLastModified: jest.Mock;
+  };
+  let mockEventParticipantsService: {
+    enrichParticipants: jest.Mock;
+    normalizeParticipants: jest.Mock;
+    validateParticipantReplacements: jest.Mock;
+    applyParticipantReplacements: jest.Mock;
+  };
   let mockEventKPIsService: { getKPIs: jest.Mock };
-  let mockUserRepository: { find: jest.Mock };
 
   const adminActor: AuthenticatedUser = {
     id: 'admin-1',
@@ -63,23 +78,48 @@ describe('EventsService', () => {
   beforeEach(async () => {
     mockRepository = {
       find: jest.fn(),
-      findOne: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
       merge: jest.fn(),
       delete: jest.fn(),
+      manager: {
+        transaction: jest.fn(),
+      },
     };
 
-    mockTransactionsService = {
-      findByEvent: jest.fn(),
+    mockTransactionalEventRepository = {
+      findOne: jest.fn(),
+      merge: jest.fn(),
+      save: jest.fn(),
+    };
+
+    mockRepository.manager.transaction.mockImplementation(async (callback: (manager: unknown) => Promise<unknown>) => {
+      const manager = {
+        getRepository: (entity: unknown) => {
+          if (entity === Event) {
+            return mockTransactionalEventRepository;
+          }
+          throw new Error('Unknown repository requested in test transaction manager');
+        },
+      };
+
+      return callback(manager);
+    });
+
+    mockEventQueryService = {
+      findEventOrThrow: jest.fn().mockResolvedValue(mockEvent),
+      calculateLastModified: jest.fn().mockResolvedValue(undefined),
+    };
+
+    mockEventParticipantsService = {
+      enrichParticipants: jest.fn().mockResolvedValue(undefined),
+      normalizeParticipants: jest.fn().mockImplementation((raw: unknown) => raw as EventParticipant[]),
+      validateParticipantReplacements: jest.fn().mockReturnValue([]),
+      applyParticipantReplacements: jest.fn().mockResolvedValue(undefined),
     };
 
     mockEventKPIsService = {
       getKPIs: jest.fn(),
-    };
-
-    mockUserRepository = {
-      find: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -90,12 +130,12 @@ describe('EventsService', () => {
           useValue: mockRepository as unknown as Repository<Event>,
         },
         {
-          provide: TransactionsService,
-          useValue: mockTransactionsService as unknown as TransactionsService,
+          provide: EventQueryService,
+          useValue: mockEventQueryService,
         },
         {
-          provide: getRepositoryToken(User),
-          useValue: mockUserRepository as unknown as Repository<User>,
+          provide: EventParticipantsService,
+          useValue: mockEventParticipantsService,
         },
         {
           provide: EventKPIsService,
@@ -152,23 +192,21 @@ describe('EventsService', () => {
 
   describe('findOne', () => {
     it('returns event for admin actor', async () => {
-      mockRepository.findOne.mockResolvedValue(mockEvent);
-
       const result = await service.findOne(mockEvent.id, adminActor);
 
       expect(result).toEqual(mockEvent);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: mockEvent.id } });
+      expect(mockEventQueryService.findEventOrThrow).toHaveBeenCalledWith(mockEvent.id);
     });
 
     it('throws NotFoundException when event does not exist', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+      mockEventQueryService.findEventOrThrow.mockRejectedValue(
+        new NotFoundException(`Event with ID non-existent-id not found`),
+      );
 
       await expect(service.findOne('non-existent-id', adminActor)).rejects.toThrow(NotFoundException);
     });
 
     it('throws NotFoundException when user is not participant', async () => {
-      mockRepository.findOne.mockResolvedValue(mockEvent);
-
       await expect(service.findOne(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
     });
   });
@@ -245,7 +283,6 @@ describe('EventsService', () => {
       const updateDto: UpdateEventDto = { title: 'Updated Event' };
       const updatedEvent = { ...mockEvent, title: 'Updated Event' } as Event;
 
-      mockRepository.findOne.mockResolvedValue(mockEvent);
       mockRepository.merge.mockReturnValue(updatedEvent);
       mockRepository.save.mockResolvedValue(updatedEvent);
 
@@ -258,16 +295,62 @@ describe('EventsService', () => {
 
     it('throws NotFoundException when user is not participant', async () => {
       const updateDto: UpdateEventDto = { title: 'Blocked Update' };
-      mockRepository.findOne.mockResolvedValue(mockEvent);
 
       await expect(service.update(mockEvent.id, updateDto, outsiderActor)).rejects.toThrow(NotFoundException);
       expect(mockRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('migrates guest transactions when replacing guest with user', async () => {
+      const updateDto: UpdateEventDto = {
+        participants: [
+          { type: 'user', id: memberActor.id },
+          { type: 'user', id: 'new-user-id' },
+        ],
+        participantReplacements: [{ fromGuestId: 'g1', toUserId: 'new-user-id' }],
+      };
+
+      const updatedEvent = {
+        ...mockEvent,
+        participants: updateDto.participants,
+      } as Event;
+
+      mockTransactionalEventRepository.findOne.mockResolvedValue(mockEvent);
+      mockTransactionalEventRepository.merge.mockReturnValue(updatedEvent);
+      mockTransactionalEventRepository.save.mockResolvedValue(updatedEvent);
+      mockEventParticipantsService.validateParticipantReplacements.mockReturnValue([
+        { fromGuestId: 'g1', toUserId: 'new-user-id' },
+      ]);
+
+      const result = await service.update(mockEvent.id, updateDto, adminActor);
+
+      expect(mockRepository.manager.transaction).toHaveBeenCalledTimes(1);
+      expect(mockEventParticipantsService.applyParticipantReplacements).toHaveBeenCalledWith(
+        expect.anything(),
+        mockEvent.id,
+        [{ fromGuestId: 'g1', toUserId: 'new-user-id' }],
+      );
+      expect(result).toEqual(updatedEvent);
+    });
+
+    it('throws BadRequestException when replacement target user already participates', async () => {
+      const updateDto: UpdateEventDto = {
+        participants: [{ type: 'user', id: memberActor.id }],
+        participantReplacements: [{ fromGuestId: 'g1', toUserId: memberActor.id }],
+      };
+
+      mockEventParticipantsService.validateParticipantReplacements.mockImplementation(() => {
+        throw new BadRequestException(
+          `User ${memberActor.id} already participates in the event and cannot be used as replacement target`,
+        );
+      });
+
+      await expect(service.update(mockEvent.id, updateDto, adminActor)).rejects.toThrow(BadRequestException);
+      expect(mockRepository.manager.transaction).not.toHaveBeenCalled();
     });
   });
 
   describe('remove', () => {
     it('deletes event for authorized actor', async () => {
-      mockRepository.findOne.mockResolvedValue(mockEvent);
       mockRepository.delete.mockResolvedValue({ affected: 1, raw: {} });
 
       await service.remove(mockEvent.id, adminActor);
@@ -276,8 +359,6 @@ describe('EventsService', () => {
     });
 
     it('throws NotFoundException when user is not participant', async () => {
-      mockRepository.findOne.mockResolvedValue(mockEvent);
-
       await expect(service.remove(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
       expect(mockRepository.delete).not.toHaveBeenCalled();
     });
@@ -326,7 +407,6 @@ describe('EventsService', () => {
     };
 
     it('returns KPIs when actor can access event', async () => {
-      mockRepository.findOne.mockResolvedValue(mockEvent);
       mockEventKPIsService.getKPIs.mockResolvedValue(expectedKPIs);
 
       const result = await service.getKPIs(mockEvent.id, memberActor);
@@ -336,21 +416,20 @@ describe('EventsService', () => {
     });
 
     it('throws NotFoundException when actor cannot access event', async () => {
-      mockRepository.findOne.mockResolvedValue(mockEvent);
-
       await expect(service.getKPIs(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
       expect(mockEventKPIsService.getKPIs).not.toHaveBeenCalled();
     });
 
     it('throws NotFoundException when event does not exist', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+      mockEventQueryService.findEventOrThrow.mockRejectedValue(
+        new NotFoundException('Event with ID non-existent-id not found'),
+      );
 
       await expect(service.getKPIs('non-existent-id', adminActor)).rejects.toThrow(NotFoundException);
       expect(mockEventKPIsService.getKPIs).not.toHaveBeenCalled();
     });
 
     it('throws InternalServerErrorException when KPI service fails', async () => {
-      mockRepository.findOne.mockResolvedValue(mockEvent);
       mockEventKPIsService.getKPIs.mockRejectedValue(new InternalServerErrorException());
 
       await expect(service.getKPIs(mockEvent.id, adminActor)).rejects.toThrow(InternalServerErrorException);

@@ -12,6 +12,8 @@ interface ParticipantsComboboxProps {
   existingParticipants: EventParticipant[];
   inputValue: string;
   onInputChange: (value: string) => void;
+  allowCreateGuest?: boolean;
+  autoFocus?: boolean;
 }
 
 export function ParticipantsCombobox({
@@ -19,10 +21,14 @@ export function ParticipantsCombobox({
   existingParticipants,
   inputValue,
   onInputChange,
+  allowCreateGuest = true,
+  autoFocus = false,
 }: ParticipantsComboboxProps) {
   const { t } = useTranslation();
+  const placeholder = allowCreateGuest ? t('participantsInput.placeholder') : t('participantsInput.replacePlaceholder');
   // Generate a unique name to prevent Chrome autocomplete history
   const inputName = useRef(`participant-${crypto.randomUUID()}`).current;
+  const inputId = useRef(`participant-input-${crypto.randomUUID()}`).current;
 
   const {
     open,
@@ -39,7 +45,13 @@ export function ParticipantsCombobox({
     handleInputChange,
     handleInputFocus,
     handleInputBlur,
-  } = useParticipantsCombobox({ existingParticipants, inputValue, onInputChange, onSelect });
+  } = useParticipantsCombobox({
+    existingParticipants,
+    inputValue,
+    onInputChange,
+    onSelect,
+    allowCreateGuest,
+  });
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -51,17 +63,18 @@ export function ParticipantsCombobox({
           tabIndex={-1}
           style={{ position: 'absolute', pointerEvents: 'none', opacity: 0, height: 0, width: 0 }}
         />
-        <label htmlFor="participant-input" className="sr-only">
-          {t('participantsInput.placeholder')}
+        <label htmlFor={inputId} className="sr-only">
+          {placeholder}
         </label>
         <MdPersonAdd className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
         <Popover.Anchor asChild>
           <input
-            id="participant-input"
+            id={inputId}
             type="text"
             className="w-full pl-11 pr-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
-            placeholder={t('participantsInput.placeholder')}
+            placeholder={placeholder}
             name={inputName}
+            autoFocus={autoFocus}
             autoComplete="nope"
             autoCorrect="off"
             spellCheck={false}

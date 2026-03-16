@@ -1,4 +1,4 @@
-import type { EventParticipant } from '../types';
+import type { EventParticipant, ParticipantReplacement } from '../types';
 import { ParticipantsList } from './ParticipantsList';
 import { IconPicker } from './IconPicker';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,9 @@ export interface EventFormState {
   setDescription: (description: string) => void;
   participants: EventParticipant[];
   setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
+  setParticipantReplacements: (
+    replacements: ParticipantReplacement[] | ((prev: ParticipantReplacement[]) => ParticipantReplacement[]),
+  ) => void;
   icon?: string;
   setIcon?: (key: string) => void;
 }
@@ -21,7 +24,17 @@ interface EventFormProps {
 
 export function EventForm({ fields, onSubmit }: EventFormProps) {
   const { t } = useTranslation();
-  const { title, setTitle, description, setDescription, participants, setParticipants, icon, setIcon } = fields;
+  const {
+    title,
+    setTitle,
+    description,
+    setDescription,
+    participants,
+    setParticipants,
+    setParticipantReplacements,
+    icon,
+    setIcon,
+  } = fields;
 
   return (
     <form id="event-form" className="space-y-6" onSubmit={onSubmit}>
@@ -54,7 +67,11 @@ export function EventForm({ fields, onSubmit }: EventFormProps) {
           rows={2}
         />
       </div>
-      <ParticipantsList participants={participants} setParticipants={setParticipants} />
+      <ParticipantsList
+        participants={participants}
+        setParticipants={setParticipants}
+        setParticipantReplacements={setParticipantReplacements}
+      />
       {/* Submit button moved to modal footer via <button form="event-form" type="submit"> to match design */}
     </form>
   );

@@ -57,6 +57,12 @@ export interface UpdateEventDto {
   icon?: string;
   status?: EventStatus;
   participants?: EventParticipantDto[];
+  participantReplacements?: ParticipantReplacementDto[];
+}
+
+export interface ParticipantReplacementDto {
+  fromGuestId: string;
+  toUserId: string;
 }
 
 // ============= Transaction Types =============

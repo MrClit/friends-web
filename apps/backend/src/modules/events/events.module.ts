@@ -6,11 +6,13 @@ import { Event } from './entities/event.entity';
 import { User } from '../users/user.entity';
 import { TransactionsModule } from '../transactions/transactions.module';
 import { EventKPIsService } from './services/event-kpis.service';
+import { EventQueryService } from './services/event-query.service';
+import { EventParticipantsService } from './services/event-participants.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Event, User]), TransactionsModule],
   controllers: [EventsController],
-  providers: [EventsService, EventKPIsService],
+  providers: [EventsService, EventKPIsService, EventQueryService, EventParticipantsService],
   exports: [EventsService],
 })
 export class EventsModule {}

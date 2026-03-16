@@ -31,10 +31,22 @@ export function useEventDetail(id: string | undefined) {
    * Handles event update submission
    * Note: Caller is responsible for closing the modal on success
    */
-  const handleEditSubmit = ({ id, title, description, icon, participants }: EventFormData, onSuccess?: () => void) => {
+  const handleEditSubmit = (
+    { id, title, description, icon, participants, participantReplacements }: EventFormData,
+    onSuccess?: () => void,
+  ) => {
     if (id) {
       updateEvent.mutate(
-        { id, data: { title, description, icon, participants } },
+        {
+          id,
+          data: {
+            title,
+            description,
+            icon,
+            participants,
+            participantReplacements,
+          },
+        },
         {
           onSuccess: () => {
             // Let the caller handle UI state (closing modal)

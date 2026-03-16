@@ -73,6 +73,8 @@ export function useUpdateEvent() {
       // Invalidate both list and specific event detail
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.kpis(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.byEvent(id) });
     },
     onError: () => {
       error('events.update_error');
