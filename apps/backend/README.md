@@ -156,6 +156,11 @@ CORS_ORIGIN=http://localhost:5173   # Orígenes permitidos para CORS
 # JWT (futuro)
 JWT_SECRET=your-secret-key          # Secret para firmar tokens JWT
 JWT_EXPIRATION=1d                   # Tiempo de expiración de tokens
+
+# Cloudinary (avatar)
+CLOUDINARY_CLOUD_NAME=your-cloud-name      # Cloud name de Cloudinary
+CLOUDINARY_API_KEY=your-api-key            # API key de Cloudinary
+CLOUDINARY_API_SECRET=your-api-secret      # API secret de Cloudinary
 ```
 
 ### Configuración Inicial

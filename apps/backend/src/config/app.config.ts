@@ -1,6 +1,13 @@
 import { ConfigService } from '@nestjs/config';
 
-const REQUIRED_VARS = ['JWT_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
+const REQUIRED_VARS = [
+  'JWT_SECRET',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET',
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY',
+  'CLOUDINARY_API_SECRET',
+];
 
 function validateEnv(configService: ConfigService) {
   const nodeEnv = configService.get<string>('NODE_ENV') || 'development';

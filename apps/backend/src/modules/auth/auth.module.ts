@@ -8,6 +8,7 @@ import { GoogleStrategy } from './google.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { RolesGuard } from './roles.guard';
 import { UsersModule } from '../users/users.module';
+import { CloudinaryAvatarService } from './cloudinary-avatar.service';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { UsersModule } from '../users/users.module';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, GoogleStrategy, JwtStrategy, RolesGuard],
+  providers: [AuthService, CloudinaryAvatarService, GoogleStrategy, JwtStrategy, RolesGuard],
   controllers: [AuthController],
   exports: [AuthService],
 })
