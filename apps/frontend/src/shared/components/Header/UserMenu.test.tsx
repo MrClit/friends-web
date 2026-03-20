@@ -46,6 +46,8 @@ describe('UserMenu', () => {
       error: null,
       login: vi.fn(),
       setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(<UserMenu />);
@@ -70,6 +72,8 @@ describe('UserMenu', () => {
       error: null,
       login: vi.fn(),
       setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(<UserMenu />);
@@ -96,6 +100,8 @@ describe('UserMenu', () => {
       error: null,
       login: vi.fn(),
       setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(<UserMenu />);
