@@ -62,13 +62,29 @@ describe('AuthController (e2e)', () => {
     const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
     const response = await request(httpServer).get('/api/auth/me').set('Authorization', `Bearer ${token}`).expect(200);
 
-    expect(response.body).toMatchObject({
+    const responseBody = response.body as {
+      data: {
+        id: string;
+        email: string;
+        name: string;
+        avatar: string;
+        role: string;
+        createdAt: unknown;
+        updatedAt: unknown;
+      };
+    };
+
+    expect(responseBody).toMatchObject({
       data: {
         id: user.id,
         email: 'john.doe@example.com',
         name: 'John Doe',
+        avatar: 'https://example.com/avatar.png',
         role: 'user',
       },
     });
+
+    expect(typeof responseBody.data.createdAt).toBe('string');
+    expect(typeof responseBody.data.updatedAt).toBe('string');
   });
 });

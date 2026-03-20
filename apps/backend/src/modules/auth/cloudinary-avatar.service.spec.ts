@@ -1,8 +1,15 @@
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryAvatarService } from './cloudinary-avatar.service';
 
+type UploadMockResult = {
+  public_id: string;
+  version?: string | number;
+};
+
 const configMock = jest.fn((_: Record<string, unknown>) => undefined);
-const uploadMock = jest.fn((_: string, __: Record<string, unknown>) => Promise.resolve({ public_id: '' }));
+const uploadMock = jest.fn((_: string, __: Record<string, unknown>) =>
+  Promise.resolve<UploadMockResult>({ public_id: '' }),
+);
 const urlMock = jest.fn((_: string, __: Record<string, unknown>) => '');
 
 jest.mock('cloudinary', () => ({
@@ -83,7 +90,7 @@ describe('CloudinaryAvatarService', () => {
       }),
     } as unknown as ConfigService;
 
-    uploadMock.mockResolvedValue({ public_id: 'friends/dev/avatars/user-123' });
+    uploadMock.mockResolvedValue({ public_id: 'friends/dev/avatars/user-123', version: 123 });
     urlMock.mockReturnValue(
       'https://res.cloudinary.com/friends-cloud/image/upload/c_fill,w_128,h_128,g_face,f_auto,q_auto,dpr_auto/friends/dev/avatars/user-123',
     );
@@ -100,6 +107,7 @@ describe('CloudinaryAvatarService', () => {
     });
     expect(urlMock).toHaveBeenCalledWith('friends/dev/avatars/user-123', {
       secure: true,
+      version: 123,
       transformation: [
         {
           width: 128,

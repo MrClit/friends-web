@@ -20,9 +20,23 @@ export class AuthService {
       throw new UnauthorizedException('No autorizado');
     }
 
+    const resolvedName = this.resolveNameForLogin(user, name);
     const resolvedAvatar = await this.resolveAvatarForLogin(user, avatar);
-    await this.usersService.updateProfileIfChanged(user, name, resolvedAvatar);
+    await this.usersService.updateProfileIfChanged(user, resolvedName, resolvedAvatar);
     return user;
+  }
+
+  private resolveNameForLogin(user: User, googleName?: string): string | undefined {
+    const hasStoredName = Boolean(user.name && user.name.trim());
+    if (hasStoredName) {
+      return undefined;
+    }
+
+    if (!googleName || !googleName.trim()) {
+      return undefined;
+    }
+
+    return googleName.trim();
   }
 
   private async resolveAvatarForLogin(user: User, googleAvatar?: string): Promise<string | undefined> {

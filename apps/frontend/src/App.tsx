@@ -16,6 +16,7 @@ const KPIDetail = lazy(() => import('./pages/KPIDetail').then((m) => ({ default:
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
+const UserSettings = lazy(() => import('./pages/UserSettings').then((m) => ({ default: m.UserSettings })));
 const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })));
 
 export function App() {
@@ -48,6 +49,14 @@ export function App() {
                 element={
                   <RequireAuth>
                     <KPIDetail />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <RequireAuth>
+                    <UserSettings />
                   </RequireAuth>
                 }
               />

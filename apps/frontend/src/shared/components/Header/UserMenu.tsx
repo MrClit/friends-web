@@ -1,5 +1,5 @@
 import { useAuth } from '@/features/auth/useAuth';
-import { MdLogout, MdAccountCircle } from 'react-icons/md';
+import { MdLogout, MdAccountCircle, MdSettings } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/shared/hooks/useToast';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
@@ -97,6 +97,14 @@ export function UserMenu() {
         <DropdownMenuItem disabled className="flex items-center gap-2 opacity-80 cursor-default select-text">
           <MdAccountCircle className="text-xl text-teal-500" />
           <span className="truncate">{user.email}</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onClick={() => navigate('/settings')}
+          className={cn('flex items-center gap-2 cursor-pointer', 'font-semibold text-teal-800', 'dark:text-teal-200')}
+        >
+          <MdSettings className="text-lg" />
+          {t('user.settings', 'Settings')}
         </DropdownMenuItem>
 
         {user.role === ADMIN_ROLE && (

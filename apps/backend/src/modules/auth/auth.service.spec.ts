@@ -51,7 +51,7 @@ describe('AuthService', () => {
     usersService.findByEmail.mockResolvedValue(user);
     cloudinaryAvatarService.uploadGoogleAvatar.mockResolvedValue(cloudinaryAvatarUrl);
 
-    await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'avatar')).resolves.toBe(user);
+    await expect(service.validateOrRejectGoogleUser('a@b.com', '  Name  ', 'avatar')).resolves.toBe(user);
 
     expect(cloudinaryAvatarService.isCloudinaryAvatarUrl).toHaveBeenCalledWith(user.avatar);
     expect(cloudinaryAvatarService.uploadGoogleAvatar).toHaveBeenCalledWith('avatar', user.id);
@@ -77,7 +77,7 @@ describe('AuthService', () => {
     await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'new-google-avatar')).resolves.toBe(user);
 
     expect(cloudinaryAvatarService.uploadGoogleAvatar).not.toHaveBeenCalled();
-    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, 'Name', user.avatar);
+    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, undefined, user.avatar);
   });
 
   it('keeps previous avatar when Cloudinary upload fails', async () => {
@@ -98,7 +98,31 @@ describe('AuthService', () => {
     await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'new-google-avatar')).resolves.toBe(user);
 
     expect(cloudinaryAvatarService.uploadGoogleAvatar).toHaveBeenCalledWith('new-google-avatar', user.id);
-    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, 'Name', user.avatar);
+    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, undefined, user.avatar);
+  });
+
+  it('keeps existing name even when Google sends a different display name', async () => {
+    const user: User = {
+      id: '1',
+      email: 'a@b.com',
+      role: 'user',
+      name: 'Custom Name',
+      avatar: 'https://legacy.example.com/avatar.png',
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    usersService.findByEmail.mockResolvedValue(user);
+    cloudinaryAvatarService.uploadGoogleAvatar.mockResolvedValue('https://res.cloudinary.com/demo/image/upload/avatar');
+
+    await expect(service.validateOrRejectGoogleUser('a@b.com', 'Google Name', 'new-google-avatar')).resolves.toBe(user);
+
+    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(
+      user,
+      undefined,
+      'https://res.cloudinary.com/demo/image/upload/avatar',
+    );
   });
 
   it('generates jwt', () => {

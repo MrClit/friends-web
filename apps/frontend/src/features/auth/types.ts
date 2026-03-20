@@ -17,6 +17,8 @@ export interface User {
   name?: string;
   avatar?: string;
   role: UserRole;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthContextType {
@@ -27,4 +29,6 @@ export interface AuthContextType {
   login: () => void;
   logout: () => void;
   setAuth: (user: User, token: string) => void;
+  refreshUser: () => Promise<User | null>;
+  updateUser: (user: User) => void;
 }

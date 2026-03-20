@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from './users.service';
@@ -109,5 +110,95 @@ describe('UsersService', () => {
     expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.name', 'ASC');
     expect(queryBuilder.limit).toHaveBeenCalledWith(20);
     expect(queryBuilder.getMany).toHaveBeenCalledTimes(1);
+  });
+
+  it('getCurrentUserProfileByIdOrThrow returns current user profile projection', async () => {
+    const now = new Date();
+    const user = {
+      id: 'u1',
+      email: 'alice@example.com',
+      name: 'Alice',
+      avatar: 'https://example.com/avatar.png',
+      role: 'user',
+      createdAt: now,
+      updatedAt: now,
+    } as User;
+    mockRepository.findOne.mockResolvedValue(user);
+
+    const result = await service.getCurrentUserProfileByIdOrThrow('u1');
+
+    expect(result).toEqual({
+      id: 'u1',
+      email: 'alice@example.com',
+      name: 'Alice',
+      avatar: 'https://example.com/avatar.png',
+      role: 'user',
+      createdAt: now,
+      updatedAt: now,
+    });
+    expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: 'u1' } });
+  });
+
+  it('getCurrentUserProfileByIdOrThrow throws when user does not exist', async () => {
+    mockRepository.findOne.mockResolvedValue(null);
+
+    await expect(service.getCurrentUserProfileByIdOrThrow('missing')).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('updateCurrentUserProfile updates changed fields and returns profile dto', async () => {
+    const now = new Date();
+    const user = {
+      id: 'u1',
+      email: 'alice@example.com',
+      name: 'Alice',
+      avatar: 'old-avatar',
+      role: 'user',
+      createdAt: now,
+      updatedAt: now,
+    } as User;
+    mockRepository.findOne.mockResolvedValue(user);
+    mockRepository.save.mockResolvedValue({
+      ...user,
+      name: 'New Alice',
+      avatar: 'new-avatar',
+    });
+
+    const result = await service.updateCurrentUserProfile('u1', {
+      name: 'New Alice',
+      avatar: 'new-avatar',
+    });
+
+    expect(mockRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'u1',
+        name: 'New Alice',
+        avatar: 'new-avatar',
+      }),
+    );
+    expect(result.name).toBe('New Alice');
+    expect(result.avatar).toBe('new-avatar');
+  });
+
+  it('updateCurrentUserProfile does not save when fields are unchanged', async () => {
+    const now = new Date();
+    const user = {
+      id: 'u1',
+      email: 'alice@example.com',
+      name: 'Alice',
+      avatar: 'same-avatar',
+      role: 'user',
+      createdAt: now,
+      updatedAt: now,
+    } as User;
+    mockRepository.findOne.mockResolvedValue(user);
+
+    const result = await service.updateCurrentUserProfile('u1', {
+      name: 'Alice',
+      avatar: 'same-avatar',
+    });
+
+    expect(mockRepository.save).not.toHaveBeenCalled();
+    expect(result.name).toBe('Alice');
+    expect(result.avatar).toBe('same-avatar');
   });
 });

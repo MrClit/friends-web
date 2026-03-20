@@ -32,14 +32,22 @@ export class ApiError extends Error {
 export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   let response: Response;
   const token = getAuthToken();
+  const isFormData = typeof FormData !== 'undefined' && options?.body instanceof FormData;
+
   try {
+    const headers = new Headers(options?.headers);
+
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    if (!isFormData && !headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
+
     response = await fetch(`${API_BASE}${endpoint}`, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options?.headers,
-      },
+      headers,
     });
   } catch (e) {
     throw new ApiError(0, 'NetworkError', (e as Error).message);

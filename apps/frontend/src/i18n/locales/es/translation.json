@@ -19,6 +19,7 @@
     "menu": "Opciones de usuario",
     "logout": "Cerrar sesión",
     "logout_success": "Sesión cerrada correctamente",
+    "settings": "Ajustes",
     "auth": {
       "loginWithGoogle": "Iniciar sesión con Google"
     }
@@ -261,6 +262,35 @@
       "name": "Nombre",
       "avatar": "URL del avatar",
       "role": "Rol"
+    }
+  },
+  "userSettings": {
+    "title": "Ajustes de usuario",
+    "subtitle": "Actualiza tu información de perfil y tu avatar.",
+    "goHome": "Ir al inicio",
+    "avatar": {
+      "title": "Foto de perfil",
+      "subtitle": "Elige una imagen existente o haz una foto nueva desde tu dispositivo.",
+      "choose": "Elegir foto",
+      "camera": "Hacer foto"
+    },
+    "fields": {
+      "name": "Nombre",
+      "email": "Email",
+      "role": "Rol",
+      "createdAt": "Fecha de alta",
+      "updatedAt": "Última actualización"
+    },
+    "actions": {
+      "save": "Guardar cambios",
+      "saving": "Guardando..."
+    },
+    "toasts": {
+      "invalidImage": "Selecciona un archivo de imagen válido.",
+      "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 5 MB.",
+      "invalidName": "El nombre no puede estar vacío.",
+      "updateSuccess": "Perfil actualizado correctamente.",
+      "updateError": "No se pudo actualizar el perfil."
     }
   },
   "errorBoundary": {

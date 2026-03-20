@@ -19,6 +19,7 @@
     "menu": "User options",
     "logout": "Log out",
     "logout_success": "Logged out successfully",
+    "settings": "Settings",
     "auth": {
       "loginWithGoogle": "Login with Google"
     }
@@ -261,6 +262,35 @@
       "name": "Name",
       "avatar": "Avatar URL",
       "role": "Role"
+    }
+  },
+  "userSettings": {
+    "title": "User settings",
+    "subtitle": "Update your profile information and avatar.",
+    "goHome": "Go to home",
+    "avatar": {
+      "title": "Profile photo",
+      "subtitle": "Choose an existing image or take a new photo from your device.",
+      "choose": "Choose photo",
+      "camera": "Take photo"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "createdAt": "Member since",
+      "updatedAt": "Last updated"
+    },
+    "actions": {
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "toasts": {
+      "invalidImage": "Please select a valid image file.",
+      "fileTooLarge": "Image is too large. Maximum size is 5 MB.",
+      "invalidName": "Name cannot be empty.",
+      "updateSuccess": "Profile updated successfully.",
+      "updateError": "Could not update profile."
     }
   },
   "errorBoundary": {

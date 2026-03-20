@@ -76,15 +76,87 @@ export class CloudinaryAvatarService {
     };
 
     const uploadResult: UploadApiResponse = await cloudinary.uploader.upload(normalizedAvatarUrl, uploadOptions);
-    return this.buildOptimizedAvatarUrl(uploadResult.public_id);
+    return this.buildOptimizedAvatarUrl(uploadResult.public_id, uploadResult.version);
+  }
+
+  async uploadUserAvatarBuffer(fileBuffer: Buffer, userId: string): Promise<string> {
+    if (!this.isConfigured || !this.cloudName) {
+      throw new Error('Cloudinary avatar integration is not configured');
+    }
+
+    if (!fileBuffer || fileBuffer.length === 0) {
+      throw new Error('Avatar file is empty');
+    }
+
+    const uploadOptions: UploadApiOptions = {
+      folder: this.avatarFolder,
+      public_id: this.getAvatarPublicId(userId),
+      overwrite: true,
+      invalidate: true,
+      resource_type: 'image',
+    };
+
+    const uploadResult = await this.uploadBuffer(fileBuffer, uploadOptions);
+    return this.buildOptimizedAvatarUrl(uploadResult.public_id, uploadResult.version);
+  }
+
+  private uploadBuffer(fileBuffer: Buffer, uploadOptions: UploadApiOptions): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+        if (error) {
+          reject(new Error(this.getErrorMessage(error)));
+          return;
+        }
+
+        if (!result) {
+          reject(new Error('Cloudinary upload did not return a result'));
+          return;
+        }
+
+        resolve(result);
+      });
+
+      uploadStream.end(fileBuffer);
+    });
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error && error.message.trim()) {
+      return error.message;
+    }
+
+    if (typeof error === 'string' && error.trim()) {
+      return error;
+    }
+
+    if (typeof error === 'object' && error !== null) {
+      const errorWithMessage = error as { message?: unknown };
+      if (typeof errorWithMessage.message === 'string' && errorWithMessage.message.trim()) {
+        return errorWithMessage.message;
+      }
+    }
+
+    return 'Cloudinary upload failed';
   }
 
   private getAvatarPublicId(userId: string): string {
     return `user-${userId}`;
   }
 
-  private buildOptimizedAvatarUrl(publicId: string): string {
-    return cloudinary.url(publicId, {
+  private buildOptimizedAvatarUrl(publicId: string, version?: string | number): string {
+    const urlOptions: {
+      secure: true;
+      transformation: Array<{
+        width: number;
+        height: number;
+        crop: 'fill';
+        gravity: 'face';
+        quality: 'auto';
+        fetch_format: 'auto';
+        dpr: 'auto';
+      }>;
+      version?: string | number;
+    } = {
       secure: true,
       transformation: [
         {
@@ -97,6 +169,12 @@ export class CloudinaryAvatarService {
           dpr: 'auto',
         },
       ],
-    });
+    };
+
+    if (typeof version === 'number' || typeof version === 'string') {
+      urlOptions.version = version;
+    }
+
+    return cloudinary.url(publicId, urlOptions);
   }
 }

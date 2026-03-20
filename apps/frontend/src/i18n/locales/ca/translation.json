@@ -19,6 +19,7 @@
     "menu": "Opcions d'usuari",
     "logout": "Tanca la sessió",
     "logout_success": "Sessió tancada correctament",
+    "settings": "Configuració",
     "auth": {
       "loginWithGoogle": "Iniciar sessió amb Google"
     }
@@ -261,6 +262,35 @@
       "name": "Nom",
       "avatar": "URL de l'avatar",
       "role": "Rol"
+    }
+  },
+  "userSettings": {
+    "title": "Configuració d'usuari",
+    "subtitle": "Actualitza la teva informació de perfil i l'avatar.",
+    "goHome": "Anar a l'inici",
+    "avatar": {
+      "title": "Foto de perfil",
+      "subtitle": "Tria una imatge existent o fes una foto nova des del teu dispositiu.",
+      "choose": "Triar foto",
+      "camera": "Fer foto"
+    },
+    "fields": {
+      "name": "Nom",
+      "email": "Correu electrònic",
+      "role": "Rol",
+      "createdAt": "Data d'alta",
+      "updatedAt": "Darrera actualització"
+    },
+    "actions": {
+      "save": "Desar canvis",
+      "saving": "Desant..."
+    },
+    "toasts": {
+      "invalidImage": "Selecciona un fitxer d'imatge vàlid.",
+      "fileTooLarge": "La imatge és massa gran. La mida màxima és de 5 MB.",
+      "invalidName": "El nom no pot estar buit.",
+      "updateSuccess": "Perfil actualitzat correctament.",
+      "updateError": "No s'ha pogut actualitzar el perfil."
     }
   },
   "errorBoundary": {
