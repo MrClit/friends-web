@@ -228,7 +228,6 @@
   "adminUsers": {
     "title": "Users Administration",
     "subtitle": "Manage users and roles",
-    "goHome": "Go to home",
     "newUser": "New user",
     "menuEntry": "Users administration",
     "empty": "No users found. Create your first user to start managing access.",
@@ -267,7 +266,6 @@
   "profile": {
     "title": "Profile",
     "subtitle": "Update your profile information and avatar.",
-    "goHome": "Go to home",
     "avatar": {
       "title": "Profile photo",
       "subtitle": "Tap your photo to update it.",

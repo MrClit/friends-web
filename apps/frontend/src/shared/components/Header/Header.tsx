@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Logo } from '@/shared/components';
+import { Link } from 'react-router-dom';
+import { LogoIcon } from '@/shared/components/Logo';
 import { LanguageSelector } from '@/shared/components/Header';
 import { ThemeToggle } from '@/shared/components/Header';
 import { UserMenu } from '@/shared/components/Header';
@@ -17,13 +18,17 @@ export function Header() {
       className="sticky top-0 z-50 px-6 py-4 border-b border-emerald-100 dark:border-emerald-800/50 bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(2,44,34,0.8)] backdrop-blur-md"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Logo showText={false} size={40} rounded="xl" />
+        <Link
+          to="/"
+          aria-label={t('notFound.goHome')}
+          className="group flex items-center gap-3 rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-emerald-950"
+        >
+          <LogoIcon size={40} rounded="xl" />
 
-          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-slate-700 dark:text-white dark:group-hover:text-emerald-100">
             FRI<span className="text-yellow-400">€</span>NDS
           </h1>
-        </div>
+        </Link>
 
         <div className="flex items-center gap-2 md:gap-4">
           <LanguageSelector />

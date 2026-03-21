@@ -1,11 +1,8 @@
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MdArrowBack } from 'react-icons/md';
 
 import { useAuth } from '@/features/auth/useAuth';
 import { useProfileForm, ProfileCard } from '@/features/profile';
 import { HeaderSection } from '@/shared/components/HeaderSection';
-import { cn } from '@/shared/utils';
 
 import { MainLayout } from './MainLayout';
 
@@ -33,22 +30,6 @@ export function Profile() {
   return (
     <MainLayout>
       <HeaderSection
-        eyebrow={
-          <Link
-            to="/"
-            className={cn(
-              '-ml-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5',
-              'text-sm font-semibold text-emerald-700/90',
-              'transition-colors hover:text-emerald-900',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500',
-              'focus-visible:ring-offset-2 dark:text-emerald-300 dark:hover:text-emerald-100',
-              'dark:focus-visible:ring-offset-emerald-950',
-            )}
-          >
-            <MdArrowBack size={18} aria-hidden />
-            <span>{t('profile.goHome', 'Go to home')}</span>
-          </Link>
-        }
         title={t('profile.title', 'Profile')}
         subtitle={t('profile.subtitle', 'Update your profile information and avatar.')}
       />

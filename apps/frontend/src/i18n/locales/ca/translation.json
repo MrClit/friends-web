@@ -228,7 +228,6 @@
   "adminUsers": {
     "title": "Administració d'usuaris",
     "subtitle": "Administra usuaris i rols",
-    "goHome": "Anar a l'inici",
     "newUser": "Nou usuari",
     "menuEntry": "Administració d'usuaris",
     "empty": "No s'han trobat usuaris. Crea el primer per començar a gestionar accessos.",
@@ -267,7 +266,6 @@
   "profile": {
     "title": "Perfil",
     "subtitle": "Actualitza la teva informació de perfil i l'avatar.",
-    "goHome": "Anar a l'inici",
     "avatar": {
       "title": "Foto de perfil",
       "subtitle": "Toca la teva foto per actualitzar-la.",
