@@ -19,7 +19,7 @@
     "menu": "Opcions d'usuari",
     "logout": "Tanca la sessió",
     "logout_success": "Sessió tancada correctament",
-    "settings": "Configuració",
+    "profile": "Perfil",
     "auth": {
       "loginWithGoogle": "Iniciar sessió amb Google"
     }
@@ -226,11 +226,11 @@
     "delete_error": "Error en eliminar la transacció"
   },
   "adminUsers": {
-    "title": "Gestió d'usuaris",
+    "title": "Administració d'usuaris",
     "subtitle": "Administra usuaris i rols",
     "goHome": "Anar a l'inici",
     "newUser": "Nou usuari",
-    "menuEntry": "Gestió d'usuaris",
+    "menuEntry": "Administració d'usuaris",
     "empty": "No s'han trobat usuaris. Crea el primer per començar a gestionar accessos.",
     "loadedUsers": "{{count}} usuaris carregats",
     "stats": {
@@ -264,13 +264,14 @@
       "role": "Rol"
     }
   },
-  "userSettings": {
-    "title": "Configuració d'usuari",
+  "profile": {
+    "title": "Perfil",
     "subtitle": "Actualitza la teva informació de perfil i l'avatar.",
     "goHome": "Anar a l'inici",
     "avatar": {
       "title": "Foto de perfil",
-      "subtitle": "Tria una imatge existent o fes una foto nova des del teu dispositiu.",
+      "subtitle": "Toca la teva foto per actualitzar-la.",
+      "change": "Canviar foto",
       "choose": "Triar foto",
       "camera": "Fer foto"
     },

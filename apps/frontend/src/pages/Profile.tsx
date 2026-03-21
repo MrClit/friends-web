@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { MdArrowBack } from 'react-icons/md';
 
 import { useAuth } from '@/features/auth/useAuth';
-import { useUserSettingsForm, UserSettingsAvatarCard, UserSettingsProfileFields } from '@/features/user-settings';
+import { useProfileForm, ProfileCard } from '@/features/profile';
 import { HeaderSection } from '@/shared/components/HeaderSection';
 import { cn } from '@/shared/utils';
 
 import { MainLayout } from './MainLayout';
 
-export function UserSettings() {
+export function Profile() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
-  const form = useUserSettingsForm();
+  const form = useProfileForm();
 
   if (loading) {
     return (
@@ -46,32 +46,25 @@ export function UserSettings() {
             )}
           >
             <MdArrowBack size={18} aria-hidden />
-            <span>{t('userSettings.goHome', 'Go to home')}</span>
+            <span>{t('profile.goHome', 'Go to home')}</span>
           </Link>
         }
-        title={t('userSettings.title', 'User Settings')}
-        subtitle={t('userSettings.subtitle', 'Update your profile information and avatar.')}
+        title={t('profile.title', 'Profile')}
+        subtitle={t('profile.subtitle', 'Update your profile information and avatar.')}
       />
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
-        <UserSettingsAvatarCard
-          user={user}
-          name={form.trimmedName}
-          avatarPreviewUrl={form.avatarPreviewUrl}
-          avatarFile={form.avatarFile}
-          galleryInputRef={form.galleryInputRef}
-          cameraInputRef={form.cameraInputRef}
-          onSelectAvatar={form.handleSelectAvatar}
-        />
-        <UserSettingsProfileFields
-          user={user}
-          name={form.name}
-          setName={form.setName}
-          hasChanges={form.hasChanges}
-          isSaving={form.isSaving}
-          onSave={() => void form.handleSave()}
-        />
-      </div>
+      <ProfileCard
+        user={user}
+        name={form.name}
+        setName={form.setName}
+        avatarPreviewUrl={form.avatarPreviewUrl}
+        avatarFile={form.avatarFile}
+        galleryInputRef={form.galleryInputRef}
+        onSelectAvatar={form.handleSelectAvatar}
+        hasChanges={form.hasChanges}
+        isSaving={form.isSaving}
+        onSave={() => void form.handleSave()}
+      />
     </MainLayout>
   );
 }

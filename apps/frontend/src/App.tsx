@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { QueryProvider } from './providers/QueryProvider';
 import { RequireAuth } from './features/auth/RequireAuth';
@@ -16,7 +16,7 @@ const KPIDetail = lazy(() => import('./pages/KPIDetail').then((m) => ({ default:
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
-const UserSettings = lazy(() => import('./pages/UserSettings').then((m) => ({ default: m.UserSettings })));
+const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })));
 const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })));
 
 export function App() {
@@ -53,10 +53,18 @@ export function App() {
                 }
               />
               <Route
+                path="/profile"
+                element={
+                  <RequireAuth>
+                    <Profile />
+                  </RequireAuth>
+                }
+              />
+              <Route
                 path="/settings"
                 element={
                   <RequireAuth>
-                    <UserSettings />
+                    <Navigate to="/profile" replace />
                   </RequireAuth>
                 }
               />

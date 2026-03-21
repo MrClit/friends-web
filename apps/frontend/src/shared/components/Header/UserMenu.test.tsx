@@ -55,7 +55,36 @@ describe('UserMenu', () => {
     const trigger = screen.getByRole('button');
     fireEvent.pointerDown(trigger);
 
-    expect(await screen.findByText(/user management/i)).toBeInTheDocument();
+    expect(await screen.findByText(/users administration|user management/i)).toBeInTheDocument();
+  });
+
+  it('navigates to profile page when clicking profile menu entry', async () => {
+    mockedUseAuth.mockReturnValue({
+      user: {
+        id: 'user-1',
+        email: 'user@test.com',
+        name: 'User',
+        role: 'user',
+      },
+      loading: false,
+      logout: vi.fn(),
+      token: 'token',
+      error: null,
+      login: vi.fn(),
+      setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
+    });
+
+    render(<UserMenu />);
+
+    const trigger = screen.getByRole('button');
+    fireEvent.pointerDown(trigger);
+
+    const profileMenuItem = await screen.findByText(/profile|perfil/i);
+    fireEvent.click(profileMenuItem);
+
+    expect(navigateMock).toHaveBeenCalledWith('/profile');
   });
 
   it('does not show admin menu entry for non-admin users', async () => {
@@ -82,7 +111,7 @@ describe('UserMenu', () => {
     fireEvent.pointerDown(trigger);
 
     await waitFor(() => {
-      expect(screen.queryByText(/user management/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/users administration|user management/i)).not.toBeInTheDocument();
     });
   });
 
@@ -109,9 +138,45 @@ describe('UserMenu', () => {
     const trigger = screen.getByRole('button');
     fireEvent.pointerDown(trigger);
 
-    const menuItem = await screen.findByText(/user management/i);
+    const menuItem = await screen.findByText(/users administration|user management/i);
     fireEvent.click(menuItem);
 
     expect(navigateMock).toHaveBeenCalledWith('/admin/users');
+  });
+
+  it('renders nothing while auth is loading', () => {
+    mockedUseAuth.mockReturnValue({
+      user: null,
+      loading: true,
+      logout: vi.fn(),
+      token: null,
+      error: null,
+      login: vi.fn(),
+      setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
+    });
+
+    const { container } = render(<UserMenu />);
+
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('renders nothing when there is no authenticated user', () => {
+    mockedUseAuth.mockReturnValue({
+      user: null,
+      loading: false,
+      logout: vi.fn(),
+      token: null,
+      error: null,
+      login: vi.fn(),
+      setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
+    });
+
+    const { container } = render(<UserMenu />);
+
+    expect(container.firstChild).toBeNull();
   });
 });

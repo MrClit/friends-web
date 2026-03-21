@@ -1,6 +1,6 @@
-# User Settings Feature – Manual Validation Checklist
+# Profile Feature – Manual Validation Checklist
 
-**Objective:** Verify User Settings implementation works end-to-end  
+**Objective:** Verify Profile implementation works end-to-end  
 **Duration:** ~30-40 minutes  
 **Prerequisites:** Backend running on localhost:3000, Frontend on localhost:5173, Google OAuth configured
 
@@ -58,14 +58,14 @@
 
 ---
 
-## Test Case 2: Access Settings Page
+## Test Case 2: Access Profile Page
 
-**Objective:** Verify Settings page loads and displays full profile
+**Objective:** Verify Profile page loads and displays full profile
 
 **Steps:**
 
-1. From Home page, click Header user avatar → "Settings" (or navigate directly to /#/settings)
-2. Settings page should load with:
+1. From Home page, click Header user avatar → "Profile" (or navigate directly to /#/profile)
+2. Profile page should load with:
    - Avatar section (current avatar or initials fallback)
    - Two buttons: "Choose photo" and "Take photo"
    - Name field (populated with current name)
@@ -92,7 +92,7 @@
 
 **Steps:**
 
-1. In Settings, locate Name field
+1. In Profile, locate Name field
 2. Clear current text
 3. Type new name: "Custom Name for Testing"
 4. Verify "Save" button is not disabled
@@ -113,18 +113,18 @@
 
 ## Test Case 4: Edit Name + Verify Header Reflects Change
 
-**Objective:** Verify Header avatar/name immediately updates after Settings save
+**Objective:** Verify Header avatar/name immediately updates after Profile save
 
 **Steps:**
 
 1. From previous test, name is now "Custom Name for Testing"
-2. Click "Close Settings" or navigate to Home
+2. Click "Close Profile" or navigate to Home
 3. Verify Header shows updated name: "Custom Name for ..."
 4. Avatar/initials still correct (should show first letter of new name if applicable)
 
 **Expected Result:**
 
-- Header name matches Settings name
+- Header name matches Profile name
 - No refresh required (optimistic update working)
 - Cache invalidation occurred
 
@@ -143,7 +143,7 @@
 3. Click "Login with Google"
 4. Complete OAuth (should use same Google account as before)
 5. Redirect to Home
-6. Open Settings again
+6. Open Profile again
 7. Check Name field
 
 **Expected Result:**
@@ -162,7 +162,7 @@
 
 **Steps:**
 
-1. Go to Settings
+1. Go to Profile
 2. Click "Choose photo" button
 3. Select a JPG or PNG file from your device (any image, ~2 MB or smaller)
 4. Verify preview appears on screen (shows selected image)
@@ -192,11 +192,11 @@
 **Steps:**
 
 1. Access app on mobile device or browser simulator (Mobile Safari or Chrome DevTools)
-2. Go to Settings
+2. Go to Profile
 3. Click "Take photo" button
 4. Native camera app should open (on mobile) or file picker should show camera option
 5. Take a photo
-6. Auto-return to Settings with preview
+6. Auto-return to Profile with preview
 7. Click "Save"
 8. Verify avatar updates
 
@@ -219,7 +219,7 @@
 
 **Steps:**
 
-1. In Settings, attempt to click on Email field → should be disabled/readonly
+1. In Profile, attempt to click on Email field → should be disabled/readonly
 2. Open browser DevTools → Console
 3. Paste:
    ```javascript
@@ -251,7 +251,7 @@
 
 **Steps:**
 
-1. Change name in Settings to "New Name"
+1. Change name in Profile to "New Name"
 2. Save
 3. Navigate to event creation or edit
 4. Open participant selector (Typeahead/autocomplete)
@@ -275,20 +275,20 @@
 
 ---
 
-## Test Case 10: Logout + Re-Access Settings (Auth Guard)
+## Test Case 10: Logout + Re-Access Profile (Auth Guard)
 
-**Objective:** Verify Settings page is protected
+**Objective:** Verify Profile page is protected
 
 **Steps:**
 
-1. In Settings, manually clear auth token:
+1. In Profile, manually clear auth token:
    - DevTools → Application → Local Storage → remove `token`
-2. Refresh page Or navigate away and back to /#/settings
+2. Refresh page Or navigate away and back to /#/profile
 3. Should redirect to login page
 
 **Expected Result:**
 
-- Automatic redirect to login (no access to Settings without token)
+- Automatic redirect to login (no access to Profile without token)
 - Network request to GET /api/users/me fails with 401
 - Protected route guard working
 
@@ -298,11 +298,11 @@
 
 ## Test Case 11: Error Handling + Retry
 
-**Objective:** Verify Settings handles errors gracefully
+**Objective:** Verify Profile handles errors gracefully
 
 **Steps:**
 
-1. In Settings, throttle network to "Slow 3G" (DevTools → Network tab)
+1. In Profile, throttle network to "Slow 3G" (DevTools → Network tab)
 2. Click "Save" with any changes
 3. Verify request times out or fails
 4. Verify error toast appears (or error message)
@@ -326,9 +326,9 @@
 
 **Steps:**
 
-1. In Settings, select an avatar file → preview shows
+1. In Profile, select an avatar file → preview shows
 2. Open DevTools → Memory tab → Take heap snapshot
-3. Leave Settings (navigate away)
+3. Leave Profile (navigate away)
 4. Take another heap snapshot
 5. Compare: ObjectURL should be released (no dangling blob URLs)
 
@@ -350,7 +350,7 @@
 **Steps:**
 
 1. Create a dummy image >5 MB (e.g., 10 MB)
-2. Try to upload in Settings
+2. Try to upload in Profile
 3. Observe:
    - Browser validator (might block before upload) OR
    - Server rejects with 400 Bad Request
@@ -390,14 +390,14 @@
 
 ## Test Case 15: Internationalization (i18n)
 
-**Objective:** Verify Settings page appears in correct language
+**Objective:** Verify Profile page appears in correct language
 
 **Steps:**
 
 1. In Header, switch language (if language picker exists)
-2. Reload Settings page
+2. Reload Profile page
 3. Verify:
-   - "Settings" title in correct language
+   - "Profile" title in correct language
    - "Member since" label translated
    - "Last updated" label translated
    - Button labels translated
@@ -422,7 +422,7 @@
 - [ ] No TypeScript errors in DevTools
 - [ ] Backend test suite still passing: `pnpm test`
 - [ ] Frontend test suite still passing: `pnpm test`
-- [ ] No performance regressions (Settings page loads <2s)
+- [ ] No performance regressions (Profile page loads <2s)
 
 ---
 

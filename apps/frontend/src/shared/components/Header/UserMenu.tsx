@@ -1,5 +1,5 @@
 import { useAuth } from '@/features/auth/useAuth';
-import { MdLogout, MdAccountCircle, MdSettings } from 'react-icons/md';
+import { MdLogout, MdAccountCircle, MdPerson } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/shared/hooks/useToast';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
@@ -100,11 +100,11 @@ export function UserMenu() {
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          onClick={() => navigate('/settings')}
+          onClick={() => navigate('/profile')}
           className={cn('flex items-center gap-2 cursor-pointer', 'font-semibold text-teal-800', 'dark:text-teal-200')}
         >
-          <MdSettings className="text-lg" />
-          {t('user.settings', 'Settings')}
+          <MdPerson className="text-lg" />
+          {t('user.profile', 'Profile')}
         </DropdownMenuItem>
 
         {user.role === ADMIN_ROLE && (

@@ -19,7 +19,7 @@
     "menu": "User options",
     "logout": "Log out",
     "logout_success": "Logged out successfully",
-    "settings": "Settings",
+    "profile": "Profile",
     "auth": {
       "loginWithGoogle": "Login with Google"
     }
@@ -226,11 +226,11 @@
     "delete_error": "Error deleting transaction"
   },
   "adminUsers": {
-    "title": "User management",
+    "title": "Users Administration",
     "subtitle": "Manage users and roles",
     "goHome": "Go to home",
     "newUser": "New user",
-    "menuEntry": "User management",
+    "menuEntry": "Users administration",
     "empty": "No users found. Create your first user to start managing access.",
     "loadedUsers": "{{count}} users loaded",
     "stats": {
@@ -264,13 +264,14 @@
       "role": "Role"
     }
   },
-  "userSettings": {
-    "title": "User settings",
+  "profile": {
+    "title": "Profile",
     "subtitle": "Update your profile information and avatar.",
     "goHome": "Go to home",
     "avatar": {
       "title": "Profile photo",
-      "subtitle": "Choose an existing image or take a new photo from your device.",
+      "subtitle": "Tap your photo to update it.",
+      "change": "Change photo",
       "choose": "Choose photo",
       "camera": "Take photo"
     },

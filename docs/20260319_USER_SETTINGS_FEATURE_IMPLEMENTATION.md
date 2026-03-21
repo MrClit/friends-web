@@ -1,4 +1,4 @@
-# User Settings Feature – Implementation Complete
+# Profile Feature – Implementation Complete
 
 **Date:** March 19, 2026 23:18 UTC  
 **Status:** ✅ **IMPLEMENTATION COMPLETE** | Tests Passing | Ready for Manual Validation
@@ -7,7 +7,7 @@
 
 ## Overview
 
-The User Settings feature enables self-service profile management for authenticated users:
+The Profile feature enables self-service profile management for authenticated users:
 
 - **View** complete profile: email, name, role, avatar, member-since date (createdAt), last-updated date (updatedAt)
 - **Edit** name and avatar without touching email/role (read-only)
@@ -50,8 +50,8 @@ The User Settings feature enables self-service profile management for authentica
 
 **New Route & Component:**
 
-- Route: `/settings` (protected, lazy-loaded)
-- Component: `UserSettings.tsx` (280 lines) — Full settings page with avatar picker (gallery + camera), name field, read-only metadata display, save button with mutation handling
+- Route: `/profile` (protected, lazy-loaded)
+- Component: `Profile.tsx` (280 lines) — Full profile page with avatar picker (gallery + camera), name field, read-only metadata display, save button with mutation handling
 
 **Core Changes:**
 
@@ -60,8 +60,8 @@ The User Settings feature enables self-service profile management for authentica
 3. **FormData Support** (`api/client.ts`) — Conditional Content-Type header: skip JSON header if body is FormData
 4. **Users API** (`api/users.api.ts`) — `getCurrentProfile()`, `updateCurrentProfile(data)` methods; `CurrentUserProfile` interface
 5. **React Query Hook** (`hooks/api/useUsers.ts`) — `useUpdateCurrentUserProfile()` mutation with cache invalidation for `users.all` and `adminUsers.all`
-6. **Menu Integration** (`shared/components/Header/UserMenu.tsx`) — Settings entry added before Admin, links to `/settings`
-7. **i18n** (`i18n/locales/{es,en,ca}/translation.json`) — Complete Settings page translations (labels, placeholders, toasts)
+6. **Menu Integration** (`shared/components/Header/UserMenu.tsx`) — Profile entry added before Admin, links to `/profile`
+7. **i18n** (`i18n/locales/{es,en,ca}/translation.json`) — Complete Profile page translations (labels, placeholders, toasts)
 
 **Test Results:**
 
@@ -101,12 +101,12 @@ AuthContext.fetchUser populates UI with latest profile + timestamps
 
 **Result:** Custom names survive re-login. ✅
 
-### Settings Page + Avatar Upload Flow
+### Profile Page + Avatar Upload Flow
 
 ```
-User clicks Settings → Navigate to /settings
+User clicks Profile → Navigate to /profile
   ↓
-UserSettings component mounts, calls useAuth hook
+Profile component mounts, calls useAuth hook
   ↓
 Display current profile (email, role, readonly)
 Display avatar preview (from user.avatar or stringAvatar initials)
@@ -128,7 +128,7 @@ User clicks Save:
   → optimistic update via updateUser(nextUser)
   → Toast feedback: "Profile updated successfully"
   ↓
-On Settings unmount:
+On Profile unmount:
   → URL.revokeObjectURL(preview) to prevent memory leak
 ```
 
@@ -140,18 +140,18 @@ On Settings unmount:
 
 ### 1️⃣ Google Name Preservation (PRIORITY 1: Business Rule Fix)
 
-**Scenario:** User logs in with Google, custom-edits name in Settings, logs out, logs back in.
+**Scenario:** User logs in with Google, custom-edits name in Profile, logs out, logs back in.
 
 **Expected:** Google's new display name should NOT overwrite the custom name.
 
 **Validation Steps:**
 
 1. Log in with test account (e.g., `test@gmail.com` with Google)—see name seeded from Google
-2. Go to Settings → Change name to "Custom Name" → Save
+2. Go to Profile → Change name to "Custom Name" → Save
 3. Verify in Header avatar/name shows "Custom Name"
 4. Sign out
 5. Sign in again with **same Google account**
-6. Check Settings: name should still be "Custom Name", NOT overwritten by Google
+6. Check Profile: name should still be "Custom Name", NOT overwritten by Google
 
 **Code Evidence:**
 
@@ -171,13 +171,13 @@ private resolveNameForLogin(user: User, googleName?: string): string | undefined
 
 ### 2️⃣ Avatar Upload & File Validation
 
-**Scenario:** Open Settings → Upload avatar from device (JPG/PNG) or take photo on mobile.
+**Scenario:** Open Profile → Upload avatar from device (JPG/PNG) or take photo on mobile.
 
 **Expected:** File accepted, preview shown, saved to Cloudinary, old URL invalidated, avatar visible in Header.
 
 **Validation Steps:**
 
-1. Log in → Navigate to Settings
+1. Log in → Navigate to Profile
 2. Click "Choose photo" → Select JPG or PNG from device
 3. Verify preview appears (ObjectURL rendered)
 4. Click Save → Verify toast "Profile updated successfully"
@@ -205,7 +205,7 @@ const AVATAR_MIME_TYPE_REGEX = /^image\/(jpeg|jpg|png|webp|gif|heic|heif)$/;
 
 **Validation Steps:**
 
-1. Settings → Name field → Clear → Try to save
+1. Profile → Name field → Clear → Try to save
    - Should either reject or keep previous name (no blank names allowed)
 2. Name field → Enter " Custom Name " → Save
    - Server trims → Profile saved as "Custom Name"
@@ -225,13 +225,13 @@ if (trimmedName === '' || trimmedName === user.name) {
 
 ### 4️⃣ Read-Only Fields (email, role, timestamps)
 
-**Scenario:** User opens Settings and sees email, role, createdAt, updatedAt.
+**Scenario:** User opens Profile and sees email, role, createdAt, updatedAt.
 
 **Expected:** Fields displayed as disabled/readonly; not editable via UI; not sent to update endpoint.
 
 **Validation Steps:**
 
-1. Settings page → Verify email field is readonly (grayed out, no cursor)
+1. Profile page → Verify email field is readonly (grayed out, no cursor)
 2. Verify role displayed as badge or text (not editable)
 3. Verify createdAt, updatedAt formatted as human-readable dates
 4. Attempt to edit email in browser dev tools → Verify FormData sent to server does NOT include email
@@ -255,43 +255,45 @@ export class UpdateCurrentUserProfileDto {
 
 ### 5️⃣ Menu Navigation & Route Guard
 
-**Scenario:** User clicks "Settings" in Header menu → Should navigate to `/settings` protected route.
+**Scenario:** User clicks "Profile" in Header menu → Should navigate to `/profile` protected route.
 
-**Expected:** Settings page loads; if user logs out/session expires, auto-redirect to login.
+**Expected:** Profile page loads; if user logs out/session expires, auto-redirect to login.
 
 **Validation Steps:**
 
 1. Logged-in user → Click Header user avatar → Dropdown menu
 2. Verify:
-   - Settings entry visible (before Admin, before Logout)
-   - Icon and label correct (MdSettings icon + translated "Settings")
-3. Click Settings → Navigate to `/settings` (URL shows #/settings)
-4. Settings page fully rendered
+   - Profile entry visible (before Admin, before Logout)
+
+- Icon and label correct (MdPerson icon + translated "Profile")
+
+3. Click Profile → Navigate to `/profile` (URL shows #/profile)
+4. Profile page fully rendered
 5. Open dev tools → clear auth token → Navigate away and back → Should redirect to `/login`
 
 **Code Evidence:**
 
 ```typescript
-<DropdownMenuItem onClick={() => navigate('/settings')} className={...}>
-  <MdSettings className="text-lg" />
-  {t('user.settings', 'Settings')}
+<DropdownMenuItem onClick={() => navigate('/profile')} className={...}>
+  <MdPerson className="text-lg" />
+  {t('user.profile', 'Profile')}
 </DropdownMenuItem>
 ```
 
-✅ **Tests:** `Header/UserMenu.test.tsx` includes "Settings menu entry" navigation test
+✅ **Tests:** `Header/UserMenu.test.tsx` includes "Profile menu entry" navigation test
 
 ---
 
 ### 6️⃣ Cache Invalidation & Participant Sync
 
-**Scenario:** User updates name in Settings → Avatar picker, admin users table, event creator participant list should reflect new name/avatar.
+**Scenario:** User updates name in Profile → Avatar picker, admin users table, event creator participant list should reflect new name/avatar.
 
 **Expected:** React Query cache for `users.all` and `adminUsers.all` invalidated; participant selectors re-request data; UI reflects changes.
 
 **Validation Steps:**
 
 1. Log in → Create event with participants including self
-2. Go to Settings → Change name from "Alice" to "Alicia"
+2. Go to Profile → Change name from "Alice" to "Alicia"
 3. Go back to Home / View event → Check participant list
 4. Verify participant shows updated name "Alicia" (not stale "Alice")
 5. Admin page (if user is admin) → Check admin users table
@@ -314,17 +316,17 @@ onSuccess: () => {
 
 **Scenario:** User on mobile → Click "Take photo" button → Native camera app opens.
 
-**Expected:** Photo taken → Returned to app → Preview shown → Saved to Settings.
+**Expected:** Photo taken → Returned to app → Preview shown → Saved to Profile.
 
 **Validation Steps:**
 
 1. Access app on mobile browser / simulator
-2. Go to Settings
+2. Go to Profile
 3. Verify two buttons:
    - "Choose photo" (file input, no capture)
    - "Take photo" (file input with `capture="user"`)
 4. Click "Take photo" → Native camera should open
-5. Take photo → Returns to Settings with preview
+5. Take photo → Returns to Profile with preview
 6. Save → Verify upload succeeds
 
 **Code Evidence:**
@@ -353,7 +355,7 @@ onSuccess: () => {
 **Validation Steps:**
 
 1. Mock server error (dev tools network throttle or simulate error response)
-2. Go to Settings → Select avatar → Click Save
+2. Go to Profile → Select avatar → Click Save
 3. Verify toast error appears: "Failed to update profile"
 4. Verify user can retry without reloading
 5. Test oversized file:
@@ -380,7 +382,7 @@ mutationFn catches errors → toastStore.error("update_profile_error") → displ
 
 1. `/apps/backend/src/modules/users/dto/current-user-profile.dto.ts`
 2. `/apps/backend/src/modules/users/dto/update-current-user-profile.dto.ts`
-3. `/apps/frontend/src/pages/UserSettings.tsx`
+3. `/apps/frontend/src/pages/Profile.tsx`
 
 ### Files Modified (Backend)
 
@@ -402,8 +404,8 @@ mutationFn catches errors → toastStore.error("update_profile_error") → displ
 3. `/apps/frontend/src/api/client.ts` — Conditional Content-Type header
 4. `/apps/frontend/src/api/users.api.ts` — Added profile methods
 5. `/apps/frontend/src/hooks/api/useUsers.ts` — Added mutation hook
-6. `/apps/frontend/src/App.tsx` — Registered /settings route
-7. `/apps/frontend/src/shared/components/Header/UserMenu.tsx` — Added Settings entry
+6. `/apps/frontend/src/App.tsx` — Registered /profile route
+7. `/apps/frontend/src/shared/components/Header/UserMenu.tsx` — Added Profile entry
 8. `/apps/frontend/src/i18n/locales/{es,en,ca}/translation.json` — Added translations
 
 ### Files Modified (Documentation)
@@ -431,7 +433,7 @@ mutationFn catches errors → toastStore.error("update_profile_error") → displ
 ## Known Limitations & Deferred Items
 
 1. **Avatar Fallback Behavior:** If Cloudinary is disabled (env vars missing), users get localStorage-persisted avatar URL which may become stale. Mitigation: stringAvatar fallback initials work in all cases.
-2. **Simultaneous Settings Updates:** If two browser tabs open Settings simultaneously and both save, second save may override first. Mitigation: React Query cache invalidation handles this; next re-fetch gets latest state from server. No optimistic locking implemented (low priority).
+2. **Simultaneous Profile Updates:** If two browser tabs open Profile simultaneously and both save, second save may override first. Mitigation: React Query cache invalidation handles this; next re-fetch gets latest state from server. No optimistic locking implemented (low priority).
 3. **Camera Capture on Desktop:** Desktop browsers may not support `capture="user"`. Falls back to file picker. Expected behavior.
 4. **Email Change:** Intentionally not exposed. Would require re-verification flow (out of scope for this feature).
 
@@ -452,8 +454,8 @@ mutationFn catches errors → toastStore.error("update_profile_error") → displ
 
 ### Rollback Procedure
 
-1. Remove `/settings` route from App.tsx
-2. Revert UserMenu.tsx (remove Settings entry)
+1. Remove `/profile` route from App.tsx
+2. Revert UserMenu.tsx (remove Profile entry)
 3. Revert AuthContext (remove refreshUser/updateUser)
 4. Endpoints remain live but inactive (opt-in via frontend)
 

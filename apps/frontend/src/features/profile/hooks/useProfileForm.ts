@@ -7,13 +7,12 @@ import { useToastStore } from '@/shared/store/useToastStore';
 
 const AVATAR_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
-export interface UseUserSettingsFormResult {
+export interface UseProfileFormResult {
   name: string;
   setName: (name: string) => void;
   avatarFile: File | null;
   avatarPreviewUrl: string | null;
   galleryInputRef: React.RefObject<HTMLInputElement | null>;
-  cameraInputRef: React.RefObject<HTMLInputElement | null>;
   trimmedName: string;
   hasChanges: boolean;
   isSaving: boolean;
@@ -21,7 +20,7 @@ export interface UseUserSettingsFormResult {
   handleSave: () => Promise<void>;
 }
 
-export function useUserSettingsForm(): UseUserSettingsFormResult {
+export function useProfileForm(): UseProfileFormResult {
   const { t } = useTranslation();
   const { user, refreshUser, updateUser } = useAuth();
   const addToast = useToastStore((state) => state.addToast);
@@ -31,7 +30,6 @@ export function useUserSettingsForm(): UseUserSettingsFormResult {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user) {
@@ -80,7 +78,7 @@ export function useUserSettingsForm(): UseUserSettingsFormResult {
     if (!file.type.startsWith('image/')) {
       addToast({
         type: 'error',
-        message: t('userSettings.toasts.invalidImage', 'Please select a valid image file.'),
+        message: t('profile.toasts.invalidImage', 'Please select a valid image file.'),
         duration: 5000,
       });
       return;
@@ -89,7 +87,7 @@ export function useUserSettingsForm(): UseUserSettingsFormResult {
     if (file.size > AVATAR_MAX_SIZE_BYTES) {
       addToast({
         type: 'error',
-        message: t('userSettings.toasts.fileTooLarge', 'Image is too large. Maximum size is 5 MB.'),
+        message: t('profile.toasts.fileTooLarge', 'Image is too large. Maximum size is 5 MB.'),
         duration: 5000,
       });
       return;
@@ -106,7 +104,7 @@ export function useUserSettingsForm(): UseUserSettingsFormResult {
     if (!trimmedName) {
       addToast({
         type: 'error',
-        message: t('userSettings.toasts.invalidName', 'Name cannot be empty.'),
+        message: t('profile.toasts.invalidName', 'Name cannot be empty.'),
         duration: 5000,
       });
       return;
@@ -127,7 +125,7 @@ export function useUserSettingsForm(): UseUserSettingsFormResult {
 
       addToast({
         type: 'success',
-        message: t('userSettings.toasts.updateSuccess', 'Profile updated successfully.'),
+        message: t('profile.toasts.updateSuccess', 'Profile updated successfully.'),
         duration: 3500,
       });
 
@@ -137,7 +135,7 @@ export function useUserSettingsForm(): UseUserSettingsFormResult {
 
       addToast({
         type: 'error',
-        message: t('userSettings.toasts.updateError', 'Could not update profile.'),
+        message: t('profile.toasts.updateError', 'Could not update profile.'),
         description,
         duration: 6000,
       });
@@ -150,7 +148,6 @@ export function useUserSettingsForm(): UseUserSettingsFormResult {
     avatarFile,
     avatarPreviewUrl,
     galleryInputRef,
-    cameraInputRef,
     trimmedName,
     hasChanges,
     isSaving,

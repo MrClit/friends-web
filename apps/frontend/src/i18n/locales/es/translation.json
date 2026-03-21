@@ -19,7 +19,7 @@
     "menu": "Opciones de usuario",
     "logout": "Cerrar sesión",
     "logout_success": "Sesión cerrada correctamente",
-    "settings": "Ajustes",
+    "profile": "Perfil",
     "auth": {
       "loginWithGoogle": "Iniciar sesión con Google"
     }
@@ -226,11 +226,11 @@
     "delete_error": "Error al eliminar transacción"
   },
   "adminUsers": {
-    "title": "Gestión de usuarios",
+    "title": "Administración de usuarios",
     "subtitle": "Administra usuarios y roles",
     "goHome": "Ir al inicio",
     "newUser": "Nuevo usuario",
-    "menuEntry": "Gestión de usuarios",
+    "menuEntry": "Administración de usuarios",
     "empty": "No se encontraron usuarios. Crea el primero para empezar a gestionar accesos.",
     "loadedUsers": "{{count}} usuarios cargados",
     "stats": {
@@ -264,13 +264,14 @@
       "role": "Rol"
     }
   },
-  "userSettings": {
-    "title": "Ajustes de usuario",
+  "profile": {
+    "title": "Perfil",
     "subtitle": "Actualiza tu información de perfil y tu avatar.",
     "goHome": "Ir al inicio",
     "avatar": {
       "title": "Foto de perfil",
-      "subtitle": "Elige una imagen existente o haz una foto nueva desde tu dispositivo.",
+      "subtitle": "Toca tu foto para actualizarla.",
+      "change": "Cambiar foto",
       "choose": "Elegir foto",
       "camera": "Hacer foto"
     },
