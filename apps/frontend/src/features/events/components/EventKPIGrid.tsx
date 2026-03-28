@@ -67,6 +67,14 @@ export function EventKPIGrid(props: EventKPIGridProps) {
       labelColorClass: 'text-emerald-700 dark:text-emerald-400',
     },
     {
+      key: 'expenses',
+      label: t('eventDetail.kpi.expenses'),
+      value: props.totalExpenses,
+      icon: <MdShoppingBag className="text-lg" />,
+      borderColorClass: 'border-rose-500',
+      labelColorClass: 'text-rose-700 dark:text-rose-400',
+    },
+    {
       key: 'contributionStatus',
       label: t('eventDetail.kpi.contributionStatus'),
       value: contributionStatusPercent,
@@ -92,14 +100,6 @@ export function EventKPIGrid(props: EventKPIGridProps) {
           ? t('eventDetail.kpi.userStatusHelper', { amount: formatAmount(currentUserAdjustmentPending) })
           : t('eventDetail.kpi.userStatusNoTargetHelper', { amount: formatAmount(currentUserAdjustmentPending) })
         : t('eventDetail.kpi.userStatusNoParticipation'),
-    },
-    {
-      key: 'expenses',
-      label: t('eventDetail.kpi.expenses'),
-      value: props.totalExpenses,
-      icon: <MdShoppingBag className="text-lg" />,
-      borderColorClass: 'border-rose-500',
-      labelColorClass: 'text-rose-700 dark:text-rose-400',
     },
   ];
 
