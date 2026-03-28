@@ -7,10 +7,31 @@ interface KPIBoxProps {
   icon?: React.ReactNode;
   borderColorClass: string;
   labelColorClass: string;
+  valueFormat?: 'amount' | 'percent';
+  helperText?: string;
   onClick?: () => void;
 }
 
-export function KPIBox({ label, value, icon, borderColorClass, labelColorClass, onClick }: KPIBoxProps) {
+function formatKPIValue(value: number, valueFormat: 'amount' | 'percent') {
+  if (valueFormat === 'percent') {
+    return Number.isFinite(value) ? `${value.toFixed(1)}%` : '--';
+  }
+
+  return formatAmount(value);
+}
+
+export function KPIBox({
+  label,
+  value,
+  icon,
+  borderColorClass,
+  labelColorClass,
+  valueFormat = 'amount',
+  helperText,
+  onClick,
+}: KPIBoxProps) {
+  const formattedValue = formatKPIValue(value, valueFormat);
+
   return (
     <div
       className={cn(
@@ -38,7 +59,8 @@ export function KPIBox({ label, value, icon, borderColorClass, labelColorClass, 
           {icon}
           {label}
         </div>
-        <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{formatAmount(value)}</div>
+        <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{formattedValue}</div>
+        {helperText ? <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{helperText}</p> : null}
       </div>
     </div>
   );

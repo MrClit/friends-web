@@ -1,5 +1,5 @@
 import { type TFunction } from 'i18next';
-import { MdAccountBalanceWallet, MdVolunteerActivism, MdShoppingBag, MdCreditCard } from 'react-icons/md';
+import { MdAccountBalanceWallet, MdVolunteerActivism, MdPerson, MdShoppingBag } from 'react-icons/md';
 import type { KPIType } from './types';
 import { KPI_SPEC } from './types';
 
@@ -29,15 +29,27 @@ export const getKPIConfig = (t: TFunction) =>
       includePot: false, // Pot doesn't have a balance
       gradients: ['from-emerald-400 to-emerald-500', 'from-teal-400 to-teal-500', 'from-green-400 to-green-500'],
     },
-    contributions: {
-      label: t('kpiDetail.kpi.contributions'),
+    contributionStatus: {
+      label: t('kpiDetail.kpi.contributionStatus'),
       colorClass: 'bg-white text-blue-800 dark:bg-emerald-950 dark:text-blue-200',
       borderColorClass: 'border-blue-200 dark:border-blue-700/50',
-      descriptionKey: 'kpiDetail.description.contributions',
+      descriptionKey: 'kpiDetail.description.contributionStatus',
       IconComponent: MdVolunteerActivism,
-      kpiKey: 'participantContributions' as const,
-      includePot: false, // Pot doesn't receive contributions
+      kpiKey: 'participantPending' as const,
+      includePot: false,
       gradients: ['from-blue-400 to-blue-500', 'from-indigo-400 to-indigo-500', 'from-cyan-400 to-cyan-500'],
+      valueFormat: 'percent' as const,
+    },
+    userStatus: {
+      label: t('kpiDetail.kpi.userStatus'),
+      colorClass: 'bg-white text-amber-800 dark:bg-emerald-950 dark:text-amber-200',
+      borderColorClass: 'border-amber-200 dark:border-amber-700/50',
+      descriptionKey: 'kpiDetail.description.userStatus',
+      IconComponent: MdPerson,
+      kpiKey: 'participantPending' as const,
+      includePot: false,
+      gradients: ['from-amber-400 to-amber-500', 'from-orange-400 to-orange-500', 'from-yellow-400 to-yellow-500'],
+      valueFormat: 'percent' as const,
     },
     expenses: {
       label: t('kpiDetail.kpi.expenses'),
@@ -48,16 +60,6 @@ export const getKPIConfig = (t: TFunction) =>
       kpiKey: 'participantExpenses' as const,
       includePot: true, // ⭐ POT CAN HAVE EXPENSES
       gradients: ['from-red-400 to-red-500', 'from-rose-400 to-rose-500', 'from-pink-400 to-pink-500'],
-    },
-    pending: {
-      label: t('kpiDetail.kpi.pending'),
-      colorClass: 'bg-white text-yellow-800 dark:bg-emerald-950 dark:text-yellow-200',
-      borderColorClass: 'border-yellow-200 dark:border-yellow-700/50',
-      descriptionKey: 'kpiDetail.description.pending',
-      IconComponent: MdCreditCard,
-      kpiKey: 'participantPending' as const,
-      includePot: false, // Pot doesn't have pending amounts
-      gradients: ['from-yellow-400 to-yellow-500', 'from-amber-400 to-amber-500', 'from-orange-400 to-orange-500'],
     },
   }) as const;
 

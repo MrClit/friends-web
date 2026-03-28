@@ -45,7 +45,13 @@ describe('EventKPIsService', () => {
   });
 
   it('calculates KPIs including POT expenses and participant balances', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-1' } as Event);
+    eventRepository.findOne.mockResolvedValue({
+      id: 'event-1',
+      participants: [
+        { type: 'user', id: 'u1' },
+        { type: 'user', id: 'u2' },
+      ],
+    } as unknown as Event);
 
     const transactions = [
       {
@@ -94,24 +100,32 @@ describe('EventKPIsService', () => {
 
     const result = await service.getKPIs('event-1', actor);
 
+    // New formula:
+    // u1: net contribution = 100 + 40 - 10 = 130
+    // u2: net contribution = 60 + 0 - 0 = 60
+    // totalContributions (net) = 130 + 60 = 190
+    // pendingToCompensate (no targets) = 130 + 60 = 190
+    // potBalance (unchanged) = 160 (cash contrib) - 10 (compensations) - 20 (pot expenses) = 130
     expect(result).toMatchObject({
-      totalContributions: 160,
+      totalContributions: 190, // Net contribution: C + E - R per participant
       totalExpenses: 60,
       totalCompensations: 10,
       potExpenses: 20,
-      potBalance: 130,
-      pendingToCompensate: 30,
+      potBalance: 130, // Unchanged: cash contributions - compensations - pot expenses
+      pendingToCompensate: 190, // Sum of participant pending values (net contribution - target)
     });
 
-    expect(result.participantContributions).toEqual({ u1: 100, u2: 60 });
+    // participantContributions now reflects net contribution, not just cash
+    expect(result.participantContributions).toEqual({ u1: 130, u2: 60 });
     expect(result.participantExpenses).toEqual({ u1: 40, u2: 0 });
     expect(result.participantCompensations).toEqual({ u1: 10, u2: 0 });
     expect(result.participantBalances).toEqual({ u1: 130, u2: 60 });
-    expect(result.participantPending).toEqual({ u1: 30, u2: 0 });
+    // participantPending reflects (net contribution - target) where default target=0
+    expect(result.participantPending).toEqual({ u1: 130, u2: 60 });
 
     expect(result.balanceBreakdown).toEqual({
       inflows: {
-        total: 160,
+        total: 160, // Only cash contributions for pot balance
         contributionsByParticipant: { u1: 100, u2: 60 },
       },
       outflows: {
@@ -128,7 +142,7 @@ describe('EventKPIsService', () => {
           },
         ],
       },
-      participantNetWithPot: { u1: 90, u2: 60 },
+      participantNetWithPot: { u1: 90, u2: 60 }, // Cash contribution - compensation only (unchanged)
       reconciliation: {
         inflows: 160,
         outflows: 30,
@@ -212,6 +226,58 @@ describe('EventKPIsService', () => {
         isConsistent: true,
       },
     });
+  });
+
+  it('applies contribution targets and includes participants with no transactions', async () => {
+    eventRepository.findOne.mockResolvedValue({
+      id: 'event-4',
+      participants: [
+        { type: 'user', id: 'u1', contributionTarget: 150 },
+        { type: 'guest', id: 'g1', name: 'Guest One', contributionTarget: 20 },
+        { type: 'user', id: 'u2' },
+        { type: 'pot', id: '0' },
+      ],
+    } as unknown as Event);
+
+    transactionsService.findByEvent.mockResolvedValue([
+      {
+        id: 'tx-30',
+        title: 'Contribution u1',
+        participantId: 'u1',
+        paymentType: 'contribution',
+        amount: 100,
+        date: new Date('2026-01-08'),
+      },
+      {
+        id: 'tx-31',
+        title: 'Expense g1',
+        participantId: 'g1',
+        paymentType: 'expense',
+        amount: 10,
+        date: new Date('2026-01-08'),
+      },
+    ] as Transaction[]);
+
+    const result = await service.getKPIs('event-4', actor);
+
+    expect(result.totalContributions).toBe(110);
+    expect(result.pendingToCompensate).toBe(-60);
+
+    expect(result.participantContributions).toEqual({
+      u1: 100,
+      g1: 10,
+      u2: 0,
+    });
+    expect(result.participantPending).toEqual({
+      u1: -50,
+      g1: -10,
+      u2: 0,
+    });
+
+    // Pot balance still uses cash-flow semantics only.
+    expect(result.potBalance).toBe(100);
+    expect(result.balanceBreakdown.inflows.total).toBe(100);
+    expect(result.balanceBreakdown.outflows.total).toBe(0);
   });
 
   it('throws NotFoundException when event does not exist', async () => {

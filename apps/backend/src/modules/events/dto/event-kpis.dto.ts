@@ -84,7 +84,7 @@ export class EventKPIsDto {
   totalExpenses: number;
 
   @ApiProperty({
-    description: 'Total contributions from participants',
+    description: 'Net contribution total (contributions + expenses - compensations per participant, summed)',
     example: 200.0,
   })
   totalContributions: number;
@@ -102,7 +102,7 @@ export class EventKPIsDto {
   potBalance: number;
 
   @ApiProperty({
-    description: 'Amount still pending to compensate from participant expenses (excludes pot expenses)',
+    description: 'Total pending to compensate (sum of per-participant pending deltas vs targets, can be negative)',
     example: 100.5,
   })
   pendingToCompensate: number;
@@ -114,7 +114,7 @@ export class EventKPIsDto {
   participantBalances: Record<string, number>;
 
   @ApiProperty({
-    description: 'Contributions per participant',
+    description: 'Net contribution per participant (contributions + expenses - compensations)',
     example: { user1: 100.0, user2: 50.0 },
   })
   participantContributions: Record<string, number>;
@@ -132,7 +132,7 @@ export class EventKPIsDto {
   participantCompensations: Record<string, number>;
 
   @ApiProperty({
-    description: 'Pending amounts per participant (expenses - compensations)',
+    description: 'Pending amounts per participant (net contribution - contribution target, can be negative)',
     example: { user1: 20.0, user2: 15.0 },
   })
   participantPending: Record<string, number>;

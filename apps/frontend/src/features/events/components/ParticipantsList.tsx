@@ -31,6 +31,7 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
     handleCancelRenameGuest,
     handleRenameGuestNameChange,
     handleCommitRenameGuest,
+    handleUpdateParticipantTarget,
   } = useParticipantsList({
     participants,
     setParticipants,
@@ -53,6 +54,7 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
           <ParticipantRow
             key={participant.id}
             participant={participant}
+            participantIndex={idx}
             isFirst={idx === 0}
             existingParticipants={participants}
             isRenamingGuest={renamingGuestId === participant.id}
@@ -70,6 +72,7 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
             onCancelRename={handleCancelRenameGuest}
             onRenameNameChange={handleRenameGuestNameChange}
             onCommitRename={handleCommitRenameGuest}
+            onTargetChange={(target) => handleUpdateParticipantTarget(idx, target)}
           />
         ))}
       </div>

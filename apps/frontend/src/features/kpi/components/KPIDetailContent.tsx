@@ -1,10 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import { EventDetailHeader } from '@/features/events';
-import { KPIBalanceBreakdown, KPIParticipantsList } from '../index';
+import { KPIBalanceBreakdown, KPIParticipantsList, KPIUserStatusSummary } from '../index';
 import type { Event } from '@/features/events/types';
-import type { KPIType, KPIParticipantItem, KPIBalanceBreakdownViewModel } from '../types';
+import type {
+  KPIType,
+  KPIParticipantItem,
+  KPIBalanceBreakdownViewModel,
+  KPIContributionStatusSummaryData,
+  KPISelectableParticipant,
+  KPIUserStatusSummaryData,
+} from '../types';
 import { getKPIConfig } from '../index';
 import { KPIBoxDetail } from './KPIBoxDetail';
+import { KPIContributionStatusSummary } from './KPIContributionStatusSummary';
 
 interface KPIDetailContentProps {
   event: Event;
@@ -13,6 +21,12 @@ interface KPIDetailContentProps {
   kpiValue: number;
   kpiConfig: ReturnType<typeof getKPIConfig>;
   balanceBreakdownData?: KPIBalanceBreakdownViewModel;
+  contributionStatusSummaryData?: KPIContributionStatusSummaryData;
+  userStatusSummaryData?: KPIUserStatusSummaryData;
+  userStatusSelectableParticipants: KPISelectableParticipant[];
+  selectedUserStatusParticipantId?: string;
+  isCurrentUserParticipant: boolean;
+  onUserStatusParticipantChange: (participantId: string | undefined) => void;
   onBack: () => void;
 }
 
@@ -28,6 +42,12 @@ export function KPIDetailContent({
   kpiValue,
   kpiConfig,
   balanceBreakdownData,
+  contributionStatusSummaryData,
+  userStatusSummaryData,
+  userStatusSelectableParticipants,
+  selectedUserStatusParticipantId,
+  isCurrentUserParticipant,
+  onUserStatusParticipantChange,
   onBack,
 }: KPIDetailContentProps) {
   const { t } = useTranslation();
@@ -39,8 +59,30 @@ export function KPIDetailContent({
 
       {kpi === 'balance' && balanceBreakdownData ? (
         <KPIBalanceBreakdown data={balanceBreakdownData} />
+      ) : kpi === 'userStatus' ? (
+        <KPIUserStatusSummary
+          data={userStatusSummaryData}
+          selectableParticipants={userStatusSelectableParticipants}
+          selectedParticipantId={selectedUserStatusParticipantId}
+          isCurrentUserParticipant={isCurrentUserParticipant}
+          onSelectParticipant={onUserStatusParticipantChange}
+        />
       ) : (
-        <KPIParticipantsList items={items} title={t('kpiDetail.participants')} kpiConfig={kpiConfig[kpi]} />
+        <div className="space-y-6">
+          {kpi === 'contributionStatus' && contributionStatusSummaryData ? (
+            <KPIContributionStatusSummary data={contributionStatusSummaryData} />
+          ) : null}
+
+          <KPIParticipantsList
+            items={items}
+            title={
+              kpi === 'contributionStatus'
+                ? t('kpiDetail.contributionStatus.participantsSectionTitle')
+                : t('kpiDetail.participants')
+            }
+            kpiConfig={kpiConfig[kpi]}
+          />
+        </div>
       )}
     </div>
   );

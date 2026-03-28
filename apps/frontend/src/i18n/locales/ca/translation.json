@@ -93,6 +93,9 @@
     "cancelReplace": "Cancel·lar",
     "potName": "Fons comú",
     "noUsers": "No s'han trobat usuaris",
+    "targetLabel": "Objectiu",
+    "targetPlaceholder": "0",
+    "targetAria": "Import de l'objectiu de contribució",
     "createNew": "Afegir com a convidat"
   },
   "eventDetail": {
@@ -100,6 +103,13 @@
     "notFound": "Esdeveniment no trobat",
     "kpi": {
       "pot": "Saldo del Pot",
+      "contributionStatus": "Estat de Contribució",
+      "contributionStatusHelper": "Ajust pendent: {{amount}}",
+      "contributionStatusNoTargetHelper": "Sense objectius definits · Ajust: {{amount}}",
+      "userStatus": "El Teu Estat de Contribució",
+      "userStatusHelper": "Ajust pendent: {{amount}}",
+      "userStatusNoTargetHelper": "Sense objectiu definit · Ajust: {{amount}}",
+      "userStatusNoParticipation": "No participes en aquest esdeveniment",
       "contributions": "Contribució Total",
       "expenses": "Despesa Total",
       "pending": "Pendent de Pagar"
@@ -164,17 +174,51 @@
   },
   "kpiDetail": {
     "notFound": "KPI o esdeveniment no trobat",
+    "targetLabel": "Objectiu",
     "kpi": {
       "balance": "Saldo del Pot",
+      "contributionStatus": "Estat de Contribució",
+      "userStatus": "Estat Personal",
       "contributions": "Contribució Total",
       "expenses": "Despesa Total",
       "pending": "Pendent de Pagar"
     },
     "description": {
       "balance": "Diners disponibles al fons comú.",
-      "contributions": "Suma d'aportacions de cada participant.",
+      "contributionStatus": "Progrés de l'aportació neta respecte a l'objectiu de contribució del grup.",
+      "userStatus": "Progrés de l'aportació neta d'un participant respecte al seu objectiu individual.",
+      "contributions": "Total de l'aporte net de tots els participants (aportacions + despeses - reembolsos).",
       "expenses": "Total gastat per cada participant.",
-      "pending": "Quantitat que cada participant deu o li deuen."
+      "pending": "Quantitat que cada participant deu o li deuen respecte al seu objectiu, considerant el seu aporte net."
+    },
+    "contributionStatus": {
+      "summaryTitle": "Resum de l'estat de contribució",
+      "complianceLabel": "Compliment",
+      "adjustmentPendingLabel": "Ajust pendent",
+      "netTotalLabel": "Aportat net",
+      "targetTotalLabel": "Objectiu total",
+      "differenceLabel": "Diferència (net - objectiu)",
+      "noTargetHint": "No hi ha objectius definits. Defineix un objectiu per participant per activar el percentatge de compliment.",
+      "noTargetValue": "Sense objectiu",
+      "participantsSectionTitle": "Detall per participant"
+    },
+    "userStatus": {
+      "summaryTitle": "Resum d'estat personal",
+      "selectorHint": "Selecciona un participant per veure el seu estat.",
+      "selectorLabel": "Participant",
+      "selectorPlaceholder": "Selecciona un participant",
+      "searchParticipantPlaceholder": "Cercar participant...",
+      "noParticipantsFound": "No s'han trobat participants",
+      "youBadge": "Tu",
+      "complianceLabel": "Compliment",
+      "adjustmentPendingLabel": "Ajust pendent",
+      "netTotalLabel": "Aportat net",
+      "targetTotalLabel": "Objectiu",
+      "differenceLabel": "Diferència (net - objectiu)",
+      "noTargetValue": "Sense objectiu",
+      "noTargetHint": "Aquest participant no té objectiu definit.",
+      "noParticipation": "No participes en aquest esdeveniment. Selecciona un participant per veure el seu estat.",
+      "noSelection": "Selecciona un participant per veure el seu estat de contribució."
     },
     "participants": "Participants",
     "balanceBreakdown": {
@@ -195,9 +239,9 @@
     },
     "noteTitle": "Nota:",
     "noteBalance": "Diners disponibles al fons comú.",
-    "noteContributions": "Suma d'aportacions de cada participant.",
+    "noteContributions": "Total de l'aporte net de tots els participants (aportacions + despeses - reembolsos).",
     "noteExpenses": "Total gastat per cada participant.",
-    "notePending": "Quantitat que cada participant deu o li deuen."
+    "notePending": "Quantitat que cada participant deu o li deuen respecte al seu objectiu, considerant el seu aporte net."
   },
   "confirmDialog": {
     "title": "Estàs segur?",

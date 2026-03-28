@@ -19,6 +19,13 @@ export function KPIBoxDetail({ kpi, kpiValue, kpiConfig }: KPIBoxDetailProps) {
   const config = kpiConfig[kpi];
   const IconComponent = config.IconComponent;
 
+  const formattedValue =
+    config.valueFormat === 'percent'
+      ? Number.isFinite(kpiValue)
+        ? `${kpiValue.toFixed(1)}%`
+        : t('kpiDetail.contributionStatus.noTargetValue')
+      : formatAmount(kpiValue);
+
   // Extract all color classes from colorClass (includes dark mode variants)
   const colorClasses = config.colorClass.split(' ');
   const bgClasses = colorClasses.filter((cls) => cls.startsWith('bg-') || cls.startsWith('dark:bg-')).join(' ');
@@ -59,7 +66,7 @@ export function KPIBoxDetail({ kpi, kpiValue, kpiConfig }: KPIBoxDetailProps) {
           </p>
         </div>
         <div className={cn('text-center md:text-right')}>
-          <div className={cn('text-2xl sm:text-3xl md:text-4xl font-black', textClasses)}>{formatAmount(kpiValue)}</div>
+          <div className={cn('text-2xl sm:text-3xl md:text-4xl font-black', textClasses)}>{formattedValue}</div>
         </div>
       </div>
     </div>

@@ -13,10 +13,12 @@ import { TransactionsList } from '../features/transactions/components/Transactio
 import { ActionButton } from '@/shared/components/ActionButton';
 import { ConfirmDialog, ErrorState } from '@/shared/components';
 import { MdAdd } from 'react-icons/md';
+import { useAuth } from '@/features/auth/useAuth';
 
 export function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { event, kpis, isLoading, error, refetch, handleEditSubmit, handleDelete, handleBack } = useEventDetail(id);
 
   // UI state management
@@ -79,10 +81,12 @@ export function EventDetail() {
 
       <EventKPIGrid
         eventId={event.id}
+        currentUserId={user?.id}
+        participants={event.participants}
         potBalance={kpis?.potBalance ?? 0}
         totalContributions={kpis?.totalContributions ?? 0}
         totalExpenses={kpis?.totalExpenses ?? 0}
-        pendingToCompensate={kpis?.pendingToCompensate ?? 0}
+        participantPending={kpis?.participantPending ?? {}}
       />
 
       <TransactionsList event={event} />

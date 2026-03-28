@@ -15,6 +15,8 @@ export interface UserParticipant {
   name?: string | null;
   email?: string | null;
   avatar?: string | null;
+  // Objetivo individual de contribución (en unidades monetarias, >= 0)
+  contributionTarget?: number;
 }
 
 // Participant que es un invitado (sin cuenta)
@@ -22,6 +24,8 @@ export interface GuestParticipant {
   type: 'guest';
   id: string;
   name: string;
+  // Objetivo individual de contribución (en unidades monetarias, >= 0)
+  contributionTarget?: number;
 }
 
 // Participant especial para el POT (gasto compartido)

@@ -93,6 +93,9 @@
     "cancelReplace": "Cancel",
     "potName": "Shared pot",
     "noUsers": "No users found",
+    "targetLabel": "Target",
+    "targetPlaceholder": "0",
+    "targetAria": "Contribution target amount",
     "createNew": "Add as guest"
   },
   "eventDetail": {
@@ -100,6 +103,13 @@
     "notFound": "Event not found",
     "kpi": {
       "pot": "Pot Balance",
+      "contributionStatus": "Contribution Status",
+      "contributionStatusHelper": "Pending adjustment: {{amount}}",
+      "contributionStatusNoTargetHelper": "No targets defined · Adjustment: {{amount}}",
+      "userStatus": "Your Contribution Status",
+      "userStatusHelper": "Pending adjustment: {{amount}}",
+      "userStatusNoTargetHelper": "No target defined · Adjustment: {{amount}}",
+      "userStatusNoParticipation": "You are not participating in this event",
       "contributions": "Total Contribution",
       "expenses": "Total Expenses",
       "pending": "Pending to Pay"
@@ -164,17 +174,51 @@
   },
   "kpiDetail": {
     "notFound": "KPI or event not found",
+    "targetLabel": "Target",
     "kpi": {
       "balance": "Pot Balance",
+      "contributionStatus": "Contribution Status",
+      "userStatus": "Personal Status",
       "contributions": "Total Contribution",
       "expenses": "Total Expenses",
       "pending": "Pending to Pay"
     },
     "description": {
       "balance": "Money available in the common fund.",
-      "contributions": "Sum of contributions by each participant.",
+      "contributionStatus": "Net contribution progress against the group's contribution target.",
+      "userStatus": "Net contribution progress for one participant against their individual target.",
+      "contributions": "Total net contribution by all participants (contributions + expenses - compensations).",
       "expenses": "Total spent by each participant.",
-      "pending": "Amount each participant owes or is owed."
+      "pending": "Amount each participant owes or is owed relative to their target, accounting for their net contribution."
+    },
+    "contributionStatus": {
+      "summaryTitle": "Contribution status summary",
+      "complianceLabel": "Compliance",
+      "adjustmentPendingLabel": "Pending adjustment",
+      "netTotalLabel": "Net contributed",
+      "targetTotalLabel": "Total target",
+      "differenceLabel": "Difference (net - target)",
+      "noTargetHint": "There are no defined targets. Set a target per participant to enable compliance percentage.",
+      "noTargetValue": "No target",
+      "participantsSectionTitle": "Participant breakdown"
+    },
+    "userStatus": {
+      "summaryTitle": "Personal status summary",
+      "selectorHint": "Select a participant to inspect their status.",
+      "selectorLabel": "Participant",
+      "selectorPlaceholder": "Select a participant",
+      "searchParticipantPlaceholder": "Search participant...",
+      "noParticipantsFound": "No participants found",
+      "youBadge": "You",
+      "complianceLabel": "Compliance",
+      "adjustmentPendingLabel": "Pending adjustment",
+      "netTotalLabel": "Net contributed",
+      "targetTotalLabel": "Target",
+      "differenceLabel": "Difference (net - target)",
+      "noTargetValue": "No target",
+      "noTargetHint": "This participant has no target defined.",
+      "noParticipation": "You are not participating in this event. Select a participant to inspect their status.",
+      "noSelection": "Select a participant to inspect contribution status."
     },
     "participants": "Participants",
     "balanceBreakdown": {
@@ -195,9 +239,9 @@
     },
     "noteTitle": "Note:",
     "noteBalance": "Money available in the common fund.",
-    "noteContributions": "Sum of contributions by each participant.",
+    "noteContributions": "Total net contribution by all participants (contributions + expenses - compensations).",
     "noteExpenses": "Total spent by each participant.",
-    "notePending": "Amount each participant owes or is owed."
+    "notePending": "Amount each participant owes or is owed relative to their target, accounting for their net contribution."
   },
   "confirmDialog": {
     "title": "Are you sure?",

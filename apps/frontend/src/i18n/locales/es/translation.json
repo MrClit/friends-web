@@ -93,6 +93,9 @@
     "cancelReplace": "Cancelar",
     "potName": "Fondo común",
     "noUsers": "No se encontraron usuarios",
+    "targetLabel": "Objetivo",
+    "targetPlaceholder": "0",
+    "targetAria": "Importe del objetivo de contribución",
     "createNew": "Añadir como invitado"
   },
   "eventDetail": {
@@ -100,6 +103,13 @@
     "notFound": "Evento no encontrado",
     "kpi": {
       "pot": "Saldo del Bote",
+      "contributionStatus": "Estado de Contribución",
+      "contributionStatusHelper": "Ajuste pendiente: {{amount}}",
+      "contributionStatusNoTargetHelper": "Sin objetivos definidos · Ajuste: {{amount}}",
+      "userStatus": "Tu Estado de Contribución",
+      "userStatusHelper": "Ajuste pendiente: {{amount}}",
+      "userStatusNoTargetHelper": "Sin objetivo definido · Ajuste: {{amount}}",
+      "userStatusNoParticipation": "No participas en este evento",
       "contributions": "Contribución Total",
       "expenses": "Gastos Totales",
       "pending": "Pendiente de Pagar"
@@ -164,17 +174,51 @@
   },
   "kpiDetail": {
     "notFound": "KPI o evento no encontrado",
+    "targetLabel": "Objetivo",
     "kpi": {
       "balance": "Saldo del Bote",
+      "contributionStatus": "Estado de Contribución",
+      "userStatus": "Estado Personal",
       "contributions": "Contribución Total",
       "expenses": "Gastos Totales",
       "pending": "Pendiente de Pagar"
     },
     "description": {
       "balance": "Dinero disponible en el fondo común.",
-      "contributions": "Suma de aportaciones de cada participante.",
+      "contributionStatus": "Progreso del aporte neto frente al objetivo de contribución del grupo.",
+      "userStatus": "Progreso de aporte neto de un participante frente a su objetivo individual.",
+      "contributions": "Total de aporte neto de todos los participantes (aportaciones + gastos - reembolsos).",
       "expenses": "Total gastado por cada participante.",
-      "pending": "Cantidad que cada participante debe o le deben."
+      "pending": "Cantidad que cada participante debe o le deben respecto a su objetivo, considerando su aporte neto."
+    },
+    "contributionStatus": {
+      "summaryTitle": "Resumen del estado de contribución",
+      "complianceLabel": "Cumplimiento",
+      "adjustmentPendingLabel": "Ajuste pendiente",
+      "netTotalLabel": "Aportado neto",
+      "targetTotalLabel": "Objetivo total",
+      "differenceLabel": "Diferencia (neto - objetivo)",
+      "noTargetHint": "No hay objetivos definidos. Define un objetivo por participante para activar el porcentaje de cumplimiento.",
+      "noTargetValue": "Sin objetivo",
+      "participantsSectionTitle": "Detalle por participante"
+    },
+    "userStatus": {
+      "summaryTitle": "Resumen de estado personal",
+      "selectorHint": "Selecciona un participante para ver su estado.",
+      "selectorLabel": "Participante",
+      "selectorPlaceholder": "Selecciona un participante",
+      "searchParticipantPlaceholder": "Buscar participante...",
+      "noParticipantsFound": "No se encontraron participantes",
+      "youBadge": "Tú",
+      "complianceLabel": "Cumplimiento",
+      "adjustmentPendingLabel": "Ajuste pendiente",
+      "netTotalLabel": "Aportado neto",
+      "targetTotalLabel": "Objetivo",
+      "differenceLabel": "Diferencia (neto - objetivo)",
+      "noTargetValue": "Sin objetivo",
+      "noTargetHint": "Este participante no tiene objetivo definido.",
+      "noParticipation": "No participas en este evento. Selecciona un participante para ver su estado.",
+      "noSelection": "Selecciona un participante para ver su estado de contribución."
     },
     "participants": "Participantes",
     "balanceBreakdown": {
@@ -195,9 +239,9 @@
     },
     "noteTitle": "Nota:",
     "noteBalance": "Dinero disponible en el fondo común.",
-    "noteContributions": "Suma de aportaciones de cada participante.",
+    "noteContributions": "Total de aporte neto de todos los participantes (aportaciones + gastos - reembolsos).",
     "noteExpenses": "Total gastado por cada participante.",
-    "notePending": "Cantidad que cada participante debe o le deben."
+    "notePending": "Cantidad que cada participante debe o le deben respecto a su objetivo, considerando su aporte neto."
   },
   "confirmDialog": {
     "title": "¿Estás seguro?",

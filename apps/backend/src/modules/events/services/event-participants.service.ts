@@ -1,7 +1,7 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, In } from 'typeorm';
-import { Event, EventParticipant } from '../entities/event.entity';
+import { Event, EventParticipant, UserParticipant, GuestParticipant } from '../entities/event.entity';
 import { User } from '../../users/user.entity';
 import { ParticipantReplacementDto } from '../dto/participant-replacement.dto';
 import { Transaction } from '../../transactions/entities/transaction.entity';
@@ -17,6 +17,7 @@ export class EventParticipantsService {
 
   /**
    * Enrich user participants with name/email/avatar from the users table.
+   * Preserves contributionTarget field in the enriched participant.
    * Works with one or multiple events, batching the database query.
    */
   async enrichParticipants(events: Event | Event[]): Promise<void> {
@@ -54,13 +55,15 @@ export class EventParticipantsService {
         });
       }
     } catch (err) {
-      this.logger.warn(`Failed to enrich participants: ${(err as Error).message}`);
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Failed to enrich participants: ${message}`);
     }
   }
 
   /**
    * Normalize and validate a raw participants array from a DTO.
    * - Strips extra properties (name/email from user participants)
+   * - Accepts and validates contributionTarget (number >= 0, finite)
    * - Validates required fields per type
    * @param allowEmpty - When true (update), undefined/empty input returns undefined (skip update).
    *                     When false (create), undefined/empty input throws.
@@ -85,6 +88,22 @@ export class EventParticipantsService {
 
     const isPlainObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
 
+    const validateContributionTarget = (target: unknown, idx: number): number | undefined => {
+      if (target === undefined || target === null) {
+        return undefined;
+      }
+      if (typeof target !== 'number') {
+        throw new BadRequestException(`participants[${idx}].contributionTarget must be a number or undefined`);
+      }
+      if (!Number.isFinite(target)) {
+        throw new BadRequestException(`participants[${idx}].contributionTarget must be finite`);
+      }
+      if (target < 0) {
+        throw new BadRequestException(`participants[${idx}].contributionTarget must be >= 0`);
+      }
+      return target;
+    };
+
     return rawParticipants.map((p: unknown, idx: number): EventParticipant => {
       if (!isPlainObject(p) || typeof p['type'] !== 'string') {
         throw new BadRequestException(`participants[${idx}].type is required`);
@@ -96,7 +115,13 @@ export class EventParticipantsService {
           if (typeof p['id'] !== 'string' || !p['id'].trim()) {
             throw new BadRequestException(`participants[${idx}].id is required for user participant`);
           }
-          return { type: 'user', id: p['id'] };
+          const contributionTarget = validateContributionTarget(p['contributionTarget'], idx);
+          const userParticipant = {
+            type: 'user',
+            id: p['id'],
+            ...(contributionTarget !== undefined && { contributionTarget }),
+          } as UserParticipant;
+          return userParticipant;
         }
         case 'guest': {
           if (typeof p['id'] !== 'string' || !p['id'].trim()) {
@@ -105,7 +130,14 @@ export class EventParticipantsService {
           if (typeof p['name'] !== 'string' || !p['name'].trim()) {
             throw new BadRequestException(`participants[${idx}].name is required for guest participant`);
           }
-          return { type: 'guest', id: p['id'], name: p['name'] };
+          const contributionTarget = validateContributionTarget(p['contributionTarget'], idx);
+          const guestParticipant = {
+            type: 'guest',
+            id: p['id'],
+            name: p['name'],
+            ...(contributionTarget !== undefined && { contributionTarget }),
+          } as GuestParticipant;
+          return guestParticipant;
         }
         case 'pot': {
           return { type: 'pot', id: '0' };

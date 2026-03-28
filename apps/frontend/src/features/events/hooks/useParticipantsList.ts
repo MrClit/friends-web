@@ -80,6 +80,8 @@ export function useParticipantsList({
               name: participant.name,
               email: participant.email,
               avatar: participant.avatar,
+              // Preserve contribution target from the guest
+              ...(current.contributionTarget !== undefined && { contributionTarget: current.contributionTarget }),
             };
           }
           return current;
@@ -121,6 +123,25 @@ export function useParticipantsList({
     setInlineEdition(IDLE);
   }, [inlineEdition, setParticipants]);
 
+  const handleUpdateParticipantTarget = useCallback(
+    (idx: number, target: number | undefined) => {
+      setParticipants((prev) => [
+        ...prev.slice(0, idx),
+        prev[idx]
+          ? target === 0 || target === undefined
+            ? // Remove target if 0 or undefined (default)
+              (Object.fromEntries(
+                Object.entries(prev[idx]).filter(([key]) => key !== 'contributionTarget'),
+              ) as EventParticipant)
+            : // Set target for non-zero values
+              { ...prev[idx], contributionTarget: target }
+          : prev[idx],
+        ...prev.slice(idx + 1),
+      ]);
+    },
+    [setParticipants],
+  );
+
   return {
     inputValue,
     setInputValue,
@@ -138,5 +159,6 @@ export function useParticipantsList({
     handleCancelRenameGuest,
     handleRenameGuestNameChange,
     handleCommitRenameGuest,
+    handleUpdateParticipantTarget,
   };
 }

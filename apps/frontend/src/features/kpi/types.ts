@@ -4,9 +4,9 @@
  */
 export const KPI_SPEC = {
   balance: {},
-  contributions: {},
+  contributionStatus: {},
+  userStatus: {},
   expenses: {},
-  pending: {},
 } as const;
 
 /**
@@ -21,9 +21,11 @@ export interface KPIParticipantItem {
   id: string; // Unique ID (participantId or POT_PARTICIPANT_ID)
   name: string; // Display name
   value: string; // Formatted amount (formatAmount already applied)
+  rawAmount?: number; // Raw numeric value for calculations (e.g., percentage with negative values)
+  targetValue?: string; // Optional formatted contribution target context
   isPot?: boolean; // Indicates if this is the Pot
   avatar?: string; // Avatar URL or initials
-  percentage?: number; // Progress bar percentage (0-100)
+  percentage?: number; // Progress bar percentage (0-100, uses absolute magnitude for negatives)
   bgColor?: string; // Background color for avatar (when no image)
   textColor?: string; // Text color for avatar initials
 }
@@ -53,6 +55,32 @@ export interface KPIBalanceBreakdownViewModel {
   potExpenseItems: KPIBalancePotExpenseItem[];
 }
 
+export interface KPIContributionStatusSummaryData {
+  compliancePercent?: number;
+  netTotal: number;
+  targetTotal: number;
+  differenceTotal: number;
+  adjustmentPending: number;
+}
+
+export interface KPISelectableParticipant {
+  id: string;
+  name: string;
+}
+
+export interface KPIUserStatusSummaryData {
+  participantId: string;
+  participantName: string;
+  compliancePercent?: number;
+  netTotal: number;
+  targetTotal: number;
+  differenceTotal: number;
+  adjustmentPending: number;
+  isCurrentUser: boolean;
+}
+
+export type KPIValueFormat = 'amount' | 'percent';
+
 /**
  * Configuration for each KPI type
  */
@@ -64,4 +92,5 @@ export interface KPIConfig {
   IconComponent: React.ComponentType<{ className?: string }>;
   includePot: boolean; // Whether to show Pot in the list
   gradients: readonly string[]; // Gradient classes for progress bar (3 variants for cycling through participants)
+  valueFormat?: KPIValueFormat;
 }
