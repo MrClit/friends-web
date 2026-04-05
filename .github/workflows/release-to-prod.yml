@@ -4,9 +4,9 @@ on:
   workflow_dispatch: # Manual trigger from GitHub Actions UI
     inputs:
       allow_merges:
-        description: "Allow merging develop into main"
+        description: 'Allow merging develop into main'
         required: false
-        default: "true"
+        default: 'true'
 
 permissions:
   contents: write
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for merge
+          fetch-depth: 0 # Full history for merge
 
       - name: Configure Git
         run: |

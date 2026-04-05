@@ -80,7 +80,6 @@ const main = async () => {
 
     log.success('🎉 Production release completed successfully!');
     log.info('The deployment should be triggered by GitHub Actions on the main branch.');
-
   } catch (error) {
     log.error(`Unexpected error: ${error.message}`);
     process.exit(1);

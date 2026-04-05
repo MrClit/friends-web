@@ -100,7 +100,9 @@ ssh-keygen -t ed25519 -C "tu@email.com"
 ## Troubleshooting
 
 ### "You have uncommitted changes"
+
 Commit o stash tus cambios antes de hacer release:
+
 ```bash
 git add .
 git commit -m "feat: descripción"
@@ -109,7 +111,9 @@ git stash
 ```
 
 ### Conflicto de merge
+
 Resolver en develop antes de hacer release:
+
 ```bash
 git merge origin/main  # En develop
 # Resuelve conflictos
@@ -119,6 +123,7 @@ pnpm release:prod      # Reintenta
 ```
 
 ### El workflow no se dispara
+
 - Verifica que GitHub Actions esté habilitado en Settings → Actions
 - Asegúrate que el workflow `deploy.yml` tenga `on: push: branches: [main]`
 
