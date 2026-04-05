@@ -26,6 +26,7 @@ export function useUpdateCurrentUserProfile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
     },
   });
 }
