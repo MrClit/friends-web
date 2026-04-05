@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import type { AuthenticatedUser } from '../src/common/types/authenticated-user.type';
 import { AppModule } from '../src/app.module';
 import { Event, EventStatus } from '../src/modules/events/entities/event.entity';
 import { EventsService } from '../src/modules/events/events.service';
@@ -13,6 +14,12 @@ describe('EventsService lastModified (integration)', () => {
   let eventsService: EventsService;
   let eventRepository: Repository<Event>;
   let transactionRepository: Repository<Transaction>;
+
+  const actor: AuthenticatedUser = {
+    id: 'test-user-1',
+    email: 'test@example.com',
+    role: 'user',
+  };
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -45,7 +52,7 @@ describe('EventsService lastModified (integration)', () => {
       participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
     });
 
-    const event = await eventsService.findOne(savedEvent.id);
+    const event = await eventsService.findOne(savedEvent.id, actor);
 
     expect(event.lastModified).toBeDefined();
     expect(event.lastModified?.getTime()).toBe(event.updatedAt.getTime());
@@ -78,7 +85,7 @@ describe('EventsService lastModified (integration)', () => {
       savedTx.id,
     ]);
 
-    const event = await eventsService.findOne(savedEvent.id);
+    const event = await eventsService.findOne(savedEvent.id, actor);
 
     expect(event.lastModified).toBeDefined();
     expect(event.lastModified?.getTime()).toBe(txUpdatedAt.getTime());
