@@ -14,6 +14,19 @@ export class AuthService {
   ) {}
 
   async validateOrRejectGoogleUser(email: string, name?: string, avatar?: string): Promise<User> {
+    return this.validateOrRejectOAuthUser(email, 'Google', name, avatar);
+  }
+
+  async validateOrRejectMicrosoftUser(email: string, name?: string, avatar?: string): Promise<User> {
+    return this.validateOrRejectOAuthUser(email, 'Microsoft', name, avatar);
+  }
+
+  private async validateOrRejectOAuthUser(
+    email: string,
+    provider: 'Google' | 'Microsoft',
+    name?: string,
+    avatar?: string,
+  ): Promise<User> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       this.logger.warn(`Login attempt with unregistered email: ${email}`);
@@ -21,38 +34,42 @@ export class AuthService {
     }
 
     const resolvedName = this.resolveNameForLogin(user, name);
-    const resolvedAvatar = await this.resolveAvatarForLogin(user, avatar);
+    const resolvedAvatar = await this.resolveAvatarForLogin(user, avatar, provider);
     await this.usersService.updateProfileIfChanged(user, resolvedName, resolvedAvatar);
     return user;
   }
 
-  private resolveNameForLogin(user: User, googleName?: string): string | undefined {
+  private resolveNameForLogin(user: User, providerName?: string): string | undefined {
     const hasStoredName = Boolean(user.name && user.name.trim());
     if (hasStoredName) {
       return undefined;
     }
 
-    if (!googleName || !googleName.trim()) {
+    if (!providerName || !providerName.trim()) {
       return undefined;
     }
 
-    return googleName.trim();
+    return providerName.trim();
   }
 
-  private async resolveAvatarForLogin(user: User, googleAvatar?: string): Promise<string | undefined> {
+  private async resolveAvatarForLogin(
+    user: User,
+    providerAvatar: string | undefined,
+    provider: 'Google' | 'Microsoft',
+  ): Promise<string | undefined> {
     if (this.cloudinaryAvatarService.isCloudinaryAvatarUrl(user.avatar)) {
       return user.avatar ?? undefined;
     }
 
-    if (!googleAvatar || !googleAvatar.trim()) {
+    if (!providerAvatar || !providerAvatar.trim()) {
       return user.avatar ?? undefined;
     }
 
     try {
-      return await this.cloudinaryAvatarService.uploadGoogleAvatar(googleAvatar, user.id);
+      return await this.cloudinaryAvatarService.uploadProviderAvatar(providerAvatar, user.id);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'unknown error';
-      this.logger.warn(`Cloudinary avatar upload failed for user ${user.id}: ${errorMessage}`);
+      this.logger.warn(`${provider} avatar upload failed for user ${user.id}: ${errorMessage}`);
       return user.avatar ?? undefined;
     }
   }

@@ -1,4 +1,5 @@
 import { GoogleLoginButton } from '@/features/auth/GoogleLoginButton';
+import { MicrosoftLoginButton } from '@/features/auth/MicrosoftLoginButton';
 import { useTranslation } from 'react-i18next';
 import { Logo } from '@/shared/components';
 
@@ -14,9 +15,12 @@ export function LoginPage() {
         <p className="mb-6 text-gray-600 dark:text-gray-300 text-center">
           {t('auth.loginPage.description')}
           <br />
-          {t('auth.loginPage.continueWithGoogle')}
+          {t('auth.loginPage.continueWithProvider')}
         </p>
-        <GoogleLoginButton />
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <GoogleLoginButton />
+          <MicrosoftLoginButton />
+        </div>
       </div>
       <footer className="mt-8 text-xs text-gray-400">{t('auth.loginPage.footer', { year: currentYear })}</footer>
     </div>

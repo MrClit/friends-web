@@ -9,7 +9,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let usersService: { findByEmail: jest.Mock; updateProfileIfChanged: jest.Mock };
   let jwtService: { sign: jest.Mock };
-  let cloudinaryAvatarService: { isCloudinaryAvatarUrl: jest.Mock; uploadGoogleAvatar: jest.Mock };
+  let cloudinaryAvatarService: { isCloudinaryAvatarUrl: jest.Mock; uploadProviderAvatar: jest.Mock };
 
   beforeEach(() => {
     usersService = {
@@ -21,7 +21,7 @@ describe('AuthService', () => {
     };
     cloudinaryAvatarService = {
       isCloudinaryAvatarUrl: jest.fn().mockReturnValue(false),
-      uploadGoogleAvatar: jest.fn(),
+      uploadProviderAvatar: jest.fn(),
     };
     service = new AuthService(
       usersService as unknown as UsersService,
@@ -49,12 +49,12 @@ describe('AuthService', () => {
     const cloudinaryAvatarUrl =
       'https://res.cloudinary.com/demo/image/upload/c_fill,w_128,h_128,g_face,f_auto,q_auto,dpr_auto/friends/avatars/user-1';
     usersService.findByEmail.mockResolvedValue(user);
-    cloudinaryAvatarService.uploadGoogleAvatar.mockResolvedValue(cloudinaryAvatarUrl);
+    cloudinaryAvatarService.uploadProviderAvatar.mockResolvedValue(cloudinaryAvatarUrl);
 
     await expect(service.validateOrRejectGoogleUser('a@b.com', '  Name  ', 'avatar')).resolves.toBe(user);
 
     expect(cloudinaryAvatarService.isCloudinaryAvatarUrl).toHaveBeenCalledWith(user.avatar);
-    expect(cloudinaryAvatarService.uploadGoogleAvatar).toHaveBeenCalledWith('avatar', user.id);
+    expect(cloudinaryAvatarService.uploadProviderAvatar).toHaveBeenCalledWith('avatar', user.id);
     expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, 'Name', cloudinaryAvatarUrl);
   });
 
@@ -76,7 +76,7 @@ describe('AuthService', () => {
 
     await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'new-google-avatar')).resolves.toBe(user);
 
-    expect(cloudinaryAvatarService.uploadGoogleAvatar).not.toHaveBeenCalled();
+    expect(cloudinaryAvatarService.uploadProviderAvatar).not.toHaveBeenCalled();
     expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, undefined, user.avatar);
   });
 
@@ -93,11 +93,11 @@ describe('AuthService', () => {
     };
 
     usersService.findByEmail.mockResolvedValue(user);
-    cloudinaryAvatarService.uploadGoogleAvatar.mockRejectedValue(new Error('Cloudinary timeout'));
+    cloudinaryAvatarService.uploadProviderAvatar.mockRejectedValue(new Error('Cloudinary timeout'));
 
     await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'new-google-avatar')).resolves.toBe(user);
 
-    expect(cloudinaryAvatarService.uploadGoogleAvatar).toHaveBeenCalledWith('new-google-avatar', user.id);
+    expect(cloudinaryAvatarService.uploadProviderAvatar).toHaveBeenCalledWith('new-google-avatar', user.id);
     expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, undefined, user.avatar);
   });
 
@@ -114,7 +114,9 @@ describe('AuthService', () => {
     };
 
     usersService.findByEmail.mockResolvedValue(user);
-    cloudinaryAvatarService.uploadGoogleAvatar.mockResolvedValue('https://res.cloudinary.com/demo/image/upload/avatar');
+    cloudinaryAvatarService.uploadProviderAvatar.mockResolvedValue(
+      'https://res.cloudinary.com/demo/image/upload/avatar',
+    );
 
     await expect(service.validateOrRejectGoogleUser('a@b.com', 'Google Name', 'new-google-avatar')).resolves.toBe(user);
 

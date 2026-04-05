@@ -26,14 +26,19 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Req() req: Request & { user: User }, @Res() res: express.Response) {
-    // El usuario ya está validado por el guard
-    // Generar JWT y devolverlo al frontend
-    const user = req.user;
-    const token = this.authService.generateJwt(user);
-    // Redirigir a una página intermedia del frontend que guarda el token y redirige a Home
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173/friends-web/#';
-    const redirectUrl = `${frontendUrl}/auth/callback?token=${encodeURIComponent(token)}&id=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name || '')}&avatar=${encodeURIComponent(user.avatar || '')}&role=${encodeURIComponent(user.role)}`;
-    return res.redirect(redirectUrl);
+    return this.redirectToFrontendWithToken(req.user, res);
+  }
+
+  @Get('microsoft')
+  @UseGuards(AuthGuard('microsoft'))
+  async microsoftAuth() {
+    // Passport will handle the redirect
+  }
+
+  @Get('microsoft/callback')
+  @UseGuards(AuthGuard('microsoft'))
+  microsoftAuthRedirect(@Req() req: Request & { user: User }, @Res() res: express.Response) {
+    return this.redirectToFrontendWithToken(req.user, res);
   }
 
   @Get('me')
@@ -42,5 +47,12 @@ export class AuthController {
   @ApiStandardResponse(200, 'Current user profile retrieved successfully', CurrentUserProfileDto)
   getProfile(@Req() req: Request & { user: User }) {
     return this.usersService.toCurrentUserProfile(req.user);
+  }
+
+  private redirectToFrontendWithToken(user: User, res: express.Response) {
+    const token = this.authService.generateJwt(user);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173/friends-web/#';
+    const redirectUrl = `${frontendUrl}/auth/callback?token=${encodeURIComponent(token)}&id=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name || '')}&avatar=${encodeURIComponent(user.avatar || '')}&role=${encodeURIComponent(user.role)}`;
+    return res.redirect(redirectUrl);
   }
 }

@@ -21,16 +21,19 @@
     "logout_success": "Logged out successfully",
     "profile": "Profile",
     "auth": {
-      "loginWithGoogle": "Login with Google"
+      "loginWithGoogle": "Login with Google",
+      "loginWithMicrosoft": "Login with Microsoft"
     }
   },
   "auth": {
     "loginWithGoogle": "Login with Google",
+    "loginWithMicrosoft": "Login with Microsoft",
     "googleIconAlt": "Google logo",
     "loginPage": {
       "title": "Welcome to Friends",
       "description": "Share expenses and manage events easily.",
       "continueWithGoogle": "Sign in with Google to continue.",
+      "continueWithProvider": "Sign in with Google or Microsoft to continue.",
       "footer": "Powered by Fri€nds • {{year}}"
     },
     "loading": "Loading authentication...",

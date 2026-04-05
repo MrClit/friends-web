@@ -57,14 +57,14 @@ export class CloudinaryAvatarService {
     }
   }
 
-  async uploadGoogleAvatar(googleAvatarUrl: string, userId: string): Promise<string> {
+  async uploadProviderAvatar(providerAvatarUrl: string, userId: string): Promise<string> {
     if (!this.isConfigured || !this.cloudName) {
       throw new Error('Cloudinary avatar integration is not configured');
     }
 
-    const normalizedAvatarUrl = googleAvatarUrl.trim();
+    const normalizedAvatarUrl = providerAvatarUrl.trim();
     if (!normalizedAvatarUrl) {
-      throw new Error('Google avatar URL is empty');
+      throw new Error('Provider avatar URL is empty');
     }
 
     const uploadOptions: UploadApiOptions = {

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useState, type ReactNode } from 'react';
-import type { AuthContextType, User } from './types';
+import type { AuthContextType, AuthProvider, User } from './types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -54,8 +54,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void fetchUser(storedToken);
   }, [fetchUser]);
 
-  const login = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL || '/api'}/auth/google`;
+  const login = (provider: AuthProvider = 'google') => {
+    window.location.href = `${import.meta.env.VITE_API_URL || '/api'}/auth/${provider}`;
+  };
+
+  const loginWithGoogle = () => {
+    login('google');
+  };
+
+  const loginWithMicrosoft = () => {
+    login('microsoft');
   };
 
   const logout = () => {
@@ -84,7 +92,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, error, login, logout, setAuth, refreshUser, updateUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        error,
+        login,
+        loginWithGoogle,
+        loginWithMicrosoft,
+        logout,
+        setAuth,
+        refreshUser,
+        updateUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -21,16 +21,19 @@
     "logout_success": "Sesión cerrada correctamente",
     "profile": "Perfil",
     "auth": {
-      "loginWithGoogle": "Iniciar sesión con Google"
+      "loginWithGoogle": "Iniciar sesión con Google",
+      "loginWithMicrosoft": "Iniciar sesión con Microsoft"
     }
   },
   "auth": {
     "loginWithGoogle": "Iniciar sesión con Google",
+    "loginWithMicrosoft": "Iniciar sesión con Microsoft",
     "googleIconAlt": "Logotipo de Google",
     "loginPage": {
       "title": "Bienvenido a Friends",
       "description": "Comparte gastos y gestiona eventos fácilmente.",
       "continueWithGoogle": "Inicia sesión con Google para continuar.",
+      "continueWithProvider": "Inicia sesión con Google o Microsoft para continuar.",
       "footer": "Desarrollado por Fri€nds • {{year}}"
     },
     "loading": "Cargando autenticación...",

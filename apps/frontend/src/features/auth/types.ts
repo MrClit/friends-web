@@ -21,12 +21,16 @@ export interface User {
   updatedAt?: string;
 }
 
+export type AuthProvider = 'google' | 'microsoft';
+
 export interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
   error: Error | null;
-  login: () => void;
+  login: (provider?: AuthProvider) => void;
+  loginWithGoogle: () => void;
+  loginWithMicrosoft: () => void;
   logout: () => void;
   setAuth: (user: User, token: string) => void;
   refreshUser: () => Promise<User | null>;

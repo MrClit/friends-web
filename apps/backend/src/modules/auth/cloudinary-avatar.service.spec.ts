@@ -62,7 +62,7 @@ describe('CloudinaryAvatarService', () => {
 
     const service = new CloudinaryAvatarService(configService);
 
-    await expect(service.uploadGoogleAvatar('https://lh3.googleusercontent.com/avatar', 'user-1')).rejects.toThrow(
+    await expect(service.uploadProviderAvatar('https://lh3.googleusercontent.com/avatar', 'user-1')).rejects.toThrow(
       'Cloudinary avatar integration is not configured',
     );
   });
@@ -96,7 +96,7 @@ describe('CloudinaryAvatarService', () => {
     );
 
     const service = new CloudinaryAvatarService(configService);
-    const optimizedUrl = await service.uploadGoogleAvatar('https://lh3.googleusercontent.com/avatar', '123');
+    const optimizedUrl = await service.uploadProviderAvatar('https://lh3.googleusercontent.com/avatar', '123');
 
     expect(uploadMock).toHaveBeenCalledWith('https://lh3.googleusercontent.com/avatar', {
       folder: 'friends/dev/avatars',
@@ -140,7 +140,7 @@ describe('CloudinaryAvatarService', () => {
     urlMock.mockReturnValue('https://res.cloudinary.com/friends-cloud/image/upload/friends/prod/avatars/user-456');
 
     const service = new CloudinaryAvatarService(configService);
-    await service.uploadGoogleAvatar('https://lh3.googleusercontent.com/avatar', '456');
+    await service.uploadProviderAvatar('https://lh3.googleusercontent.com/avatar', '456');
 
     expect(uploadMock).toHaveBeenCalledWith(
       'https://lh3.googleusercontent.com/avatar',
@@ -167,7 +167,7 @@ describe('CloudinaryAvatarService', () => {
     );
 
     const service = new CloudinaryAvatarService(configService);
-    await service.uploadGoogleAvatar('https://lh3.googleusercontent.com/avatar', '789');
+    await service.uploadProviderAvatar('https://lh3.googleusercontent.com/avatar', '789');
 
     expect(uploadMock).toHaveBeenCalledWith(
       'https://lh3.googleusercontent.com/avatar',
