@@ -1,0 +1,46 @@
+name: Release to Production
+
+on:
+  workflow_dispatch: # Manual trigger from GitHub Actions UI
+    inputs:
+      allow_merges:
+        description: "Allow merging develop into main"
+        required: false
+        default: "true"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for merge
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: git fetch origin
+
+      - name: Checkout main
+        run: git checkout main
+
+      - name: Merge develop into main
+        run: git merge origin/develop --no-edit
+
+      - name: Push main
+        run: git push origin main
+
+      - name: Create deployment notification
+        run: |
+          echo "✅ Production release successful!"
+          echo "Merged develop → main and pushed"
+          echo ""
+          echo "Changes pushed to main branch:"
+          git log main -1 --pretty=format:"Commit: %h%nAuthor: %an%nMessage: %s"

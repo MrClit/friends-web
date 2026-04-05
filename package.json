@@ -19,7 +19,8 @@
     "test:coverage": "pnpm -r test:coverage",
     "format": "prettier --write \"apps/**/*.{ts,tsx,js,jsx,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"apps/**/*.{ts,tsx,js,jsx,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,json,md}\"",
-    "clean": "pnpm -r clean && rm -rf node_modules"
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "release:prod": "node scripts/release-to-prod.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",
