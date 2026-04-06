@@ -52,6 +52,7 @@ export const ParticipantRow = memo(function ParticipantRow({
   const isGuest = participant.type === 'guest';
   const isPot = participant.type === 'pot';
   const participantName = getParticipantName(participant, t);
+  const participantEmail = participant.type === 'user' ? participant.email : undefined;
   const currentTarget = participant.type !== 'pot' ? (participant.contributionTarget ?? 0) : 0;
 
   return (
@@ -129,9 +130,14 @@ export const ParticipantRow = memo(function ParticipantRow({
                 </button>
               </div>
             ) : (
-              <p className="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">
-                {participantName}
-              </p>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">
+                  {participantName}
+                </p>
+                {participantEmail && (
+                  <p className="truncate text-xs text-slate-500 dark:text-emerald-400">{participantEmail}</p>
+                )}
+              </div>
             )}
           </div>
 
