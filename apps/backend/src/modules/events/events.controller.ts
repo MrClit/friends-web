@@ -21,7 +21,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Event } from './entities/event.entity';
 import { EventKPIsDto } from './dto/event-kpis.dto';
-import { RolesGuard } from '../auth/roles.guard';
+import { RolesGuard } from '../auth/roles/roles.guard';
 import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
 import { EventStatus } from './entities/event.entity';
 

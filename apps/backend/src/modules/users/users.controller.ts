@@ -15,8 +15,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
-import { CloudinaryAvatarService } from '../auth/cloudinary-avatar.service';
-import { RolesGuard } from '../auth/roles.guard';
+import { AvatarService } from '../auth/services/avatar.service';
+import { RolesGuard } from '../auth/roles/roles.guard';
 import { CurrentUserProfileDto } from './dto/current-user-profile.dto';
 import { UpdateCurrentUserProfileDto } from './dto/update-current-user-profile.dto';
 import { UsersService } from './users.service';
@@ -35,7 +35,7 @@ interface UploadedAvatarFile {
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly cloudinaryAvatarService: CloudinaryAvatarService,
+    private readonly avatarService: AvatarService,
   ) {}
 
   @Get()
@@ -88,7 +88,7 @@ export class UsersController {
     let uploadedAvatarUrl: string | undefined;
 
     if (avatarFile) {
-      uploadedAvatarUrl = await this.cloudinaryAvatarService.uploadUserAvatarBuffer(avatarFile.buffer, currentUser.id);
+      uploadedAvatarUrl = await this.avatarService.uploadUserAvatarBuffer(avatarFile.buffer, currentUser.id);
     }
 
     return this.usersService.updateCurrentUserProfile(currentUser.id, {

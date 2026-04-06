@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CloudinaryAvatarService } from '../auth/cloudinary-avatar.service';
+import { AvatarService } from '../auth/services/avatar.service';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
@@ -11,7 +11,7 @@ describe('UsersController', () => {
     getCurrentUserProfileByIdOrThrow: jest.Mock;
     updateCurrentUserProfile: jest.Mock;
   };
-  let cloudinaryAvatarService: { uploadUserAvatarBuffer: jest.Mock };
+  let avatarService: { uploadUserAvatarBuffer: jest.Mock };
 
   beforeEach(async () => {
     usersService = {
@@ -21,7 +21,7 @@ describe('UsersController', () => {
       updateCurrentUserProfile: jest.fn(),
     };
 
-    cloudinaryAvatarService = {
+    avatarService = {
       uploadUserAvatarBuffer: jest.fn(),
     };
 
@@ -33,8 +33,8 @@ describe('UsersController', () => {
           useValue: usersService,
         },
         {
-          provide: CloudinaryAvatarService,
-          useValue: cloudinaryAvatarService,
+          provide: AvatarService,
+          useValue: avatarService,
         },
       ],
     }).compile();
@@ -102,7 +102,7 @@ describe('UsersController', () => {
     );
 
     expect(result).toEqual(profile);
-    expect(cloudinaryAvatarService.uploadUserAvatarBuffer).not.toHaveBeenCalled();
+    expect(avatarService.uploadUserAvatarBuffer).not.toHaveBeenCalled();
     expect(usersService.updateCurrentUserProfile).toHaveBeenCalledWith('u1', {
       name: 'Alice',
       avatar: undefined,
@@ -120,7 +120,7 @@ describe('UsersController', () => {
       updatedAt: new Date(),
     };
     const avatarBuffer = Buffer.from('avatar-content');
-    cloudinaryAvatarService.uploadUserAvatarBuffer.mockResolvedValue(profile.avatar);
+    avatarService.uploadUserAvatarBuffer.mockResolvedValue(profile.avatar);
     usersService.updateCurrentUserProfile.mockResolvedValue(profile);
 
     const result = await controller.updateCurrentUserProfile(
@@ -130,7 +130,7 @@ describe('UsersController', () => {
     );
 
     expect(result).toEqual(profile);
-    expect(cloudinaryAvatarService.uploadUserAvatarBuffer).toHaveBeenCalledWith(avatarBuffer, 'u1');
+    expect(avatarService.uploadUserAvatarBuffer).toHaveBeenCalledWith(avatarBuffer, 'u1');
     expect(usersService.updateCurrentUserProfile).toHaveBeenCalledWith('u1', {
       name: 'Alice',
       avatar: profile.avatar,

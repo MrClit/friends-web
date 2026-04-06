@@ -15,8 +15,8 @@ import {
 import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
-import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles/roles.decorator';
+import { RolesGuard } from '../auth/roles/roles.guard';
 import { User } from '../users/user.entity';
 import { UserDto } from '../users/dto/user.dto';
 import { AdminUsersService } from './admin-users.service';

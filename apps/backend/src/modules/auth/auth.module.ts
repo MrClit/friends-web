@@ -4,12 +4,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { GoogleStrategy } from './google.strategy';
-import { MicrosoftStrategy } from './microsoft.strategy';
-import { JwtStrategy } from './jwt.strategy';
-import { RolesGuard } from './roles.guard';
+import { RolesGuard } from './roles/roles.guard';
 import { UsersModule } from '../users/users.module';
-import { CloudinaryAvatarService } from './cloudinary-avatar.service';
+import { AvatarService } from './services/avatar.service';
+import { OAuthProviderService } from './services/oauth-provider.service';
+import { AUTH_STRATEGIES } from './strategies';
 
 @Module({
   imports: [
@@ -25,7 +24,7 @@ import { CloudinaryAvatarService } from './cloudinary-avatar.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, CloudinaryAvatarService, GoogleStrategy, MicrosoftStrategy, JwtStrategy, RolesGuard],
+  providers: [AuthService, AvatarService, OAuthProviderService, ...AUTH_STRATEGIES, RolesGuard],
   controllers: [AuthController],
   exports: [AuthService],
 })

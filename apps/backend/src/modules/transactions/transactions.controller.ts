@@ -21,7 +21,7 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { Transaction } from './entities/transaction.entity';
-import { RolesGuard } from '../auth/roles.guard';
+import { RolesGuard } from '../auth/roles/roles.guard';
 import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
 
 /**

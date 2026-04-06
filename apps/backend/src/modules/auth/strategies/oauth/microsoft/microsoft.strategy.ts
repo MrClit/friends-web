@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, MicrosoftStrategyOptionsWithRequest } from 'passport-microsoft';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from './auth.service';
+import { AuthService } from '../../../auth.service';
 import { Request } from 'express';
+import { getDisplayName, getPrimaryEmail, hasOAuthIdentity } from '../../base/oauth-profile';
+import { runOAuthValidation } from '../../base/oauth-validation.base';
 
 type MicrosoftProfile = {
   provider: string;
@@ -13,7 +15,7 @@ type MicrosoftProfile = {
 };
 
 function isMicrosoftProfile(obj: unknown): obj is MicrosoftProfile {
-  return typeof obj === 'object' && obj !== null && 'provider' in obj && 'id' in obj;
+  return hasOAuthIdentity(obj);
 }
 
 @Injectable()
@@ -51,17 +53,18 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       return;
     }
 
-    const profile = profileRaw;
-    const email: string | undefined =
-      Array.isArray(profile.emails) && profile.emails.length > 0 ? profile.emails[0].value : undefined;
-    const name: string | undefined = typeof profile.displayName === 'string' ? profile.displayName : undefined;
+    const email = getPrimaryEmail(profileRaw);
+    const name = getDisplayName(profileRaw);
 
-    try {
-      if (!email) throw new Error('No email found in Microsoft profile');
-      const user = await this.authService.validateOrRejectMicrosoftUser(email, name);
-      done(null, user);
-    } catch (err) {
-      done(err, false);
-    }
+    await runOAuthValidation(
+      {
+        email,
+        missingEmailMessage: 'No email found in Microsoft profile',
+      },
+      {
+        resolveUser: ({ email: resolvedEmail }) => this.authService.validateOrRejectMicrosoftUser(resolvedEmail, name),
+        done,
+      },
+    );
   }
 }

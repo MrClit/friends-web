@@ -5,8 +5,8 @@ import { v2 as cloudinary, type UploadApiOptions, type UploadApiResponse } from 
 const AVATAR_SIZE = 128;
 
 @Injectable()
-export class CloudinaryAvatarService {
-  private readonly logger = new Logger(CloudinaryAvatarService.name);
+export class AvatarService {
+  private readonly logger = new Logger(AvatarService.name);
   private readonly cloudName?: string;
   private readonly avatarFolder: string;
   private readonly isConfigured: boolean;

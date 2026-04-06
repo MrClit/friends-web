@@ -1,14 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile, StrategyOptions } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from './auth.service';
+import { AuthService } from '../../../auth.service';
 import { Request } from 'express';
+import { getDisplayName, getPrimaryEmail, getPrimaryPhoto, hasOAuthIdentity } from '../../base/oauth-profile';
+import { runOAuthValidation } from '../../base/oauth-validation.base';
 
 function isProfile(obj: unknown): obj is Profile {
-  return typeof obj === 'object' && obj !== null && 'provider' in obj && 'id' in obj;
+  return hasOAuthIdentity(obj);
 }
 
 @Injectable()
@@ -31,29 +31,34 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(
-    req: Request,
+    _req: Request,
     accessToken: string,
     refreshToken: string,
     profileRaw: unknown,
     done: (err: any, user?: any) => void,
   ) {
+    void accessToken;
+    void refreshToken;
+
     if (!isProfile(profileRaw)) {
       done(new Error('Invalid Google profile object'), false);
       return;
     }
 
-    const profile = profileRaw;
-    const email: string | undefined =
-      Array.isArray(profile.emails) && profile.emails.length > 0 ? profile.emails[0].value : undefined;
-    const name: string | undefined = typeof profile.displayName === 'string' ? profile.displayName : undefined;
-    const avatar: string | undefined =
-      Array.isArray(profile.photos) && profile.photos.length > 0 ? profile.photos[0].value : undefined;
-    try {
-      if (!email) throw new Error('No email found in Google profile');
-      const user = await this.authService.validateOrRejectGoogleUser(email, name, avatar);
-      done(null, user);
-    } catch (err) {
-      done(err, false);
-    }
+    const email = getPrimaryEmail(profileRaw);
+    const name = getDisplayName(profileRaw);
+    const avatar = getPrimaryPhoto(profileRaw);
+
+    await runOAuthValidation(
+      {
+        email,
+        missingEmailMessage: 'No email found in Google profile',
+      },
+      {
+        resolveUser: ({ email: resolvedEmail }) =>
+          this.authService.validateOrRejectGoogleUser(resolvedEmail, name, avatar),
+        done,
+      },
+    );
   }
 }

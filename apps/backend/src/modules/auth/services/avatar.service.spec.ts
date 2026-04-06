@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { CloudinaryAvatarService } from './cloudinary-avatar.service';
+import { AvatarService } from './avatar.service';
 
 type UploadMockResult = {
   public_id: string;
@@ -24,7 +24,7 @@ jest.mock('cloudinary', () => ({
   },
 }));
 
-describe('CloudinaryAvatarService', () => {
+describe('AvatarService', () => {
   beforeEach(() => {
     configMock.mockReset();
     uploadMock.mockReset();
@@ -41,7 +41,7 @@ describe('CloudinaryAvatarService', () => {
       }),
     } as unknown as ConfigService;
 
-    const service = new CloudinaryAvatarService(configService);
+    const service = new AvatarService(configService);
 
     expect(
       service.isCloudinaryAvatarUrl(
@@ -60,7 +60,7 @@ describe('CloudinaryAvatarService', () => {
       get: jest.fn().mockReturnValue(undefined),
     } as unknown as ConfigService;
 
-    const service = new CloudinaryAvatarService(configService);
+    const service = new AvatarService(configService);
 
     await expect(service.uploadProviderAvatar('https://lh3.googleusercontent.com/avatar', 'user-1')).rejects.toThrow(
       'Cloudinary avatar integration is not configured',
@@ -75,7 +75,7 @@ describe('CloudinaryAvatarService', () => {
       }),
     } as unknown as ConfigService;
 
-    expect(() => new CloudinaryAvatarService(configService)).toThrow(
+    expect(() => new AvatarService(configService)).toThrow(
       'Cloudinary avatar integration is disabled because CLOUDINARY_* variables are missing',
     );
   });
@@ -95,7 +95,7 @@ describe('CloudinaryAvatarService', () => {
       'https://res.cloudinary.com/friends-cloud/image/upload/c_fill,w_128,h_128,g_face,f_auto,q_auto,dpr_auto/friends/dev/avatars/user-123',
     );
 
-    const service = new CloudinaryAvatarService(configService);
+    const service = new AvatarService(configService);
     const optimizedUrl = await service.uploadProviderAvatar('https://lh3.googleusercontent.com/avatar', '123');
 
     expect(uploadMock).toHaveBeenCalledWith('https://lh3.googleusercontent.com/avatar', {
@@ -139,7 +139,7 @@ describe('CloudinaryAvatarService', () => {
     uploadMock.mockResolvedValue({ public_id: 'friends/prod/avatars/user-456' });
     urlMock.mockReturnValue('https://res.cloudinary.com/friends-cloud/image/upload/friends/prod/avatars/user-456');
 
-    const service = new CloudinaryAvatarService(configService);
+    const service = new AvatarService(configService);
     await service.uploadProviderAvatar('https://lh3.googleusercontent.com/avatar', '456');
 
     expect(uploadMock).toHaveBeenCalledWith(
@@ -166,7 +166,7 @@ describe('CloudinaryAvatarService', () => {
       'https://res.cloudinary.com/friends-cloud/image/upload/my-company/staging/avatars/user-789',
     );
 
-    const service = new CloudinaryAvatarService(configService);
+    const service = new AvatarService(configService);
     await service.uploadProviderAvatar('https://lh3.googleusercontent.com/avatar', '789');
 
     expect(uploadMock).toHaveBeenCalledWith(

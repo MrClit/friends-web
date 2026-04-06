@@ -1,129 +1,69 @@
 import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
 import { User } from '../users/user.entity';
-import { CloudinaryAvatarService } from './cloudinary-avatar.service';
+import { OAUTH_PROVIDER, OAuthProviderService } from './services/oauth-provider.service';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let usersService: { findByEmail: jest.Mock; updateProfileIfChanged: jest.Mock };
   let jwtService: { sign: jest.Mock };
-  let cloudinaryAvatarService: { isCloudinaryAvatarUrl: jest.Mock; uploadProviderAvatar: jest.Mock };
+  let oauthProviderService: { validateOrRejectOAuthUser: jest.Mock };
 
   beforeEach(() => {
-    usersService = {
-      findByEmail: jest.fn(),
-      updateProfileIfChanged: jest.fn(),
-    };
     jwtService = {
       sign: jest.fn().mockReturnValue('signed-token'),
     };
-    cloudinaryAvatarService = {
-      isCloudinaryAvatarUrl: jest.fn().mockReturnValue(false),
-      uploadProviderAvatar: jest.fn(),
+    oauthProviderService = {
+      validateOrRejectOAuthUser: jest.fn(),
     };
     service = new AuthService(
-      usersService as unknown as UsersService,
       jwtService as unknown as JwtService,
-      cloudinaryAvatarService as unknown as CloudinaryAvatarService,
+      oauthProviderService as unknown as OAuthProviderService,
     );
   });
 
-  it('rejects unknown email', async () => {
-    usersService.findByEmail.mockResolvedValue(undefined);
-    await expect(service.validateOrRejectGoogleUser('no@exist.com')).rejects.toBeInstanceOf(UnauthorizedException);
-  });
-
-  it('uploads avatar to Cloudinary when user has no Cloudinary avatar yet', async () => {
+  it('delegates Google validation to OAuthProviderService', async () => {
     const user: User = {
       id: '1',
       email: 'a@b.com',
       role: 'user',
       name: '',
-      avatar: 'https://googleusercontent.com/legacy-avatar',
+      avatar: '',
       deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    const cloudinaryAvatarUrl =
-      'https://res.cloudinary.com/demo/image/upload/c_fill,w_128,h_128,g_face,f_auto,q_auto,dpr_auto/friends/avatars/user-1';
-    usersService.findByEmail.mockResolvedValue(user);
-    cloudinaryAvatarService.uploadProviderAvatar.mockResolvedValue(cloudinaryAvatarUrl);
+    oauthProviderService.validateOrRejectOAuthUser.mockResolvedValue(user);
 
-    await expect(service.validateOrRejectGoogleUser('a@b.com', '  Name  ', 'avatar')).resolves.toBe(user);
+    await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'avatar')).resolves.toBe(user);
 
-    expect(cloudinaryAvatarService.isCloudinaryAvatarUrl).toHaveBeenCalledWith(user.avatar);
-    expect(cloudinaryAvatarService.uploadProviderAvatar).toHaveBeenCalledWith('avatar', user.id);
-    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, 'Name', cloudinaryAvatarUrl);
-  });
-
-  it('keeps existing Cloudinary avatar and skips upload', async () => {
-    const user: User = {
-      id: '1',
-      email: 'a@b.com',
-      role: 'user',
-      name: 'Existing Name',
-      avatar:
-        'https://res.cloudinary.com/demo/image/upload/c_fill,w_128,h_128,g_face,f_auto,q_auto,dpr_auto/friends/avatars/user-1',
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    usersService.findByEmail.mockResolvedValue(user);
-    cloudinaryAvatarService.isCloudinaryAvatarUrl.mockReturnValue(true);
-
-    await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'new-google-avatar')).resolves.toBe(user);
-
-    expect(cloudinaryAvatarService.uploadProviderAvatar).not.toHaveBeenCalled();
-    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, undefined, user.avatar);
-  });
-
-  it('keeps previous avatar when Cloudinary upload fails', async () => {
-    const user: User = {
-      id: '1',
-      email: 'a@b.com',
-      role: 'user',
-      name: 'Existing Name',
-      avatar: 'https://legacy.example.com/avatar.png',
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    usersService.findByEmail.mockResolvedValue(user);
-    cloudinaryAvatarService.uploadProviderAvatar.mockRejectedValue(new Error('Cloudinary timeout'));
-
-    await expect(service.validateOrRejectGoogleUser('a@b.com', 'Name', 'new-google-avatar')).resolves.toBe(user);
-
-    expect(cloudinaryAvatarService.uploadProviderAvatar).toHaveBeenCalledWith('new-google-avatar', user.id);
-    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(user, undefined, user.avatar);
-  });
-
-  it('keeps existing name even when Google sends a different display name', async () => {
-    const user: User = {
-      id: '1',
-      email: 'a@b.com',
-      role: 'user',
-      name: 'Custom Name',
-      avatar: 'https://legacy.example.com/avatar.png',
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    usersService.findByEmail.mockResolvedValue(user);
-    cloudinaryAvatarService.uploadProviderAvatar.mockResolvedValue(
-      'https://res.cloudinary.com/demo/image/upload/avatar',
+    expect(oauthProviderService.validateOrRejectOAuthUser).toHaveBeenCalledWith(
+      'a@b.com',
+      OAUTH_PROVIDER.GOOGLE,
+      'Name',
+      'avatar',
     );
+  });
 
-    await expect(service.validateOrRejectGoogleUser('a@b.com', 'Google Name', 'new-google-avatar')).resolves.toBe(user);
+  it('delegates Microsoft validation to OAuthProviderService', async () => {
+    const user: User = {
+      id: '1',
+      email: 'a@b.com',
+      role: 'user',
+      name: '',
+      avatar: '',
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    oauthProviderService.validateOrRejectOAuthUser.mockResolvedValue(user);
 
-    expect(usersService.updateProfileIfChanged).toHaveBeenCalledWith(
-      user,
+    await expect(service.validateOrRejectMicrosoftUser('a@b.com', 'Name')).resolves.toBe(user);
+
+    expect(oauthProviderService.validateOrRejectOAuthUser).toHaveBeenCalledWith(
+      'a@b.com',
+      OAUTH_PROVIDER.MICROSOFT,
+      'Name',
       undefined,
-      'https://res.cloudinary.com/demo/image/upload/avatar',
     );
   });
 
