@@ -186,6 +186,32 @@ export const ParticipantRow = memo(function ParticipantRow({
           )}
         </div>
 
+        {isReplacingGuest && (
+          <div className="mt-1 pl-12 sm:pl-13">
+            <div className="flex items-center gap-2">
+              <ParticipantsCombobox
+                onSelect={onReplaceWithUser}
+                existingParticipants={existingParticipants}
+                inputValue={replaceInputValue}
+                onInputChange={onReplaceInputChange}
+                allowCreateGuest={false}
+                autoFocus
+                compact
+              />
+              <button
+                type="button"
+                className={cn(
+                  'rounded-xl border border-slate-300/80 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition-colors',
+                  'hover:bg-slate-100 dark:border-emerald-700/70 dark:bg-emerald-950/30 dark:text-emerald-200 dark:hover:bg-emerald-900/40',
+                )}
+                onClick={onCancelReplace}
+              >
+                {t('participantsInput.cancelReplace')}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Contribution target input for non-pot participants */}
         {!isPot && (
           <div className="flex items-center gap-2 pl-13">
@@ -220,7 +246,7 @@ export const ParticipantRow = memo(function ParticipantRow({
                 placeholder={t('participantsInput.targetPlaceholder')}
                 className={cn(
                   'w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-2 pl-3 pr-8 text-sm font-medium text-slate-900',
-                  'outline-none transition-all placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-emerald-500',
+                  'outline-none transition-colors placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-emerald-500',
                   'dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-white dark:placeholder:text-emerald-700',
                 )}
                 aria-label={t('participantsInput.targetAria')}
@@ -235,31 +261,6 @@ export const ParticipantRow = memo(function ParticipantRow({
           </div>
         )}
       </div>
-
-      {isReplacingGuest && (
-        <div className="mt-2 pl-12 sm:pl-13">
-          <div className="flex items-center gap-2">
-            <ParticipantsCombobox
-              onSelect={onReplaceWithUser}
-              existingParticipants={existingParticipants}
-              inputValue={replaceInputValue}
-              onInputChange={onReplaceInputChange}
-              allowCreateGuest={false}
-              autoFocus
-            />
-            <button
-              type="button"
-              className={cn(
-                'rounded-xl border border-slate-300/80 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition-colors',
-                'hover:bg-slate-100 dark:border-emerald-700/70 dark:bg-emerald-950/30 dark:text-emerald-200 dark:hover:bg-emerald-900/40',
-              )}
-              onClick={onCancelReplace}
-            >
-              {t('participantsInput.cancelReplace')}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 });

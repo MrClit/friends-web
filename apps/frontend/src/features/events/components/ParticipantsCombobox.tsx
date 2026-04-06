@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
 import { MdPersonAdd } from 'react-icons/md';
+import { cn } from '@/shared/utils/cn';
 import { useParticipantsCombobox } from '../hooks/useParticipantsCombobox';
 import { ComboboxUserOptionItem } from './ComboboxUserOptionItem';
 import { ComboboxNewGuestItem } from './ComboboxNewGuestItem';
@@ -14,6 +15,7 @@ interface ParticipantsComboboxProps {
   onInputChange: (value: string) => void;
   allowCreateGuest?: boolean;
   autoFocus?: boolean;
+  compact?: boolean;
 }
 
 export function ParticipantsCombobox({
@@ -23,6 +25,7 @@ export function ParticipantsCombobox({
   onInputChange,
   allowCreateGuest = true,
   autoFocus = false,
+  compact = false,
 }: ParticipantsComboboxProps) {
   const { t } = useTranslation();
   const placeholder = allowCreateGuest ? t('participantsInput.placeholder') : t('participantsInput.replacePlaceholder');
@@ -66,12 +69,23 @@ export function ParticipantsCombobox({
         <label htmlFor={inputId} className="sr-only">
           {placeholder}
         </label>
-        <MdPersonAdd className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
+        <MdPersonAdd
+          className={cn(
+            'absolute top-1/2 -translate-y-1/2 text-slate-400',
+            compact ? 'left-3 text-lg' : 'left-4 text-xl',
+          )}
+        />
         <Popover.Anchor asChild>
           <input
             id={inputId}
             type="text"
-            className="w-full pl-11 pr-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
+            className={cn(
+              'w-full border bg-slate-50 font-medium text-slate-900',
+              'outline-none transition-colors placeholder:text-slate-400',
+              'focus:border-transparent focus:ring-2 focus:ring-primary',
+              'dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-white dark:placeholder:text-emerald-700',
+              compact ? 'rounded-xl py-2.5 pl-10 pr-4 text-sm' : 'rounded-2xl py-3.5 pl-11 pr-5',
+            )}
             placeholder={placeholder}
             name={inputName}
             autoFocus={autoFocus}
