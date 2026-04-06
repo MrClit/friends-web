@@ -57,7 +57,7 @@ export function useParticipantsCombobox({
 
   const handleSelectUser = useCallback(
     (user: User) => {
-      onSelect({ id: user.id, type: 'user', name: user.name || user.email, avatar: user.avatar });
+      onSelect({ id: user.id, type: 'user', name: user.name || user.email, email: user.email, avatar: user.avatar });
       onInputChange('');
       close();
     },

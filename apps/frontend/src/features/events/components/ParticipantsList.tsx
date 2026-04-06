@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParticipantsList } from '../hooks/useParticipantsList';
 import { ParticipantsCombobox } from './ParticipantsCombobox';
@@ -14,6 +15,9 @@ interface ParticipantsListProps {
 
 export function ParticipantsList({ participants, setParticipants, setParticipantReplacements }: ParticipantsListProps) {
   const { t } = useTranslation();
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const previousParticipantsCountRef = useRef(participants.length);
+
   const {
     inputValue,
     setInputValue,
@@ -38,6 +42,14 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
     setParticipantReplacements,
   });
 
+  useEffect(() => {
+    if (participants.length > previousParticipantsCountRef.current) {
+      listRef.current?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    previousParticipantsCountRef.current = participants.length;
+  }, [participants.length]);
+
   return (
     <div>
       <div className="block text-slate-700 dark:text-emerald-100 font-medium mb-2">{t('participantsInput.label')}</div>
@@ -49,7 +61,7 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
           onInputChange={setInputValue}
         />
       </div>
-      <div id="participants-group" className="space-y-3 pt-2">
+      <div ref={listRef} id="participants-group" className="space-y-3 pt-2">
         {participants.map((participant, idx) => (
           <ParticipantRow
             key={participant.id}
