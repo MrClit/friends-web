@@ -66,6 +66,7 @@ export interface KPIContributionStatusSummaryData {
 export interface KPISelectableParticipant {
   id: string;
   name: string;
+  avatar?: string | null;
 }
 
 export interface KPIUserStatusSummaryData {

@@ -14,12 +14,30 @@ import type {
 import { getKPIConfig } from '@/features/kpi/constants';
 import { getParticipantName } from '@/features/events/utils/participants';
 
+export function formatPercent(value?: number): string {
+  if (value === undefined || !Number.isFinite(value)) {
+    return '--';
+  }
+
+  return `${value.toFixed(1)}%`;
+}
+
+export function formatSignedAmount(value: number): string {
+  if (value === 0) {
+    return formatAmount(0);
+  }
+
+  const sign = value > 0 ? '+' : '-';
+  return `${sign}${formatAmount(Math.abs(value))}`;
+}
+
 export function buildUserStatusSelectableParticipants(event: Event, t: TFunction): KPISelectableParticipant[] {
   return event.participants
     .filter((participant) => participant.type === 'user' || participant.type === 'guest')
     .map((participant) => ({
       id: participant.id,
       name: getParticipantName(participant, t),
+      avatar: participant.type === 'user' ? (participant.avatar ?? null) : null,
     }));
 }
 
