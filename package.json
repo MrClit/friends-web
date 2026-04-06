@@ -23,11 +23,40 @@
     "release:prod": "node scripts/release-to-prod.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.3",
-    "eslint": "^9.39.3",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.3.0",
     "prettier": "^3.8.1",
-    "typescript-eslint": "^8.56.0"
+    "typescript-eslint": "^8.58.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "lodash": "^4.18.1",
+      "brace-expansion@^1.1.7": "1.1.13",
+      "brace-expansion@^2.0.2": "2.0.3",
+      "handlebars": ">=4.7.9",
+      "multer": ">=2.1.1",
+      "path-to-regexp": ">=8.4.0",
+      "rollup": ">=4.59.0",
+      "serialize-javascript": ">=7.0.3",
+      "flatted": ">=3.4.2",
+      "eslint>minimatch": "^3.1.4",
+      "@eslint/eslintrc>minimatch": "^3.1.4",
+      "fork-ts-checker-webpack-plugin>minimatch": "^3.1.4",
+      "@typescript-eslint/typescript-estree>minimatch": "^9.0.7",
+      "glob>minimatch": "^10.2.3",
+      "minimatch>@isaacs/brace-expansion": ">=5.0.1",
+      "micromatch>picomatch": "^2.3.2",
+      "anymatch>picomatch": "^2.3.2",
+      "tinyglobby>picomatch": "^4.0.4",
+      "jest-util>picomatch": "^4.0.4",
+      "rollup-plugin-visualizer>picomatch": "^4.0.4",
+      "vite>picomatch": "^4.0.4",
+      "vitest>picomatch": "^4.0.4",
+      "@angular-devkit/core>picomatch": "^4.0.4",
+      "eslint>ajv": "^6.14.0",
+      "@angular-devkit/core>ajv": ">=8.18.0"
+    }
   }
 }
