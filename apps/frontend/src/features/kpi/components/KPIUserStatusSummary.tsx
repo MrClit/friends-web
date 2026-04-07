@@ -75,10 +75,7 @@ export function KPIUserStatusSummary({
               value={formatAmount(data.adjustmentPending)}
             />
             <SummaryMetricCard label={t('userStatus.netTotalLabel')} value={formatAmount(data.netTotal)} />
-            <SummaryMetricCard
-              label={t('userStatus.targetTotalLabel')}
-              value={formatAmount(data.targetTotal)}
-            />
+            <SummaryMetricCard label={t('userStatus.targetTotalLabel')} value={formatAmount(data.targetTotal)} />
           </div>
 
           <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/40">
@@ -90,9 +87,7 @@ export function KPIUserStatusSummary({
             </p>
           </div>
 
-          {!hasTargets && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">{t('userStatus.noTargetHint')}</p>
-          )}
+          {!hasTargets && <p className="text-xs text-slate-500 dark:text-slate-400">{t('userStatus.noTargetHint')}</p>}
         </>
       ) : (
         <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 px-4 py-5 text-sm text-slate-600 dark:text-slate-300">

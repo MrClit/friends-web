@@ -58,17 +58,13 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
             </span>
           </div>
           <div className="flex items-center justify-between text-sm sm:text-base">
-            <span className="text-slate-600 dark:text-slate-300">
-              {t('balanceBreakdown.compensationsLabel')}
-            </span>
+            <span className="text-slate-600 dark:text-slate-300">{t('balanceBreakdown.compensationsLabel')}</span>
             <span className="font-bold text-rose-700 dark:text-rose-300">
               {formatSignedAmount(data.compensationsTotal, '-')}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm sm:text-base">
-            <span className="text-slate-600 dark:text-slate-300">
-              {t('balanceBreakdown.potExpensesLabel')}
-            </span>
+            <span className="text-slate-600 dark:text-slate-300">{t('balanceBreakdown.potExpensesLabel')}</span>
             <span className="font-bold text-rose-700 dark:text-rose-300">
               {formatSignedAmount(data.potExpensesTotal, '-')}
             </span>

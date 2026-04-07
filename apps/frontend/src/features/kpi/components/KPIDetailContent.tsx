@@ -75,11 +75,7 @@ export function KPIDetailContent({
 
           <KPIParticipantsList
             items={items}
-            title={
-              kpi === 'contributionStatus'
-                ? t('contributionStatus.participantsSectionTitle')
-                : t('participants')
-            }
+            title={kpi === 'contributionStatus' ? t('contributionStatus.participantsSectionTitle') : t('participants')}
             kpiConfig={kpiConfig[kpi]}
           />
         </div>

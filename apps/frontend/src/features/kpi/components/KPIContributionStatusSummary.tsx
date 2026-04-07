@@ -56,14 +56,8 @@ export function KPIContributionStatusSummary({ data }: KPIContributionStatusSumm
           label={t('contributionStatus.adjustmentPendingLabel')}
           value={formatAmount(data.adjustmentPending)}
         />
-        <SummaryMetricCard
-          label={t('contributionStatus.netTotalLabel')}
-          value={formatAmount(data.netTotal)}
-        />
-        <SummaryMetricCard
-          label={t('contributionStatus.targetTotalLabel')}
-          value={formatAmount(data.targetTotal)}
-        />
+        <SummaryMetricCard label={t('contributionStatus.netTotalLabel')} value={formatAmount(data.netTotal)} />
+        <SummaryMetricCard label={t('contributionStatus.targetTotalLabel')} value={formatAmount(data.targetTotal)} />
       </div>
 
       <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/40">
