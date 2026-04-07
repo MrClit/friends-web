@@ -1,0 +1,56 @@
+{
+  "transactionsList": {
+    "noTransactions": "Encara no hi ha moviments.",
+    "participantPrefix": {
+      "contribution": "Rebut de",
+      "expense": "Pagat per",
+      "compensation": "Pagat a"
+    },
+    "potLabel": "El Pot",
+    "unknownParticipant": "Participant desconegut",
+    "loadingMore": "Carregant més transaccions...",
+    "loadMore": "Carregar transaccions anteriors",
+    "showingDates": "Mostrant {{loaded}} de {{total}} dies"
+  },
+  "transactionModal": {
+    "addTitle": "Afegir Transacció",
+    "editTitle": "Editar Transacció",
+    "save": "Desar",
+    "saving": "Desant...",
+    "delete": "Esborrar",
+    "deleting": "Esborrant...",
+    "deleteTitle": "Eliminar transacció",
+    "deleteMessage": "Segur que vols esborrar aquesta transacció? Aquesta acció no es pot desfer.",
+    "discardTitle": "Descartar canvis?",
+    "discardMessage": "Tens canvis sense desar. Estàs segur que vols descartar-los?",
+    "discard": "Descartar",
+    "cancel": "Cancel·lar"
+  },
+  "transactionTypeSelector": {
+    "contribution": "Contribució",
+    "expense": "Despesa",
+    "compensation": "Reemborsament"
+  },
+  "transactionForm": {
+    "titleLabel": "Títol",
+    "titlePlaceholder": "Ex. Sopar al port",
+    "amountLabel": "Import",
+    "dateLabel": "Data",
+    "participantLabel": {
+      "contribution": "Rebut de",
+      "expense": "Pagat per",
+      "compensation": "Pagat a"
+    },
+    "participantPlaceholder": "Selecciona un participant",
+    "searchParticipantPlaceholder": "Cercar participant...",
+    "noParticipantsFound": "No s'han trobat participants",
+    "potOption": "POT (Pot Comú)",
+    "save": "Desar"
+  },
+  "create_success": "Transacció creada",
+  "create_error": "Error en crear la transacció",
+  "update_success": "Transacció actualitzada",
+  "update_error": "Error en actualitzar la transacció",
+  "delete_success": "Transacció eliminada",
+  "delete_error": "Error en eliminar la transacció"
+}

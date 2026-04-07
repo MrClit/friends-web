@@ -23,14 +23,14 @@ export const ProfileAvatarPicker = memo(function ProfileAvatarPicker({
   galleryInputRef,
   onSelectAvatar,
 }: ProfileAvatarPickerProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('profile');
 
   return (
     <div className="flex flex-col items-center gap-2 sm:w-28 sm:shrink-0">
       <button
         type="button"
         onClick={() => galleryInputRef.current?.click()}
-        aria-label={t('profile.avatar.change', 'Change photo')}
+        aria-label={t('avatar.change', 'Change photo')}
         className={cn(
           'group relative h-24 w-24 cursor-pointer rounded-full',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
@@ -77,7 +77,7 @@ export const ProfileAvatarPicker = memo(function ProfileAvatarPicker({
       </button>
 
       <p className="text-center text-xs text-slate-500 dark:text-emerald-300/60">
-        {t('profile.avatar.subtitle', 'Tap to update')}
+        {t('avatar.subtitle', 'Tap to update')}
       </p>
 
       {avatarFile && (

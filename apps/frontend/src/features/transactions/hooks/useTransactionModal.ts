@@ -118,7 +118,7 @@ export function useTransactionModal({
   // Delete confirmation state (separate from discard)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
   // Mutations
   const createTransaction = useCreateTransaction(event?.id ?? '');
@@ -193,7 +193,7 @@ export function useTransactionModal({
               modal.closeAndReset();
             },
             onError: (error) => {
-              const message = error instanceof Error ? error.message : t('common.errorLoading');
+              const message = error instanceof Error ? error.message : t('errorLoading');
               modal.setErrorMessage(message);
             },
           },
@@ -213,7 +213,7 @@ export function useTransactionModal({
               modal.closeAndReset();
             },
             onError: (error) => {
-              const message = error instanceof Error ? error.message : t('common.errorLoading');
+              const message = error instanceof Error ? error.message : t('errorLoading');
               modal.setErrorMessage(message);
             },
           },
@@ -248,7 +248,7 @@ export function useTransactionModal({
           modal.closeAndReset();
         },
         onError: (error) => {
-          const message = error instanceof Error ? error.message : t('common.errorLoading');
+          const message = error instanceof Error ? error.message : t('errorLoading');
           modal.setErrorMessage(message);
         },
       });

@@ -2,12 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { User } from '@/features/auth/types';
-import {
-  useAdminUsers,
-  useCreateAdminUser,
-  useDeleteAdminUser,
-  useUpdateAdminUser,
-} from '@/hooks/api/useAdminUsers';
+import { useAdminUsers, useCreateAdminUser, useDeleteAdminUser, useUpdateAdminUser } from '@/hooks/api/useAdminUsers';
 import { useToastStore } from '@/shared/store/useToastStore';
 
 import {
@@ -44,7 +39,7 @@ interface UseAdminUsersPageResult {
 }
 
 export function useAdminUsersPage(): UseAdminUsersPageResult {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['adminUsers', 'common']);
   const addToast = useToastStore((state) => state.addToast);
 
   const { data: users = [], isPending: isLoadingUsers, error: usersError } = useAdminUsers();
@@ -70,7 +65,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
     if (!createForm.email.trim()) {
       addToast({
         type: 'error',
-        message: t('common.validation_error', 'Please complete all fields'),
+        message: t('validation_error', { ns: 'common', defaultValue: 'Please complete all fields' }),
         duration: 5000,
       });
       return;
@@ -83,15 +78,18 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       });
       addToast({
         type: 'success',
-        message: t('adminUsers.createSuccess', 'User created successfully'),
+        message: t('createSuccess', { ns: 'adminUsers', defaultValue: 'User created successfully' }),
         duration: 3500,
       });
       closeCreateDialog();
     } catch (error) {
       addToast({
         type: 'error',
-        message: t('adminUsers.createError', 'Could not create user'),
-        description: getAdminUsersErrorMessage(error, t('adminUsers.createError', 'Could not create user')),
+        message: t('createError', { ns: 'adminUsers', defaultValue: 'Could not create user' }),
+        description: getAdminUsersErrorMessage(
+          error,
+          t('createError', { ns: 'adminUsers', defaultValue: 'Could not create user' }),
+        ),
         duration: 6000,
       });
     }
@@ -120,7 +118,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
     if (!editForm.email.trim()) {
       addToast({
         type: 'error',
-        message: t('common.validation_error', 'Please complete all fields'),
+        message: t('validation_error', { ns: 'common', defaultValue: 'Please complete all fields' }),
         duration: 5000,
       });
       return;
@@ -138,15 +136,18 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       });
       addToast({
         type: 'success',
-        message: t('adminUsers.updateSuccess', 'User updated successfully'),
+        message: t('updateSuccess', { ns: 'adminUsers', defaultValue: 'User updated successfully' }),
         duration: 3500,
       });
       cancelEdit();
     } catch (error) {
       addToast({
         type: 'error',
-        message: t('adminUsers.updateError', 'Could not update user'),
-        description: getAdminUsersErrorMessage(error, t('adminUsers.updateError', 'Could not update user')),
+        message: t('updateError', { ns: 'adminUsers', defaultValue: 'Could not update user' }),
+        description: getAdminUsersErrorMessage(
+          error,
+          t('updateError', { ns: 'adminUsers', defaultValue: 'Could not update user' }),
+        ),
         duration: 6000,
       });
     }
@@ -164,15 +165,18 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       await deleteUserMutation.mutateAsync(deletingUserId);
       addToast({
         type: 'success',
-        message: t('adminUsers.deleteSuccess', 'User deleted successfully'),
+        message: t('deleteSuccess', { ns: 'adminUsers', defaultValue: 'User deleted successfully' }),
         duration: 3500,
       });
       cancelDelete();
     } catch (error) {
       addToast({
         type: 'error',
-        message: t('adminUsers.deleteError', 'Could not delete user'),
-        description: getAdminUsersErrorMessage(error, t('adminUsers.deleteError', 'Could not delete user')),
+        message: t('deleteError', { ns: 'adminUsers', defaultValue: 'Could not delete user' }),
+        description: getAdminUsersErrorMessage(
+          error,
+          t('deleteError', { ns: 'adminUsers', defaultValue: 'Could not delete user' }),
+        ),
         duration: 6000,
       });
     }

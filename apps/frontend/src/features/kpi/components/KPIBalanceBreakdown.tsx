@@ -20,14 +20,14 @@ function formatSignedAmount(amount: number, sign: '+' | '-') {
 }
 
 function BreakdownSection({ title, subtotal, sign, emptyMessage, children, hasItems }: BreakdownSectionProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('kpiDetail');
 
   return (
     <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-soft border border-slate-100 dark:border-slate-700 p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between gap-4">
         <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
         <span className="text-sm sm:text-base font-extrabold text-slate-700 dark:text-slate-200">
-          {t('kpiDetail.balanceBreakdown.subtotal')}: {formatSignedAmount(subtotal, sign)}
+          {t('balanceBreakdown.subtotal')}: {formatSignedAmount(subtotal, sign)}
         </span>
       </div>
 
@@ -41,25 +41,25 @@ function BreakdownSection({ title, subtotal, sign, emptyMessage, children, hasIt
 }
 
 export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('kpiDetail');
 
   return (
     <div className="space-y-6">
       <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-soft border border-slate-100 dark:border-slate-700 p-4 sm:p-6 space-y-4">
         <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-          {t('kpiDetail.balanceBreakdown.summaryTitle')}
+          {t('balanceBreakdown.summaryTitle')}
         </h3>
 
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm sm:text-base">
-            <span className="text-slate-600 dark:text-slate-300">{t('kpiDetail.balanceBreakdown.inflowsLabel')}</span>
+            <span className="text-slate-600 dark:text-slate-300">{t('balanceBreakdown.inflowsLabel')}</span>
             <span className="font-bold text-emerald-700 dark:text-emerald-300">
               {formatSignedAmount(data.inflowsTotal, '+')}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm sm:text-base">
             <span className="text-slate-600 dark:text-slate-300">
-              {t('kpiDetail.balanceBreakdown.compensationsLabel')}
+              {t('balanceBreakdown.compensationsLabel')}
             </span>
             <span className="font-bold text-rose-700 dark:text-rose-300">
               {formatSignedAmount(data.compensationsTotal, '-')}
@@ -67,7 +67,7 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
           </div>
           <div className="flex items-center justify-between text-sm sm:text-base">
             <span className="text-slate-600 dark:text-slate-300">
-              {t('kpiDetail.balanceBreakdown.potExpensesLabel')}
+              {t('balanceBreakdown.potExpensesLabel')}
             </span>
             <span className="font-bold text-rose-700 dark:text-rose-300">
               {formatSignedAmount(data.potExpensesTotal, '-')}
@@ -78,26 +78,26 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
 
           <div className="flex items-center justify-between text-base sm:text-lg">
             <span className="font-extrabold text-slate-900 dark:text-white">
-              {t('kpiDetail.balanceBreakdown.finalBalanceLabel')}
+              {t('balanceBreakdown.finalBalanceLabel')}
             </span>
             <span className="font-black text-slate-900 dark:text-white">{formatAmount(data.potBalance)}</span>
           </div>
         </div>
 
-        <p className="text-xs text-slate-500 dark:text-slate-400">{t('kpiDetail.balanceBreakdown.equation')}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{t('balanceBreakdown.equation')}</p>
 
         {!data.isConsistent && (
           <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
-            {t('kpiDetail.balanceBreakdown.inconsistentWarning')}
+            {t('balanceBreakdown.inconsistentWarning')}
           </p>
         )}
       </section>
 
       <BreakdownSection
-        title={t('kpiDetail.balanceBreakdown.inflowsSectionTitle')}
+        title={t('balanceBreakdown.inflowsSectionTitle')}
         subtotal={data.inflowsTotal}
         sign="+"
-        emptyMessage={t('kpiDetail.balanceBreakdown.emptyInflows')}
+        emptyMessage={t('balanceBreakdown.emptyInflows')}
         hasItems={data.inflowItems.length > 0}
       >
         {data.inflowItems.map((item) => (
@@ -114,10 +114,10 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
       </BreakdownSection>
 
       <BreakdownSection
-        title={t('kpiDetail.balanceBreakdown.compensationsSectionTitle')}
+        title={t('balanceBreakdown.compensationsSectionTitle')}
         subtotal={data.compensationsTotal}
         sign="-"
-        emptyMessage={t('kpiDetail.balanceBreakdown.emptyCompensations')}
+        emptyMessage={t('balanceBreakdown.emptyCompensations')}
         hasItems={data.compensationItems.length > 0}
       >
         {data.compensationItems.map((item) => (
@@ -132,10 +132,10 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
       </BreakdownSection>
 
       <BreakdownSection
-        title={t('kpiDetail.balanceBreakdown.potExpensesSectionTitle')}
+        title={t('balanceBreakdown.potExpensesSectionTitle')}
         subtotal={data.potExpensesTotal}
         sign="-"
-        emptyMessage={t('kpiDetail.balanceBreakdown.emptyPotExpenses')}
+        emptyMessage={t('balanceBreakdown.emptyPotExpenses')}
         hasItems={data.potExpenseItems.length > 0}
       >
         {data.potExpenseItems.map((item) => {

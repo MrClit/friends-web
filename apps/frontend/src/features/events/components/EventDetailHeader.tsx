@@ -11,7 +11,7 @@ interface EventDetailHeaderProps {
 }
 
 export function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: EventDetailHeaderProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   const hasActions = Boolean(onEdit || onDelete);
 
   return (
@@ -21,7 +21,7 @@ export function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: Even
           <button
             type="button"
             onClick={onBack}
-            aria-label={t('common.back')}
+            aria-label={t('back')}
             className={cn(
               'bg-white dark:bg-emerald-950',
               'p-2 rounded-xl shadow-sm',
@@ -42,7 +42,7 @@ export function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: Even
               <button
                 type="button"
                 onClick={onEdit}
-                aria-label={t('common.edit')}
+                aria-label={t('edit')}
                 className={cn(
                   'flex items-center justify-center gap-2',
                   'p-2 sm:px-4 sm:py-2',
@@ -55,14 +55,14 @@ export function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: Even
                 )}
               >
                 <MdEdit size={20} />
-                <span className="hidden sm:inline">Editar</span>
+                <span className="hidden sm:inline">{t('edit')}</span>
               </button>
             ) : null}
             {onDelete ? (
               <button
                 type="button"
                 onClick={onDelete}
-                aria-label={t('common.delete')}
+                aria-label={t('delete')}
                 className={cn(
                   'flex items-center justify-center gap-2',
                   'p-2 sm:px-4 sm:py-2',
@@ -75,7 +75,7 @@ export function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: Even
                 )}
               >
                 <MdDelete size={20} />
-                <span className="hidden sm:inline">Eliminar</span>
+                <span className="hidden sm:inline">{t('delete')}</span>
               </button>
             ) : null}
           </div>

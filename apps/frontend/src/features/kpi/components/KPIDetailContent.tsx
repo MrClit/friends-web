@@ -50,7 +50,7 @@ export function KPIDetailContent({
   onUserStatusParticipantChange,
   onBack,
 }: KPIDetailContentProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('kpiDetail');
 
   return (
     <div>
@@ -77,8 +77,8 @@ export function KPIDetailContent({
             items={items}
             title={
               kpi === 'contributionStatus'
-                ? t('kpiDetail.contributionStatus.participantsSectionTitle')
-                : t('kpiDetail.participants')
+                ? t('contributionStatus.participantsSectionTitle')
+                : t('participants')
             }
             kpiConfig={kpiConfig[kpi]}
           />

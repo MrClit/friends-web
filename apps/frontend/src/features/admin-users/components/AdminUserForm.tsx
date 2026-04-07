@@ -37,15 +37,15 @@ interface RoleSelectProps {
 }
 
 function RoleSelect({ value, onChangeValue, disabled }: RoleSelectProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('adminUsers');
 
   return (
     <Select.Root value={value} onValueChange={(v) => onChangeValue(v)} disabled={disabled}>
       <Select.Trigger
-        aria-label={t('adminUsers.fields.role', 'Role')}
+        aria-label={t('fields.role', 'Role')}
         className="mt-1 w-full inline-flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
       >
-        <Select.Value placeholder={t('adminUsers.selectRole', 'Select role')} />
+        <Select.Value placeholder={t('selectRole', 'Select role')} />
         <Select.Icon>
           <svg
             className="h-4 w-4 text-gray-500 dark:text-gray-300"
@@ -110,7 +110,7 @@ interface EditAdminUserFormProps {
 type AdminUserFormProps = CreateAdminUserFormProps | EditAdminUserFormProps;
 
 export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminUserFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('adminUsers');
 
   const onRoleChange = (role: string) => {
     if (mode === 'create') {
@@ -126,7 +126,7 @@ export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminU
     return (
       <div className="space-y-4">
         <TextField
-          label={t('adminUsers.fields.email', 'Email')}
+          label={t('fields.email', 'Email')}
           type="email"
           value={form.email}
           onChangeField={(v) => onChange({ ...form, email: v })}
@@ -135,7 +135,7 @@ export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminU
         />
 
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          {t('adminUsers.fields.role', 'Role')}
+          {t('fields.role', 'Role')}
           <RoleSelect value={form.role} onChangeValue={(v) => onRoleChange(v)} disabled={disabled} />
         </label>
       </div>
@@ -145,7 +145,7 @@ export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminU
   return (
     <div className="space-y-4">
       <TextField
-        label={t('adminUsers.fields.email', 'Email')}
+        label={t('fields.email', 'Email')}
         type="email"
         value={form.email}
         onChangeField={(v) => onChange({ ...form, email: v })}
@@ -154,7 +154,7 @@ export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminU
       />
 
       <TextField
-        label={t('adminUsers.fields.name', 'Name')}
+        label={t('fields.name', 'Name')}
         type="text"
         value={form.name}
         onChangeField={(v) => onChange({ ...form, name: v })}
@@ -162,7 +162,7 @@ export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminU
       />
 
       <TextField
-        label={t('adminUsers.fields.avatar', 'Avatar URL')}
+        label={t('fields.avatar', 'Avatar URL')}
         type="url"
         value={form.avatar}
         onChangeField={(v) => onChange({ ...form, avatar: v })}
@@ -170,7 +170,7 @@ export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminU
       />
 
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {t('adminUsers.fields.role', 'Role')}
+        {t('fields.role', 'Role')}
         <RoleSelect value={form.role} onChangeValue={(v) => onRoleChange(v)} disabled={disabled} />
       </label>
     </div>

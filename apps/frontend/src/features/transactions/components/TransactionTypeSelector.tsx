@@ -9,7 +9,7 @@ interface TransactionTypeSelectorProps {
 }
 
 export function TransactionTypeSelector({ value, onChange }: TransactionTypeSelectorProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('transactions');
   return (
     <div className="flex justify-center w-full">
       <div className="flex p-1.5 bg-slate-100/80 dark:bg-emerald-900/40 rounded-2xl w-full max-w-md mx-auto">

@@ -1,0 +1,4 @@
+{
+  "select": "Selecciona l'idioma",
+  "current": "Idioma actual: {{lng}}"
+}

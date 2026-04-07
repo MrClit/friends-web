@@ -1,0 +1,22 @@
+{
+  "invalidId": "Invalid event ID",
+  "notFound": "Event not found",
+  "kpi": {
+    "pot": "Pot Balance",
+    "contributionStatus": "Contribution Status",
+    "contributionStatusHelper": "Pending adjustment: {{amount}}",
+    "contributionStatusNoTargetHelper": "No targets defined · Adjustment: {{amount}}",
+    "userStatus": "Your Contribution Status",
+    "userStatusHelper": "Pending adjustment: {{amount}}",
+    "userStatusNoTargetHelper": "No target defined · Adjustment: {{amount}}",
+    "userStatusNoParticipation": "You are not participating in this event",
+    "contributions": "Total Contribution",
+    "expenses": "Total Expenses",
+    "pending": "Pending to Pay"
+  },
+  "addTransaction": "Add Transaction",
+  "deleteTitle": "Delete event?",
+  "deleteMessage": "This action cannot be undone. Are you sure you want to delete this event?",
+  "deleteConfirm": "Delete",
+  "deleteCancel": "Cancel"
+}

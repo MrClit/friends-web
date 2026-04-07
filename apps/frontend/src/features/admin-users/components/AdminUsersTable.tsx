@@ -13,9 +13,9 @@ interface AdminUsersTableProps {
 }
 
 export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: AdminUsersTableProps) {
-  const { t } = useTranslation();
-  const editLabel = t('common.edit', 'Edit');
-  const deleteLabel = t('common.delete', 'Delete');
+  const { t } = useTranslation(['adminUsers', 'common']);
+  const editLabel = t('edit', { ns: 'common', defaultValue: 'Edit' });
+  const deleteLabel = t('delete', { ns: 'common', defaultValue: 'Delete' });
 
   return (
     <div className="md:rounded-lg md:border md:border-gray-200 md:bg-white md:shadow-sm md:dark:border-gray-800 md:dark:bg-gray-900">
@@ -38,16 +38,16 @@ export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: A
           <thead className="bg-gray-50 dark:bg-gray-950">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                {t('adminUsers.fields.name', 'Name')}
+                {t('fields.name', { ns: 'adminUsers', defaultValue: 'Name' })}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                {t('adminUsers.fields.email', 'Email')}
+                {t('fields.email', { ns: 'adminUsers', defaultValue: 'Email' })}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                {t('adminUsers.fields.role', 'Role')}
+                {t('fields.role', { ns: 'adminUsers', defaultValue: 'Role' })}
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                {t('common.actions', 'Actions')}
+                {t('actions', { ns: 'common', defaultValue: 'Actions' })}
               </th>
             </tr>
           </thead>

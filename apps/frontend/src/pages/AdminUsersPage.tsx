@@ -3,11 +3,15 @@ import { MdAdd } from 'react-icons/md';
 
 import { AdminUsersDialogs, AdminUsersStats, AdminUsersTable, useAdminUsersPage } from '@/features/admin-users';
 import { HeaderSection } from '@/shared/components/HeaderSection';
+import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
 
 import { MainLayout } from './MainLayout';
 
+const ADMIN_USERS_NAMESPACES = ['adminUsers', 'common', 'confirmDialog'] as const;
+
 export function AdminUsersPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(ADMIN_USERS_NAMESPACES);
+  const isI18nReady = useI18nNamespacesReady(ADMIN_USERS_NAMESPACES);
 
   const {
     users,
@@ -39,29 +43,34 @@ export function AdminUsersPage() {
   return (
     <MainLayout>
       <HeaderSection
-        title={t('adminUsers.title', 'User Management')}
-        subtitle={t('adminUsers.subtitle', 'Manage users and roles')}
+        title={t('title', { ns: 'adminUsers', defaultValue: 'User Management' })}
+        subtitle={t('subtitle', { ns: 'adminUsers', defaultValue: 'Manage users and roles' })}
         onNewEvent={openCreateDialog}
-        actionLabel={t('adminUsers.newUser', 'New User')}
+        actionLabel={t('newUser', { ns: 'adminUsers', defaultValue: 'New User' })}
         actionIcon={<MdAdd size={22} />}
       />
 
       <section className="space-y-6">
-        {isLoadingUsers && <p className="text-slate-600 dark:text-emerald-200">{t('common.loading')}</p>}
+        {(isLoadingUsers || !isI18nReady) && (
+          <p className="text-slate-600 dark:text-emerald-200">{t('loading', { ns: 'common' })}</p>
+        )}
 
-        {Boolean(usersError) && (
+        {isI18nReady && Boolean(usersError) && (
           <p className="text-red-600 dark:text-red-300">
-            {t('common.errorLoading', 'Could not load data. Please try again.')}
+            {t('errorLoading', { ns: 'common', defaultValue: 'Could not load data. Please try again.' })}
           </p>
         )}
 
-        {!isLoadingUsers && !usersError && users.length === 0 && (
+        {isI18nReady && !isLoadingUsers && !usersError && users.length === 0 && (
           <p className="text-slate-700 dark:text-emerald-100">
-            {t('adminUsers.empty', 'No users found. Create your first user to start managing access.')}
+            {t('empty', {
+              ns: 'adminUsers',
+              defaultValue: 'No users found. Create your first user to start managing access.',
+            })}
           </p>
         )}
 
-        {!isLoadingUsers && !usersError && users.length > 0 && (
+        {isI18nReady && !isLoadingUsers && !usersError && users.length > 0 && (
           <>
             <AdminUsersStats users={users} />
             <AdminUsersTable users={users} disabled={isMutating} onEdit={startEdit} onDelete={requestDelete} />

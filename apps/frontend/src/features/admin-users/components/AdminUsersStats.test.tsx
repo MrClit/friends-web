@@ -13,12 +13,12 @@ vi.mock('react-i18next', async () => {
     useTranslation: () => ({
       t: (key: string) => {
         const translations: Record<string, string> = {
-          'adminUsers.stats.totalShort': 'Tot',
-          'adminUsers.stats.adminShort': 'Adm',
-          'adminUsers.stats.userShort': 'Usr',
-          'adminUsers.stats.total': 'Total users',
-          'adminUsers.stats.admin': 'Admins',
-          'adminUsers.stats.user': 'Users',
+          'stats.totalShort': 'Tot',
+          'stats.adminShort': 'Adm',
+          'stats.userShort': 'Usr',
+          'stats.total': 'Total users',
+          'stats.admin': 'Admins',
+          'stats.user': 'Users',
         };
 
         return translations[key] ?? key;

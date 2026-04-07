@@ -47,12 +47,12 @@ export function useCreateEvent() {
   return useMutation({
     mutationFn: eventsApi.create,
     onSuccess: () => {
-      success('events.create_success');
+      success('create_success', undefined, undefined, { ns: 'events' });
       // Invalidate events list to trigger refetch
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
     },
     onError: () => {
-      error('events.create_error');
+      error('create_error', undefined, { ns: 'events' });
     },
   });
 }
@@ -69,7 +69,7 @@ export function useUpdateEvent() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEventInput }) => eventsApi.update(id, data),
     onSuccess: (_, { id }) => {
-      success('events.update_success');
+      success('update_success', undefined, undefined, { ns: 'events' });
       // Invalidate both list and specific event detail
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.detail(id) });
@@ -77,7 +77,7 @@ export function useUpdateEvent() {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.byEvent(id) });
     },
     onError: () => {
-      error('events.update_error');
+      error('update_error', undefined, { ns: 'events' });
     },
   });
 }
@@ -106,7 +106,7 @@ export function useDeleteEvent() {
       queryClient.removeQueries({ queryKey: ['transactions', 'event', deletedId], exact: false });
     },
     onSuccess: async (_, deletedId) => {
-      success('events.delete_success');
+      success('delete_success', undefined, undefined, { ns: 'events' });
       // Note: Don't clear deleting state here to prevent re-enabling queries before unmount
 
       // Remove specific queries from cache to prevent stale data
@@ -120,7 +120,7 @@ export function useDeleteEvent() {
     onError: () => {
       // Clear deleting state on error
       setDeleting(false);
-      error('events.delete_error');
+      error('delete_error', undefined, { ns: 'events' });
     },
   });
 }

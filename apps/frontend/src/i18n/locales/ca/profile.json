@@ -1,0 +1,29 @@
+{
+  "title": "Perfil",
+  "subtitle": "Actualitza la teva informació de perfil i l'avatar.",
+  "avatar": {
+    "title": "Foto de perfil",
+    "subtitle": "Toca la teva foto per actualitzar-la.",
+    "change": "Canviar foto",
+    "choose": "Triar foto",
+    "camera": "Fer foto"
+  },
+  "fields": {
+    "name": "Nom",
+    "email": "Correu electrònic",
+    "role": "Rol",
+    "createdAt": "Data d'alta",
+    "updatedAt": "Darrera actualització"
+  },
+  "actions": {
+    "save": "Desar canvis",
+    "saving": "Desant..."
+  },
+  "toasts": {
+    "invalidImage": "Selecciona un fitxer d'imatge vàlid.",
+    "fileTooLarge": "La imatge és massa gran. La mida màxima és de 5 MB.",
+    "invalidName": "El nom no pot estar buit.",
+    "updateSuccess": "Perfil actualitzat correctament.",
+    "updateError": "No s'ha pogut actualitzar el perfil."
+  }
+}

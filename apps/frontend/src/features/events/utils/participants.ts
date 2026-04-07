@@ -22,7 +22,7 @@ export function getParticipantName(participant: EventParticipant, t: TFunction):
     return participant.name || '?';
   }
   if (participant.type === 'pot') {
-    return t('participantsInput.potName');
+    return t('participantsInput.potName', { ns: 'events' });
   }
   return '?';
 }

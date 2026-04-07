@@ -27,11 +27,11 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('confirmDialog');
 
-  const resolvedTitle = title ?? t('confirmDialog.title');
-  const resolvedConfirm = confirmText ?? t('confirmDialog.confirm');
-  const resolvedCancel = cancelText ?? t('confirmDialog.cancel');
+  const resolvedTitle = title ?? t('title');
+  const resolvedConfirm = confirmText ?? t('confirm');
+  const resolvedCancel = cancelText ?? t('cancel');
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>

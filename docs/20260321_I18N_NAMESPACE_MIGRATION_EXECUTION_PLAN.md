@@ -28,7 +28,7 @@ The frontend currently stores all UI strings for each language in one monolithic
 
 Current characteristics:
 
-- ~306 lines per locale file.
+- ~353 lines per locale file (grew from ~306 due to Microsoft OAuth login keys, profile/user-settings, and participant autocomplete additions).
 - All locales are imported eagerly at startup from `apps/frontend/src/i18n/index.ts`.
 - Translation ownership is shared across many features, increasing merge conflicts.
 
@@ -119,6 +119,8 @@ apps/frontend/src/i18n/
       profile.json
       user.json
       header.json
+      language.json
+      theme.json
       notFound.json
       errorBoundary.json
       confirmDialog.json
@@ -158,11 +160,15 @@ Example (`profile.json`):
 #### Ownership contract
 
 - `common`: shared generic UI actions/messages.
-- `auth`: login/callback/auth-specific texts.
+- `auth`: login/callback/auth-specific texts. Includes both Google and Microsoft OAuth login strings.
 - `adminUsers`: admin users feature.
-- `profile`: profile feature.
-- `events`, `eventDetail`, `transactions`, `kpiDetail`: domain screens/components.
-- `header`, `user`, `language`, `theme`: global shell.
+- `profile`: profile/user-settings feature (`Profile.tsx` and `features/profile/`).
+- `events`: event list, event form modal, event context menu, and `participantsInput` (participant autocomplete/rename/replace — kept here because it only appears inside event management flows).
+- `eventDetail`: event detail screen, KPI grid, participant rows.
+- `transactions`: transaction list, modal, form, and type selector.
+- `kpiDetail`: KPI drill-down screen.
+- `header`, `user`: global shell navigation and user menu.
+- `language`, `theme`: language selector and theme toggle (global shell).
 
 #### Type contract
 
@@ -181,6 +187,8 @@ export const NAMESPACES = [
   'profile',
   'user',
   'header',
+  'language',
+  'theme',
   'notFound',
   'errorBoundary',
   'confirmDialog',
@@ -382,16 +390,16 @@ Deliverable:
 
 ### Quality and regression
 
-- [ ] All frontend tests pass.
-- [ ] All lint checks pass.
-- [ ] Build passes.
+- [x] All frontend tests pass.
+- [x] All lint checks pass.
+- [x] Build passes.
 - [ ] Manual language switch verification done in main routes.
 
 ### Cleanup
 
-- [ ] Legacy `translation.json` files removed.
-- [ ] Compatibility code paths removed.
-- [ ] Documentation updated.
+- [x] Legacy `translation.json` files removed.
+- [x] Compatibility code paths removed.
+- [x] Documentation updated.
 
 ---
 
@@ -412,6 +420,22 @@ Run after each PR:
 3. Admin users page renders all translated strings in 3 languages.
 4. Event detail and KPI detail keep previous translations and no key leaks.
 5. NotFound and ErrorBoundary still resolve strings.
+
+### Bundle impact measurement (Phase 5)
+
+Measured on `2026-04-07` with `pnpm --filter @friends/frontend build` in production mode.
+
+Before removing compatibility path (legacy monolithic files still statically imported):
+
+1. `translation.json` payload (raw, 3 locales): `40,598 bytes`.
+2. Entry chunk `dist/assets/index-*.js`: `269.22 kB` (`83.50 kB` gzip).
+3. Build warning present: locale files were both dynamically and statically imported.
+
+After enabling namespace-only runtime loading and removing legacy monoliths:
+
+1. Entry chunk `dist/assets/index-*.js`: `234.84 kB` (`74.45 kB` gzip).
+2. Delta vs before: `-34.38 kB` raw and `-9.05 kB` gzip on the main entry chunk.
+3. Build warning about mixed static/dynamic import for `translation.json` disappeared.
 
 ### Mocking strategy (unit tests)
 

@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { isUserRole } from '@/features/auth/types';
+import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
+
+const AUTH_NAMESPACES = ['auth'] as const;
 
 function parseQuery(search: string) {
   const params = new URLSearchParams(search);
@@ -17,10 +20,11 @@ function parseQuery(search: string) {
 }
 
 export function AuthCallback() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(AUTH_NAMESPACES);
   const navigate = useNavigate();
   const location = useLocation();
   const { setAuth } = useAuth();
+  const isI18nReady = useI18nNamespacesReady(AUTH_NAMESPACES);
 
   useEffect(() => {
     const { token, id, email, name, avatar, role } = parseQuery(location.search);
@@ -45,7 +49,7 @@ export function AuthCallback() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <span className="text-lg">{t('auth.loading')}</span>
+      <span className="text-lg">{isI18nReady ? t('loading') : 'Loading...'}</span>
     </div>
   );
 }

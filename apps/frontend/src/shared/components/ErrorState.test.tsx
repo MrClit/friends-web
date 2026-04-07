@@ -7,8 +7,8 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'common.errorLoading': 'Could not load data. Please try again.',
-        'common.retry': 'Retry',
+        errorLoading: 'Could not load data. Please try again.',
+        retry: 'Retry',
       };
       return translations[key] || key;
     },

@@ -21,7 +21,7 @@ export interface UseProfileFormResult {
 }
 
 export function useProfileForm(): UseProfileFormResult {
-  const { t } = useTranslation();
+  const { t } = useTranslation('profile');
   const { user, refreshUser, updateUser } = useAuth();
   const addToast = useToastStore((state) => state.addToast);
   const updateCurrentUserProfile = useUpdateCurrentUserProfile();
@@ -78,7 +78,7 @@ export function useProfileForm(): UseProfileFormResult {
     if (!file.type.startsWith('image/')) {
       addToast({
         type: 'error',
-        message: t('profile.toasts.invalidImage', 'Please select a valid image file.'),
+        message: t('toasts.invalidImage', 'Please select a valid image file.'),
         duration: 5000,
       });
       return;
@@ -87,7 +87,7 @@ export function useProfileForm(): UseProfileFormResult {
     if (file.size > AVATAR_MAX_SIZE_BYTES) {
       addToast({
         type: 'error',
-        message: t('profile.toasts.fileTooLarge', 'Image is too large. Maximum size is 5 MB.'),
+        message: t('toasts.fileTooLarge', 'Image is too large. Maximum size is 5 MB.'),
         duration: 5000,
       });
       return;
@@ -104,7 +104,7 @@ export function useProfileForm(): UseProfileFormResult {
     if (!trimmedName) {
       addToast({
         type: 'error',
-        message: t('profile.toasts.invalidName', 'Name cannot be empty.'),
+        message: t('toasts.invalidName', 'Name cannot be empty.'),
         duration: 5000,
       });
       return;
@@ -125,7 +125,7 @@ export function useProfileForm(): UseProfileFormResult {
 
       addToast({
         type: 'success',
-        message: t('profile.toasts.updateSuccess', 'Profile updated successfully.'),
+        message: t('toasts.updateSuccess', 'Profile updated successfully.'),
         duration: 3500,
       });
 
@@ -135,7 +135,7 @@ export function useProfileForm(): UseProfileFormResult {
 
       addToast({
         type: 'error',
-        message: t('profile.toasts.updateError', 'Could not update profile.'),
+        message: t('toasts.updateError', 'Could not update profile.'),
         description,
         duration: 6000,
       });

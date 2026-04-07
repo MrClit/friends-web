@@ -1,0 +1,10 @@
+{
+  "menu": "User options",
+  "logout": "Log out",
+  "logout_success": "Logged out successfully",
+  "profile": "Profile",
+  "auth": {
+    "loginWithGoogle": "Login with Google",
+    "loginWithMicrosoft": "Login with Microsoft"
+  }
+}

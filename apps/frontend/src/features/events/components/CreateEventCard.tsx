@@ -8,12 +8,12 @@ export interface CreateEventCardProps extends ButtonHTMLAttributes<HTMLButtonEle
 }
 
 const CreateEventCardInner: FC<CreateEventCardProps> = ({ onClick, className, disabled, ...rest }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('events');
 
   return (
     <button
       type="button"
-      aria-label={t('events.createEventCard.ariaLabel')}
+      aria-label={t('createEventCard.ariaLabel')}
       className={cn(
         'group border-2 border-dashed border-emerald-200 dark:border-emerald-800/50 p-8 rounded-3xl flex flex-col items-center justify-center text-slate-400 hover:border-primary/50 hover:bg-white/50 dark:hover:bg-emerald-900/20 transition-all min-h-75',
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
@@ -35,10 +35,10 @@ const CreateEventCardInner: FC<CreateEventCardProps> = ({ onClick, className, di
         />
       </div>
       <p className="font-bold text-lg text-emerald-800 dark:text-emerald-100 group-hover:text-emerald-600 transition-colors">
-        {t('events.createEventCard.title')}
+        {t('createEventCard.title')}
       </p>
       <p className="text-sm mt-2 text-center text-emerald-600/60 dark:text-emerald-400/60 px-6">
-        {t('events.createEventCard.subtitle')}
+        {t('createEventCard.subtitle')}
       </p>
     </button>
   );

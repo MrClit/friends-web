@@ -18,7 +18,7 @@ import {
 
 export function TransactionModal() {
   const { open, event, transaction, closeModal } = useTransactionModalStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['transactions', 'common']);
 
   const {
     type,
@@ -76,7 +76,7 @@ export function TransactionModal() {
             <DialogCloseButton
               onClick={() => handleOpenChange(false)}
               disabled={isSaving || isDeleting || showDiscardConfirm || showDeleteConfirm}
-              aria-label={t('common.close')}
+              aria-label={t('close', { ns: 'common' })}
             />
           </DialogHeader>
 

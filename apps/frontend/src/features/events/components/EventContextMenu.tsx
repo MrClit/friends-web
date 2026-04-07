@@ -8,7 +8,7 @@ interface EventContextMenuProps {
 }
 
 export function EventContextMenu({ onEdit, onDelete }: EventContextMenuProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('events');
 
   return (
     <DropdownMenu>

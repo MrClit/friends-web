@@ -48,7 +48,7 @@ export const ParticipantRow = memo(function ParticipantRow({
   onCommitRename,
   onTargetChange,
 }: ParticipantRowProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('events');
   const isGuest = participant.type === 'guest';
   const isPot = participant.type === 'pot';
   const participantName = getParticipantName(participant, t);

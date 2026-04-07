@@ -43,22 +43,24 @@ export function AdminUsersDialogs({
   onDeleteOpenChange,
   onDeleteConfirm,
 }: AdminUsersDialogsProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['adminUsers', 'common', 'confirmDialog']);
 
   return (
     <>
       <DialogFormWrapper
         open={isCreateOpen}
         onOpenChange={onCreateOpenChange}
-        title={t('adminUsers.createTitle', 'Create User')}
-        closeAriaLabel={t('common.close')}
+        title={t('createTitle', { ns: 'adminUsers', defaultValue: 'Create User' })}
+        closeAriaLabel={t('close', { ns: 'common' })}
         primaryAction={{
-          label: isCreating ? t('adminUsers.creating', 'Creating...') : t('adminUsers.createAction', 'Create user'),
+          label: isCreating
+            ? t('creating', { ns: 'adminUsers', defaultValue: 'Creating...' })
+            : t('createAction', { ns: 'adminUsers', defaultValue: 'Create user' }),
           onClick: onCreateSubmit,
           disabled: isCreating,
         }}
         secondaryAction={{
-          label: t('common.close', 'Close'),
+          label: t('close', { ns: 'common', defaultValue: 'Close' }),
           onClick: () => onCreateOpenChange(false),
           disabled: isCreating,
         }}
@@ -69,15 +71,17 @@ export function AdminUsersDialogs({
       <DialogFormWrapper
         open={isEditOpen}
         onOpenChange={onEditOpenChange}
-        title={t('adminUsers.editTitle', 'Edit User')}
-        closeAriaLabel={t('common.close')}
+        title={t('editTitle', { ns: 'adminUsers', defaultValue: 'Edit User' })}
+        closeAriaLabel={t('close', { ns: 'common' })}
         primaryAction={{
-          label: isUpdating ? t('adminUsers.updating', 'Updating...') : t('adminUsers.updateAction', 'Update user'),
+          label: isUpdating
+            ? t('updating', { ns: 'adminUsers', defaultValue: 'Updating...' })
+            : t('updateAction', { ns: 'adminUsers', defaultValue: 'Update user' }),
           onClick: onEditSubmit,
           disabled: isUpdating,
         }}
         secondaryAction={{
-          label: t('common.close', 'Close'),
+          label: t('close', { ns: 'common', defaultValue: 'Close' }),
           onClick: () => onEditOpenChange(false),
           disabled: isUpdating,
         }}
@@ -87,13 +91,17 @@ export function AdminUsersDialogs({
 
       <ConfirmDialog
         open={isDeleteOpen}
-        title={t('adminUsers.deleteTitle', 'Delete user?')}
-        message={t(
-          'adminUsers.deleteMessage',
-          'This action will soft delete the user and cannot be undone from this screen.',
-        )}
-        confirmText={isDeleting ? t('adminUsers.deleting', 'Deleting...') : t('common.delete', 'Delete')}
-        cancelText={t('confirmDialog.cancel', 'Cancel')}
+        title={t('deleteTitle', { ns: 'adminUsers', defaultValue: 'Delete user?' })}
+        message={t('deleteMessage', {
+          ns: 'adminUsers',
+          defaultValue: 'This action will soft delete the user and cannot be undone from this screen.',
+        })}
+        confirmText={
+          isDeleting
+            ? t('deleting', { ns: 'adminUsers', defaultValue: 'Deleting...' })
+            : t('delete', { ns: 'common', defaultValue: 'Delete' })
+        }
+        cancelText={t('cancel', { ns: 'confirmDialog', defaultValue: 'Cancel' })}
         onConfirm={onDeleteConfirm}
         onCancel={() => onDeleteOpenChange(false)}
       />

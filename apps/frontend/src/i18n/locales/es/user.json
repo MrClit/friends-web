@@ -1,0 +1,10 @@
+{
+  "menu": "Opciones de usuario",
+  "logout": "Cerrar sesión",
+  "logout_success": "Sesión cerrada correctamente",
+  "profile": "Perfil",
+  "auth": {
+    "loginWithGoogle": "Iniciar sesión con Google",
+    "loginWithMicrosoft": "Iniciar sesión con Microsoft"
+  }
+}

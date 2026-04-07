@@ -20,20 +20,20 @@ export function isValidKPI(value: unknown): value is KPIType {
 export const getKPIConfig = (t: TFunction) =>
   ({
     balance: {
-      label: t('kpiDetail.kpi.balance'),
+      label: t('kpi.balance'),
       colorClass: 'bg-white text-green-800 dark:bg-emerald-950 dark:text-green-200',
       borderColorClass: 'border-emerald-200 dark:border-emerald-700/50',
-      descriptionKey: 'kpiDetail.description.balance',
+      descriptionKey: 'description.balance',
       IconComponent: MdAccountBalanceWallet,
       kpiKey: 'participantBalances' as const,
       includePot: false, // Pot doesn't have a balance
       gradients: ['from-emerald-400 to-emerald-500', 'from-teal-400 to-teal-500', 'from-green-400 to-green-500'],
     },
     contributionStatus: {
-      label: t('kpiDetail.kpi.contributionStatus'),
+      label: t('kpi.contributionStatus'),
       colorClass: 'bg-white text-blue-800 dark:bg-emerald-950 dark:text-blue-200',
       borderColorClass: 'border-blue-200 dark:border-blue-700/50',
-      descriptionKey: 'kpiDetail.description.contributionStatus',
+      descriptionKey: 'description.contributionStatus',
       IconComponent: MdVolunteerActivism,
       kpiKey: 'participantPending' as const,
       includePot: false,
@@ -41,10 +41,10 @@ export const getKPIConfig = (t: TFunction) =>
       valueFormat: 'percent' as const,
     },
     userStatus: {
-      label: t('kpiDetail.kpi.userStatus'),
+      label: t('kpi.userStatus'),
       colorClass: 'bg-white text-amber-800 dark:bg-emerald-950 dark:text-amber-200',
       borderColorClass: 'border-amber-200 dark:border-amber-700/50',
-      descriptionKey: 'kpiDetail.description.userStatus',
+      descriptionKey: 'description.userStatus',
       IconComponent: MdPerson,
       kpiKey: 'participantPending' as const,
       includePot: false,
@@ -52,10 +52,10 @@ export const getKPIConfig = (t: TFunction) =>
       valueFormat: 'percent' as const,
     },
     expenses: {
-      label: t('kpiDetail.kpi.expenses'),
+      label: t('kpi.expenses'),
       colorClass: 'bg-white text-red-800 dark:bg-emerald-950 dark:text-red-200',
       borderColorClass: 'border-red-200 dark:border-red-700/50',
-      descriptionKey: 'kpiDetail.description.expenses',
+      descriptionKey: 'description.expenses',
       IconComponent: MdShoppingBag,
       kpiKey: 'participantExpenses' as const,
       includePot: true, // ⭐ POT CAN HAVE EXPENSES

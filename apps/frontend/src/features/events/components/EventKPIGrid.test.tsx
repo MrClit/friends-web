@@ -21,15 +21,15 @@ vi.mock('react-i18next', async () => {
     useTranslation: () => ({
       t: (key: string, options?: { amount?: string }) => {
         const translations: Record<string, string> = {
-          'eventDetail.kpi.pot': 'Pot Balance',
-          'eventDetail.kpi.contributionStatus': 'Contribution Status',
-          'eventDetail.kpi.contributionStatusHelper': `Pending adjustment: ${options?.amount ?? ''}`,
-          'eventDetail.kpi.contributionStatusNoTargetHelper': `No targets defined · Adjustment: ${options?.amount ?? ''}`,
-          'eventDetail.kpi.userStatus': 'Your Contribution Status',
-          'eventDetail.kpi.userStatusHelper': `Pending adjustment: ${options?.amount ?? ''}`,
-          'eventDetail.kpi.userStatusNoTargetHelper': `No target defined · Adjustment: ${options?.amount ?? ''}`,
-          'eventDetail.kpi.userStatusNoParticipation': 'No participas',
-          'eventDetail.kpi.expenses': 'Total Expenses',
+          'kpi.pot': 'Pot Balance',
+          'kpi.contributionStatus': 'Contribution Status',
+          'kpi.contributionStatusHelper': `Pending adjustment: ${options?.amount ?? ''}`,
+          'kpi.contributionStatusNoTargetHelper': `No targets defined · Adjustment: ${options?.amount ?? ''}`,
+          'kpi.userStatus': 'Your Contribution Status',
+          'kpi.userStatusHelper': `Pending adjustment: ${options?.amount ?? ''}`,
+          'kpi.userStatusNoTargetHelper': `No target defined · Adjustment: ${options?.amount ?? ''}`,
+          'kpi.userStatusNoParticipation': 'No participas',
+          'kpi.expenses': 'Total Expenses',
         };
 
         return translations[key] ?? key;

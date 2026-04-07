@@ -28,7 +28,7 @@ function groupByDate(transactions: Transaction[]) {
 
 export function TransactionsList({ event }: TransactionsListProps) {
   const transactionModalStore = useTransactionModalStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['transactions', 'common']);
 
   // Use React Query infinite query for pagination
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error, refetch } = useTransactionsPaginated(
@@ -71,7 +71,7 @@ export function TransactionsList({ event }: TransactionsListProps) {
   );
 
   if (isLoading) {
-    return <div className="w-full max-w-2xl mb-8 text-center text-teal-400 py-8">{t('common.loading')}</div>;
+    return <div className="w-full max-w-2xl mb-8 text-center text-teal-400 py-8">{t('loading', { ns: 'common' })}</div>;
   }
 
   if (error) {
@@ -79,7 +79,7 @@ export function TransactionsList({ event }: TransactionsListProps) {
 
     return (
       <ErrorState
-        message={isNotFoundOrNoAccess ? t('common.notFoundOrNoAccess') : undefined}
+        message={isNotFoundOrNoAccess ? t('notFoundOrNoAccess', { ns: 'common' }) : undefined}
         onRetry={isNotFoundOrNoAccess ? undefined : () => void refetch()}
       />
     );

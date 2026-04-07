@@ -7,16 +7,12 @@ import { useThemeStore } from '@/shared/store/useThemeStore';
  */
 export function ThemeToggle() {
   const { mode, toggle } = useThemeStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation('theme');
 
   return (
     <button
       onClick={toggle}
-      aria-label={
-        mode === 'dark'
-          ? t('theme.toggleDark', 'Cambiar a modo claro')
-          : t('theme.toggleLight', 'Cambiar a modo oscuro')
-      }
+      aria-label={mode === 'dark' ? t('toggleDark', 'Cambiar a modo claro') : t('toggleLight', 'Cambiar a modo oscuro')}
       className="p-2 rounded-lg border border-slate-200 dark:border-emerald-800 hover:bg-white dark:hover:bg-emerald-900/50 transition-all cursor-pointer"
     >
       {mode === 'dark' ? (

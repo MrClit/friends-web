@@ -1,0 +1,64 @@
+{
+  "eventsList": {
+    "noEvents": "No events yet.",
+    "emptyHint": "Click the \"+\" button to create your first event.",
+    "title": "Events",
+    "participants_one": "1 participant",
+    "participants_other": "{{count}} participants"
+  },
+  "eventFormModal": {
+    "editTitle": "Edit Event",
+    "newTitle": "New Event",
+    "discardEditTitle": "Discard changes?",
+    "discardNewTitle": "Discard new event?",
+    "discardEditMessage": "You have unsaved changes. Are you sure you want to close the form?",
+    "discardNewMessage": "Are you sure you want to close the form?",
+    "discard": "Discard",
+    "cancel": "Cancel"
+  },
+  "eventForm": {
+    "titleLabel": "Title",
+    "iconLabel": "Event icon",
+    "descriptionLabel": "Description (optional)",
+    "descriptionPlaceholder": "Add details about the event...",
+    "titlePlaceholder": "Event name",
+    "update": "Update Event",
+    "create": "Create Event",
+    "saving": "Saving..."
+  },
+  "participantsInput": {
+    "label": "Participants",
+    "add": "Add",
+    "addAria": "Add participant",
+    "placeholder": "Name or email...",
+    "replacePlaceholder": "Search user to replace...",
+    "deleteAria": "Delete participant",
+    "replaceAria": "Replace guest with user",
+    "renameAria": "Edit guest name",
+    "renameInputAria": "Guest name",
+    "saveRenameAria": "Save guest name",
+    "cancelRenameAria": "Cancel guest editing",
+    "cancelReplace": "Cancel",
+    "potName": "Shared pot",
+    "noUsers": "No users found",
+    "targetLabel": "Target",
+    "targetPlaceholder": "0",
+    "targetAria": "Contribution target amount",
+    "createNew": "Add as guest"
+  },
+  "eventContextMenu": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "create_success": "Event created",
+  "create_error": "Error creating event",
+  "update_success": "Event updated",
+  "update_error": "Error updating event",
+  "delete_success": "Event deleted",
+  "delete_error": "Error deleting event",
+  "createEventCard": {
+    "ariaLabel": "Create new event",
+    "title": "Create new event",
+    "subtitle": "Start splitting expenses with your friends right now."
+  }
+}

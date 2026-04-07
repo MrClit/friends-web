@@ -23,7 +23,7 @@ interface EventFormProps {
 }
 
 export function EventForm({ fields, onSubmit }: EventFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('events');
   const {
     title,
     setTitle,

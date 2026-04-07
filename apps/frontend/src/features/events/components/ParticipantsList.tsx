@@ -14,7 +14,7 @@ interface ParticipantsListProps {
 }
 
 export function ParticipantsList({ participants, setParticipants, setParticipantReplacements }: ParticipantsListProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('events');
   const listRef = useRef<HTMLDivElement | null>(null);
   const previousParticipantsCountRef = useRef(participants.length);
 

@@ -1,0 +1,64 @@
+{
+  "eventsList": {
+    "noEvents": "No hay eventos aún.",
+    "emptyHint": "Pulsa el botón \"+\" para crear tu primer evento.",
+    "title": "Eventos",
+    "participants_one": "1 participante",
+    "participants_other": "{{count}} participantes"
+  },
+  "eventFormModal": {
+    "editTitle": "Editar Evento",
+    "newTitle": "Nuevo Evento",
+    "discardEditTitle": "¿Descartar cambios?",
+    "discardNewTitle": "¿Descartar nuevo evento?",
+    "discardEditMessage": "Tienes cambios sin guardar. ¿Seguro que quieres cerrar el formulario?",
+    "discardNewMessage": "¿Seguro que quieres cerrar el formulario?",
+    "discard": "Descartar",
+    "cancel": "Cancelar"
+  },
+  "eventForm": {
+    "titleLabel": "Título",
+    "iconLabel": "Icono del evento",
+    "descriptionLabel": "Descripción (opcional)",
+    "descriptionPlaceholder": "Añade detalles sobre el evento...",
+    "titlePlaceholder": "Nombre del evento",
+    "update": "Actualizar Evento",
+    "create": "Crear Evento",
+    "saving": "Guardando..."
+  },
+  "participantsInput": {
+    "label": "Participantes",
+    "add": "Añadir",
+    "addAria": "Añadir participante",
+    "placeholder": "Nombre o email...",
+    "replacePlaceholder": "Buscar usuario para reemplazar...",
+    "deleteAria": "Eliminar participante",
+    "replaceAria": "Reemplazar invitado por usuario",
+    "renameAria": "Editar nombre del invitado",
+    "renameInputAria": "Nombre del invitado",
+    "saveRenameAria": "Guardar nombre del invitado",
+    "cancelRenameAria": "Cancelar edición del invitado",
+    "cancelReplace": "Cancelar",
+    "potName": "Fondo común",
+    "noUsers": "No se encontraron usuarios",
+    "targetLabel": "Objetivo",
+    "targetPlaceholder": "0",
+    "targetAria": "Importe del objetivo de contribución",
+    "createNew": "Añadir como invitado"
+  },
+  "eventContextMenu": {
+    "edit": "Modificar",
+    "delete": "Borrar"
+  },
+  "create_success": "Evento creado",
+  "create_error": "Error al crear evento",
+  "update_success": "Evento actualizado",
+  "update_error": "Error al actualizar evento",
+  "delete_success": "Evento eliminado",
+  "delete_error": "Error al eliminar evento",
+  "createEventCard": {
+    "ariaLabel": "Crear nuevo evento",
+    "title": "Crear nuevo evento",
+    "subtitle": "Empieza a dividir gastos con tus amigos ahora mismo."
+  }
+}

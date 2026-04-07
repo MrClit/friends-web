@@ -1,0 +1,22 @@
+{
+  "invalidId": "ID de evento inválido",
+  "notFound": "Evento no encontrado",
+  "kpi": {
+    "pot": "Saldo del Bote",
+    "contributionStatus": "Estado de Contribución",
+    "contributionStatusHelper": "Ajuste pendiente: {{amount}}",
+    "contributionStatusNoTargetHelper": "Sin objetivos definidos · Ajuste: {{amount}}",
+    "userStatus": "Tu Estado de Contribución",
+    "userStatusHelper": "Ajuste pendiente: {{amount}}",
+    "userStatusNoTargetHelper": "Sin objetivo definido · Ajuste: {{amount}}",
+    "userStatusNoParticipation": "No participas en este evento",
+    "contributions": "Contribución Total",
+    "expenses": "Gastos Totales",
+    "pending": "Pendiente de Pagar"
+  },
+  "addTransaction": "Añadir Transacción",
+  "deleteTitle": "¿Borrar evento?",
+  "deleteMessage": "Esta acción no se puede deshacer. ¿Seguro que quieres borrar este evento?",
+  "deleteConfirm": "Borrar",
+  "deleteCancel": "Cancelar"
+}

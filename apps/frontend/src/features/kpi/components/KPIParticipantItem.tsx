@@ -11,7 +11,7 @@ interface KPIParticipantItemProps {
 }
 
 export const KPIParticipantItem = memo(function KPIParticipantItem({ item, gradientClass }: KPIParticipantItemProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('kpiDetail');
   const percentage = item.percentage ?? 0;
   const avatarSrc = item.avatar?.startsWith('http') ? item.avatar : undefined;
   const isNegative = (item.rawAmount ?? 0) < 0;
@@ -37,7 +37,7 @@ export const KPIParticipantItem = memo(function KPIParticipantItem({ item, gradi
             <h4 className="font-bold text-slate-900 dark:text-white text-base leading-tight">{item.name}</h4>
             {item.targetValue && (
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {t('kpiDetail.targetLabel')}: {item.targetValue}
+                {t('targetLabel')}: {item.targetValue}
               </p>
             )}
           </div>

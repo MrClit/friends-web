@@ -5,14 +5,15 @@ import { ErrorBoundary } from './ErrorBoundary';
 // Mock i18n
 vi.mock('@/i18n', () => ({
   i18n: {
-    t: (key: string) => {
+    t: (key: string, options?: { ns?: string }) => {
+      const namespacedKey = options?.ns ? `${options.ns}.${key}` : key;
       const translations: Record<string, string> = {
         'errorBoundary.title': 'Something went wrong',
         'errorBoundary.message': 'An unexpected error occurred.',
         'errorBoundary.reload': 'Reload page',
         'errorBoundary.details': 'Error details',
       };
-      return translations[key] || key;
+      return translations[namespacedKey] || namespacedKey;
     },
   },
 }));

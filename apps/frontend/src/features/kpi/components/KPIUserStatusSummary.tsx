@@ -33,7 +33,7 @@ export function KPIUserStatusSummary({
   isCurrentUserParticipant,
   onSelectParticipant,
 }: KPIUserStatusSummaryProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('kpiDetail');
 
   const hasTargets = (data?.targetTotal ?? 0) > 0;
 
@@ -42,9 +42,9 @@ export function KPIUserStatusSummary({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-            {t('kpiDetail.userStatus.summaryTitle')}
+            {t('userStatus.summaryTitle')}
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('kpiDetail.userStatus.selectorHint')}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('userStatus.selectorHint')}</p>
         </div>
 
         <KPIParticipantCombobox
@@ -60,30 +60,30 @@ export function KPIUserStatusSummary({
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{data.participantName}</p>
             {data.isCurrentUser && (
               <span className="rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 px-2 py-0.5 text-xs font-semibold">
-                {t('kpiDetail.userStatus.youBadge')}
+                {t('userStatus.youBadge')}
               </span>
             )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <SummaryMetricCard
-              label={t('kpiDetail.userStatus.complianceLabel')}
-              value={hasTargets ? formatPercent(data.compliancePercent) : t('kpiDetail.userStatus.noTargetValue')}
+              label={t('userStatus.complianceLabel')}
+              value={hasTargets ? formatPercent(data.compliancePercent) : t('userStatus.noTargetValue')}
             />
             <SummaryMetricCard
-              label={t('kpiDetail.userStatus.adjustmentPendingLabel')}
+              label={t('userStatus.adjustmentPendingLabel')}
               value={formatAmount(data.adjustmentPending)}
             />
-            <SummaryMetricCard label={t('kpiDetail.userStatus.netTotalLabel')} value={formatAmount(data.netTotal)} />
+            <SummaryMetricCard label={t('userStatus.netTotalLabel')} value={formatAmount(data.netTotal)} />
             <SummaryMetricCard
-              label={t('kpiDetail.userStatus.targetTotalLabel')}
+              label={t('userStatus.targetTotalLabel')}
               value={formatAmount(data.targetTotal)}
             />
           </div>
 
           <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/40">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-              {t('kpiDetail.userStatus.differenceLabel')}
+              {t('userStatus.differenceLabel')}
             </p>
             <p className="text-lg font-black text-slate-900 dark:text-white">
               {formatSignedAmount(data.differenceTotal)}
@@ -91,12 +91,12 @@ export function KPIUserStatusSummary({
           </div>
 
           {!hasTargets && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">{t('kpiDetail.userStatus.noTargetHint')}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('userStatus.noTargetHint')}</p>
           )}
         </>
       ) : (
         <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 px-4 py-5 text-sm text-slate-600 dark:text-slate-300">
-          {isCurrentUserParticipant ? t('kpiDetail.userStatus.noSelection') : t('kpiDetail.userStatus.noParticipation')}
+          {isCurrentUserParticipant ? t('userStatus.noSelection') : t('userStatus.noParticipation')}
         </div>
       )}
     </section>

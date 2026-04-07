@@ -13,7 +13,7 @@ interface RequireRoleProps {
 
 export function RequireRole({ children, allowedRoles }: RequireRoleProps) {
   const { location, status } = useAccessGuard({ allowedRoles });
-  const { t } = useTranslation();
+  const { t } = useTranslation('adminUsers');
   const { addToast } = useToastStore();
   const hasNotifiedRef = useRef(false);
 
@@ -21,7 +21,7 @@ export function RequireRole({ children, allowedRoles }: RequireRoleProps) {
     if (status === 'unauthorized' && !hasNotifiedRef.current) {
       addToast({
         type: 'error',
-        message: t('adminUsers.accessDenied', 'Access denied'),
+        message: t('accessDenied', 'Access denied'),
         duration: 5000,
       });
       hasNotifiedRef.current = true;

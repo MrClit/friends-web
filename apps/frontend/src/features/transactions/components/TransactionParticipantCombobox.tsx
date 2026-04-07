@@ -24,7 +24,7 @@ export function TransactionParticipantCombobox({
   value,
   onChange,
 }: TransactionParticipantComboboxProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['transactions', 'events']);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const options = useMemo(() => {

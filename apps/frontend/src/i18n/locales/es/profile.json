@@ -1,0 +1,29 @@
+{
+  "title": "Perfil",
+  "subtitle": "Actualiza tu información de perfil y tu avatar.",
+  "avatar": {
+    "title": "Foto de perfil",
+    "subtitle": "Toca tu foto para actualizarla.",
+    "change": "Cambiar foto",
+    "choose": "Elegir foto",
+    "camera": "Hacer foto"
+  },
+  "fields": {
+    "name": "Nombre",
+    "email": "Email",
+    "role": "Rol",
+    "createdAt": "Fecha de alta",
+    "updatedAt": "Última actualización"
+  },
+  "actions": {
+    "save": "Guardar cambios",
+    "saving": "Guardando..."
+  },
+  "toasts": {
+    "invalidImage": "Selecciona un archivo de imagen válido.",
+    "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 5 MB.",
+    "invalidName": "El nombre no puede estar vacío.",
+    "updateSuccess": "Perfil actualizado correctamente.",
+    "updateError": "No se pudo actualizar el perfil."
+  }
+}

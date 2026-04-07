@@ -1,0 +1,22 @@
+{
+  "invalidId": "ID d'esdeveniment invàlid",
+  "notFound": "Esdeveniment no trobat",
+  "kpi": {
+    "pot": "Saldo del Pot",
+    "contributionStatus": "Estat de Contribució",
+    "contributionStatusHelper": "Ajust pendent: {{amount}}",
+    "contributionStatusNoTargetHelper": "Sense objectius definits · Ajust: {{amount}}",
+    "userStatus": "El Teu Estat de Contribució",
+    "userStatusHelper": "Ajust pendent: {{amount}}",
+    "userStatusNoTargetHelper": "Sense objectiu definit · Ajust: {{amount}}",
+    "userStatusNoParticipation": "No participes en aquest esdeveniment",
+    "contributions": "Contribució Total",
+    "expenses": "Despesa Total",
+    "pending": "Pendent de Pagar"
+  },
+  "addTransaction": "Afegir Transacció",
+  "deleteTitle": "Vols esborrar l'esdeveniment?",
+  "deleteMessage": "Aquesta acció no es pot desfer. Segur que vols esborrar aquest esdeveniment?",
+  "deleteConfirm": "Esborrar",
+  "deleteCancel": "Cancel·lar"
+}

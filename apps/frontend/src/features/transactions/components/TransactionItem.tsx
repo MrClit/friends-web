@@ -19,7 +19,7 @@ interface TransactionItemProps {
  * Optimized with React.memo to prevent unnecessary re-renders
  */
 function TransactionItemBase({ transaction, onClick, participantsMap }: TransactionItemProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('transactions');
 
   const isPot = isPotExpense(transaction);
 

@@ -9,7 +9,7 @@ interface IconPickerProps {
 }
 
 export function IconPicker({ selected, onSelect }: IconPickerProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('events');
 
   return (
     <div>

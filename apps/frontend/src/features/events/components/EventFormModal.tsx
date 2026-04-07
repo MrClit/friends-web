@@ -16,7 +16,7 @@ import { useEventFormModal } from '../hooks/useEventFormModal';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 
 export function EventFormModal() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['events', 'common']);
   const { open, closeModal, event, onSubmit } = useEventFormModalStore();
 
   const {
@@ -67,7 +67,7 @@ export function EventFormModal() {
             <DialogCloseButton
               onClick={() => handleOpenChange(false)}
               disabled={isLoading || showConfirm}
-              aria-label={t('common.close')}
+              aria-label={t('close', { ns: 'common' })}
             />
           </DialogHeader>
 

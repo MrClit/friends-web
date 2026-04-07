@@ -39,7 +39,7 @@ export const ProfileCard = memo(function ProfileCard({
   isSaving,
   onSave,
 }: ProfileCardProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('profile');
   const displayName = name.trim() || user.name;
 
   return (
@@ -67,7 +67,7 @@ export const ProfileCard = memo(function ProfileCard({
               htmlFor="profile-name"
               className="block text-sm font-semibold uppercase tracking-wide text-slate-700 dark:text-emerald-300/85"
             >
-              {t('profile.fields.name', 'Name')}
+              {t('fields.name', 'Name')}
             </label>
             <input
               id="profile-name"
@@ -86,16 +86,10 @@ export const ProfileCard = memo(function ProfileCard({
           </div>
 
           <dl className="grid gap-3 sm:grid-cols-2">
-            <ProfileInfoField label={t('profile.fields.email', 'Email')} value={user.email} />
-            <ProfileInfoField label={t('profile.fields.role', 'Role')} value={user.role.toUpperCase()} />
-            <ProfileInfoField
-              label={t('profile.fields.createdAt', 'Member since')}
-              value={formatProfileDate(user.createdAt)}
-            />
-            <ProfileInfoField
-              label={t('profile.fields.updatedAt', 'Last updated')}
-              value={formatProfileDate(user.updatedAt)}
-            />
+            <ProfileInfoField label={t('fields.email', 'Email')} value={user.email} />
+            <ProfileInfoField label={t('fields.role', 'Role')} value={user.role.toUpperCase()} />
+            <ProfileInfoField label={t('fields.createdAt', 'Member since')} value={formatProfileDate(user.createdAt)} />
+            <ProfileInfoField label={t('fields.updatedAt', 'Last updated')} value={formatProfileDate(user.updatedAt)} />
           </dl>
 
           <div className="pt-1">
@@ -113,7 +107,7 @@ export const ProfileCard = memo(function ProfileCard({
               )}
             >
               <MdSave className="text-lg" aria-hidden />
-              {isSaving ? t('profile.actions.saving', 'Saving...') : t('profile.actions.save', 'Save changes')}
+              {isSaving ? t('actions.saving', 'Saving...') : t('actions.save', 'Save changes')}
             </button>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { LANGUAGES } from '@/i18n/constants';
  * Shows language names in dropdown and checkmark for active language.
  */
 export function LanguageSelector() {
-  const { i18n, t } = useTranslation();
+  const { i18n, t } = useTranslation('language');
   const current = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0];
 
   const handleSelect = (code: string) => {
@@ -19,8 +19,8 @@ export function LanguageSelector() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          aria-label={t('language.select', 'Seleccionar idioma')}
-          title={t('language.current', { lng: current.name })}
+          aria-label={t('select', 'Seleccionar idioma')}
+          title={t('current', { lng: current.name })}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-emerald-800 hover:bg-white dark:hover:bg-emerald-900/50 transition-all cursor-pointer"
         >
           <MdLanguage className="text-[20px] text-emerald-600 dark:text-emerald-400" />

@@ -30,7 +30,7 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
   const [participants, setParticipants] = useState<EventParticipant[]>([buildDefaultParticipant(user)]);
   const [participantReplacements, setParticipantReplacements] = useState<ParticipantReplacement[]>([]);
   const createEvent = useCreateEvent();
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
   // Centralized reset function to avoid duplication
   const resetForm = useCallback(() => {
@@ -121,7 +121,7 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
             modal.closeAndReset();
           },
           onError: (error) => {
-            const message = error instanceof Error ? error.message : t('common.errorLoading');
+            const message = error instanceof Error ? error.message : t('errorLoading');
             modal.setErrorMessage(message);
           },
         });

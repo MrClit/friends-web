@@ -1,0 +1,29 @@
+{
+  "title": "Profile",
+  "subtitle": "Update your profile information and avatar.",
+  "avatar": {
+    "title": "Profile photo",
+    "subtitle": "Tap your photo to update it.",
+    "change": "Change photo",
+    "choose": "Choose photo",
+    "camera": "Take photo"
+  },
+  "fields": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "createdAt": "Member since",
+    "updatedAt": "Last updated"
+  },
+  "actions": {
+    "save": "Save changes",
+    "saving": "Saving..."
+  },
+  "toasts": {
+    "invalidImage": "Please select a valid image file.",
+    "fileTooLarge": "Image is too large. Maximum size is 5 MB.",
+    "invalidName": "Name cannot be empty.",
+    "updateSuccess": "Profile updated successfully.",
+    "updateError": "Could not update profile."
+  }
+}

@@ -15,7 +15,7 @@ interface KPIBoxDetailProps {
  * Supports responsive layout with dynamic styling
  */
 export function KPIBoxDetail({ kpi, kpiValue, kpiConfig }: KPIBoxDetailProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('kpiDetail');
   const config = kpiConfig[kpi];
   const IconComponent = config.IconComponent;
 
@@ -23,7 +23,7 @@ export function KPIBoxDetail({ kpi, kpiValue, kpiConfig }: KPIBoxDetailProps) {
     config.valueFormat === 'percent'
       ? Number.isFinite(kpiValue)
         ? `${kpiValue.toFixed(1)}%`
-        : t('kpiDetail.contributionStatus.noTargetValue')
+        : t('contributionStatus.noTargetValue')
       : formatAmount(kpiValue);
 
   // Extract all color classes from colorClass (includes dark mode variants)

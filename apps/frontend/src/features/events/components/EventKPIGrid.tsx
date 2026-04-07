@@ -29,7 +29,7 @@ interface KPIConfig {
 export function EventKPIGrid(props: EventKPIGridProps) {
   const { eventId, currentUserId, participants, totalContributions, participantPending } = props;
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation('eventDetail');
 
   const targetTotal = participants.reduce((sum, participant) => {
     if (participant.type === 'user' || participant.type === 'guest') {
@@ -60,7 +60,7 @@ export function EventKPIGrid(props: EventKPIGridProps) {
   const kpiConfig: KPIConfig[] = [
     {
       key: 'balance',
-      label: t('eventDetail.kpi.pot'),
+      label: t('kpi.pot'),
       value: props.potBalance,
       icon: <MdAccountBalanceWallet className="text-lg" />,
       borderColorClass: 'border-emerald-500',
@@ -68,7 +68,7 @@ export function EventKPIGrid(props: EventKPIGridProps) {
     },
     {
       key: 'expenses',
-      label: t('eventDetail.kpi.expenses'),
+      label: t('kpi.expenses'),
       value: props.totalExpenses,
       icon: <MdShoppingBag className="text-lg" />,
       borderColorClass: 'border-rose-500',
@@ -76,7 +76,7 @@ export function EventKPIGrid(props: EventKPIGridProps) {
     },
     {
       key: 'contributionStatus',
-      label: t('eventDetail.kpi.contributionStatus'),
+      label: t('kpi.contributionStatus'),
       value: contributionStatusPercent,
       icon: <MdVolunteerActivism className="text-lg" />,
       borderColorClass: 'border-blue-500',
@@ -84,12 +84,12 @@ export function EventKPIGrid(props: EventKPIGridProps) {
       valueFormat: 'percent',
       helperText:
         targetTotal > 0
-          ? t('eventDetail.kpi.contributionStatusHelper', { amount: formatAmount(pendingAdjustment) })
-          : t('eventDetail.kpi.contributionStatusNoTargetHelper', { amount: formatAmount(pendingAdjustment) }),
+          ? t('kpi.contributionStatusHelper', { amount: formatAmount(pendingAdjustment) })
+          : t('kpi.contributionStatusNoTargetHelper', { amount: formatAmount(pendingAdjustment) }),
     },
     {
       key: 'userStatus',
-      label: t('eventDetail.kpi.userStatus'),
+      label: t('kpi.userStatus'),
       value: currentUserCompliancePercent,
       icon: <MdPerson className="text-lg" />,
       borderColorClass: 'border-amber-500',
@@ -97,9 +97,9 @@ export function EventKPIGrid(props: EventKPIGridProps) {
       valueFormat: 'percent',
       helperText: currentUserParticipant
         ? currentUserTarget > 0
-          ? t('eventDetail.kpi.userStatusHelper', { amount: formatAmount(currentUserAdjustmentPending) })
-          : t('eventDetail.kpi.userStatusNoTargetHelper', { amount: formatAmount(currentUserAdjustmentPending) })
-        : t('eventDetail.kpi.userStatusNoParticipation'),
+          ? t('kpi.userStatusHelper', { amount: formatAmount(currentUserAdjustmentPending) })
+          : t('kpi.userStatusNoTargetHelper', { amount: formatAmount(currentUserAdjustmentPending) })
+        : t('kpi.userStatusNoParticipation'),
     },
   ];
 

@@ -3,18 +3,22 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { useProfileForm, ProfileCard } from '@/features/profile';
 import { HeaderSection } from '@/shared/components/HeaderSection';
+import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
 
 import { MainLayout } from './MainLayout';
 
+const PROFILE_NAMESPACES = ['profile', 'common'] as const;
+
 export function Profile() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(PROFILE_NAMESPACES);
   const { user, loading } = useAuth();
   const form = useProfileForm();
+  const isI18nReady = useI18nNamespacesReady(PROFILE_NAMESPACES);
 
-  if (loading) {
+  if (loading || !isI18nReady) {
     return (
       <MainLayout>
-        <p className="text-slate-600 dark:text-emerald-200">{t('common.loading')}</p>
+        <p className="text-slate-600 dark:text-emerald-200">{t('loading', { ns: 'common' })}</p>
       </MainLayout>
     );
   }
@@ -22,7 +26,7 @@ export function Profile() {
   if (!user) {
     return (
       <MainLayout>
-        <p className="text-red-600 dark:text-red-300">{t('common.notFoundOrNoAccess')}</p>
+        <p className="text-red-600 dark:text-red-300">{t('notFoundOrNoAccess', { ns: 'common' })}</p>
       </MainLayout>
     );
   }
@@ -30,8 +34,11 @@ export function Profile() {
   return (
     <MainLayout>
       <HeaderSection
-        title={t('profile.title', 'Profile')}
-        subtitle={t('profile.subtitle', 'Update your profile information and avatar.')}
+        title={t('title', { ns: 'profile', defaultValue: 'Profile' })}
+        subtitle={t('subtitle', {
+          ns: 'profile',
+          defaultValue: 'Update your profile information and avatar.',
+        })}
       />
 
       <ProfileCard

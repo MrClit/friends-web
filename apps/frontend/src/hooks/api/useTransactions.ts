@@ -74,7 +74,7 @@ export function useCreateTransaction(eventId: string) {
   return useMutation({
     mutationFn: (data: CreateTransactionDto) => transactionsApi.create(eventId, data),
     onSuccess: () => {
-      success('transactions.create_success');
+      success('create_success', undefined, undefined, { ns: 'transactions' });
       // Invalidate transactions for this event
       queryClient.invalidateQueries({
         queryKey: queryKeys.transactions.byEvent(eventId),
@@ -89,7 +89,7 @@ export function useCreateTransaction(eventId: string) {
       });
     },
     onError: () => {
-      error('transactions.create_error');
+      error('create_error', undefined, { ns: 'transactions' });
     },
   });
 }
@@ -106,7 +106,7 @@ export function useUpdateTransaction() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTransactionDto }) => transactionsApi.update(id, data),
     onSuccess: (transaction) => {
-      success('transactions.update_success');
+      success('update_success', undefined, undefined, { ns: 'transactions' });
       // Invalidate transactions for the event
       queryClient.invalidateQueries({
         queryKey: queryKeys.transactions.byEvent(transaction.eventId),
@@ -125,7 +125,7 @@ export function useUpdateTransaction() {
       });
     },
     onError: () => {
-      error('transactions.update_error');
+      error('update_error', undefined, { ns: 'transactions' });
     },
   });
 }
@@ -142,7 +142,7 @@ export function useDeleteTransaction(eventId?: string) {
   return useMutation({
     mutationFn: (id: string) => transactionsApi.delete(id),
     onSuccess: (_data, id) => {
-      success('transactions.delete_success');
+      success('delete_success', undefined, undefined, { ns: 'transactions' });
       // Invalidate all transaction queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
       // Invalidate specific transaction detail
@@ -155,7 +155,7 @@ export function useDeleteTransaction(eventId?: string) {
       }
     },
     onError: () => {
-      error('transactions.delete_error');
+      error('delete_error', undefined, { ns: 'transactions' });
     },
   });
 }

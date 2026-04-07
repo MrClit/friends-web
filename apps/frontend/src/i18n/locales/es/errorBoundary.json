@@ -1,0 +1,6 @@
+{
+  "title": "Algo salió mal",
+  "message": "Ha ocurrido un error inesperado. Puedes intentar recargar la página.",
+  "reload": "Recargar página",
+  "details": "Detalles del error"
+}

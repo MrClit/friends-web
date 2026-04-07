@@ -8,9 +8,9 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'confirmDialog.title': 'Confirm action',
-        'confirmDialog.confirm': 'Confirm',
-        'confirmDialog.cancel': 'Cancel',
+        title: 'Confirm action',
+        confirm: 'Confirm',
+        cancel: 'Cancel',
       };
       return translations[key] ?? key;
     },

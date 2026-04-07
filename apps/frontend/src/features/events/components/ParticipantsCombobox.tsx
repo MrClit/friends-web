@@ -27,7 +27,7 @@ export function ParticipantsCombobox({
   autoFocus = false,
   compact = false,
 }: ParticipantsComboboxProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['events', 'common']);
   const placeholder = allowCreateGuest ? t('participantsInput.placeholder') : t('participantsInput.replacePlaceholder');
   // Generate a unique name to prevent Chrome autocomplete history
   const inputName = useRef(`participant-${crypto.randomUUID()}`).current;
@@ -111,7 +111,7 @@ export function ParticipantsCombobox({
       >
         <div ref={listRef} className="max-h-64 overflow-y-auto">
           {isLoading ? (
-            <div className="p-3 text-sm text-slate-500">{t('common.loading')}</div>
+            <div className="p-3 text-sm text-slate-500">{t('loading', { ns: 'common' })}</div>
           ) : filteredUsers.length === 0 && !isNewUser ? (
             <div className="p-3 text-sm text-slate-500">{t('participantsInput.noUsers')}</div>
           ) : (

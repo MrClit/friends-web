@@ -25,7 +25,7 @@ export function KPIParticipantCombobox({
   selectedParticipantId,
   onSelectParticipant,
 }: KPIParticipantComboboxProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('kpiDetail');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -151,7 +151,7 @@ export function KPIParticipantCombobox({
         htmlFor="kpi-user-participant"
         className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1"
       >
-        {t('kpiDetail.userStatus.selectorLabel')}
+        {t('userStatus.selectorLabel')}
       </label>
       <Popover.Root open={open} onOpenChange={handleOpenChange}>
         <div className="relative group">
@@ -178,7 +178,7 @@ export function KPIParticipantCombobox({
                 'dark:border-slate-600 dark:bg-slate-900 dark:text-white',
               )}
               onKeyDown={handleTriggerKeyDown}
-              aria-label={t('kpiDetail.userStatus.selectorLabel')}
+              aria-label={t('userStatus.selectorLabel')}
             >
               <span
                 className={cn(
@@ -186,7 +186,7 @@ export function KPIParticipantCombobox({
                   hasSelectedParticipant ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500',
                 )}
               >
-                {selectedOption?.label ?? t('kpiDetail.userStatus.selectorPlaceholder')}
+                {selectedOption?.label ?? t('userStatus.selectorPlaceholder')}
               </span>
             </button>
           </Popover.Trigger>
@@ -216,7 +216,7 @@ export function KPIParticipantCombobox({
                 'focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30',
                 'dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500',
               )}
-              placeholder={t('kpiDetail.userStatus.searchParticipantPlaceholder')}
+              placeholder={t('userStatus.searchParticipantPlaceholder')}
               value={searchValue}
               onChange={(event) => handleSearchChange(event.target.value)}
               onKeyDown={handleSearchKeyDown}
@@ -230,7 +230,7 @@ export function KPIParticipantCombobox({
           <div className="max-h-64 overflow-y-auto py-1">
             {filteredOptions.length === 0 ? (
               <div className="p-3 text-sm text-slate-500 dark:text-slate-300">
-                {t('kpiDetail.userStatus.noParticipantsFound')}
+                {t('userStatus.noParticipantsFound')}
               </div>
             ) : (
               filteredOptions.map((option, index) => (

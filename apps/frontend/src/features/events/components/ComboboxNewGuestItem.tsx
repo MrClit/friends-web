@@ -9,7 +9,7 @@ interface ComboboxNewGuestItemProps {
 }
 
 export function ComboboxNewGuestItem({ name, isHighlighted, onSelect, onHover }: ComboboxNewGuestItemProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('events');
 
   return (
     <button

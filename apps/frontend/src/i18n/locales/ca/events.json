@@ -1,0 +1,64 @@
+{
+  "eventsList": {
+    "noEvents": "Encara no hi ha esdeveniments.",
+    "emptyHint": "Prem el botó \"+\" per crear el teu primer esdeveniment.",
+    "title": "Esdeveniments",
+    "participants_one": "1 participant",
+    "participants_other": "{{count}} participants"
+  },
+  "eventFormModal": {
+    "editTitle": "Edita l'esdeveniment",
+    "newTitle": "Nou Esdeveniment",
+    "discardEditTitle": "Descartar canvis?",
+    "discardNewTitle": "Descartar nou esdeveniment?",
+    "discardEditMessage": "Tens canvis sense desar. Segur que vols tancar el formulari?",
+    "discardNewMessage": "Segur que vols tancar el formulari?",
+    "discard": "Descartar",
+    "cancel": "Cancel·lar"
+  },
+  "eventForm": {
+    "titleLabel": "Títol",
+    "iconLabel": "Icona de l'esdeveniment",
+    "descriptionLabel": "Descripció (opcional)",
+    "descriptionPlaceholder": "Afegeix detalls sobre l'esdeveniment...",
+    "titlePlaceholder": "Nom de l'esdeveniment",
+    "update": "Actualitza l'esdeveniment",
+    "create": "Crear Esdeveniment",
+    "saving": "Desant..."
+  },
+  "participantsInput": {
+    "label": "Participants",
+    "add": "Afegir",
+    "addAria": "Afegeix participant",
+    "placeholder": "Nom o email...",
+    "replacePlaceholder": "Cerca usuari per substituir...",
+    "deleteAria": "Elimina participant",
+    "replaceAria": "Substituir convidat per usuari",
+    "renameAria": "Editar nom del convidat",
+    "renameInputAria": "Nom del convidat",
+    "saveRenameAria": "Desar nom del convidat",
+    "cancelRenameAria": "Cancel·lar edició del convidat",
+    "cancelReplace": "Cancel·lar",
+    "potName": "Fons comú",
+    "noUsers": "No s'han trobat usuaris",
+    "targetLabel": "Objectiu",
+    "targetPlaceholder": "0",
+    "targetAria": "Import de l'objectiu de contribució",
+    "createNew": "Afegir com a convidat"
+  },
+  "eventContextMenu": {
+    "edit": "Modificar",
+    "delete": "Esborrar"
+  },
+  "create_success": "Esdeveniment creat",
+  "create_error": "Error en crear l'esdeveniment",
+  "update_success": "Esdeveniment actualitzat",
+  "update_error": "Error en actualitzar l'esdeveniment",
+  "delete_success": "Esdeveniment eliminat",
+  "delete_error": "Error en eliminar l'esdeveniment",
+  "createEventCard": {
+    "ariaLabel": "Crear nou esdeveniment",
+    "title": "Crear nou esdeveniment",
+    "subtitle": "Comença a dividir despeses amb els teus amics ara mateix."
+  }
+}

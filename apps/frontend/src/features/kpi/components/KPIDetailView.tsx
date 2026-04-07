@@ -36,7 +36,7 @@ import { KPIDetailContent } from './KPIDetailContent.tsx';
 export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: string }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['kpiDetail', 'common', 'transactions', 'events']);
   const { user } = useAuth();
   const setDeleting = useDeletingStore((state) => state.setDeleting);
 
@@ -94,12 +94,12 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
   const KPI_CONFIG = getKPIConfig(t);
 
   if (!kpi) {
-    return <div className="text-center mt-10">{t('kpiDetail.notFound')}</div>;
+    return <div className="text-center mt-10">{t('notFound', { ns: 'kpiDetail' })}</div>;
   }
 
   // Loading state
   if (isLoadingEvent || isLoadingKPIs) {
-    return <div className="text-center mt-10">{t('common.loading')}</div>;
+    return <div className="text-center mt-10">{t('loading', { ns: 'common' })}</div>;
   }
 
   // Error state
@@ -109,7 +109,7 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
 
     return (
       <ErrorState
-        message={isNotFoundOrNoAccess ? t('common.notFoundOrNoAccess') : undefined}
+        message={isNotFoundOrNoAccess ? t('notFoundOrNoAccess', { ns: 'common' }) : undefined}
         onRetry={
           isNotFoundOrNoAccess
             ? undefined
@@ -123,7 +123,7 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
   }
 
   if (!event || !kpis) {
-    return <div className="text-center mt-10">{t('kpiDetail.notFound')}</div>;
+    return <div className="text-center mt-10">{t('notFound', { ns: 'kpiDetail' })}</div>;
   }
 
   const targetTotal = event.participants.reduce((sum, participant) => {

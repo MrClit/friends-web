@@ -1,0 +1,38 @@
+{
+  "title": "Administració d'usuaris",
+  "subtitle": "Administra usuaris i rols",
+  "newUser": "Nou usuari",
+  "menuEntry": "Administració d'usuaris",
+  "empty": "No s'han trobat usuaris. Crea el primer per començar a gestionar accessos.",
+  "loadedUsers": "{{count}} usuaris carregats",
+  "stats": {
+    "total": "Total usuaris",
+    "totalShort": "Total",
+    "admin": "Admins",
+    "adminShort": "Admins",
+    "user": "Usuaris",
+    "userShort": "Usuaris"
+  },
+  "accessDenied": "Accés denegat",
+  "createTitle": "Crear usuari",
+  "editTitle": "Editar usuari",
+  "deleteTitle": "Eliminar usuari?",
+  "deleteMessage": "Aquesta acció farà un esborrat lògic de l'usuari i no es pot desfer des d'aquesta pantalla.",
+  "createAction": "Crear usuari",
+  "updateAction": "Actualitzar usuari",
+  "creating": "Creant...",
+  "updating": "Actualitzant...",
+  "deleting": "Eliminant...",
+  "createSuccess": "Usuari creat correctament",
+  "createError": "No s'ha pogut crear l'usuari",
+  "updateSuccess": "Usuari actualitzat correctament",
+  "updateError": "No s'ha pogut actualitzar l'usuari",
+  "deleteSuccess": "Usuari eliminat correctament",
+  "deleteError": "No s'ha pogut eliminar l'usuari",
+  "fields": {
+    "email": "Correu electrònic",
+    "name": "Nom",
+    "avatar": "URL de l'avatar",
+    "role": "Rol"
+  }
+}

@@ -38,43 +38,43 @@ function SummaryMetricCard({ label, value }: SummaryMetricCardProps) {
 }
 
 export function KPIContributionStatusSummary({ data }: KPIContributionStatusSummaryProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('kpiDetail');
   const hasTargets = data.targetTotal > 0;
 
   return (
     <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-soft border border-slate-100 dark:border-slate-700 p-4 sm:p-6 space-y-4">
       <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-        {t('kpiDetail.contributionStatus.summaryTitle')}
+        {t('contributionStatus.summaryTitle')}
       </h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <SummaryMetricCard
-          label={t('kpiDetail.contributionStatus.complianceLabel')}
-          value={hasTargets ? formatPercent(data.compliancePercent) : t('kpiDetail.contributionStatus.noTargetValue')}
+          label={t('contributionStatus.complianceLabel')}
+          value={hasTargets ? formatPercent(data.compliancePercent) : t('contributionStatus.noTargetValue')}
         />
         <SummaryMetricCard
-          label={t('kpiDetail.contributionStatus.adjustmentPendingLabel')}
+          label={t('contributionStatus.adjustmentPendingLabel')}
           value={formatAmount(data.adjustmentPending)}
         />
         <SummaryMetricCard
-          label={t('kpiDetail.contributionStatus.netTotalLabel')}
+          label={t('contributionStatus.netTotalLabel')}
           value={formatAmount(data.netTotal)}
         />
         <SummaryMetricCard
-          label={t('kpiDetail.contributionStatus.targetTotalLabel')}
+          label={t('contributionStatus.targetTotalLabel')}
           value={formatAmount(data.targetTotal)}
         />
       </div>
 
       <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/40">
         <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-          {t('kpiDetail.contributionStatus.differenceLabel')}
+          {t('contributionStatus.differenceLabel')}
         </p>
         <p className="text-lg font-black text-slate-900 dark:text-white">{formatSignedAmount(data.differenceTotal)}</p>
       </div>
 
       {!hasTargets && (
-        <p className="text-xs text-slate-500 dark:text-slate-400">{t('kpiDetail.contributionStatus.noTargetHint')}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{t('contributionStatus.noTargetHint')}</p>
       )}
     </section>
   );

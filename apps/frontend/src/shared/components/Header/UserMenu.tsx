@@ -12,7 +12,7 @@ import { cn } from '@/shared/utils';
 
 export function UserMenu() {
   const { user, logout, loading } = useAuth();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['user', 'adminUsers']);
   const { success } = useToast();
   const navigate = useNavigate();
 
@@ -20,7 +20,7 @@ export function UserMenu() {
   if (!user) return null;
 
   const handleLogout = () => {
-    success('user.logout_success');
+    success('logout_success', undefined, undefined, { ns: 'user' });
 
     setTimeout(() => {
       logout();
@@ -48,7 +48,7 @@ export function UserMenu() {
             'dark:focus-visible:ring-offset-emerald-950',
             'sm:pr-2.5',
           )}
-          aria-label={t('user.menu', 'Opciones de usuario')}
+          aria-label={t('menu', { ns: 'user', defaultValue: 'Opciones de usuario' })}
         >
           <Avatar
             avatar={user.avatar}
@@ -104,7 +104,7 @@ export function UserMenu() {
           className={cn('flex items-center gap-2 cursor-pointer', 'font-semibold text-teal-800', 'dark:text-teal-200')}
         >
           <MdPerson className="text-lg" />
-          {t('user.profile', 'Profile')}
+          {t('profile', { ns: 'user', defaultValue: 'Profile' })}
         </DropdownMenuItem>
 
         {user.role === ADMIN_ROLE && (
@@ -117,7 +117,7 @@ export function UserMenu() {
             )}
           >
             <MdAdminPanelSettings className="text-lg" />
-            {t('adminUsers.menuEntry', 'User Management')}
+            {t('menuEntry', { ns: 'adminUsers', defaultValue: 'User Management' })}
           </DropdownMenuItem>
         )}
 
@@ -130,7 +130,7 @@ export function UserMenu() {
           )}
         >
           <MdLogout className="text-lg" />
-          {t('user.logout', 'Cerrar sesión')}
+          {t('logout', { ns: 'user', defaultValue: 'Cerrar sesión' })}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

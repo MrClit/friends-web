@@ -25,7 +25,7 @@ interface TransactionFormProps {
 }
 
 export function TransactionForm({ fields, participants, onSubmit }: TransactionFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('transactions');
   const { type, title, setTitle, amount, setAmount, date, setDate, participantId, setParticipantId } = fields;
   const showCustomCalendarIcon = React.useMemo(() => {
     if (typeof navigator === 'undefined') return false;

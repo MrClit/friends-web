@@ -20,7 +20,7 @@ function EventIcon({ iconKey }: { iconKey?: string }) {
  */
 export function EventsList() {
   const { data: events, isLoading, error, refetch } = useEvents();
-  const { t } = useTranslation();
+  const { t } = useTranslation('events');
   const navigate = useNavigate();
   const openModal = useEventFormModalStore((s) => s.openModal);
 
