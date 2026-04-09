@@ -26,7 +26,7 @@ export class AdminUsersService {
 
   async findAll(): Promise<User[]> {
     return this.userRepository.find({
-      select: ['id', 'email', 'name', 'avatar', 'role'],
+      select: ['id', 'email', 'name', 'avatar', 'role', 'createdAt', 'updatedAt'],
       order: { name: 'ASC' },
     });
   }

@@ -49,7 +49,7 @@ describe('AdminUsersService', () => {
 
     expect(result).toEqual(users);
     expect(mockRepository.find).toHaveBeenCalledWith({
-      select: ['id', 'email', 'name', 'avatar', 'role'],
+      select: ['id', 'email', 'name', 'avatar', 'role', 'createdAt', 'updatedAt'],
       order: { name: 'ASC' },
     });
   });

@@ -46,6 +46,12 @@ export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: A
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 {t('fields.role', { ns: 'adminUsers', defaultValue: 'Role' })}
               </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                {t('fields.createdAt', { ns: 'adminUsers', defaultValue: 'Member since' })}
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                {t('fields.updatedAt', { ns: 'adminUsers', defaultValue: 'Last updated' })}
+              </th>
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 {t('actions', { ns: 'common', defaultValue: 'Actions' })}
               </th>

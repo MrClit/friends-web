@@ -15,6 +15,16 @@
     "createdAt": "Member since",
     "updatedAt": "Last updated"
   },
+  "roles": {
+    "admin": {
+      "label": "ADMIN",
+      "description": "Full administrative access"
+    },
+    "user": {
+      "label": "USER",
+      "description": "Standard user access"
+    }
+  },
   "actions": {
     "save": "Save changes",
     "saving": "Saving..."

@@ -41,6 +41,9 @@ export const ProfileCard = memo(function ProfileCard({
 }: ProfileCardProps) {
   const { t } = useTranslation('profile');
   const displayName = name.trim() || user.name;
+  const roleLabel = t(`roles.${user.role}.label`, { defaultValue: user.role.toUpperCase() });
+  const roleDescription = t(`roles.${user.role}.description`, { defaultValue: '' });
+  const roleValue = roleDescription ? `${roleLabel} - ${roleDescription}` : roleLabel;
 
   return (
     <div
@@ -87,7 +90,7 @@ export const ProfileCard = memo(function ProfileCard({
 
           <dl className="grid gap-3 sm:grid-cols-2">
             <ProfileInfoField label={t('fields.email', 'Email')} value={user.email} />
-            <ProfileInfoField label={t('fields.role', 'Role')} value={user.role.toUpperCase()} />
+            <ProfileInfoField label={t('fields.role', 'Role')} value={roleValue} />
             <ProfileInfoField label={t('fields.createdAt', 'Member since')} value={formatProfileDate(user.createdAt)} />
             <ProfileInfoField label={t('fields.updatedAt', 'Last updated')} value={formatProfileDate(user.updatedAt)} />
           </dl>

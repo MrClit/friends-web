@@ -15,6 +15,16 @@
     "createdAt": "Data d'alta",
     "updatedAt": "Darrera actualització"
   },
+  "roles": {
+    "admin": {
+      "label": "ADMIN",
+      "description": "Accés complet d'administració"
+    },
+    "user": {
+      "label": "USER",
+      "description": "Accés estàndard d'usuari"
+    }
+  },
   "actions": {
     "save": "Desar canvis",
     "saving": "Desant..."

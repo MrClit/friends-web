@@ -33,6 +33,18 @@
     "email": "Email",
     "name": "Name",
     "avatar": "Avatar URL",
-    "role": "Role"
+    "role": "Role",
+    "createdAt": "Member since",
+    "updatedAt": "Last updated"
+  },
+  "roles": {
+    "admin": {
+      "label": "ADMIN",
+      "description": "Can manage users and permissions"
+    },
+    "user": {
+      "label": "USER",
+      "description": "Basic access to the application"
+    }
   }
 }

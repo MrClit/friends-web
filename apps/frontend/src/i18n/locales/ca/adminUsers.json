@@ -33,6 +33,18 @@
     "email": "Correu electrònic",
     "name": "Nom",
     "avatar": "URL de l'avatar",
-    "role": "Rol"
+    "role": "Rol",
+    "createdAt": "Data d'alta",
+    "updatedAt": "Darrera actualització"
+  },
+  "roles": {
+    "admin": {
+      "label": "ADMIN",
+      "description": "Pot gestionar usuaris i permisos"
+    },
+    "user": {
+      "label": "USER",
+      "description": "Accés bàsic a l'aplicació"
+    }
   }
 }

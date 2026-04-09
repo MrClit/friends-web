@@ -38,6 +38,8 @@ interface RoleSelectProps {
 
 function RoleSelect({ value, onChangeValue, disabled }: RoleSelectProps) {
   const { t } = useTranslation('adminUsers');
+  const roleLabel = value ? t(`roles.${value}.label`, { defaultValue: value.toUpperCase() }) : '';
+  const roleDescription = value ? t(`roles.${value}.description`, { defaultValue: '' }) : '';
 
   return (
     <Select.Root value={value} onValueChange={(v) => onChangeValue(v)} disabled={disabled}>
@@ -45,7 +47,14 @@ function RoleSelect({ value, onChangeValue, disabled }: RoleSelectProps) {
         aria-label={t('fields.role', 'Role')}
         className="mt-1 w-full inline-flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
       >
-        <Select.Value placeholder={t('selectRole', 'Select role')} />
+        <Select.Value placeholder={t('selectRole', 'Select role')}>
+          {roleLabel && (
+            <span className="inline-flex items-center gap-2">
+              <span>{roleLabel}</span>
+              {roleDescription && <span className="text-xs text-gray-500 dark:text-gray-300">{roleDescription}</span>}
+            </span>
+          )}
+        </Select.Value>
         <Select.Icon>
           <svg
             className="h-4 w-4 text-gray-500 dark:text-gray-300"
@@ -70,7 +79,16 @@ function RoleSelect({ value, onChangeValue, disabled }: RoleSelectProps) {
                 value={role}
                 className="relative flex cursor-default select-none items-center rounded-md pl-8 pr-3 py-2 text-sm text-gray-900 hover:bg-gray-100 data-disabled:opacity-50 dark:text-white dark:hover:bg-gray-800"
               >
-                <Select.ItemText className="truncate">{role}</Select.ItemText>
+                <Select.ItemText>
+                  <div className="flex flex-col">
+                    <span className="font-medium">
+                      {t(`roles.${role}.label`, { defaultValue: role.toUpperCase() })}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-300">
+                      {t(`roles.${role}.description`, { defaultValue: '' })}
+                    </span>
+                  </div>
+                </Select.ItemText>
                 <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
                   <svg
                     className="h-4 w-4 text-teal-600"

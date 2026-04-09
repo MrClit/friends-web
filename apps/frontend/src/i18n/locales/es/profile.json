@@ -15,6 +15,16 @@
     "createdAt": "Fecha de alta",
     "updatedAt": "Última actualización"
   },
+  "roles": {
+    "admin": {
+      "label": "ADMIN",
+      "description": "Acceso completo de administración"
+    },
+    "user": {
+      "label": "USER",
+      "description": "Acceso estándar de usuario"
+    }
+  },
   "actions": {
     "save": "Guardar cambios",
     "saving": "Guardando..."

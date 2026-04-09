@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { ADMIN_ROLE, type UserRole } from '@/features/auth/types';
 
 interface AdminUserRoleBadgeProps {
@@ -13,9 +15,16 @@ function getRoleBadgeClass(role: UserRole): string {
 }
 
 export function AdminUserRoleBadge({ role }: AdminUserRoleBadgeProps) {
+  const { t } = useTranslation('adminUsers');
+  const roleLabel = t(`roles.${role}.label`, { defaultValue: role });
+  const roleDescription = t(`roles.${role}.description`, { defaultValue: '' });
+
   return (
-    <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(role)}`}>
-      {role}
+    <span
+      className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(role)}`}
+      title={roleDescription || undefined}
+    >
+      {roleLabel}
     </span>
   );
 }
