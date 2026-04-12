@@ -20,6 +20,15 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
+  async findByIdOrThrow(userId: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return user;
+  }
+
   toCurrentUserProfile(user: User): CurrentUserProfileDto {
     return {
       id: user.id,
@@ -49,11 +58,7 @@ export class UsersService {
   }
 
   async getCurrentUserProfileByIdOrThrow(userId: string): Promise<CurrentUserProfileDto> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
-    }
-
+    const user = await this.findByIdOrThrow(userId);
     return this.toCurrentUserProfile(user);
   }
 

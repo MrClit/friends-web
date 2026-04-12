@@ -66,17 +66,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login('microsoft');
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
+    const currentToken = token;
+
     setUser(null);
     setToken(null);
     localStorage.removeItem(TOKEN_KEY);
-  };
+
+    void fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: currentToken
+        ? {
+            Authorization: `Bearer ${currentToken}`,
+          }
+        : undefined,
+    }).catch(() => {
+      // Intentionally ignore logout API failures to keep local logout immediate.
+    });
+  }, [token]);
+
+  useEffect(() => {
+    const handleLogout = () => {
+      logout();
+    };
+
+    window.addEventListener('auth:logout', handleLogout);
+    return () => {
+      window.removeEventListener('auth:logout', handleLogout);
+    };
+  }, [logout]);
 
   const setAuth = (nextUser: User, nextToken: string) => {
     setUser(nextUser);
     setToken(nextToken);
     localStorage.setItem(TOKEN_KEY, nextToken);
-    void fetchUser(nextToken);
   };
 
   const refreshUser = useCallback(() => {

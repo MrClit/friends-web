@@ -5,6 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -43,6 +44,8 @@ async function bootstrap() {
 
   // Global Response Transformer
   app.useGlobalInterceptors(new TransformInterceptor());
+
+  app.use(cookieParser());
 
   // Swagger Configuration
   const config = new DocumentBuilder()

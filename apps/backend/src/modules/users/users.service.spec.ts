@@ -45,6 +45,22 @@ describe('UsersService', () => {
     expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { email: 'john@example.com' } });
   });
 
+  it('findByIdOrThrow returns user when found', async () => {
+    const user = { id: 'u1', email: 'john@example.com' } as User;
+    mockRepository.findOne.mockResolvedValue(user);
+
+    const result = await service.findByIdOrThrow('u1');
+
+    expect(result).toBe(user);
+    expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: 'u1' } });
+  });
+
+  it('findByIdOrThrow throws when user does not exist', async () => {
+    mockRepository.findOne.mockResolvedValue(null);
+
+    await expect(service.findByIdOrThrow('missing')).rejects.toBeInstanceOf(NotFoundException);
+  });
+
   it('updateProfileIfChanged updates fields and saves when changed', async () => {
     const user = { id: 'u1', name: 'Old Name', avatar: 'old-avatar' } as User;
     mockRepository.save.mockResolvedValue(user);

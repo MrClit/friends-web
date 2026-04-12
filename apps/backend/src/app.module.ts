@@ -10,6 +10,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AdminModule } from './modules/admin/admin.module';
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       cache: true,
     }),
+    ScheduleModule.forRoot(),
     // TypeORM con configuración async para usar ConfigService
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

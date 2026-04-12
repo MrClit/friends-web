@@ -1,10 +1,40 @@
 import { ENV } from '@/config/env';
 
 const API_BASE = ENV.API_URL;
+let refreshPromise: Promise<string | null> | null = null;
+
+interface ApiRequestInit extends RequestInit {
+  _retried?: boolean;
+}
 
 function getAuthToken() {
   // Intenta obtener el token desde localStorage
   return localStorage.getItem('token');
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = fetch(`${API_BASE}/auth/refresh`, {
+    method: 'POST',
+    credentials: 'include',
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        return null;
+      }
+
+      const body = (await response.json()) as { data?: { accessToken?: string } };
+      return body.data?.accessToken ?? null;
+    })
+    .catch(() => null)
+    .finally(() => {
+      refreshPromise = null;
+    });
+
+  return refreshPromise;
 }
 
 /**
@@ -29,13 +59,16 @@ export class ApiError extends Error {
  * @returns Parsed response data
  * @throws ApiError on request failure
  */
-export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
+export async function apiRequest<T>(endpoint: string, options?: ApiRequestInit): Promise<T> {
+  const requestOptions = options ?? {};
+  const { _retried: hasRetried = false, ...baseOptions } = requestOptions;
+
   let response: Response;
   const token = getAuthToken();
-  const isFormData = typeof FormData !== 'undefined' && options?.body instanceof FormData;
+  const isFormData = typeof FormData !== 'undefined' && baseOptions.body instanceof FormData;
 
   try {
-    const headers = new Headers(options?.headers);
+    const headers = new Headers(baseOptions.headers);
 
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
@@ -46,7 +79,7 @@ export async function apiRequest<T>(endpoint: string, options?: RequestInit): Pr
     }
 
     response = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
+      ...baseOptions,
       headers,
     });
   } catch (e) {
@@ -56,6 +89,20 @@ export async function apiRequest<T>(endpoint: string, options?: RequestInit): Pr
   const contentType = response.headers.get('content-type') || '';
 
   if (!response.ok) {
+    if (response.status === 401 && !hasRetried && endpoint !== '/auth/refresh') {
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        localStorage.setItem('token', newToken);
+        return apiRequest<T>(endpoint, {
+          ...baseOptions,
+          _retried: true,
+        });
+      }
+
+      window.dispatchEvent(new Event('auth:logout'));
+    }
+
     let errorMessage: string;
     if (contentType.includes('application/json')) {
       const error = await response.json().catch(() => ({}));

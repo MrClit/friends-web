@@ -10,7 +10,7 @@ const AUTH_NAMESPACES = ['auth'] as const;
 function parseQuery(search: string) {
   const params = new URLSearchParams(search);
   return {
-    token: params.get('token'),
+    token: params.get('access_token'),
     id: params.get('id'),
     email: params.get('email'),
     name: params.get('name'),
