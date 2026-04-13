@@ -4,6 +4,7 @@ import { cn } from '@/shared/utils/cn';
 import type { FC } from 'react';
 import { Avatar } from '@/shared/components/Avatar';
 import { formatDateShort } from '@/shared/utils/format';
+import { useTranslation } from 'react-i18next';
 
 export interface EventCardParticipant {
   avatarUrl?: string;
@@ -27,16 +28,17 @@ export interface EventCardProps {
 
 const statusConfig = {
   active: {
-    label: 'Activo',
+    labelKey: 'status.active',
     className: 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 border-emerald-200/50',
   },
   archived: {
-    label: 'Archivado',
+    labelKey: 'status.archived',
     className: 'bg-slate-100 dark:bg-emerald-900/30 text-slate-500 dark:text-emerald-400 border-slate-200/50',
   },
 };
 
 export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, style }) => {
+  const { t } = useTranslation('events');
   const {
     id,
     title,
@@ -81,7 +83,9 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
             statusInfo.className,
           )}
         >
-          {statusInfo.label}
+          {t(statusInfo.labelKey, {
+            defaultValue: status === 'archived' ? 'Archivado' : 'Activo',
+          })}
         </span>
       </div>
       <h3 className="text-2xl font-bold mb-2 group-hover:text-emerald-600 transition-colors text-slate-900 dark:text-white">
@@ -109,7 +113,9 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
         </div>
         <div className="text-right">
           <p className="text-[10px] font-bold text-emerald-600/50 dark:text-emerald-400/50 uppercase tracking-widest">
-            {status === 'archived' ? 'Archivado' : 'Último cambio'}
+            {status === 'archived'
+              ? t('eventCard.archivedLabel', { defaultValue: 'Archivado' })
+              : t('eventCard.lastModifiedLabel', { defaultValue: 'Último cambio' })}
           </p>
           {lastModified && formatDateShort(lastModified) && (
             <p className="text-sm font-semibold text-slate-600 dark:text-emerald-200">

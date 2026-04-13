@@ -1,8 +1,14 @@
 {
   "eventsList": {
     "noEvents": "No events yet.",
+    "noEventsActive": "No active events yet.",
+    "noEventsArchived": "No archived events.",
     "emptyHint": "Click the \"+\" button to create your first event.",
     "title": "Events",
+    "toggleActive": "Active",
+    "toggleArchived": "Archived",
+    "modeLabelActive": "Viewing active",
+    "modeLabelArchived": "Viewing archived",
     "participants_one": "1 participant",
     "participants_other": "{{count}} participants"
   },
@@ -48,7 +54,18 @@
   },
   "eventContextMenu": {
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "options": "Event options"
+  },
+  "status": {
+    "active": "Active",
+    "archived": "Archived"
+  },
+  "eventCard": {
+    "lastModifiedLabel": "Last update",
+    "archivedLabel": "Archived"
   },
   "create_success": "Event created",
   "create_error": "Error creating event",

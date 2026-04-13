@@ -54,7 +54,7 @@ export function KPIDetailContent({
 
   return (
     <div>
-      <EventDetailHeader eventId={event.id} eventTitle={event.title} onBack={onBack} />
+      <EventDetailHeader eventTitle={event.title} eventStatus={event.status} onBack={onBack} />
       <KPIBoxDetail kpi={kpi} kpiValue={kpiValue} kpiConfig={kpiConfig} />
 
       {kpi === 'balance' && balanceBreakdownData ? (

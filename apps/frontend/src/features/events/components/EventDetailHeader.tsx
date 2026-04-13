@@ -1,21 +1,41 @@
-import { MdArrowBack, MdEdit, MdDelete } from 'react-icons/md';
+import { MdArrowBack } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/utils/cn';
+import type { EventStatus } from '@/api/types';
+import { EventContextMenu } from './EventContextMenu';
 
 interface EventDetailHeaderProps {
-  eventId: string;
   eventTitle: string;
+  eventStatus: EventStatus;
   onBack: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onToggleArchive?: () => void;
+  isMutatingStatus?: boolean;
 }
 
-export function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: EventDetailHeaderProps) {
-  const { t } = useTranslation('common');
-  const hasActions = Boolean(onEdit || onDelete);
+export function EventDetailHeader({
+  eventTitle,
+  eventStatus,
+  onBack,
+  onEdit,
+  onDelete,
+  onToggleArchive,
+  isMutatingStatus = false,
+}: EventDetailHeaderProps) {
+  const { t } = useTranslation(['common', 'events']);
+  const isArchived = eventStatus === 'archived';
+  const hasActions = Boolean(onEdit || onDelete || onToggleArchive);
 
   return (
-    <section className="mb-6">
+    <section
+      className={cn(
+        'mb-6 rounded-2xl border p-4 sm:p-5',
+        isArchived
+          ? 'border-slate-200 bg-slate-50/70 dark:border-emerald-800/80 dark:bg-emerald-950/25'
+          : 'border-transparent bg-transparent p-0',
+      )}
+    >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
           <button
@@ -32,52 +52,31 @@ export function EventDetailHeader({ eventTitle, onBack, onEdit, onDelete }: Even
           >
             <MdArrowBack className={cn('text-slate-500 dark:text-slate-400', 'group-hover:text-emerald-500')} />
           </button>
-          <h1 className="text-xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
-            {eventTitle}
-          </h1>
+          <div className="overflow-hidden">
+            <h1
+              className={cn(
+                'truncate text-xl font-bold tracking-tight sm:text-3xl',
+                isArchived ? 'text-slate-700 dark:text-emerald-100/85' : 'text-slate-900 dark:text-white',
+              )}
+            >
+              {eventTitle}
+            </h1>
+            {isArchived ? (
+              <span className="mt-2 inline-flex items-center rounded-md border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+                {t('status.archived', { ns: 'events' })}
+              </span>
+            ) : null}
+          </div>
         </div>
         {hasActions ? (
-          <div className="flex items-center gap-2 shrink-0">
-            {onEdit ? (
-              <button
-                type="button"
-                onClick={onEdit}
-                aria-label={t('edit')}
-                className={cn(
-                  'flex items-center justify-center gap-2',
-                  'p-2 sm:px-4 sm:py-2',
-                  'bg-white dark:bg-emerald-950',
-                  'border border-slate-200 dark:border-slate-700',
-                  'rounded-lg',
-                  'text-slate-600 dark:text-slate-300',
-                  'hover:border-emerald-500 hover:text-emerald-500 dark:hover:text-emerald-400',
-                  'transition shadow-sm text-sm font-medium',
-                )}
-              >
-                <MdEdit size={20} />
-                <span className="hidden sm:inline">{t('edit')}</span>
-              </button>
-            ) : null}
-            {onDelete ? (
-              <button
-                type="button"
-                onClick={onDelete}
-                aria-label={t('delete')}
-                className={cn(
-                  'flex items-center justify-center gap-2',
-                  'p-2 sm:px-4 sm:py-2',
-                  'bg-white dark:bg-emerald-950',
-                  'border border-slate-200 dark:border-slate-700',
-                  'rounded-lg',
-                  'text-red-500',
-                  'hover:bg-red-50 dark:hover:bg-red-900/50 hover:border-red-200',
-                  'transition shadow-sm text-sm font-medium',
-                )}
-              >
-                <MdDelete size={20} />
-                <span className="hidden sm:inline">{t('delete')}</span>
-              </button>
-            ) : null}
+          <div className="shrink-0">
+            <EventContextMenu
+              status={eventStatus}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onToggleArchive={onToggleArchive}
+              disabled={isMutatingStatus}
+            />
           </div>
         ) : null}
       </div>

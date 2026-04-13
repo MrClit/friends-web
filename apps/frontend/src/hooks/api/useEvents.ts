@@ -2,17 +2,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { eventsApi } from '@/api/events.api';
 import { queryKeys } from './keys';
 import type { UpdateEventInput } from '@/features/events/types';
+import type { EventStatus } from '@/api/types';
 import { useDeletingStore } from '@/shared/store/useDeletingStore';
 import { useToast } from '@/shared/hooks/useToast';
 
 /**
  * Query hook to fetch all events
+ * @param status - Event status filter
  * @returns Query result with events list, loading state, and error
  */
-export function useEvents() {
+export function useEvents(status: EventStatus = 'active') {
   return useQuery({
-    queryKey: queryKeys.events.all,
-    queryFn: eventsApi.getAll,
+    queryKey: queryKeys.events.list(status),
+    queryFn: () => eventsApi.getAll(status),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

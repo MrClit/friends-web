@@ -72,6 +72,22 @@ export function useEventDetail(id: string | undefined) {
   };
 
   /**
+   * Toggles event status between active and archived
+   */
+  const handleToggleArchive = () => {
+    if (!event) {
+      return;
+    }
+
+    updateEvent.mutate({
+      id: event.id,
+      data: {
+        status: event.status === 'archived' ? 'active' : 'archived',
+      },
+    });
+  };
+
+  /**
    * Navigates back to home
    */
   const handleBack = () => navigate('/');
@@ -86,6 +102,8 @@ export function useEventDetail(id: string | undefined) {
     // Handlers
     handleEditSubmit,
     handleDelete,
+    handleToggleArchive,
     handleBack,
+    isMutatingEvent: updateEvent.isPending,
   };
 }

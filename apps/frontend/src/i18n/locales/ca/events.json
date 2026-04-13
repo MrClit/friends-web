@@ -1,8 +1,14 @@
 {
   "eventsList": {
     "noEvents": "Encara no hi ha esdeveniments.",
+    "noEventsActive": "Encara no hi ha esdeveniments actius.",
+    "noEventsArchived": "No hi ha esdeveniments arxivats.",
     "emptyHint": "Prem el botó \"+\" per crear el teu primer esdeveniment.",
     "title": "Esdeveniments",
+    "toggleActive": "Actius",
+    "toggleArchived": "Arxivats",
+    "modeLabelActive": "Veient actius",
+    "modeLabelArchived": "Veient arxivats",
     "participants_one": "1 participant",
     "participants_other": "{{count}} participants"
   },
@@ -48,7 +54,18 @@
   },
   "eventContextMenu": {
     "edit": "Modificar",
-    "delete": "Esborrar"
+    "delete": "Esborrar",
+    "archive": "Arxivar",
+    "unarchive": "Desarxivar",
+    "options": "Opcions de l'esdeveniment"
+  },
+  "status": {
+    "active": "Actiu",
+    "archived": "Arxivat"
+  },
+  "eventCard": {
+    "lastModifiedLabel": "Últim canvi",
+    "archivedLabel": "Arxivat"
   },
   "create_success": "Esdeveniment creat",
   "create_error": "Error en crear l'esdeveniment",

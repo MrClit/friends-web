@@ -15,6 +15,12 @@ export const queryKeys = {
     all: ['events'] as const,
 
     /**
+     * Key for events list filtered by status
+     * @param status - Event status filter
+     */
+    list: (status: 'active' | 'archived') => ['events', 'list', status] as const,
+
+    /**
      * Key for specific event detail
      * @param id - Event ID
      */

@@ -13,7 +13,6 @@ export function Home() {
   const { openModal } = useEventFormModalStore();
   const { t } = useTranslation(HOME_NAMESPACES);
   const isI18nReady = useI18nNamespacesReady(HOME_NAMESPACES);
-
   if (!isI18nReady) {
     return (
       <MainLayout>

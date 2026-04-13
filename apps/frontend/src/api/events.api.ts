@@ -1,5 +1,5 @@
 import { apiRequest } from './client';
-import type { Event, CreateEventDto, UpdateEventDto, EventKPIs } from './types';
+import type { Event, CreateEventDto, UpdateEventDto, EventKPIs, EventStatus } from './types';
 
 /**
  * Events API endpoints
@@ -8,9 +8,19 @@ import type { Event, CreateEventDto, UpdateEventDto, EventKPIs } from './types';
 export const eventsApi = {
   /**
    * Get all events
+   * @param status - Optional event status filter
    * @returns List of all events
    */
-  getAll: () => apiRequest<Event[]>('/events'),
+  getAll: (status?: EventStatus) => {
+    const searchParams = new URLSearchParams();
+
+    if (status) {
+      searchParams.set('status', status);
+    }
+
+    const query = searchParams.toString();
+    return apiRequest<Event[]>(query ? `/events?${query}` : '/events');
+  },
 
   /**
    * Get event by ID

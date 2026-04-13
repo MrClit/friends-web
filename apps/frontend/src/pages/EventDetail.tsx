@@ -23,7 +23,18 @@ export function EventDetail() {
   const { t } = useTranslation(EVENT_DETAIL_NAMESPACES);
   const isI18nReady = useI18nNamespacesReady(EVENT_DETAIL_NAMESPACES);
   const { user } = useAuth();
-  const { event, kpis, isLoading, error, refetch, handleEditSubmit, handleDelete, handleBack } = useEventDetail(id);
+  const {
+    event,
+    kpis,
+    isLoading,
+    error,
+    refetch,
+    handleEditSubmit,
+    handleDelete,
+    handleToggleArchive,
+    handleBack,
+    isMutatingEvent,
+  } = useEventDetail(id);
 
   // UI state management
   const eventFormModalStore = useEventFormModalStore();
@@ -71,8 +82,8 @@ export function EventDetail() {
   return (
     <MainLayout>
       <EventDetailHeader
-        eventId={event.id}
         eventTitle={event.title}
+        eventStatus={event.status}
         onBack={handleBack}
         onEdit={() =>
           eventFormModalStore.openModal({
@@ -81,6 +92,8 @@ export function EventDetail() {
           })
         }
         onDelete={() => deleteDialog.confirm(handleDelete)}
+        onToggleArchive={handleToggleArchive}
+        isMutatingStatus={isMutatingEvent}
       />
 
       <EventKPIGrid

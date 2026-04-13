@@ -1,22 +1,39 @@
-import { MdEdit, MdDelete, MdMoreVert } from 'react-icons/md';
+import { MdArchive, MdDelete, MdEdit, MdMoreVert, MdUnarchive } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/components/ui';
+import type { EventStatus } from '@/api/types';
+import { cn } from '@/shared/utils/cn';
 
 interface EventContextMenuProps {
+  status?: EventStatus;
   onEdit?: () => void;
   onDelete?: () => void;
+  onToggleArchive?: () => void;
+  disabled?: boolean;
 }
 
-export function EventContextMenu({ onEdit, onDelete }: EventContextMenuProps) {
+export function EventContextMenu({
+  status = 'active',
+  onEdit,
+  onDelete,
+  onToggleArchive,
+  disabled = false,
+}: EventContextMenuProps) {
   const { t } = useTranslation('events');
+  const isArchived = status === 'archived';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="p-2 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors cursor-pointer"
-          aria-label="Opciones"
+          disabled={disabled}
+          className={cn(
+            'cursor-pointer rounded-lg p-2 transition-colors',
+            'hover:bg-teal-200 dark:hover:bg-teal-800',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+          )}
+          aria-label={t('eventContextMenu.options')}
         >
           <MdMoreVert className="text-teal-900 dark:text-teal-100 text-2xl" />
         </button>
@@ -32,6 +49,21 @@ export function EventContextMenu({ onEdit, onDelete }: EventContextMenuProps) {
         >
           <MdEdit className="mr-2 text-teal-900 dark:text-teal-100" />
           {t('eventContextMenu.edit')}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            if (onToggleArchive) {
+              onToggleArchive();
+            }
+          }}
+          className="hover:bg-slate-100 dark:hover:bg-teal-800 cursor-pointer"
+        >
+          {isArchived ? (
+            <MdUnarchive className="mr-2 text-slate-700 dark:text-teal-100" />
+          ) : (
+            <MdArchive className="mr-2 text-slate-700 dark:text-teal-100" />
+          )}
+          {t(isArchived ? 'eventContextMenu.unarchive' : 'eventContextMenu.archive')}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
