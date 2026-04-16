@@ -33,7 +33,7 @@ export const ProfileAvatarPicker = memo(function ProfileAvatarPicker({
         aria-label={t('avatar.change', 'Change photo')}
         className={cn(
           'group relative h-24 w-24 cursor-pointer rounded-full',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
           'dark:focus-visible:ring-offset-emerald-950',
         )}
       >
@@ -43,12 +43,12 @@ export const ProfileAvatarPicker = memo(function ProfileAvatarPicker({
           email={user.email}
           alt={displayName || user.email}
           className="h-24 w-24 rounded-full"
-          imageClassName={cn('h-24 w-24 object-cover', 'ring-2 ring-teal-300/80 shadow-sm', 'dark:ring-teal-700/70')}
+          imageClassName={cn('h-24 w-24 object-cover', 'ring-2 ring-emerald-300/80 shadow-sm', 'dark:ring-emerald-700/70')}
           fallbackClassName={cn(
             'flex h-24 w-24 items-center justify-center rounded-full',
             'text-2xl font-bold text-white',
-            'bg-gradient-to-br from-teal-500 to-emerald-600',
-            'ring-2 ring-teal-300/80 shadow-sm dark:ring-teal-700/70',
+            'bg-gradient-to-br from-emerald-500 to-emerald-600',
+            'ring-2 ring-emerald-300/80 shadow-sm dark:ring-emerald-700/70',
           )}
         />
 
@@ -68,7 +68,7 @@ export const ProfileAvatarPicker = memo(function ProfileAvatarPicker({
           className={cn(
             'absolute bottom-0.5 right-0.5',
             'flex h-7 w-7 items-center justify-center rounded-full',
-            'bg-teal-500 shadow-sm ring-2 ring-white dark:ring-emerald-950',
+            'bg-emerald-500 shadow-sm ring-2 ring-white dark:ring-emerald-950',
             'transition-opacity group-hover:opacity-0 group-focus-visible:opacity-0',
           )}
         >
@@ -81,7 +81,7 @@ export const ProfileAvatarPicker = memo(function ProfileAvatarPicker({
       </p>
 
       {avatarFile && (
-        <p className="max-w-28 truncate text-center text-xs text-teal-600 dark:text-teal-400">{avatarFile.name}</p>
+        <p className="max-w-28 truncate text-center text-xs text-emerald-600 dark:text-emerald-400">{avatarFile.name}</p>
       )}
 
       <input

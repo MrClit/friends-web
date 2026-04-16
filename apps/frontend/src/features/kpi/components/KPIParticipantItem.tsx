@@ -17,7 +17,7 @@ export const KPIParticipantItem = memo(function KPIParticipantItem({ item, gradi
   const isNegative = (item.rawAmount ?? 0) < 0;
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-soft overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-slate-100 dark:border-slate-700 p-4 sm:p-6 hover:border-primary/30">
+    <div className="bg-white dark:bg-emerald-950 rounded-2xl shadow-soft overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-slate-100 dark:border-emerald-800 p-4 sm:p-6 hover:border-emerald-600/30">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
         <div className="flex items-center gap-3 w-full sm:w-1/4 sm:min-w-45">
           <Avatar
@@ -25,7 +25,7 @@ export const KPIParticipantItem = memo(function KPIParticipantItem({ item, gradi
             name={item.name}
             alt={item.name}
             isPot={item.isPot}
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full ring-2 ring-slate-100 dark:ring-slate-700 shrink-0"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full ring-2 ring-slate-100 dark:ring-emerald-800 shrink-0"
             imageClassName="object-cover"
             fallbackClassName={cn(
               'flex items-center justify-center font-bold text-sm',
@@ -56,7 +56,7 @@ export const KPIParticipantItem = memo(function KPIParticipantItem({ item, gradi
         <div className="flex-1 w-full sm:px-4">
           <Progress.Root
             value={Math.min(percentage, 100)}
-            className="relative w-full h-3 sm:h-4 bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden"
+            className="relative w-full h-3 sm:h-4 bg-slate-100 dark:bg-emerald-800/50 rounded-full overflow-hidden"
           >
             <Progress.Indicator
               className={cn('h-full bg-linear-to-r rounded-full transition-[width]', gradientClass)}

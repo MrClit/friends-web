@@ -26,6 +26,20 @@ interface KPIConfig {
   helperText?: string;
 }
 
+const KPI_BORDER_COLOR: Record<string, string> = {
+  blue: 'border-blue-500',
+  rose: 'border-rose-500',
+  emerald: 'border-emerald-500',
+  amber: 'border-amber-500',
+};
+
+const KPI_LABEL_COLOR: Record<string, string> = {
+  blue: 'text-blue-700 dark:text-blue-400',
+  rose: 'text-rose-700 dark:text-rose-400',
+  emerald: 'text-emerald-700 dark:text-emerald-400',
+  amber: 'text-amber-700 dark:text-amber-400',
+};
+
 export function EventKPIGrid(props: EventKPIGridProps) {
   const { eventId, currentUserId, participants, totalContributions, participantPending } = props;
   const navigate = useNavigate();
@@ -63,24 +77,24 @@ export function EventKPIGrid(props: EventKPIGridProps) {
       label: t('kpi.pot'),
       value: props.potBalance,
       icon: <MdAccountBalanceWallet className="text-lg" />,
-      borderColorClass: 'border-emerald-500',
-      labelColorClass: 'text-emerald-700 dark:text-emerald-400',
+      borderColorClass: KPI_BORDER_COLOR.emerald,
+      labelColorClass: KPI_LABEL_COLOR.emerald,
     },
     {
       key: 'expenses',
       label: t('kpi.expenses'),
       value: props.totalExpenses,
       icon: <MdShoppingBag className="text-lg" />,
-      borderColorClass: 'border-rose-500',
-      labelColorClass: 'text-rose-700 dark:text-rose-400',
+      borderColorClass: KPI_BORDER_COLOR.rose,
+      labelColorClass: KPI_LABEL_COLOR.rose,
     },
     {
       key: 'contributionStatus',
       label: t('kpi.contributionStatus'),
       value: contributionStatusPercent,
       icon: <MdVolunteerActivism className="text-lg" />,
-      borderColorClass: 'border-blue-500',
-      labelColorClass: 'text-blue-700 dark:text-blue-400',
+      borderColorClass: KPI_BORDER_COLOR.blue,
+      labelColorClass: KPI_LABEL_COLOR.blue,
       valueFormat: 'percent',
       helperText:
         targetTotal > 0
@@ -92,8 +106,8 @@ export function EventKPIGrid(props: EventKPIGridProps) {
       label: t('kpi.userStatus'),
       value: currentUserCompliancePercent,
       icon: <MdPerson className="text-lg" />,
-      borderColorClass: 'border-amber-500',
-      labelColorClass: 'text-amber-700 dark:text-amber-400',
+      borderColorClass: KPI_BORDER_COLOR.amber,
+      labelColorClass: KPI_LABEL_COLOR.amber,
       valueFormat: 'percent',
       helperText: currentUserParticipant
         ? currentUserTarget > 0

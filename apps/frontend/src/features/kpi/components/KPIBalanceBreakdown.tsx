@@ -23,7 +23,7 @@ function BreakdownSection({ title, subtotal, sign, emptyMessage, children, hasIt
   const { t } = useTranslation('kpiDetail');
 
   return (
-    <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-soft border border-slate-100 dark:border-slate-700 p-4 sm:p-6 space-y-4">
+    <section className="bg-white dark:bg-emerald-950 rounded-2xl shadow-soft border border-slate-100 dark:border-emerald-800 p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between gap-4">
         <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
         <span className="text-sm sm:text-base font-extrabold text-slate-700 dark:text-slate-200">
@@ -45,7 +45,7 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
 
   return (
     <div className="space-y-6">
-      <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-soft border border-slate-100 dark:border-slate-700 p-4 sm:p-6 space-y-4">
+      <section className="bg-white dark:bg-emerald-950 rounded-2xl shadow-soft border border-slate-100 dark:border-emerald-800 p-4 sm:p-6 space-y-4">
         <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
           {t('balanceBreakdown.summaryTitle')}
         </h3>
@@ -70,7 +70,7 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
             </span>
           </div>
 
-          <div className="h-px bg-slate-200 dark:bg-slate-700 my-2" />
+          <div className="h-px bg-slate-200 dark:bg-emerald-800 my-2" />
 
           <div className="flex items-center justify-between text-base sm:text-lg">
             <span className="font-extrabold text-slate-900 dark:text-white">
@@ -99,7 +99,7 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
         {data.inflowItems.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 px-3 py-2"
+            className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 dark:border-emerald-800 bg-slate-50/70 dark:bg-emerald-900/20 px-3 py-2"
           >
             <span className="font-medium text-slate-800 dark:text-slate-100">{item.name}</span>
             <span className="font-bold text-emerald-700 dark:text-emerald-300">
@@ -119,7 +119,7 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
         {data.compensationItems.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 px-3 py-2"
+            className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 dark:border-emerald-800 bg-slate-50/70 dark:bg-emerald-900/20 px-3 py-2"
           >
             <span className="font-medium text-slate-800 dark:text-slate-100">{item.name}</span>
             <span className="font-bold text-rose-700 dark:text-rose-300">{formatSignedAmount(item.amount, '-')}</span>
@@ -139,7 +139,7 @@ export function KPIBalanceBreakdown({ data }: KPIBalanceBreakdownProps) {
           return (
             <div
               key={item.id}
-              className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 px-3 py-2"
+              className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 dark:border-emerald-800 bg-slate-50/70 dark:bg-emerald-900/20 px-3 py-2"
             >
               <div className="min-w-0">
                 <p className="font-medium text-slate-800 dark:text-slate-100 truncate">{item.title}</p>

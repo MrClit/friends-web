@@ -15,7 +15,7 @@ const CreateEventCardInner: FC<CreateEventCardProps> = ({ onClick, className, di
       type="button"
       aria-label={t('createEventCard.ariaLabel')}
       className={cn(
-        'group border-2 border-dashed border-emerald-200 dark:border-emerald-800/50 p-8 rounded-3xl flex flex-col items-center justify-center text-slate-400 hover:border-primary/50 hover:bg-white/50 dark:hover:bg-emerald-900/20 transition-all min-h-75',
+        'group border-2 border-dashed border-emerald-200 dark:border-emerald-800/50 p-8 rounded-3xl flex flex-col items-center justify-center text-slate-400 hover:border-emerald-600/50 hover:bg-white/50 dark:hover:bg-emerald-900/20 transition-all min-h-75',
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
         className,
       )}

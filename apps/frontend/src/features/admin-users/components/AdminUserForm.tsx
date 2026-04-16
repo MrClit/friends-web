@@ -20,7 +20,7 @@ function TextField({ label, type = 'text', value, onChangeField, required = fals
       {label}
       <input
         type={type}
-        className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+        className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
         value={value}
         onChange={(e) => onChangeField(e.target.value)}
         disabled={disabled}
@@ -45,7 +45,7 @@ function RoleSelect({ value, onChangeValue, disabled }: RoleSelectProps) {
     <Select.Root value={value} onValueChange={(v) => onChangeValue(v)} disabled={disabled}>
       <Select.Trigger
         aria-label={t('fields.role', 'Role')}
-        className="mt-1 w-full inline-flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+        className="mt-1 w-full inline-flex items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white"
       >
         <Select.Value placeholder={t('selectRole', 'Select role')}>
           {roleLabel && (
@@ -91,7 +91,7 @@ function RoleSelect({ value, onChangeValue, disabled }: RoleSelectProps) {
                 </Select.ItemText>
                 <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
                   <svg
-                    className="h-4 w-4 text-teal-600"
+                    className="h-4 w-4 text-emerald-600"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"

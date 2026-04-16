@@ -38,10 +38,10 @@ export function UserMenu() {
             'group flex items-center rounded-full border cursor-pointer',
             'gap-2.5 p-1',
             'border-slate-200/80 bg-white/80 shadow-sm',
-            'transition-colors hover:border-teal-200 hover:bg-white',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/60',
+            'transition-colors hover:border-emerald-200 hover:bg-white',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60',
             'focus-visible:ring-offset-2 focus-visible:ring-offset-white',
-            'data-[state=open]:border-teal-200 data-[state=open]:bg-white',
+            'data-[state=open]:border-emerald-200 data-[state=open]:bg-white',
             'dark:border-emerald-800/70 dark:bg-emerald-950/40',
             'dark:hover:border-emerald-700/80 dark:hover:bg-emerald-900/50',
             'dark:data-[state=open]:border-emerald-700/80 dark:data-[state=open]:bg-emerald-900/50',
@@ -56,20 +56,20 @@ export function UserMenu() {
             email={user.email}
             alt={user.name || user.email || 'User'}
             className="h-9 w-9 shrink-0 rounded-full"
-            imageClassName={cn('h-9 w-9 object-cover', 'ring-1 ring-teal-300/80 shadow-sm', 'dark:ring-teal-700/80')}
+            imageClassName={cn('h-9 w-9 object-cover', 'ring-1 ring-emerald-300/80 shadow-sm', 'dark:ring-emerald-700/80')}
             fallbackClassName={cn(
               'flex h-9 w-9 items-center justify-center',
               'text-xs font-bold text-white',
-              'bg-gradient-to-br from-teal-500 to-emerald-600',
-              'ring-1 ring-teal-300/80 shadow-sm',
-              'dark:ring-teal-700/80',
+              'bg-gradient-to-br from-emerald-500 to-emerald-600',
+              'ring-1 ring-emerald-300/80 shadow-sm',
+              'dark:ring-emerald-700/80',
             )}
           />
           <span
             className={cn(
               'hidden max-w-32 truncate',
               'text-sm font-semibold text-slate-700',
-              'dark:text-teal-100',
+              'dark:text-emerald-100',
               'sm:block',
             )}
           >
@@ -95,13 +95,13 @@ export function UserMenu() {
         )}
       >
         <DropdownMenuItem disabled className="flex items-center gap-2 opacity-80 cursor-default select-text">
-          <MdAccountCircle className="text-xl text-teal-500" />
+          <MdAccountCircle className="text-xl text-emerald-500" />
           <span className="truncate">{user.email}</span>
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => navigate('/profile')}
-          className={cn('flex items-center gap-2 cursor-pointer', 'font-semibold text-teal-800', 'dark:text-teal-200')}
+          className={cn('flex items-center gap-2 cursor-pointer', 'font-semibold text-emerald-800', 'dark:text-emerald-200')}
         >
           <MdPerson className="text-lg" />
           {t('profile', { ns: 'user', defaultValue: 'Profile' })}
@@ -112,8 +112,8 @@ export function UserMenu() {
             onClick={() => navigate('/admin/users')}
             className={cn(
               'flex items-center gap-2 cursor-pointer',
-              'font-semibold text-teal-800',
-              'dark:text-teal-200',
+              'font-semibold text-emerald-800',
+              'dark:text-emerald-200',
             )}
           >
             <MdAdminPanelSettings className="text-lg" />

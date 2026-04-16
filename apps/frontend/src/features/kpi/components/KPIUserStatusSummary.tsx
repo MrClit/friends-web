@@ -19,7 +19,7 @@ interface SummaryMetricCardProps {
 
 function SummaryMetricCard({ label, value }: SummaryMetricCardProps) {
   return (
-    <div className="rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/40">
+    <div className="rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-emerald-800 dark:bg-emerald-900/20">
       <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</p>
       <p className="text-base font-bold text-slate-900 dark:text-white">{value}</p>
     </div>
@@ -38,7 +38,7 @@ export function KPIUserStatusSummary({
   const hasTargets = (data?.targetTotal ?? 0) > 0;
 
   return (
-    <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-soft border border-slate-100 dark:border-slate-700 p-4 sm:p-6 space-y-4">
+    <section className="bg-white dark:bg-emerald-950 rounded-2xl shadow-soft border border-slate-100 dark:border-emerald-800 p-4 sm:p-6 space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
@@ -56,7 +56,7 @@ export function KPIUserStatusSummary({
 
       {data ? (
         <>
-          <div className="rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/40 flex items-center justify-between gap-3">
+          <div className="rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-emerald-800 dark:bg-emerald-900/20 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{data.participantName}</p>
             {data.isCurrentUser && (
               <span className="rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 px-2 py-0.5 text-xs font-semibold">
@@ -78,7 +78,7 @@ export function KPIUserStatusSummary({
             <SummaryMetricCard label={t('userStatus.targetTotalLabel')} value={formatAmount(data.targetTotal)} />
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/40">
+          <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-emerald-800 dark:bg-emerald-900/20">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
               {t('userStatus.differenceLabel')}
             </p>

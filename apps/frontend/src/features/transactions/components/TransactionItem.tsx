@@ -47,7 +47,7 @@ function TransactionItemBase({ transaction, onClick, participantsMap }: Transact
         'hover:shadow-md transition-all cursor-pointer',
         colors.hover.light,
         colors.hover.dark,
-        'focus:outline-none focus:ring-2 focus:ring-teal-500',
+        'focus:outline-none focus:ring-2 focus:ring-emerald-500',
       )}
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick()}

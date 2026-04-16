@@ -23,7 +23,7 @@ export function LanguageSelector() {
           title={t('current', { lng: current.name })}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-emerald-800 hover:bg-white dark:hover:bg-emerald-900/50 transition-all cursor-pointer"
         >
-          <MdLanguage className="text-[20px] text-emerald-600 dark:text-emerald-400" />
+          <MdLanguage className="text-xl text-emerald-600 dark:text-emerald-400" />
           <span className="text-sm font-semibold dark:text-white hidden sm:inline">{current.label}</span>
         </button>
       </DropdownMenuTrigger>
@@ -37,14 +37,14 @@ export function LanguageSelector() {
             onClick={() => handleSelect(l.code)}
             className={`text-sm font-semibold cursor-pointer flex items-center justify-between gap-2 rounded-md ${
               i18n.language === l.code
-                ? 'bg-teal-100 dark:bg-teal-800 text-teal-900 dark:text-teal-100'
-                : 'text-teal-700 dark:text-teal-200'
+                ? 'bg-emerald-100 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100'
+                : 'text-emerald-700 dark:text-emerald-200'
             }`}
           >
             <span>
               {l.name} <span className="text-xs opacity-70">({l.label})</span>
             </span>
-            {i18n.language === l.code && <MdCheck className="text-teal-600 dark:text-teal-300" />}
+            {i18n.language === l.code && <MdCheck className="text-emerald-600 dark:text-emerald-300" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

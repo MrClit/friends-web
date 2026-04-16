@@ -46,7 +46,7 @@ export function EventForm({ fields, onSubmit }: EventFormProps) {
         <input
           id="event-title"
           type="text"
-          className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
+          className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-600 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
           placeholder={t('eventForm.titlePlaceholder')}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -60,7 +60,7 @@ export function EventForm({ fields, onSubmit }: EventFormProps) {
         </label>
         <textarea
           id="event-description"
-          className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 resize-none font-medium"
+          className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-600 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 resize-none font-medium"
           placeholder={t('eventForm.descriptionPlaceholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}

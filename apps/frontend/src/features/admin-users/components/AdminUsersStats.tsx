@@ -18,13 +18,13 @@ export function AdminUsersStats({ users }: AdminUsersStatsProps) {
       <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50/70 p-2 dark:border-emerald-800/50 dark:bg-emerald-950/60 sm:hidden">
         <dl className="grid grid-cols-3 divide-x divide-slate-200 dark:divide-slate-700">
           <div className="px-2 text-center">
-            <dt className="text-[10px] font-medium text-slate-600 dark:text-slate-300">
+            <dt className="text-2xs font-medium text-slate-600 dark:text-slate-300">
               {t('stats.totalShort', 'Total')}
             </dt>
             <dd className="mt-1 text-xl font-semibold leading-none text-slate-900 dark:text-slate-100">{totalUsers}</dd>
           </div>
           <div className="px-2 text-center">
-            <dt className="text-[10px] font-medium text-purple-700 dark:text-purple-200">
+            <dt className="text-2xs font-medium text-purple-700 dark:text-purple-200">
               {t('stats.adminShort', 'Admin')}
             </dt>
             <dd className="mt-1 text-xl font-semibold leading-none text-purple-800 dark:text-purple-100">
@@ -32,7 +32,7 @@ export function AdminUsersStats({ users }: AdminUsersStatsProps) {
             </dd>
           </div>
           <div className="px-2 text-center">
-            <dt className="text-[10px] font-medium text-blue-700 dark:text-blue-200">{t('stats.userShort', 'User')}</dt>
+            <dt className="text-2xs font-medium text-blue-700 dark:text-blue-200">{t('stats.userShort', 'User')}</dt>
             <dd className="mt-1 text-xl font-semibold leading-none text-blue-800 dark:text-blue-100">{regularUsers}</dd>
           </div>
         </dl>

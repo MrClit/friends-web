@@ -18,7 +18,7 @@ body {
 .custom-scrollbar {
   /* Firefox */
   scrollbar-width: thin;
-  scrollbar-color: rgba(16, 185, 129, 0.45) transparent;
+  scrollbar-color: rgba(16, 185, 129, 0.45) transparent; /* emerald-500 at 45% */
 }
 
 /* WebKit browsers */
@@ -30,17 +30,17 @@ body {
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(16, 185, 129, 0.45);
+  background-color: rgba(16, 185, 129, 0.45); /* emerald-500 at 45% */
   border-radius: 9999px;
   border: 2px solid transparent;
 }
 
 /* Dark mode adjustments */
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(4, 120, 87, 0.45);
+  background-color: rgba(4, 120, 87, 0.45); /* emerald-700 at 45% */
 }
 .dark .custom-scrollbar {
-  scrollbar-color: rgba(4, 120, 87, 0.45) transparent;
+  scrollbar-color: rgba(4, 120, 87, 0.45) transparent; /* emerald-700 at 45% */
 }
 
 /* iOS Safari can render date inputs with intrinsic width larger than containers. */
@@ -63,4 +63,16 @@ body {
 
 .ios-date-input-force-custom::-webkit-date-and-time-value {
   text-align: left;
+}
+
+@layer utilities {
+  /* Soft elevation used across KPI cards */
+  .shadow-soft {
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  }
+  /* Sub-xs size for dense stat labels */
+  .text-2xs {
+    font-size: 0.625rem;
+    line-height: 0.875rem;
+  }
 }

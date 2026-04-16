@@ -32,7 +32,7 @@ const DialogOverlay = React.forwardRef<
       // Layout
       'fixed inset-0 z-50 flex items-center justify-center p-4',
       // Visuals
-      'bg-[rgba(2,44,34,0.4)] backdrop-blur-sm',
+      'bg-emerald-950/40 backdrop-blur-sm',
       // Animations
       'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300 motion-reduce:animate-none',
       className,
@@ -101,7 +101,7 @@ const DialogBottomSheet = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-md bg-white dark:bg-teal-900 rounded-t-3xl p-6 shadow-lg',
+        'fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-md bg-white dark:bg-emerald-900 rounded-t-3xl p-6 shadow-lg',
         'min-h-[50vh] max-h-[90vh] overflow-y-auto',
         'animate-[slideUpDialog_0.3s_cubic-bezier(0.4,0,0.2,1)] motion-reduce:animate-none',
         className,
@@ -253,7 +253,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-xl font-bold text-teal-700 dark:text-teal-100', className)}
+    className={cn('text-xl font-bold text-emerald-700 dark:text-emerald-100', className)}
     {...props}
   />
 ));
@@ -272,7 +272,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-gray-600 dark:text-gray-300', className)}
+    className={cn('text-sm text-slate-600 dark:text-slate-300', className)}
     {...props}
   />
 ));

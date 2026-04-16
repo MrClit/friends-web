@@ -30,24 +30,24 @@ export function EventContextMenu({
           disabled={disabled}
           className={cn(
             'cursor-pointer rounded-lg p-2 transition-colors',
-            'hover:bg-teal-200 dark:hover:bg-teal-800',
+            'hover:bg-emerald-200 dark:hover:bg-emerald-800',
             'disabled:cursor-not-allowed disabled:opacity-50',
           )}
           aria-label={t('eventContextMenu.options')}
         >
-          <MdMoreVert className="text-teal-900 dark:text-teal-100 text-2xl" />
+          <MdMoreVert className="text-emerald-900 dark:text-emerald-100 text-2xl" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-white dark:bg-teal-900">
+      <DropdownMenuContent align="end" className="bg-white dark:bg-emerald-900">
         <DropdownMenuItem
           onClick={() => {
             if (onEdit) {
               onEdit();
             }
           }}
-          className="hover:bg-teal-100 dark:hover:bg-teal-800 cursor-pointer"
+          className="hover:bg-emerald-100 dark:hover:bg-emerald-800 cursor-pointer"
         >
-          <MdEdit className="mr-2 text-teal-900 dark:text-teal-100" />
+          <MdEdit className="mr-2 text-emerald-900 dark:text-emerald-100" />
           {t('eventContextMenu.edit')}
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -56,12 +56,12 @@ export function EventContextMenu({
               onToggleArchive();
             }
           }}
-          className="hover:bg-slate-100 dark:hover:bg-teal-800 cursor-pointer"
+          className="hover:bg-slate-100 dark:hover:bg-emerald-800 cursor-pointer"
         >
           {isArchived ? (
-            <MdUnarchive className="mr-2 text-slate-700 dark:text-teal-100" />
+            <MdUnarchive className="mr-2 text-slate-700 dark:text-emerald-100" />
           ) : (
-            <MdArchive className="mr-2 text-slate-700 dark:text-teal-100" />
+            <MdArchive className="mr-2 text-slate-700 dark:text-emerald-100" />
           )}
           {t(isArchived ? 'eventContextMenu.unarchive' : 'eventContextMenu.archive')}
         </DropdownMenuItem>

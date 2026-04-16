@@ -37,7 +37,7 @@ export function ConfirmDialog({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
       <DialogContent className="z-60 p-5">
         <DialogTitle>{resolvedTitle}</DialogTitle>
-        <DialogDescription className="text-teal-800 dark:text-teal-100 mb-6">{message}</DialogDescription>
+        <DialogDescription className="text-emerald-800 dark:text-emerald-100 mb-6">{message}</DialogDescription>
         <div className="flex justify-end gap-3">
           <DialogCloseButton onClick={onCancel}>{resolvedCancel}</DialogCloseButton>
           <DialogPrimaryButton onClick={onConfirm}>{resolvedConfirm}</DialogPrimaryButton>

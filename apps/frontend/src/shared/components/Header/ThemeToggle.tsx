@@ -18,7 +18,7 @@ export function ThemeToggle() {
       {mode === 'dark' ? (
         <MdBrightness7 className="text-yellow-400 text-xl transition-all duration-300 ease-in-out" />
       ) : (
-        <MdBrightness4 className="text-teal-600 text-xl transition-all duration-300 ease-in-out" />
+        <MdBrightness4 className="text-emerald-600 text-xl transition-all duration-300 ease-in-out" />
       )}
     </button>
   );

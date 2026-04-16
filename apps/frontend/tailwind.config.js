@@ -3,18 +3,18 @@ module.exports = {
   safelist: [
     // Payment type colors (light variants)
     'text-blue-700',
-    'text-red-700',
-    'text-green-700',
-    'text-orange-800',
+    'text-rose-700',
+    'text-emerald-700',
+    'text-amber-800',
     // Dark mode variants
     'dark:text-blue-200',
-    'dark:text-red-200',
-    'dark:text-green-200',
-    'dark:text-orange-200',
+    'dark:text-rose-200',
+    'dark:text-emerald-200',
+    'dark:text-amber-200',
     // Strong variants
     'text-blue-800',
-    'text-red-800',
-    'text-green-800',
+    'text-rose-800',
+    'text-emerald-800',
   ],
   theme: {
     extend: {

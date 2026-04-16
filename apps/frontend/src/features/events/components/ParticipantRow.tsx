@@ -96,7 +96,7 @@ export const ParticipantRow = memo(function ParticipantRow({
                   onBlur={onCommitRename}
                   className={cn(
                     'w-full min-w-40 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-900',
-                    'outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20',
+                    'outline-none transition-colors focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20',
                     'dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-white',
                   )}
                   aria-label={t('participantsInput.renameInputAria')}
@@ -148,8 +148,8 @@ export const ParticipantRow = memo(function ParticipantRow({
                   <button
                     type="button"
                     className={cn(
-                      'rounded-xl p-2 text-slate-400 transition-colors hover:bg-teal-50 hover:text-teal-600',
-                      'dark:hover:bg-teal-900/20 dark:hover:text-teal-400',
+                      'rounded-xl p-2 text-slate-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600',
+                      'dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400',
                     )}
                     onClick={onStartReplace}
                     aria-label={t('participantsInput.replaceAria')}

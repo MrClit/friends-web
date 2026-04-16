@@ -36,7 +36,7 @@ export function LogoIcon({ size = 40, rounded = '3xl' }: LogoIconProps) {
       alt="Friends logo"
       width={size}
       height={size}
-      className={`block object-contain ${ROUNDED_CLASS_BY_SIZE[rounded]} border-teal-300 dark:border-teal-500`}
+      className={`block object-contain ${ROUNDED_CLASS_BY_SIZE[rounded]} border-emerald-300 dark:border-emerald-500`}
       loading="eager"
       decoding="async"
     />
@@ -56,7 +56,7 @@ export function Logo({ showText = false, size = 40, rounded = '3xl' }: LogoProps
     >
       <LogoIcon size={size} rounded={rounded} />
       {showText && (
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-teal-700 dark:text-teal-300 mt-2">
+        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-emerald-700 dark:text-emerald-300 mt-2">
           FRI<span className="text-yellow-400">€</span>NDS
         </h1>
       )}

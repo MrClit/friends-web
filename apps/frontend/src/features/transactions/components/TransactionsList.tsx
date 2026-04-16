@@ -71,7 +71,7 @@ export function TransactionsList({ event }: TransactionsListProps) {
   );
 
   if (isLoading) {
-    return <div className="w-full max-w-2xl mb-8 text-center text-teal-400 py-8">{t('loading', { ns: 'common' })}</div>;
+    return <div className="w-full max-w-2xl mb-8 text-center text-emerald-400 py-8">{t('loading', { ns: 'common' })}</div>;
   }
 
   if (error) {
@@ -88,7 +88,7 @@ export function TransactionsList({ event }: TransactionsListProps) {
   return (
     <section className="space-y-6 pb-24">
       {dates.length === 0 && (
-        <div className="text-center text-teal-400 py-8">{t('transactionsList.noTransactions')}</div>
+        <div className="text-center text-emerald-400 py-8">{t('transactionsList.noTransactions')}</div>
       )}
       {dates.map((date) => (
         <div key={date} className="mb-6">
@@ -112,14 +112,14 @@ export function TransactionsList({ event }: TransactionsListProps) {
       {hasNextPage && (
         <div ref={observerRef} className="py-4 text-center">
           {isFetchingNextPage ? (
-            <div className="flex justify-center items-center gap-2 text-teal-500">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500" aria-hidden="true"></div>
+            <div className="flex justify-center items-center gap-2 text-emerald-500">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500" aria-hidden="true"></div>
               <span>{t('transactionsList.loadingMore')}</span>
             </div>
           ) : (
             <button
               onClick={loadMore}
-              className="text-teal-600 dark:text-teal-400 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 rounded px-2 py-1"
+              className="text-emerald-600 dark:text-emerald-400 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded px-2 py-1"
               aria-label={t('transactionsList.loadMore')}
             >
               {t('transactionsList.loadMore')}

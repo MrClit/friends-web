@@ -81,7 +81,7 @@ export const ProfileCard = memo(function ProfileCard({
               className={cn(
                 'w-full rounded-xl border px-4 py-3 text-base',
                 'border-slate-300/90 bg-white/95 text-slate-900 placeholder:text-slate-400',
-                'focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2',
+                'focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2',
                 'dark:border-emerald-700/70 dark:bg-emerald-950/70 dark:text-emerald-50',
                 'dark:placeholder:text-emerald-300/40 dark:focus:ring-offset-emerald-950',
               )}
@@ -103,9 +103,9 @@ export const ProfileCard = memo(function ProfileCard({
               className={cn(
                 'inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3',
                 'text-sm font-semibold text-white',
-                'bg-teal-600 transition-colors hover:cursor-pointer hover:bg-emerald-700',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
-                'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-teal-600',
+                'bg-emerald-600 transition-colors hover:cursor-pointer hover:bg-emerald-700',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
+                'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600',
                 'dark:focus-visible:ring-offset-emerald-950 sm:w-auto',
               )}
             >

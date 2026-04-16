@@ -22,7 +22,7 @@ export function ActionButton({ onClick, actionLabel, actionIcon, className }: Ac
         // Shape
         'rounded-2xl',
         // Colors
-        'bg-teal-600 hover:bg-emerald-700 text-white',
+        'bg-emerald-600 hover:bg-emerald-700 text-white',
         // Typography (responsive: smaller text on mobile)
         'text-sm sm:text-base font-bold',
         // Elevation & effects

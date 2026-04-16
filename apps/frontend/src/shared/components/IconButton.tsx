@@ -15,12 +15,12 @@ interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
  */
 export function IconButton({ ariaLabel, children, className, variant = 'default', ...props }: IconButtonProps) {
   const baseStyles =
-    'cursor-pointer rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-teal-400 h-10 flex items-center justify-center hover:bg-teal-100 dark:hover:bg-teal-800 transition-colors';
+    'cursor-pointer rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-emerald-400 h-10 flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-800 transition-colors';
 
   const variantStyles = {
-    default: 'bg-white/90 dark:bg-teal-950/90 border border-teal-300 dark:border-teal-800 w-10',
+    default: 'bg-white/90 dark:bg-emerald-950/90 border border-emerald-300 dark:border-emerald-800 w-10',
     primary:
-      'bg-white/90 dark:bg-teal-950/90 border-2 border-teal-500 dark:border-yellow-400 shadow-lg px-2 w-16 backdrop-blur-md',
+      'bg-white/90 dark:bg-emerald-950/90 border-2 border-emerald-500 dark:border-yellow-400 shadow-lg px-2 w-16 backdrop-blur-md',
   };
 
   return (

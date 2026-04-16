@@ -57,7 +57,7 @@ export function LoginPage() {
         </div>
 
         <div className="mb-9 text-center sm:mb-10">
-          <h1 className="mb-2 font-serif text-3xl font-semibold tracking-tight text-teal-900 dark:text-teal-100 sm:text-4xl">
+          <h1 className="mb-2 text-3xl font-semibold tracking-tight text-teal-900 dark:text-teal-100 sm:text-4xl">
             {t('loginPage.title')}
           </h1>
           <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-700 dark:text-slate-300 sm:text-base">
