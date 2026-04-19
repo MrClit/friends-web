@@ -239,8 +239,8 @@ export class TransactionsService {
       const transaction = await this.findTransactionOrThrow(id);
       await this.ensureCanAccessTransaction(transaction, actor);
 
-      // Delete transaction
-      await this.transactionRepository.delete(id);
+      // Soft delete transaction
+      await this.transactionRepository.softDelete(id);
       this.logger.log(`Transaction ${id} deleted successfully`);
     } catch (error) {
       if (error instanceof NotFoundException) {

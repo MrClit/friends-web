@@ -59,6 +59,7 @@ describe('TransactionsService', () => {
     save: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    softDelete: jest.fn(),
     createQueryBuilder: jest.fn(),
     query: jest.fn(),
   };
@@ -315,12 +316,12 @@ describe('TransactionsService', () => {
   describe('remove', () => {
     it('deletes a transaction', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
-      mockTransactionRepository.delete.mockResolvedValue({ affected: 1 });
+      mockTransactionRepository.softDelete.mockResolvedValue({ affected: 1 });
 
       await service.remove('transaction-uuid-1', adminActor);
 
       expect(mockTransactionRepository.findOne).toHaveBeenCalledWith({ where: { id: 'transaction-uuid-1' } });
-      expect(mockTransactionRepository.delete).toHaveBeenCalledWith('transaction-uuid-1');
+      expect(mockTransactionRepository.softDelete).toHaveBeenCalledWith('transaction-uuid-1');
     });
 
     it('throws NotFoundException when transaction does not exist', async () => {

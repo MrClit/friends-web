@@ -117,6 +117,7 @@ export class TransactionPaginationService {
           DENSE_RANK() OVER (ORDER BY t.date DESC) as date_rank
         FROM transactions t
         WHERE t.event_id = $1
+          AND t.deleted_at IS NULL
       ),
       DateCounts AS (
         SELECT COUNT(DISTINCT date_rank) as total_dates
