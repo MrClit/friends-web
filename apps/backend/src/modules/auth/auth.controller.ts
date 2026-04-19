@@ -66,7 +66,12 @@ export class AuthController {
       await this.authService.revokeRefreshToken(rawToken);
     }
 
-    res.clearCookie('refresh_token', { path: '/api/auth' });
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.clearCookie('refresh_token', {
+      path: '/api/auth',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'strict',
+    } as const);
     return res.json({ data: null });
   }
 
@@ -92,12 +97,13 @@ export class AuthController {
     const configuredDays = Number(process.env.REFRESH_TOKEN_EXPIRATION_DAYS ?? '30');
     const tokenDays = Number.isFinite(configuredDays) && configuredDays > 0 ? configuredDays : 30;
 
+    const isProduction = process.env.NODE_ENV === 'production';
     return {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'strict',
       path: '/api/auth',
       maxAge: tokenDays * 24 * 60 * 60 * 1000,
-    };
+    } as const;
   }
 }
