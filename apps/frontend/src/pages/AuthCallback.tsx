@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import { isUserRole } from '@/features/auth/types';
 import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
 import { ENV } from '@/config/env';
+import { REFRESH_TOKEN_KEY } from '@/api/client';
 
 const AUTH_NAMESPACES = ['auth'] as const;
 
@@ -17,21 +18,29 @@ export function AuthCallback() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    if (!params.get('success')) {
+    const refreshToken = params.get('refreshToken');
+    if (!params.get('success') || !refreshToken) {
       navigate('/', { replace: true });
       return;
     }
+
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 
     async function bootstrap() {
       try {
         const refreshRes = await fetch(`${ENV.API_URL}/auth/refresh`, {
           method: 'POST',
-          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
         });
         if (!refreshRes.ok) throw new Error('refresh failed');
-        const refreshBody = (await refreshRes.json()) as { data?: { accessToken?: string } };
+        const refreshBody = (await refreshRes.json()) as { data?: { accessToken?: string; refreshToken?: string } };
         const accessToken = refreshBody.data?.accessToken;
+        const newRefreshToken = refreshBody.data?.refreshToken;
         if (!accessToken) throw new Error('no access token');
+        if (newRefreshToken) {
+          localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+        }
 
         const meRes = await fetch(`${ENV.API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },

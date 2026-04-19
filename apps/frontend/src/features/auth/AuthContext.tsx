@@ -1,4 +1,5 @@
 import { createContext, useCallback, useEffect, useState, type ReactNode } from 'react';
+import { REFRESH_TOKEN_KEY } from '@/api/client';
 import type { AuthContextType, AuthProvider, User } from './types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,19 +69,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     const currentToken = token;
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
     setUser(null);
     setToken(null);
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
 
     void fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/logout`, {
       method: 'POST',
-      credentials: 'include',
-      headers: currentToken
-        ? {
-            Authorization: `Bearer ${currentToken}`,
-          }
-        : undefined,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}),
+      },
+      body: JSON.stringify({ refreshToken }),
     }).catch(() => {
       // Intentionally ignore logout API failures to keep local logout immediate.
     });

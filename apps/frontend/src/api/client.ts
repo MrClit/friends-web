@@ -3,13 +3,18 @@ import { ENV } from '@/config/env';
 const API_BASE = ENV.API_URL;
 let refreshPromise: Promise<string | null> | null = null;
 
+export const REFRESH_TOKEN_KEY = 'refresh_token';
+
 interface ApiRequestInit extends RequestInit {
   _retried?: boolean;
 }
 
 function getAuthToken() {
-  // Intenta obtener el token desde localStorage
   return localStorage.getItem('token');
+}
+
+function getRefreshToken() {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
 }
 
 async function refreshAccessToken(): Promise<string | null> {
@@ -17,16 +22,25 @@ async function refreshAccessToken(): Promise<string | null> {
     return refreshPromise;
   }
 
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
   refreshPromise = fetch(`${API_BASE}/auth/refresh`, {
     method: 'POST',
-    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
   })
     .then(async (response) => {
       if (!response.ok) {
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
         return null;
       }
 
-      const body = (await response.json()) as { data?: { accessToken?: string } };
+      const body = (await response.json()) as { data?: { accessToken?: string; refreshToken?: string } };
+      const newRefreshToken = body.data?.refreshToken;
+      if (newRefreshToken) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+      }
       return body.data?.accessToken ?? null;
     })
     .catch(() => null)
