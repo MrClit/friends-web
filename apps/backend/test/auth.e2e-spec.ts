@@ -46,6 +46,19 @@ describe('AuthController (e2e)', () => {
     });
   });
 
+  it('GET /api/auth/me should return 401 for a soft-deleted user', async () => {
+    const user = await createUser(userRepository, {
+      email: 'deleted@example.com',
+      name: 'Deleted User',
+    });
+    await userRepository.softDelete(user.id);
+
+    const token = jwtService.sign({ sub: user.id, email: user.email, role: user.role });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(httpServer).get('/api/auth/me').set('Authorization', `Bearer ${token}`).expect(401);
+  });
+
   it('GET /api/auth/me should return the authenticated user with a valid JWT', async () => {
     const user = await createUser(userRepository, {
       email: 'john.doe@example.com',

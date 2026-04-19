@@ -102,6 +102,7 @@ describe('UsersService', () => {
     const users = [{ id: 'u1', name: 'Alice' }] as User[];
     const queryBuilder = {
       where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
       orderBy: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
@@ -116,6 +117,7 @@ describe('UsersService', () => {
     expect(queryBuilder.where).toHaveBeenCalledWith('(user.name ILIKE :query OR user.email ILIKE :query)', {
       query: '%ali%',
     });
+    expect(queryBuilder.andWhere).toHaveBeenCalledWith('user.deleted_at IS NULL');
     expect(queryBuilder.select).toHaveBeenCalledWith([
       'user.id',
       'user.email',

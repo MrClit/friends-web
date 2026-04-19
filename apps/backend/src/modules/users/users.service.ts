@@ -100,6 +100,7 @@ export class UsersService {
       .where('(user.name ILIKE :query OR user.email ILIKE :query)', {
         query: `%${query}%`,
       })
+      .andWhere('user.deleted_at IS NULL')
       .select(['user.id', 'user.email', 'user.name', 'user.avatar', 'user.role'])
       .orderBy('user.name', 'ASC')
       .limit(20)

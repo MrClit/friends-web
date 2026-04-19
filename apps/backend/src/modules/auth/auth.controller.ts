@@ -49,7 +49,9 @@ export class AuthController {
     }
 
     const { rawToken: newRawToken, userId } = await this.authService.rotateRefreshToken(rawToken);
-    const user = await this.usersService.findByIdOrThrow(userId);
+    const user = await this.usersService.findByIdOrThrow(userId).catch(() => {
+      throw new UnauthorizedException();
+    });
     const accessToken = this.authService.generateJwt(user);
 
     res.cookie('refresh_token', newRawToken, this.getRefreshCookieOptions());
@@ -77,12 +79,12 @@ export class AuthController {
   }
 
   private async redirectToFrontendWithToken(user: User, res: express.Response) {
-    const { accessToken, refreshToken } = await this.authService.generateAuthTokens(user);
+    const { refreshToken } = await this.authService.generateAuthTokens(user);
 
     res.cookie('refresh_token', refreshToken, this.getRefreshCookieOptions());
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173/friends-web/#';
-    const redirectUrl = `${frontendUrl}/auth/callback?access_token=${encodeURIComponent(accessToken)}&id=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name || '')}&avatar=${encodeURIComponent(user.avatar || '')}&role=${encodeURIComponent(user.role)}`;
+    const redirectUrl = `${frontendUrl}/auth/callback?success=true`;
     return res.redirect(redirectUrl);
   }
 
