@@ -79,9 +79,12 @@ export function EventsList() {
     return <ErrorState onRetry={() => refetch()} />;
   }
 
-  if (!events || events.length === 0) {
-    return (
-      <div className="w-full max-w-7xl mx-auto mt-4 sm:mt-8">
+  return (
+    <div className="w-full max-w-7xl mx-auto">
+      <div className="mb-6 flex items-center justify-between">
+        <EventsStatusToggle value={statusFilter} onChange={setStatusFilter} />
+      </div>
+      {!events || events.length === 0 ? (
         <div
           className={cn(
             'flex flex-col items-center justify-center rounded-lg border px-4 py-12',
@@ -100,39 +103,32 @@ export function EventsList() {
           </p>
           {!isArchivedView ? <CreateEventCard onClick={onNewEvent} /> : null}
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full max-w-7xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
-        <EventsStatusToggle value={statusFilter} onChange={setStatusFilter} />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        {events.map((event, idx) => (
-          <EventCard
-            key={event.id}
-            event={{
-              id: event.id,
-              title: event.title,
-              description: event.description,
-              status: event.status || 'active',
-              participants:
-                event.participants?.map((p) => ({
-                  name: getParticipantName(p, t),
-                  avatarUrl: getParticipantAvatar(p) ?? undefined,
-                })) || [],
-              lastModified: event.lastModified || event.updatedAt,
-              icon: <EventIcon iconKey={event.icon} />,
-            }}
-            onClick={() => navigate(`/event/${event.id}`)}
-            className="animate-in fade-in duration-500"
-            style={{ animationDelay: `${idx * 75}ms`, animationFillMode: 'backwards' }}
-          />
-        ))}
-        {!isArchivedView ? <CreateEventCard onClick={onNewEvent} /> : null}
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          {events.map((event, idx) => (
+            <EventCard
+              key={event.id}
+              event={{
+                id: event.id,
+                title: event.title,
+                description: event.description,
+                status: event.status || 'active',
+                participants:
+                  event.participants?.map((p) => ({
+                    name: getParticipantName(p, t),
+                    avatarUrl: getParticipantAvatar(p) ?? undefined,
+                  })) || [],
+                lastModified: event.lastModified || event.updatedAt,
+                icon: <EventIcon iconKey={event.icon} />,
+              }}
+              onClick={() => navigate(`/event/${event.id}`)}
+              className="animate-in fade-in duration-500"
+              style={{ animationDelay: `${idx * 75}ms`, animationFillMode: 'backwards' }}
+            />
+          ))}
+          {!isArchivedView ? <CreateEventCard onClick={onNewEvent} /> : null}
+        </div>
+      )}
     </div>
   );
 }
