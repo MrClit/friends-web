@@ -26,7 +26,7 @@ const main = async () => {
 
     // 1. Check for uncommitted changes
     log.info('Checking for uncommitted changes...');
-    const status = exec('git status --porcelain').trim();
+    const status = exec('git status --porcelain --untracked-files=no').trim();
     if (status) {
       log.error('You have uncommitted changes. Please commit or stash them first.');
       console.log(status);
