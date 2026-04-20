@@ -2,7 +2,7 @@ import { AuthController } from './auth.controller';
 import type { AuthService } from './auth.service';
 import type { UsersService } from '../users/users.service';
 import type { User } from '../users/user.entity';
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -44,11 +44,10 @@ describe('AuthController', () => {
     controller = new AuthController(authService as unknown as AuthService, usersService as unknown as UsersService);
   });
 
-  it('redirects Google callback to frontend auth callback with JWT payload', async () => {
-    const req = { user: baseUser } as Request & { user: User };
+  it('redirects Google callback to frontend with success flag and refresh token in query param', async () => {
+    const req = { user: baseUser } as Parameters<typeof controller.googleAuthRedirect>[0];
     const redirect = jest.fn();
-    const cookie = jest.fn();
-    const res = { redirect, cookie } as unknown as Response;
+    const res = { redirect } as unknown as Response;
 
     const oldFrontendUrl = process.env.FRONTEND_URL;
     process.env.FRONTEND_URL = 'http://localhost:5173/friends-web/#';
@@ -58,21 +57,17 @@ describe('AuthController', () => {
 
       expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
       expect(redirect).toHaveBeenCalledTimes(1);
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?access_token=jwt-token'));
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('id=user-1'));
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('email=user%40example.com'));
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('role=user'));
-      expect(cookie).toHaveBeenCalledWith('refresh_token', 'refresh-token', expect.any(Object));
+      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?success=true'));
+      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
     } finally {
       process.env.FRONTEND_URL = oldFrontendUrl;
     }
   });
 
-  it('redirects Microsoft callback to frontend auth callback with JWT payload', async () => {
-    const req = { user: baseUser } as Request & { user: User };
+  it('redirects Microsoft callback to frontend with success flag and refresh token in query param', async () => {
+    const req = { user: baseUser } as Parameters<typeof controller.microsoftAuthRedirect>[0];
     const redirect = jest.fn();
-    const cookie = jest.fn();
-    const res = { redirect, cookie } as unknown as Response;
+    const res = { redirect } as unknown as Response;
 
     const oldFrontendUrl = process.env.FRONTEND_URL;
     process.env.FRONTEND_URL = 'http://localhost:5173/friends-web/#';
@@ -82,23 +77,17 @@ describe('AuthController', () => {
 
       expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
       expect(redirect).toHaveBeenCalledTimes(1);
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?access_token=jwt-token'));
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('id=user-1'));
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('email=user%40example.com'));
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('role=user'));
-      expect(cookie).toHaveBeenCalledWith('refresh_token', 'refresh-token', expect.any(Object));
+      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?success=true'));
+      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
     } finally {
       process.env.FRONTEND_URL = oldFrontendUrl;
     }
   });
 
-  it('refresh rotates token, reissues cookie and returns access token payload', async () => {
-    const req = {
-      cookies: { refresh_token: 'refresh-token' },
-    } as unknown as Request;
-    const cookie = jest.fn();
+  it('refresh rotates token and returns new access token and refresh token in body', async () => {
+    const body = { refreshToken: 'refresh-token' };
     const json = jest.fn();
-    const res = { cookie, json } as unknown as Response;
+    const res = { json } as unknown as Response;
 
     authService.rotateRefreshToken.mockResolvedValue({
       rawToken: 'new-refresh-token',
@@ -106,34 +95,29 @@ describe('AuthController', () => {
     });
     usersService.findByIdOrThrow.mockResolvedValue(baseUser);
 
-    await controller.refresh(req, res);
+    await controller.refresh(body as Parameters<typeof controller.refresh>[0], res);
 
     expect(authService.rotateRefreshToken).toHaveBeenCalledWith('refresh-token');
     expect(usersService.findByIdOrThrow).toHaveBeenCalledWith('user-1');
     expect(authService.generateJwt).toHaveBeenCalledWith(baseUser);
-    expect(cookie).toHaveBeenCalledWith('refresh_token', 'new-refresh-token', expect.any(Object));
-    expect(json).toHaveBeenCalledWith({ data: { accessToken: 'jwt-token' } });
+    expect(json).toHaveBeenCalledWith({ data: { accessToken: 'jwt-token', refreshToken: 'new-refresh-token' } });
   });
 
-  it('logout revokes refresh token and clears cookie', async () => {
-    const req = {
-      cookies: { refresh_token: 'refresh-token' },
-    } as unknown as Request;
-    const clearCookie = jest.fn();
+  it('logout revokes refresh token from body and returns null', async () => {
+    const body = { refreshToken: 'refresh-token' };
     const json = jest.fn();
-    const res = { clearCookie, json } as unknown as Response;
+    const res = { json } as unknown as Response;
 
     authService.revokeRefreshToken.mockResolvedValue(undefined);
 
-    await controller.logout(req, res);
+    await controller.logout(body as Parameters<typeof controller.logout>[0], res);
 
     expect(authService.revokeRefreshToken).toHaveBeenCalledWith('refresh-token');
-    expect(clearCookie).toHaveBeenCalledWith('refresh_token', { path: '/api/auth' });
     expect(json).toHaveBeenCalledWith({ data: null });
   });
 
   it('returns current user profile from UsersService in getProfile', () => {
-    const req = { user: baseUser } as Request & { user: User };
+    const req = { user: baseUser } as Parameters<typeof controller.getProfile>[0];
     const expectedProfile = {
       id: baseUser.id,
       email: baseUser.email,

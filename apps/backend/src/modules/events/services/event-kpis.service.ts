@@ -1,16 +1,18 @@
 import { Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import Decimal from 'decimal.js';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { Event } from '../entities/event.entity';
 import { TransactionsService } from '../../transactions/transactions.service';
 import { EventKPIsDto } from '../dto/event-kpis.dto';
 
+Decimal.set({ rounding: Decimal.ROUND_HALF_EVEN });
+
 @Injectable()
 export class EventKPIsService {
   private readonly logger = new Logger(EventKPIsService.name);
   private static readonly POT_PARTICIPANT_ID = '0';
-  private static readonly RECONCILIATION_TOLERANCE = 0.000001;
 
   constructor(
     @InjectRepository(Event)
@@ -39,62 +41,59 @@ export class EventKPIsService {
     try {
       this.logger.log(`Calculating KPIs for event: ${eventId}`);
 
-      // Fetch event with participants to access contribution targets
       const event = await this.eventRepository.findOne({ where: { id: eventId } });
       if (!event) {
         throw new NotFoundException(`Event with ID ${eventId} not found`);
       }
 
-      // Get all transactions for the event
       const transactions = await this.transactionsService.findByEvent(eventId, actor);
 
       // ========================
       // Layer A: Pot balance logic
       // ========================
-      let totalCashContributions = 0; // Only direct contributions paid in
-      let totalExpenses = 0;
-      let totalCompensations = 0;
-      let potExpenses = 0;
+      let totalCashContributions = new Decimal(0);
+      let totalExpenses = new Decimal(0);
+      let totalCompensations = new Decimal(0);
+      let potExpenses = new Decimal(0);
 
-      const participantDirectContributions: Record<string, number> = {}; // For pot balance calc
-      const participantDirectExpenses: Record<string, number> = {}; // For pot balance calc
-      const participantDirectCompensations: Record<string, number> = {}; // For pot balance calc
+      const participantDirectContributions: Record<string, Decimal> = {};
+      const participantDirectExpenses: Record<string, Decimal> = {};
+      const participantDirectCompensations: Record<string, Decimal> = {};
       const potExpensesTransactions: Array<{ id: string; title: string; amount: number; date: string }> = [];
 
-      // First pass: aggregate for pot balance layer
-      transactions.forEach((transaction) => {
+      for (const transaction of transactions) {
         const { participantId, paymentType, amount } = transaction;
-        const numAmount = Number(amount);
+        const decAmount = new Decimal(String(amount));
 
-        if (!Number.isFinite(numAmount)) {
+        if (!decAmount.isFinite()) {
           this.logger.warn(`Skipping transaction ${transaction.id} due to invalid amount: ${String(amount)}`);
-          return;
+          continue;
         }
 
         if (participantId !== EventKPIsService.POT_PARTICIPANT_ID) {
           if (participantDirectContributions[participantId] === undefined) {
-            participantDirectContributions[participantId] = 0;
-            participantDirectExpenses[participantId] = 0;
-            participantDirectCompensations[participantId] = 0;
+            participantDirectContributions[participantId] = new Decimal(0);
+            participantDirectExpenses[participantId] = new Decimal(0);
+            participantDirectCompensations[participantId] = new Decimal(0);
           }
 
           switch (paymentType) {
             case 'contribution':
-              totalCashContributions += numAmount;
-              participantDirectContributions[participantId] += numAmount;
+              totalCashContributions = totalCashContributions.plus(decAmount);
+              participantDirectContributions[participantId] = participantDirectContributions[participantId].plus(decAmount);
               break;
             case 'expense':
-              totalExpenses += numAmount;
-              participantDirectExpenses[participantId] += numAmount;
+              totalExpenses = totalExpenses.plus(decAmount);
+              participantDirectExpenses[participantId] = participantDirectExpenses[participantId].plus(decAmount);
               break;
             case 'compensation':
-              totalCompensations += numAmount;
-              participantDirectCompensations[participantId] += numAmount;
+              totalCompensations = totalCompensations.plus(decAmount);
+              participantDirectCompensations[participantId] = participantDirectCompensations[participantId].plus(decAmount);
               break;
           }
         } else if (paymentType === 'expense') {
-          potExpenses += numAmount;
-          totalExpenses += numAmount;
+          potExpenses = potExpenses.plus(decAmount);
+          totalExpenses = totalExpenses.plus(decAmount);
 
           const dateValue =
             transaction.date instanceof Date ? transaction.date.toISOString() : String(transaction.date);
@@ -103,148 +102,137 @@ export class EventKPIsService {
           potExpensesTransactions.push({
             id: transaction.id,
             title: transaction.title,
-            amount: numAmount,
+            amount: decAmount.toNumber(),
             date: normalizedDate,
           });
         }
-      });
+      }
 
       // ========================
       // Layer B & C: Per-participant net contribution and pending vs target
       // ========================
 
-      // Build target map from event participants
-      const targetByParticipantId: Record<string, number> = {};
+      const targetByParticipantId: Record<string, Decimal> = {};
       const eventParticipants = event.participants ?? [];
       for (const p of eventParticipants) {
         if (p.type === 'user' || p.type === 'guest') {
-          targetByParticipantId[p.id] = p.contributionTarget ?? 0;
+          targetByParticipantId[p.id] = new Decimal(String(p.contributionTarget ?? 0));
         }
       }
 
-      const participantContributions: Record<string, number> = {}; // Net: C + E - R
-      const participantExpenses: Record<string, number> = {};
-      const participantCompensations: Record<string, number> = {};
-      const participantPending: Record<string, number> = {}; // Net contribution - target
-      const participantBalances: Record<string, number> = {}; // Old semantics: C + E - R (same as net contribution)
+      const participantContributions: Record<string, Decimal> = {};
+      const participantExpenses: Record<string, Decimal> = {};
+      const participantCompensations: Record<string, Decimal> = {};
+      const participantPending: Record<string, Decimal> = {};
+      const participantBalances: Record<string, Decimal> = {};
 
-      // Initialize maps for all non-pot participants (ensures all appear in output)
       for (const p of eventParticipants) {
         if (p.type !== 'pot') {
-          participantContributions[p.id] = 0;
-          participantExpenses[p.id] = 0;
-          participantCompensations[p.id] = 0;
-          participantBalances[p.id] = 0;
+          participantContributions[p.id] = new Decimal(0);
+          participantExpenses[p.id] = new Decimal(0);
+          participantCompensations[p.id] = new Decimal(0);
+          participantBalances[p.id] = new Decimal(0);
         }
       }
 
-      // Second pass: calculate net contribution per participant
-      let totalNetContribution = 0;
-      let totalPendingToCompensate = 0;
-      transactions.forEach((transaction) => {
+      for (const transaction of transactions) {
         const { participantId, paymentType, amount } = transaction;
-        const numAmount = Number(amount);
+        const decAmount = new Decimal(String(amount));
 
-        if (!Number.isFinite(numAmount) || participantId === EventKPIsService.POT_PARTICIPANT_ID) {
-          return;
+        if (!decAmount.isFinite() || participantId === EventKPIsService.POT_PARTICIPANT_ID) {
+          continue;
         }
 
         if (participantContributions[participantId] === undefined) {
-          participantContributions[participantId] = 0;
-          participantExpenses[participantId] = 0;
-          participantCompensations[participantId] = 0;
-          participantBalances[participantId] = 0;
+          participantContributions[participantId] = new Decimal(0);
+          participantExpenses[participantId] = new Decimal(0);
+          participantCompensations[participantId] = new Decimal(0);
+          participantBalances[participantId] = new Decimal(0);
         }
 
         switch (paymentType) {
           case 'contribution':
-            participantContributions[participantId] += numAmount;
-            participantBalances[participantId] += numAmount;
+            participantContributions[participantId] = participantContributions[participantId].plus(decAmount);
+            participantBalances[participantId] = participantBalances[participantId].plus(decAmount);
             break;
           case 'expense':
-            participantExpenses[participantId] += numAmount;
-            participantBalances[participantId] += numAmount;
+            participantExpenses[participantId] = participantExpenses[participantId].plus(decAmount);
+            participantBalances[participantId] = participantBalances[participantId].plus(decAmount);
             break;
           case 'compensation':
-            participantCompensations[participantId] += numAmount;
-            participantBalances[participantId] -= numAmount;
+            participantCompensations[participantId] = participantCompensations[participantId].plus(decAmount);
+            participantBalances[participantId] = participantBalances[participantId].minus(decAmount);
             break;
         }
-      });
+      }
 
-      // Calculate net contribution per participant (C + E - R) and pending vs target
+      let totalNetContribution = new Decimal(0);
+      let totalPendingToCompensate = new Decimal(0);
+
       for (const participantId of Object.keys(participantContributions)) {
-        const netContribution =
-          participantContributions[participantId] +
-          participantExpenses[participantId] -
-          participantCompensations[participantId];
-        const target = targetByParticipantId[participantId] ?? 0;
+        const netContribution = participantContributions[participantId]
+          .plus(participantExpenses[participantId])
+          .minus(participantCompensations[participantId]);
+        const target = targetByParticipantId[participantId] ?? new Decimal(0);
 
-        // Update participantContributions to reflect net (not just cash contributions)
         participantContributions[participantId] = netContribution;
+        participantPending[participantId] = netContribution.minus(target);
 
-        // Calculate pending: how much this participant still owes/is owed vs their target
-        participantPending[participantId] = netContribution - target;
-
-        totalNetContribution += netContribution;
-        totalPendingToCompensate += participantPending[participantId];
+        totalNetContribution = totalNetContribution.plus(netContribution);
+        totalPendingToCompensate = totalPendingToCompensate.plus(participantPending[participantId]);
       }
 
       // ========================
       // Final KPI values
       // ========================
-      const potBalance = totalCashContributions - totalCompensations - potExpenses;
-      const pendingToCompensate = totalPendingToCompensate;
+      const potBalance = totalCashContributions.minus(totalCompensations).minus(potExpenses);
 
-      // Build participantNetWithPot for balance breakdown (unchanged semantics)
       const participantNetWithPot: Record<string, number> = {};
-      Object.keys(participantContributions).forEach((participantId) => {
-        const cashContribution = participantDirectContributions[participantId] || 0;
-        const compensation = participantDirectCompensations[participantId] || 0;
-        participantNetWithPot[participantId] = cashContribution - compensation;
-      });
+      for (const participantId of Object.keys(participantContributions)) {
+        const cashContribution = participantDirectContributions[participantId] ?? new Decimal(0);
+        const compensation = participantDirectCompensations[participantId] ?? new Decimal(0);
+        participantNetWithPot[participantId] = cashContribution.minus(compensation).toNumber();
+      }
 
-      // Pot balance reconciliation (using cash contributions for pot formula)
       const inflowsTotal = totalCashContributions;
-      const outflowsTotal = totalCompensations + potExpenses;
-      const isConsistent =
-        Math.abs(inflowsTotal - outflowsTotal - potBalance) <= EventKPIsService.RECONCILIATION_TOLERANCE;
+      const outflowsTotal = totalCompensations.plus(potExpenses);
+      const isConsistent = inflowsTotal.minus(outflowsTotal).equals(potBalance);
 
       if (!isConsistent) {
         this.logger.warn(
-          `Pot balance reconciliation mismatch for event ${eventId}: inflows=${inflowsTotal}, outflows=${outflowsTotal}, potBalance=${potBalance}`,
+          `Pot balance reconciliation mismatch for event ${eventId}: inflows=${inflowsTotal.toFixed(2)}, outflows=${outflowsTotal.toFixed(2)}, potBalance=${potBalance.toFixed(2)}`,
         );
       }
 
       return {
-        totalExpenses,
-        totalContributions: totalNetContribution, // Net: C + E - R summed
-        totalCompensations,
-        potBalance,
-        pendingToCompensate, // Sum of (net contribution - target) for all participants
-        participantBalances,
-        participantContributions, // Now reflects net contribution, not just cash
-        participantExpenses,
-        participantCompensations,
-        participantPending, // Now reflects pending vs target
-        potExpenses,
+        totalExpenses: totalExpenses.toNumber(),
+        totalContributions: totalNetContribution.toNumber(),
+        totalCompensations: totalCompensations.toNumber(),
+        potBalance: potBalance.toNumber(),
+        pendingToCompensate: totalPendingToCompensate.toNumber(),
+        participantBalances: toNumberRecord(participantBalances),
+        participantContributions: toNumberRecord(participantContributions),
+        participantExpenses: toNumberRecord(participantExpenses),
+        participantCompensations: toNumberRecord(participantCompensations),
+        participantPending: toNumberRecord(participantPending),
+        potExpenses: potExpenses.toNumber(),
         balanceBreakdown: {
           inflows: {
-            total: inflowsTotal,
-            contributionsByParticipant: participantDirectContributions, // Only cash contributions for balance
+            total: inflowsTotal.toNumber(),
+            contributionsByParticipant: toNumberRecord(participantDirectContributions),
           },
           outflows: {
-            total: outflowsTotal,
-            compensationsTotal: totalCompensations,
-            compensationsByParticipant: participantDirectCompensations,
-            potExpensesTotal: potExpenses,
+            total: outflowsTotal.toNumber(),
+            compensationsTotal: totalCompensations.toNumber(),
+            compensationsByParticipant: toNumberRecord(participantDirectCompensations),
+            potExpensesTotal: potExpenses.toNumber(),
             potExpensesTransactions,
           },
           participantNetWithPot,
           reconciliation: {
-            inflows: inflowsTotal,
-            outflows: outflowsTotal,
-            potBalance,
+            inflows: inflowsTotal.toNumber(),
+            outflows: outflowsTotal.toNumber(),
+            potBalance: potBalance.toNumber(),
             isConsistent,
           },
         },
@@ -258,4 +246,12 @@ export class EventKPIsService {
       throw new InternalServerErrorException('Failed to calculate KPIs');
     }
   }
+}
+
+function toNumberRecord(record: Record<string, Decimal>): Record<string, number> {
+  const result: Record<string, number> = {};
+  for (const [k, v] of Object.entries(record)) {
+    result[k] = v.toNumber();
+  }
+  return result;
 }

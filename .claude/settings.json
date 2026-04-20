@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(gh issue *)",
-      "Bash(gh project *)"
+      "Bash(gh project *)",
+      "Bash(python3 -c \"import json,sys; issues=json.load\\(sys.stdin\\); matches=[i for i in issues if i['number']==23]; print\\(json.dumps\\(matches, indent=2, ensure_ascii=False\\)\\)\")"
     ]
   }
 }

@@ -98,6 +98,9 @@ importers:
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
+      decimal.js:
+        specifier: ^10.6.0
+        version: 10.6.0
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3

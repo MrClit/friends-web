@@ -294,4 +294,52 @@ describe('EventKPIsService', () => {
     await expect(service.getKPIs('event-1', actor)).rejects.toThrow(InternalServerErrorException);
     await expect(service.getKPIs('event-1', actor)).rejects.toThrow('Failed to calculate KPIs');
   });
+
+  it('calculates exact totals with floating-point-prone amounts (0.10 + 0.20 = 0.30)', async () => {
+    eventRepository.findOne.mockResolvedValue({ id: 'event-fp', participants: [] } as unknown as Event);
+    transactionsService.findByEvent.mockResolvedValue([
+      {
+        id: 'tx-fp-1',
+        title: 'Small contribution A',
+        participantId: 'u1',
+        paymentType: 'contribution',
+        amount: '0.10',
+        date: new Date('2026-01-01'),
+      },
+      {
+        id: 'tx-fp-2',
+        title: 'Small contribution B',
+        participantId: 'u1',
+        paymentType: 'contribution',
+        amount: '0.20',
+        date: new Date('2026-01-02'),
+      },
+    ] as Transaction[]);
+
+    const result = await service.getKPIs('event-fp', actor);
+
+    expect(result.totalContributions).toBe(0.3);
+    expect(result.potBalance).toBe(0.3);
+    expect(result.participantContributions['u1']).toBe(0.3);
+  });
+
+  it('accumulates many small amounts without rounding drift (10 × 0.10 = 1.00)', async () => {
+    eventRepository.findOne.mockResolvedValue({ id: 'event-acc', participants: [] } as unknown as Event);
+    transactionsService.findByEvent.mockResolvedValue(
+      Array.from({ length: 10 }, (_, i) => ({
+        id: `tx-acc-${i}`,
+        title: `Contribution ${i}`,
+        participantId: 'u1',
+        paymentType: 'contribution' as const,
+        amount: '0.10',
+        date: new Date('2026-01-01'),
+      })) as Transaction[],
+    );
+
+    const result = await service.getKPIs('event-acc', actor);
+
+    expect(result.totalContributions).toBe(1);
+    expect(result.potBalance).toBe(1);
+    expect(result.participantContributions['u1']).toBe(1);
+  });
 });
