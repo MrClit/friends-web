@@ -146,7 +146,7 @@ export function useTransactionModal({
 
   // Computed values (must be declared before handlers that use them)
   const canSubmit = useMemo(
-    () => !!title.trim() && !!amount.trim() && !!date && !!participantId,
+    () => !!title.trim() && !!amount.trim() && parseFloat(amount) > 0 && !!date && !!participantId,
     [title, amount, date, participantId],
   );
 
