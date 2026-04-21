@@ -167,7 +167,11 @@ export class TransactionsService {
       this.ensureCanAccessEvent(event, actor);
 
       // Validate participantId
-      this.participantValidationService.validateParticipantId(createTransactionDto.participantId, event.participants);
+      this.participantValidationService.validateParticipantId(
+        createTransactionDto.participantId,
+        createTransactionDto.paymentType,
+        event.participants,
+      );
 
       // Create transaction
       const transaction = this.transactionRepository.create({
@@ -199,8 +203,8 @@ export class TransactionsService {
       const transaction = await this.findTransactionOrThrow(id);
       await this.ensureCanAccessTransaction(transaction, actor);
 
-      // If participantId is being updated, validate it
-      if (updateTransactionDto.participantId) {
+      // If participantId or paymentType is being updated, re-validate the combination
+      if (updateTransactionDto.participantId || updateTransactionDto.paymentType) {
         const event = await this.eventRepository.findOne({
           where: { id: transaction.eventId },
         });
@@ -209,7 +213,9 @@ export class TransactionsService {
           throw new NotFoundException(`Event with ID ${transaction.eventId} not found`);
         }
 
-        this.participantValidationService.validateParticipantId(updateTransactionDto.participantId, event.participants);
+        const participantId = updateTransactionDto.participantId ?? transaction.participantId;
+        const paymentType = updateTransactionDto.paymentType ?? transaction.paymentType;
+        this.participantValidationService.validateParticipantId(participantId, paymentType, event.participants);
       }
 
       // Update transaction

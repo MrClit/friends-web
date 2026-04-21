@@ -17,8 +17,8 @@ describe('RefreshTokenService', () => {
 
   beforeEach(() => {
     repository = {
-      create: jest.fn((entity) => entity),
-      save: jest.fn().mockImplementation(async (entity) => entity),
+      create: jest.fn((entity: RefreshToken) => entity),
+      save: jest.fn().mockImplementation((entity: RefreshToken) => Promise.resolve(entity)),
       findOne: jest.fn(),
       update: jest.fn().mockResolvedValue(undefined),
       delete: jest.fn().mockResolvedValue(undefined),
@@ -42,8 +42,8 @@ describe('RefreshTokenService', () => {
     expect(repository.create).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: 'user-1',
-        tokenHash: expect.any(String),
-        family: expect.any(String),
+        tokenHash: expect.any(String) as unknown as string,
+        family: expect.any(String) as unknown as string,
       }),
     );
     expect(repository.save).toHaveBeenCalledTimes(1);
@@ -125,7 +125,7 @@ describe('RefreshTokenService', () => {
     expect(repository.delete).toHaveBeenCalledTimes(1);
     expect(repository.delete).toHaveBeenCalledWith(
       expect.objectContaining({
-        expiresAt: expect.any(Object),
+        expiresAt: expect.any(Object) as unknown as object,
       }),
     );
   });

@@ -59,7 +59,7 @@ describe('EventParticipantsService.enrichParticipants', () => {
 
     await service.enrichParticipants(events);
 
-    const calledWith = userRepository.find.mock.calls[0][0] as { where: { id: ReturnType<typeof In> } };
+    const calledWith = (userRepository.find.mock.calls[0] as unknown[])[0] as { where: { id: ReturnType<typeof In> } };
     const ids = (calledWith.where.id as unknown as { _value: string[] })._value;
     expect(ids).toHaveLength(1);
     expect(ids).toContain('u1');

@@ -248,7 +248,7 @@ describe('TransactionsService', () => {
 
     it('throws BadRequestException for invalid participantId', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string) => {
+      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, _paymentType: string) => {
         if (participantId === '999') {
           throw new BadRequestException('Invalid participant');
         }
@@ -290,7 +290,7 @@ describe('TransactionsService', () => {
     it('validates participantId when updating', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string) => {
+      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, _paymentType: string) => {
         if (participantId === '999') {
           throw new BadRequestException('Invalid participant');
         }
@@ -304,6 +304,21 @@ describe('TransactionsService', () => {
       await expect(service.update('transaction-uuid-1', updateDtoWithInvalidParticipant, adminActor)).rejects.toThrow(
         BadRequestException,
       );
+    });
+
+    it('validates paymentType change against existing participantId', async () => {
+      const potTransaction = { ...mockTransaction, participantId: '0', paymentType: 'expense' as const };
+      mockTransactionRepository.findOne.mockResolvedValue(potTransaction);
+      mockEventRepository.findOne.mockResolvedValue(mockEvent);
+      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, paymentType: string) => {
+        if (participantId === '0' && paymentType !== 'expense') {
+          throw new BadRequestException(`POT participant can only be used with payment type 'expense'`);
+        }
+      });
+
+      await expect(
+        service.update('transaction-uuid-1', { paymentType: 'compensation' as const }, adminActor),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('throws NotFoundException when transaction does not exist', async () => {
