@@ -20,7 +20,8 @@
     "types": ["node", "jest"],
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "strictPropertyInitialization": false
   },
   "include": ["src/**/*", "src/types/express.d.ts", "test/**/*.ts"]
 }

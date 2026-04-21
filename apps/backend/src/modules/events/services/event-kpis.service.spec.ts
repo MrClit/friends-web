@@ -314,7 +314,7 @@ describe('EventKPIsService', () => {
         amount: '0.20',
         date: new Date('2026-01-02'),
       },
-    ] as Transaction[]);
+    ] as unknown as Transaction[]);
 
     const result = await service.getKPIs('event-fp', actor);
 
@@ -333,7 +333,7 @@ describe('EventKPIsService', () => {
         paymentType: 'contribution' as const,
         amount: '0.10',
         date: new Date('2026-01-01'),
-      })) as Transaction[],
+      })) as unknown as Transaction[],
     );
 
     const result = await service.getKPIs('event-acc', actor);

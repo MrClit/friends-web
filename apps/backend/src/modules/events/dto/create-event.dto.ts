@@ -1,7 +1,6 @@
 import { IsString, IsNotEmpty, IsArray, ArrayMinSize, IsOptional, IsEnum } from 'class-validator';
-// NOTE: participant DTO types are validated in service-level logic. Keep imports for reference removed to avoid unused errors.
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { EventStatus } from '../entities/event.entity';
+import { EventStatus } from '@friends/shared-types';
 
 export class CreateEventDto {
   @ApiProperty({ description: 'Event title', example: 'Trip to Barcelona' })

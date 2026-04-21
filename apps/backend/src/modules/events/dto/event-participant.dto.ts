@@ -1,19 +1,18 @@
 import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
+import type { UserParticipant, GuestParticipant } from '@friends/shared-types';
 
-// DTO para participante que es un User existente
 export class UserParticipantDto {
   @IsEnum(['user'])
-  type: 'user';
+  type: UserParticipant['type'];
 
   @IsString()
   @IsNotEmpty()
-  id: string; // UUID del User
+  id: string;
 }
 
-// DTO para participante invitado (sin cuenta)
 export class GuestParticipantDto {
   @IsEnum(['guest'])
-  type: 'guest';
+  type: GuestParticipant['type'];
 
   @IsString()
   @IsNotEmpty()
@@ -24,5 +23,4 @@ export class GuestParticipantDto {
   name: string;
 }
 
-// Union type para validación
 export type EventParticipantDto = UserParticipantDto | GuestParticipantDto;

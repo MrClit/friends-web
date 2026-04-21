@@ -1,12 +1,13 @@
 import { IsString, IsNotEmpty, IsEnum, IsNumber, Min, IsDateString } from 'class-validator';
+import { PaymentType } from '@friends/shared-types';
 
 export class CreateTransactionDto {
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @IsEnum(['contribution', 'expense', 'compensation'])
-  paymentType: 'contribution' | 'expense' | 'compensation';
+  @IsEnum(PaymentType)
+  paymentType: PaymentType;
 
   @IsNumber()
   @Min(0)
