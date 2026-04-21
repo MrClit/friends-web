@@ -3,37 +3,14 @@
  * These types match the backend NestJS API contracts
  */
 
+// ============= Shared types (single source of truth) =============
+import { EventStatus, PaymentType } from '@friends/shared-types';
+import type { EventParticipant as EventParticipantDto, UserParticipant, GuestParticipant, PotParticipant } from '@friends/shared-types';
+
+export { EventStatus, PaymentType };
+export type { EventParticipantDto, UserParticipant, GuestParticipant, PotParticipant };
+
 // ============= Event Types =============
-// Participant que es una referencia a un User existente
-export interface UserParticipant {
-  type: 'user';
-  id: string; // UUID del User
-  name?: string | undefined;
-  email?: string | undefined;
-  avatar?: string | undefined;
-  // Objetivo individual de contribución (en unidades monetarias, >= 0)
-  contributionTarget?: number;
-}
-
-// Participant que es un invitado (sin cuenta)
-export interface GuestParticipant {
-  type: 'guest';
-  id: string;
-  name: string;
-  // Objetivo individual de contribución (en unidades monetarias, >= 0)
-  contributionTarget?: number;
-}
-
-// Participant especial para el POT (gasto compartido)
-export interface PotParticipant {
-  type: 'pot';
-  id: '0'; // Siempre será '0'
-}
-
-// Union type para participants
-export type EventParticipantDto = UserParticipant | GuestParticipant | PotParticipant;
-
-export type EventStatus = 'active' | 'archived';
 
 export interface Event {
   id: string;
@@ -70,8 +47,6 @@ export interface ParticipantReplacementDto {
 }
 
 // ============= Transaction Types =============
-
-export type PaymentType = 'contribution' | 'expense' | 'compensation';
 
 export interface Transaction {
   id: string;

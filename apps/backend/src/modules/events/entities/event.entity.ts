@@ -1,41 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Transaction } from '../../transactions/entities/transaction.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { EventStatus, type EventParticipant } from '@friends/shared-types';
 
-export enum EventStatus {
-  ACTIVE = 'active',
-  ARCHIVED = 'archived',
-}
-
-// Participant que es una referencia a un User existente
-export interface UserParticipant {
-  type: 'user';
-  id: string; // UUID del User
-  // Enriquecido al leer: opcionales para respuesta (no necesariamente persistidos)
-  name?: string | null;
-  email?: string | null;
-  avatar?: string | null;
-  // Objetivo individual de contribución (en unidades monetarias, >= 0)
-  contributionTarget?: number;
-}
-
-// Participant que es un invitado (sin cuenta)
-export interface GuestParticipant {
-  type: 'guest';
-  id: string;
-  name: string;
-  // Objetivo individual de contribución (en unidades monetarias, >= 0)
-  contributionTarget?: number;
-}
-
-// Participant especial para el POT (gasto compartido)
-export interface PotParticipant {
-  type: 'pot';
-  id: '0'; // Siempre será '0'
-}
-
-// Union type para participants
-export type EventParticipant = UserParticipant | GuestParticipant | PotParticipant;
+export { EventStatus, type EventParticipant } from '@friends/shared-types';
+export type { UserParticipant, GuestParticipant, PotParticipant } from '@friends/shared-types';
 
 @Entity('events')
 export class Event {
@@ -52,13 +21,13 @@ export class Event {
   icon: string;
 
   @ApiProperty({
-    enum: EventStatus,
+    enum: Object.values(EventStatus),
     default: EventStatus.ACTIVE,
     description: 'Event status: active or archived',
   })
   @Column({
     type: 'enum',
-    enum: EventStatus,
+    enum: Object.values(EventStatus),
     default: EventStatus.ACTIVE,
   })
   status: EventStatus;

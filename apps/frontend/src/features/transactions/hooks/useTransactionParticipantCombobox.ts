@@ -4,7 +4,7 @@ import type React from 'react';
 export interface TransactionParticipantOption {
   id: string;
   label: string;
-  description?: string;
+  description?: string | null;
   avatar?: string | null;
   isPot?: boolean;
 }

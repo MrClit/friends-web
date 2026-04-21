@@ -9,8 +9,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Event } from '../../events/entities/event.entity';
+import { PaymentType } from '@friends/shared-types';
 
-export type PaymentType = 'contribution' | 'expense' | 'compensation';
+export type { PaymentType } from '@friends/shared-types';
 
 @Entity('transactions')
 export class Transaction {
@@ -22,7 +23,7 @@ export class Transaction {
 
   @Column({
     type: 'enum',
-    enum: ['contribution', 'expense', 'compensation'],
+    enum: Object.values(PaymentType),
     enumName: 'payment_type_enum',
     name: 'payment_type',
   })

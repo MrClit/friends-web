@@ -3,7 +3,7 @@ import { cn } from '@/shared/utils/cn';
 
 interface ComboboxOptionItemProps {
   label: string;
-  description?: string;
+  description?: string | null;
   avatar?: string | null;
   isPot?: boolean;
   isHighlighted: boolean;

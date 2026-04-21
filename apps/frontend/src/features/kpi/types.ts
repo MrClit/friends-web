@@ -24,7 +24,7 @@ export interface KPIParticipantItem {
   rawAmount?: number; // Raw numeric value for calculations (e.g., percentage with negative values)
   targetValue?: string; // Optional formatted contribution target context
   isPot?: boolean; // Indicates if this is the Pot
-  avatar?: string; // Avatar URL or initials
+  avatar?: string | null; // Avatar URL or initials
   percentage?: number; // Progress bar percentage (0-100, uses absolute magnitude for negatives)
   bgColor?: string; // Background color for avatar (when no image)
   textColor?: string; // Text color for avatar initials
