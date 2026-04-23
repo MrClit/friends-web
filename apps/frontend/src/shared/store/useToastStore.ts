@@ -14,6 +14,7 @@ export const useToastStore = create<{
   toasts: Toast[];
   addToast: (toast: Omit<Toast, 'id'>) => void;
   removeToast: (id: string) => void;
+  reset: () => void;
 }>((set) => ({
   toasts: [],
   addToast: (toast) =>
@@ -24,4 +25,5 @@ export const useToastStore = create<{
     set((state) => ({
       toasts: state.toasts.filter((t) => t.id !== id),
     })),
+  reset: () => set({ toasts: [] }),
 }));

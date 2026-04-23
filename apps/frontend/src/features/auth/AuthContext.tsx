@@ -1,6 +1,10 @@
 import { createContext, useCallback, useEffect, useState, type ReactNode } from 'react';
 import { REFRESH_TOKEN_KEY } from '@/api/client';
 import type { AuthContextType, AuthProvider, User } from './types';
+import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
+import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
+import { useDeletingStore } from '@/shared/store/useDeletingStore';
+import { useToastStore } from '@/shared/store/useToastStore';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -75,6 +79,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+
+    useEventFormModalStore.getState().reset();
+    useTransactionModalStore.getState().reset();
+    useToastStore.getState().reset();
+    useDeletingStore.getState().reset();
 
     void fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/logout`, {
       method: 'POST',
