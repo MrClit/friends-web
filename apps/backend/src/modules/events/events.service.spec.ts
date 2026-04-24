@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { NotFoundException, ForbiddenException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import type { Repository } from 'typeorm';
 import { EventsService } from './events.service';
 import { Event, EventStatus } from './entities/event.entity';
@@ -206,8 +206,8 @@ describe('EventsService', () => {
       await expect(service.findOne('non-existent-id', adminActor)).rejects.toThrow(NotFoundException);
     });
 
-    it('throws NotFoundException when user is not participant', async () => {
-      await expect(service.findOne(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
+    it('throws ForbiddenException when user is not participant', async () => {
+      await expect(service.findOne(mockEvent.id, outsiderActor)).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -293,10 +293,10 @@ describe('EventsService', () => {
       expect(mockRepository.save).toHaveBeenCalledWith(updatedEvent);
     });
 
-    it('throws NotFoundException when user is not participant', async () => {
+    it('throws ForbiddenException when user is not participant', async () => {
       const updateDto: UpdateEventDto = { title: 'Blocked Update' };
 
-      await expect(service.update(mockEvent.id, updateDto, outsiderActor)).rejects.toThrow(NotFoundException);
+      await expect(service.update(mockEvent.id, updateDto, outsiderActor)).rejects.toThrow(ForbiddenException);
       expect(mockRepository.save).not.toHaveBeenCalled();
     });
 
@@ -358,8 +358,8 @@ describe('EventsService', () => {
       expect(mockRepository.delete).toHaveBeenCalledWith(mockEvent.id);
     });
 
-    it('throws NotFoundException when user is not participant', async () => {
-      await expect(service.remove(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
+    it('throws ForbiddenException when user is not participant', async () => {
+      await expect(service.remove(mockEvent.id, outsiderActor)).rejects.toThrow(ForbiddenException);
       expect(mockRepository.delete).not.toHaveBeenCalled();
     });
   });
@@ -415,8 +415,8 @@ describe('EventsService', () => {
       expect(mockEventKPIsService.getKPIs).toHaveBeenCalledWith(mockEvent.id, memberActor);
     });
 
-    it('throws NotFoundException when actor cannot access event', async () => {
-      await expect(service.getKPIs(mockEvent.id, outsiderActor)).rejects.toThrow(NotFoundException);
+    it('throws ForbiddenException when actor cannot access event', async () => {
+      await expect(service.getKPIs(mockEvent.id, outsiderActor)).rejects.toThrow(ForbiddenException);
       expect(mockEventKPIsService.getKPIs).not.toHaveBeenCalled();
     });
 

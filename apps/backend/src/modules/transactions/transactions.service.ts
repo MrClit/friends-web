@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  ForbiddenException,
   BadRequestException,
   Logger,
   InternalServerErrorException,
@@ -44,7 +45,7 @@ export class TransactionsService {
     }
 
     if (!this.isUserParticipant(event, actor.id)) {
-      throw new NotFoundException(`Event with ID ${event.id} not found`);
+      throw new ForbiddenException(`Access to event ${event.id} is not allowed`);
     }
   }
 
@@ -76,8 +77,11 @@ export class TransactionsService {
     }
 
     const event = await this.eventRepository.findOne({ where: { id: transaction.eventId } });
-    if (!event || !this.isUserParticipant(event, actor.id)) {
+    if (!event) {
       throw new NotFoundException(`Transaction with ID ${transaction.id} not found`);
+    }
+    if (!this.isUserParticipant(event, actor.id)) {
+      throw new ForbiddenException(`Access to transaction ${transaction.id} is not allowed`);
     }
   }
 
@@ -103,7 +107,7 @@ export class TransactionsService {
       this.logger.log(`Found ${transactions.length} transactions for event ${eventId}`);
       return transactions;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
         throw error;
       }
       const err = error as Error;
@@ -141,7 +145,7 @@ export class TransactionsService {
 
       return transaction;
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
         throw error;
       }
       const err = error as Error;
@@ -183,7 +187,7 @@ export class TransactionsService {
       this.logger.log(`Transaction created successfully with ID: ${savedTransaction.id}`);
       return savedTransaction;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
         throw error;
       }
       const err = error as Error;
@@ -225,7 +229,7 @@ export class TransactionsService {
       this.logger.log(`Transaction ${id} updated successfully`);
       return updatedTransaction;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
         throw error;
       }
       const err = error as Error;
@@ -249,7 +253,7 @@ export class TransactionsService {
       await this.transactionRepository.softDelete(id);
       this.logger.log(`Transaction ${id} deleted successfully`);
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
         throw error;
       }
       const err = error as Error;

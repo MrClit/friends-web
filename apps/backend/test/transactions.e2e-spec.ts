@@ -427,7 +427,7 @@ describe('Transactions API (e2e)', () => {
     });
   });
 
-  it('returns 404 for user not participating in event transactions while admin keeps global access', async () => {
+  it('returns 403 for user not participating in event transactions while admin keeps global access', async () => {
     const owner = await createUser(userRepository, {
       email: 'tx-owner-access@example.com',
       name: 'Tx Owner Access',
@@ -465,7 +465,7 @@ describe('Transactions API (e2e)', () => {
     await request(httpServer)
       .get(`/api/events/${event.id}/transactions`)
       .set('Authorization', buildAuthHeader(jwtService, outsider))
-      .expect(404);
+      .expect(403);
 
     await request(httpServer)
       .post(`/api/events/${event.id}/transactions`)
@@ -477,12 +477,12 @@ describe('Transactions API (e2e)', () => {
         participantId: 'g1',
         date: '2026-03-01',
       })
-      .expect(404);
+      .expect(403);
 
     await request(httpServer)
       .get(`/api/transactions/${transaction.id}`)
       .set('Authorization', buildAuthHeader(jwtService, outsider))
-      .expect(404);
+      .expect(403);
 
     await request(httpServer)
       .get(`/api/transactions/${transaction.id}`)

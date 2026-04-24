@@ -175,7 +175,7 @@ describe('Events API (e2e)', () => {
     expect(adminEventIds).toEqual(expect.arrayContaining([userAEvent.id, userBEvent.id]));
   });
 
-  it('GET /api/events/:id returns 404 when user is not a participant', async () => {
+  it('GET /api/events/:id returns 403 when user is not a participant', async () => {
     const userA = await createUser(userRepository, {
       email: 'events-user-access-a@example.com',
       name: 'Events User Access A',
@@ -194,10 +194,10 @@ describe('Events API (e2e)', () => {
     const response = await request(httpServer)
       .get(`/api/events/${event.id}`)
       .set('Authorization', buildAuthHeader(jwtService, userA))
-      .expect(404);
+      .expect(403);
 
     expect(response.body).toMatchObject({
-      statusCode: 404,
+      statusCode: 403,
       path: `/api/events/${event.id}`,
       method: 'GET',
     });
@@ -257,10 +257,10 @@ describe('Events API (e2e)', () => {
     await request(httpServer)
       .get(`/api/events/${event.id}`)
       .set('Authorization', buildAuthHeader(jwtService, user))
-      .expect(404);
+      .expect(403);
   });
 
-  it('GET /api/events/:id/kpis returns 404 when user is not a participant', async () => {
+  it('GET /api/events/:id/kpis returns 403 when user is not a participant', async () => {
     const userA = await createUser(userRepository, {
       email: 'events-kpi-access-a@example.com',
       name: 'KPI Access User A',
@@ -279,6 +279,6 @@ describe('Events API (e2e)', () => {
     await request(httpServer)
       .get(`/api/events/${event.id}/kpis`)
       .set('Authorization', buildAuthHeader(jwtService, userA))
-      .expect(404);
+      .expect(403);
   });
 });

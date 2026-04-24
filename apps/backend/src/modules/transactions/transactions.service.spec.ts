@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { NotFoundException, ForbiddenException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { Transaction } from './entities/transaction.entity';
 import { Event } from '../events/entities/event.entity';
@@ -127,10 +127,10 @@ describe('TransactionsService', () => {
       await expect(service.findByEvent('nonexistent-id', memberActor)).rejects.toThrow(NotFoundException);
     });
 
-    it('throws NotFoundException when user is not participant', async () => {
+    it('throws ForbiddenException when user is not participant', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
 
-      await expect(service.findByEvent('event-uuid-1', outsiderActor)).rejects.toThrow(NotFoundException);
+      await expect(service.findByEvent('event-uuid-1', outsiderActor)).rejects.toThrow(ForbiddenException);
     });
 
     it('throws InternalServerErrorException on repository error', async () => {
@@ -184,11 +184,11 @@ describe('TransactionsService', () => {
       await expect(service.findOne('nonexistent-id', adminActor)).rejects.toThrow(NotFoundException);
     });
 
-    it('throws NotFoundException when user cannot access parent event', async () => {
+    it('throws ForbiddenException when user cannot access parent event', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
 
-      await expect(service.findOne('transaction-uuid-1', outsiderActor)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('transaction-uuid-1', outsiderActor)).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -240,10 +240,10 @@ describe('TransactionsService', () => {
       await expect(service.create('nonexistent-id', createDto, adminActor)).rejects.toThrow(NotFoundException);
     });
 
-    it('throws NotFoundException when user is not participant', async () => {
+    it('throws ForbiddenException when user is not participant', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
 
-      await expect(service.create('event-uuid-1', createDto, outsiderActor)).rejects.toThrow(NotFoundException);
+      await expect(service.create('event-uuid-1', createDto, outsiderActor)).rejects.toThrow(ForbiddenException);
     });
 
     it('throws BadRequestException for invalid participantId', async () => {

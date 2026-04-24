@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  ForbiddenException,
   Logger,
   InternalServerErrorException,
   BadRequestException,
@@ -56,7 +57,7 @@ export class EventsService {
   private ensureCanAccessEvent(event: Event, actor: AuthenticatedUser): void {
     if (this.isAdmin(actor)) return;
     if (!this.isUserParticipant(event, actor.id)) {
-      throw new NotFoundException(`Event with ID ${event.id} not found`);
+      throw new ForbiddenException(`Access to event ${event.id} is not allowed`);
     }
   }
 
@@ -111,7 +112,7 @@ export class EventsService {
 
       return event;
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) throw error;
       const err = error as Error;
       this.logger.error(`Failed to fetch event ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to fetch event');
@@ -209,7 +210,7 @@ export class EventsService {
       this.logger.log(`Event ${id} updated successfully`);
       return savedEvent;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) throw error;
+      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) throw error;
       const err = error as Error;
       this.logger.error(`Failed to update event ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to update event');
@@ -229,7 +230,7 @@ export class EventsService {
       await this.eventRepository.delete(id);
       this.logger.log(`Event ${id} deleted successfully`);
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) throw error;
       const err = error as Error;
       this.logger.error(`Failed to delete event ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to delete event');
