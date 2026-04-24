@@ -2,7 +2,7 @@
 
 > Monorepo for managing shared expenses at events • React 19 + NestJS
 
-A modern web application to help groups track expenses, contributions, and compensations at shared events. Built with TypeScript and organized as a pnpm monorepo with separate frontend and backend workspaces.
+A modern web application to help groups track expenses, contributions, and compensations at shared events. Built with TypeScript and organized as a pnpm monorepo with separate frontend, backend, and shared-types workspaces.
 
 ## Table of Contents
 
@@ -11,6 +11,7 @@ A modern web application to help groups track expenses, contributions, and compe
 - [Quick Start](#-quick-start)
 - [Monorepo Management](#️-monorepo-management)
 - [Project Structure](#-project-structure)
+- [CI/CD](#-cicd)
 - [Documentation](#-documentation)
 - [License](#license)
 
@@ -20,7 +21,7 @@ A modern web application to help groups track expenses, contributions, and compe
 
 You can try the app live here: **[https://mrclit.github.io/friends-web/](https://mrclit.github.io/friends-web/)**
 
-The demo includes sample data to explore all features:
+Features available in the demo:
 
 - Event management and participant tracking
 - Transaction types (contributions, expenses, compensations)
@@ -28,8 +29,6 @@ The demo includes sample data to explore all features:
 - KPI dashboard with drill-down details
 - Multi-language support (Spanish, English, Catalan)
 - Dark mode
-
-All data is stored locally in your browser (no backend required for demo).
 
 ---
 
@@ -41,7 +40,7 @@ This is a **pnpm monorepo** containing:
 | --------------------------------------------------- | ---------------------------------- | -------------- |
 | **[@friends/frontend](apps/frontend/)**             | React 19 + TanStack Query frontend | ✅ Operational |
 | **[@friends/backend](apps/backend/)**               | NestJS + PostgreSQL API backend    | ✅ Operational |
-| **[@friends/shared-types](packages/shared-types/)** | Shared TypeScript types            | 🚧 Planned     |
+| **[@friends/shared-types](packages/shared-types/)** | Shared TypeScript types            | ✅ Operational |
 
 ---
 
@@ -55,23 +54,24 @@ cd friends-web
 # Install dependencies (uses pnpm workspaces)
 pnpm install
 
-# Start frontend development server
-pnpm dev
+# Start dev servers
+pnpm dev:frontend   # http://localhost:5173
+pnpm dev:backend    # http://localhost:3000
 
-# Run all tests
-pnpm test
+# Start PostgreSQL (backend requires Docker)
+cd apps/backend && docker-compose up -d
 
-# Build for production
+# Build all workspaces
 pnpm build
 ```
 
 ---
 
-## �️ Monorepo Management
+## 🗂️ Monorepo Management
 
 ### Package Manager
 
-- **pnpm v10.27.0** with workspaces
+- **pnpm v10.30.1** with workspaces
 - Configured in `pnpm-workspace.yaml`
 - Lock file: `pnpm-lock.yaml`
 
@@ -81,15 +81,15 @@ pnpm build
 # Install dependencies for all workspaces
 pnpm install
 
-# Run commands in specific workspace
+# Run commands in a specific workspace
 pnpm --filter @friends/frontend dev
-pnpm --filter @friends/frontend test
+pnpm --filter @friends/backend dev
 
 # Run commands in all workspaces
 pnpm -r build
-pnpm -r test
+pnpm -r test:run
 
-# Add dependency to specific workspace
+# Add dependency to a specific workspace
 pnpm --filter @friends/frontend add lodash
 pnpm --filter @friends/backend add @nestjs/core
 
@@ -101,20 +101,28 @@ pnpm add -D -w husky
 
 ```bash
 # Development
-pnpm dev          # Start frontend dev server
-pnpm dev:backend  # Start backend dev server
+pnpm dev:frontend     # Start frontend dev server (localhost:5173)
+pnpm dev:backend      # Start backend dev server (localhost:3000)
 
 # Build
-pnpm build        # Build frontend for production
-pnpm build:backend # Build backend for production
+pnpm build            # Build all workspaces
+pnpm build:frontend   # Build frontend only
+pnpm build:backend    # Build backend only
 
 # Testing
-pnpm test         # Run frontend tests
-pnpm test:run     # Run frontend tests (CI mode)
-pnpm -r test:run  # Run tests in all workspaces
+pnpm test             # Run all workspace tests (CI mode)
+pnpm test:watch       # Run all workspace tests in watch mode
+pnpm test:coverage    # Run tests with coverage
 
 # Code Quality
-pnpm lint         # Lint frontend code
+pnpm lint             # Lint all workspaces
+pnpm lint:fix         # Lint and auto-fix all workspaces
+pnpm format           # Format with Prettier
+pnpm format:check     # Check Prettier formatting
+
+# Other
+pnpm clean            # Remove all node_modules and build artifacts
+pnpm release:prod     # Merge develop → main and trigger production deploy
 ```
 
 ---
@@ -124,23 +132,27 @@ pnpm lint         # Lint frontend code
 ```
 friends-web/
 ├── apps/
-│   ├── frontend/           # React frontend application
+│   ├── frontend/           # @friends/frontend — React 19 application
 │   │   ├── src/
-│   │   ├── package.json    # @friends/frontend
+│   │   ├── package.json
 │   │   └── README.md
-│   └── backend/            # NestJS backend (planned)
+│   └── backend/            # @friends/backend — NestJS API
 │       ├── src/
-│       ├── package.json    # @friends/backend
+│       ├── docker-compose.yml
+│       ├── package.json
 │       └── README.md
 ├── packages/
-│   ├── shared-types/       # Shared TypeScript types (planned)
-│   └── shared-utils/       # Shared utilities (planned)
-├── docs/
-│   └── MONOREPO_MIGRATION.md
+│   └── shared-types/       # @friends/shared-types — shared TS types
+│       ├── src/
+│       └── package.json
+├── docs/                   # Implementation specs and architecture docs
+├── scripts/
+│   └── release-to-prod.mjs # Production release script
 ├── .github/
-│   ├── workflows/
-│   │   └── deploy.yml      # GitHub Actions CI/CD
-│   └── copilot-instructions.md
+│   └── workflows/
+│       ├── deploy.yml          # Auto-deploy frontend on push to main
+│       ├── release-to-prod.yml # Manual production release
+│       └── backend-tests.yml   # Manual backend test run
 ├── package.json            # Root package (friends-monorepo)
 ├── pnpm-workspace.yaml     # pnpm workspaces config
 └── pnpm-lock.yaml          # Lockfile
@@ -148,35 +160,28 @@ friends-web/
 
 ---
 
+## 🔄 CI/CD
+
+| Workflow              | Trigger              | Description                                              |
+| --------------------- | -------------------- | -------------------------------------------------------- |
+| **deploy.yml**        | Push to `main`       | Lints, tests, builds frontend, deploys to GitHub Pages   |
+| **release-to-prod.yml** | Manual (`workflow_dispatch`) | Merges `develop` → `main` to trigger a production release |
+| **backend-tests.yml** | Manual (`workflow_dispatch`) | Runs backend test suite against a PostgreSQL service container |
+
+---
+
 ## 📚 Documentation
 
-For detailed information about each workspace, see their respective documentation:
+Workspace-level READMEs:
 
-### Workspace Documentation
+- **[Frontend README](apps/frontend/README.md)** — React 19 + TanStack Query, architecture, state management, env vars, testing
+- **[Backend README](apps/backend/README.md)** — NestJS + PostgreSQL, API endpoints, migrations, env vars, testing
+- **[Shared Types README](packages/shared-types/README.md)** — shared TS types used across workspaces
 
-- **[Frontend README](apps/frontend/README.md)** - React 19 + TanStack Query application
-  - Tech stack and features
-  - Architecture patterns and state management
-  - Configuration and environment variables
-  - Testing strategy
-- **[Backend README](apps/backend/README.md)** - NestJS + PostgreSQL API
-  - Tech stack and API endpoints
-  - Database schema and migrations
-  - Environment configuration
-  - Development tools and testing
-
-### Additional Documentation
-
-- **[Monorepo Migration Guide](docs/MONOREPO_MIGRATION.md)** - How we migrated to pnpm monorepo
-- **[Frontend API Integration](docs/FRONTEND_API_INTEGRATION.md)** - TanStack Query integration
-- **[Copilot Instructions](.github/copilot-instructions.md)** - AI coding agent guidelines
+Implementation plans and architecture docs live in **[docs/](docs/)**.
 
 ---
 
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
-
----
-
-> Project created with ❤️ using React, TypeScript, Zustand, TailwindCSS, and Vite.
