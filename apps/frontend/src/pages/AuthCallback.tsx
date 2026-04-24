@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
@@ -15,8 +15,12 @@ export function AuthCallback() {
   const location = useLocation();
   const { setAuth } = useAuth();
   const isI18nReady = useI18nNamespacesReady(AUTH_NAMESPACES);
+  const bootstrappedRef = useRef(false);
 
   useEffect(() => {
+    if (bootstrappedRef.current) return;
+    bootstrappedRef.current = true;
+
     const params = new URLSearchParams(location.search);
     const refreshToken = params.get('refreshToken');
     if (!params.get('success') || !refreshToken) {
@@ -51,7 +55,10 @@ export function AuthCallback() {
         };
         const user = meBody.data;
         if (user && isUserRole(user.role)) {
-          setAuth({ id: user.id, email: user.email, name: user.name, avatar: user.avatar, role: user.role }, accessToken);
+          setAuth(
+            { id: user.id, email: user.email, name: user.name, avatar: user.avatar, role: user.role },
+            accessToken,
+          );
         }
       } catch {
         // fall through to navigate home unauthenticated
