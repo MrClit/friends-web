@@ -42,10 +42,11 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
     <form id="transaction-form" className="space-y-8 pb-6" onSubmit={onSubmit}>
       {/* Title input */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
+        <label htmlFor="transaction-title" className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
           {t('transactionForm.titleLabel')}
         </label>
         <input
+          id="transaction-title"
           className="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
           placeholder={t('transactionForm.titlePlaceholder')}
           type="text"
@@ -58,11 +59,12 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {/* Amount input with € symbol */}
         <div className="space-y-2">
-          <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
+          <label htmlFor="transaction-amount" className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
             {t('transactionForm.amountLabel')}
           </label>
           <div className="relative">
             <input
+              id="transaction-amount"
               className="w-full pl-5 pr-12 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
               placeholder="0,00"
               type="number"
@@ -71,17 +73,18 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
-            <span className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-slate-400">€</span>
+            <span aria-hidden className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-slate-400">€</span>
           </div>
         </div>
 
         {/* Date input */}
         <div className="space-y-2 min-w-0 w-full">
-          <label className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
+          <label htmlFor="transaction-date" className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
             {t('transactionForm.dateLabel')}
           </label>
           <div className="relative">
             <input
+              id="transaction-date"
               className={cn(
                 'w-full max-w-full pl-3 sm:pl-5 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white font-medium min-w-0 box-border ios-date-input-fix',
                 showCustomCalendarIcon ? 'pr-11 sm:pr-12 ios-date-input-force-custom' : 'pr-3 sm:pr-5',

@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,7 @@ export function DialogFormWrapper({
   closeAriaLabel,
   className,
 }: DialogFormWrapperProps) {
+  const { t } = useTranslation('common');
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -45,7 +47,7 @@ export function DialogFormWrapper({
           <DialogCloseButton
             onClick={() => onOpenChange(false)}
             disabled={primaryAction?.disabled}
-            aria-label={closeAriaLabel}
+            aria-label={closeAriaLabel ?? t('close')}
           />
         </DialogHeader>
 
