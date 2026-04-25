@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { useUpdateCurrentUserProfile } from '@/hooks/api/useUsers';
 import { useToastStore } from '@/shared/store/useToastStore';
+import { getApiErrorMessage } from '@/shared/utils';
 
 const AVATAR_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -131,7 +132,7 @@ export function useProfileForm(): UseProfileFormResult {
 
       void refreshUser();
     } catch (error) {
-      const description = error instanceof Error ? error.message : undefined;
+      const description = getApiErrorMessage(error, t);
 
       addToast({
         type: 'error',

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/hooks/api/useTransactions';
 import { useModalForm } from '@/hooks/common';
-import { formatDateToInputValue, parseDateForFormatting } from '@/shared/utils/format';
+import { formatDateToInputValue, parseDateForFormatting, getApiErrorMessage } from '@/shared/utils';
 import type { Transaction, PaymentType } from '../types';
 import type { Event } from '@/features/events/types';
 
@@ -193,7 +193,7 @@ export function useTransactionModal({
               modal.closeAndReset();
             },
             onError: (error) => {
-              const message = error instanceof Error ? error.message : t('errorLoading');
+              const message = getApiErrorMessage(error, t);
               modal.setErrorMessage(message);
             },
           },
@@ -213,7 +213,7 @@ export function useTransactionModal({
               modal.closeAndReset();
             },
             onError: (error) => {
-              const message = error instanceof Error ? error.message : t('errorLoading');
+              const message = getApiErrorMessage(error, t);
               modal.setErrorMessage(message);
             },
           },
@@ -248,7 +248,7 @@ export function useTransactionModal({
           modal.closeAndReset();
         },
         onError: (error) => {
-          const message = error instanceof Error ? error.message : t('errorLoading');
+          const message = getApiErrorMessage(error, t);
           modal.setErrorMessage(message);
         },
       });

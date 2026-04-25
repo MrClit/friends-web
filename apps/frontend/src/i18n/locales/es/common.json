@@ -13,5 +13,16 @@
   "delete": "Borrar",
   "actions": "Acciones",
   "goToHome": "Friends - Ir a la página principal",
-  "participant": "Participante"
+  "participant": "Participante",
+  "errors": {
+    "400": "Los datos de la solicitud no son válidos.",
+    "401": "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",
+    "403": "No tienes permiso para realizar esta acción.",
+    "404": "El recurso no fue encontrado.",
+    "409": "Ya existe un recurso con esos datos.",
+    "422": "Los datos proporcionados no son válidos.",
+    "429": "Demasiadas solicitudes. Por favor, espera un momento.",
+    "500": "Error del servidor. Por favor, inténtalo de nuevo.",
+    "default": "Algo salió mal. Por favor, inténtalo de nuevo."
+  }
 }

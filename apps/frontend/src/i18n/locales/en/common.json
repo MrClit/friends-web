@@ -13,5 +13,16 @@
   "delete": "Delete",
   "actions": "Actions",
   "goToHome": "Friends - Go to home page",
-  "participant": "Participant"
+  "participant": "Participant",
+  "errors": {
+    "400": "The request data is not valid.",
+    "401": "Your session has expired. Please log in again.",
+    "403": "You do not have permission to perform this action.",
+    "404": "The resource was not found.",
+    "409": "A resource with that data already exists.",
+    "422": "The provided data is not valid.",
+    "429": "Too many requests. Please wait a moment.",
+    "500": "Server error. Please try again.",
+    "default": "Something went wrong. Please try again."
+  }
 }

@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCreateEvent } from '../../../hooks/api/useEvents';
 import { useModalForm } from '@/hooks/common';
+import { getApiErrorMessage } from '@/shared/utils';
 import type { CreateEventInput, Event, EventFormData, EventParticipant, ParticipantReplacement } from '../types';
 import { useAuth } from '@/features/auth/useAuth';
 import { checkIsDirty } from '../utils/checkIsDirty';
@@ -121,8 +122,7 @@ export function useEventFormModal({ open, event, onClose, onSubmit }: UseEventFo
             modal.closeAndReset();
           },
           onError: (error) => {
-            const message = error instanceof Error ? error.message : t('errorLoading');
-            modal.setErrorMessage(message);
+            modal.setErrorMessage(getApiErrorMessage(error, t));
           },
         });
       }

@@ -11,7 +11,7 @@ import {
   type CreateAdminUserFormData,
   type EditAdminUserFormData,
 } from '../types';
-import { getAdminUsersErrorMessage } from '../utils/errorMessage';
+import { getApiErrorMessage } from '@/shared/utils';
 
 interface UseAdminUsersPageResult {
   users: User[];
@@ -86,10 +86,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       addToast({
         type: 'error',
         message: t('createError', { ns: 'adminUsers' }),
-        description: getAdminUsersErrorMessage(
-          error,
-          t('createError', { ns: 'adminUsers' }),
-        ),
+        description: getApiErrorMessage(error, t),
         duration: 6000,
       });
     }
@@ -144,10 +141,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       addToast({
         type: 'error',
         message: t('updateError', { ns: 'adminUsers' }),
-        description: getAdminUsersErrorMessage(
-          error,
-          t('updateError', { ns: 'adminUsers' }),
-        ),
+        description: getApiErrorMessage(error, t),
         duration: 6000,
       });
     }
@@ -173,10 +167,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       addToast({
         type: 'error',
         message: t('deleteError', { ns: 'adminUsers' }),
-        description: getAdminUsersErrorMessage(
-          error,
-          t('deleteError', { ns: 'adminUsers' }),
-        ),
+        description: getApiErrorMessage(error, t),
         duration: 6000,
       });
     }

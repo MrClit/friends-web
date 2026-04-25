@@ -13,5 +13,16 @@
   "delete": "Esborrar",
   "actions": "Accions",
   "goToHome": "Friends - Anar a la pàgina principal",
-  "participant": "Participant"
+  "participant": "Participant",
+  "errors": {
+    "400": "Les dades de la sol·licitud no són vàlides.",
+    "401": "La teva sessió ha caducat. Si us plau, inicia sessió de nou.",
+    "403": "No tens permís per realitzar aquesta acció.",
+    "404": "No s'ha trobat el recurs.",
+    "409": "Ja existeix un recurs amb aquestes dades.",
+    "422": "Les dades proporcionades no són vàlides.",
+    "429": "Massa sol·licituds. Si us plau, espera un moment.",
+    "500": "Error del servidor. Si us plau, torna-ho a provar.",
+    "default": "Alguna cosa ha anat malament. Si us plau, torna-ho a provar."
+  }
 }
