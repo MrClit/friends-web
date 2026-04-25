@@ -126,13 +126,8 @@ export class EventsService {
     try {
       this.logger.log(`Creating new event: ${createEventDto.title}`);
 
-      const rawParticipants = (createEventDto as unknown as { participants?: unknown[] }).participants;
-      const participantsTyped = this.eventParticipantsService.normalizeParticipants(rawParticipants, false);
-      if (!participantsTyped) {
-        throw new BadRequestException('participants must be a non-empty array');
-      }
-
-      const participantsWithActor = this.ensureActorParticipant(participantsTyped, actor);
+      const participantsTyped = this.eventParticipantsService.normalizeParticipants(createEventDto.participants, false);
+      const participantsWithActor = this.ensureActorParticipant(participantsTyped!, actor);
 
       const event = this.eventRepository.create({
         title: createEventDto.title,
@@ -166,8 +161,7 @@ export class EventsService {
       const event = await this.eventQueryService.findEventOrThrow(id);
       this.ensureCanAccessEvent(event, actor);
 
-      const rawParticipants = (updateEventDto as unknown as { participants?: unknown[] }).participants;
-      const normalizedParticipants = this.eventParticipantsService.normalizeParticipants(rawParticipants, true);
+      const normalizedParticipants = this.eventParticipantsService.normalizeParticipants(updateEventDto.participants, true);
 
       const rawParticipantReplacements = (updateEventDto as { participantReplacements?: ParticipantReplacementDto[] })
         .participantReplacements;

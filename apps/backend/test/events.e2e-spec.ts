@@ -74,6 +74,50 @@ describe('Events API (e2e)', () => {
     });
   });
 
+  describe('POST /api/events - participant DTO validation', () => {
+    let validationUser: Awaited<ReturnType<typeof createUser>>;
+    let httpServer: Parameters<typeof request>[0];
+
+    beforeEach(async () => {
+      validationUser = await createUser(userRepository, {
+        email: `participant-validation-${Date.now()}@example.com`,
+        name: 'Validation User',
+      });
+      httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    });
+
+    const postEvent = (participants: unknown[]) =>
+      request(httpServer)
+        .post('/api/events')
+        .set('Authorization', buildAuthHeader(jwtService, validationUser))
+        .send({ title: 'Validation Test', participants });
+
+    it('returns 400 for unknown participant type', async () => {
+      const response = await postEvent([{ type: 'invalid', id: 'x' }]).expect(400);
+      expect(response.body).toMatchObject({ statusCode: 400, path: '/api/events', method: 'POST' });
+    });
+
+    it('returns 400 for guest missing name', async () => {
+      const response = await postEvent([{ type: 'guest', id: 'g-x' }]).expect(400);
+      expect(response.body).toMatchObject({ statusCode: 400, path: '/api/events', method: 'POST' });
+    });
+
+    it('returns 400 for user missing id', async () => {
+      const response = await postEvent([{ type: 'user' }]).expect(400);
+      expect(response.body).toMatchObject({ statusCode: 400, path: '/api/events', method: 'POST' });
+    });
+
+    it('returns 400 for negative contributionTarget on user', async () => {
+      const response = await postEvent([{ type: 'user', id: 'u-1', contributionTarget: -50 }]).expect(400);
+      expect(response.body).toMatchObject({ statusCode: 400, path: '/api/events', method: 'POST' });
+    });
+
+    it('returns 400 for negative contributionTarget on guest', async () => {
+      const response = await postEvent([{ type: 'guest', id: 'g-1', name: 'Alice', contributionTarget: -1 }]).expect(400);
+      expect(response.body).toMatchObject({ statusCode: 400, path: '/api/events', method: 'POST' });
+    });
+  });
+
   it('POST /api/events and GET /api/events/:id use success contract { data }', async () => {
     const user = await createUser(userRepository, {
       email: 'events-owner@example.com',

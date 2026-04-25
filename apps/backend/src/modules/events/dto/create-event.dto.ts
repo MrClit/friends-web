@@ -1,7 +1,15 @@
-import { IsString, IsNotEmpty, IsArray, ArrayMinSize, IsOptional, IsEnum } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsArray, ArrayMinSize, IsOptional, IsEnum, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ApiExtraModels, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
 import { EventStatus } from '@friends/shared-types';
+import {
+  EventParticipantDto,
+  UserParticipantDto,
+  GuestParticipantDto,
+  PotParticipantDto,
+} from './event-participant.dto';
 
+@ApiExtraModels(UserParticipantDto, GuestParticipantDto, PotParticipantDto)
 export class CreateEventDto {
   @ApiProperty({ description: 'Event title', example: 'Trip to Barcelona' })
   @IsString()
@@ -27,8 +35,30 @@ export class CreateEventDto {
   @IsOptional()
   status?: EventStatus;
 
-  @ApiProperty({ description: 'Array of event participants', isArray: true })
+  @ApiProperty({
+    description: 'Array of event participants',
+    type: 'array',
+    items: {
+      oneOf: [
+        { $ref: getSchemaPath(UserParticipantDto) },
+        { $ref: getSchemaPath(GuestParticipantDto) },
+        { $ref: getSchemaPath(PotParticipantDto) },
+      ],
+    },
+  })
   @IsArray()
   @ArrayMinSize(1)
-  participants: any[];
+  @ValidateNested({ each: true })
+  @Type(() => Object, {
+    discriminator: {
+      property: 'type',
+      subTypes: [
+        { name: 'user', value: UserParticipantDto },
+        { name: 'guest', value: GuestParticipantDto },
+        { name: 'pot', value: PotParticipantDto },
+      ],
+    },
+    keepDiscriminatorProperty: true,
+  })
+  participants: EventParticipantDto[];
 }
