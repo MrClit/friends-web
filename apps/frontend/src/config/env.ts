@@ -31,25 +31,23 @@ export const ENV = {
   BASE_URL: import.meta.env.BASE_URL,
 } as const;
 
-// Runtime validation (only in development)
-if (ENV.IS_DEV) {
-  const requiredVars = ['API_URL', 'APP_NAME'] as const;
+// Runtime validation (always)
+const requiredVars = ['API_URL', 'APP_NAME'] as const;
 
-  requiredVars.forEach((varName) => {
-    if (!ENV[varName]) {
-      throw new Error(`Missing required environment variable: VITE_${varName}. Please set it in your .env file.`);
-    }
-  });
-
-  // Validate API_URL is a valid URL
-  try {
-    new URL(ENV.API_URL);
-  } catch {
-    throw new Error(`Invalid API_URL: ${ENV.API_URL}. Must be a valid URL.`);
+requiredVars.forEach((varName) => {
+  if (!ENV[varName]) {
+    throw new Error(`Missing required environment variable: VITE_${varName}`);
   }
+});
 
-  // Log configuration in development
-  console.log('🔧 Environment Configuration:', {
+try {
+  new URL(ENV.API_URL);
+} catch {
+  throw new Error(`Invalid API_URL: "${ENV.API_URL}". Must be a valid URL.`);
+}
+
+if (ENV.IS_DEV) {
+  console.log('Environment Configuration:', {
     mode: ENV.MODE,
     apiUrl: ENV.API_URL,
     devtools: ENV.ENABLE_DEVTOOLS,

@@ -13,14 +13,16 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { envValidationSchema } from './config/env.validation';
 
 @Module({
   imports: [
-    // ConfigModule global para variables de entorno
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       cache: true,
+      validationSchema: envValidationSchema,
+      validationOptions: { abortEarly: false },
     }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),

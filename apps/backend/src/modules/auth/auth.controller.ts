@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
 import { Throttle } from '@nestjs/throttler';
 import { IsOptional, IsString } from 'class-validator';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
@@ -24,6 +25,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Get('google')
@@ -85,7 +87,7 @@ export class AuthController {
 
   private async redirectToFrontendWithToken(user: User, res: express.Response) {
     const { refreshToken } = await this.authService.generateAuthTokens(user);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173/friends-web/#';
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:5173/friends-web/#');
     const redirectUrl = `${frontendUrl}/auth/callback?success=true&refreshToken=${encodeURIComponent(refreshToken)}`;
     return res.redirect(redirectUrl);
   }

@@ -54,6 +54,7 @@
     "cookie-parser": "^1.4.7",
     "decimal.js": "^10.6.0",
     "dotenv": "^17.2.3",
+    "joi": "^18.1.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",

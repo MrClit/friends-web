@@ -1,6 +1,7 @@
 import { AuthController } from './auth.controller';
 import type { AuthService } from './auth.service';
 import type { UsersService } from '../users/users.service';
+import type { ConfigService } from '@nestjs/config';
 import type { User } from '../users/user.entity';
 import type { Response } from 'express';
 
@@ -13,6 +14,7 @@ describe('AuthController', () => {
     revokeRefreshToken: jest.Mock;
   };
   let usersService: { toCurrentUserProfile: jest.Mock; findByIdOrThrow: jest.Mock };
+  let configService: { get: jest.Mock };
 
   const baseUser: User = {
     id: 'user-1',
@@ -41,7 +43,15 @@ describe('AuthController', () => {
       findByIdOrThrow: jest.fn(),
     };
 
-    controller = new AuthController(authService as unknown as AuthService, usersService as unknown as UsersService);
+    configService = {
+      get: jest.fn().mockReturnValue('http://localhost:5173/friends-web/#'),
+    };
+
+    controller = new AuthController(
+      authService as unknown as AuthService,
+      usersService as unknown as UsersService,
+      configService as unknown as ConfigService,
+    );
   });
 
   it('redirects Google callback to frontend with success flag and refresh token in query param', async () => {
@@ -49,19 +59,12 @@ describe('AuthController', () => {
     const redirect = jest.fn();
     const res = { redirect } as unknown as Response;
 
-    const oldFrontendUrl = process.env.FRONTEND_URL;
-    process.env.FRONTEND_URL = 'http://localhost:5173/friends-web/#';
+    await controller.googleAuthRedirect(req, res);
 
-    try {
-      await controller.googleAuthRedirect(req, res);
-
-      expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
-      expect(redirect).toHaveBeenCalledTimes(1);
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?success=true'));
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
-    } finally {
-      process.env.FRONTEND_URL = oldFrontendUrl;
-    }
+    expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
+    expect(redirect).toHaveBeenCalledTimes(1);
+    expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?success=true'));
+    expect(redirect).toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
   });
 
   it('redirects Microsoft callback to frontend with success flag and refresh token in query param', async () => {
@@ -69,19 +72,12 @@ describe('AuthController', () => {
     const redirect = jest.fn();
     const res = { redirect } as unknown as Response;
 
-    const oldFrontendUrl = process.env.FRONTEND_URL;
-    process.env.FRONTEND_URL = 'http://localhost:5173/friends-web/#';
+    await controller.microsoftAuthRedirect(req, res);
 
-    try {
-      await controller.microsoftAuthRedirect(req, res);
-
-      expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
-      expect(redirect).toHaveBeenCalledTimes(1);
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?success=true'));
-      expect(redirect).toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
-    } finally {
-      process.env.FRONTEND_URL = oldFrontendUrl;
-    }
+    expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
+    expect(redirect).toHaveBeenCalledTimes(1);
+    expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?success=true'));
+    expect(redirect).toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
   });
 
   it('refresh rotates token and returns new access token and refresh token in body', async () => {
