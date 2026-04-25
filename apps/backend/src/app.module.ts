@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './common/health.controller';
@@ -21,6 +23,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       cache: true,
     }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     // TypeORM con configuración async para usar ConfigService
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -34,6 +37,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     AdminModule,
   ],
   controllers: [AppController, HealthController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
 })
 export class AppModule {}

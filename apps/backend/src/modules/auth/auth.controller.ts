@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle } from '@nestjs/throttler';
 import { IsOptional, IsString } from 'class-validator';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
 import { AuthService } from './auth.service';
@@ -16,6 +17,7 @@ class RefreshTokenDto {
   refreshToken?: string;
 }
 
+@Throttle({ default: { ttl: 60_000, limit: 10 } })
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
