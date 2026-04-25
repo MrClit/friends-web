@@ -36,4 +36,5 @@ export const envValidationSchema = Joi.object({
   FRONTEND_URL: Joi.string().default('http://localhost:5173/friends-web/#'),
 
   REFRESH_TOKEN_EXPIRATION_DAYS: Joi.number().integer().default(30),
+  REFRESH_TOKEN_MAX_ROTATIONS: Joi.number().integer().min(1).default(100),
 });

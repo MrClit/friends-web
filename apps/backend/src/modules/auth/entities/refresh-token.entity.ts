@@ -23,6 +23,9 @@ export class RefreshToken {
   @Column({ name: 'is_revoked', type: 'boolean', default: false })
   isRevoked!: boolean;
 
+  @Column({ name: 'rotation_count', type: 'int', default: 0 })
+  rotationCount!: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 }

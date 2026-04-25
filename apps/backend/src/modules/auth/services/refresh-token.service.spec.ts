@@ -55,6 +55,7 @@ describe('RefreshTokenService', () => {
       userId: 'user-1',
       family: 'family-1',
       isRevoked: false,
+      rotationCount: 0,
       expiresAt: new Date(Date.now() + 60_000),
     });
 
@@ -65,12 +66,51 @@ describe('RefreshTokenService', () => {
     expect(repository.save).toHaveBeenCalled();
   });
 
+  it('rotateRefreshToken increments rotationCount on each rotation', async () => {
+    repository.findOne.mockResolvedValue({
+      tokenHash: 'hash',
+      userId: 'user-1',
+      family: 'family-1',
+      isRevoked: false,
+      rotationCount: 5,
+      expiresAt: new Date(Date.now() + 60_000),
+    });
+
+    await service.rotateRefreshToken('raw-token');
+
+    expect(repository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ rotationCount: 6 }),
+    );
+  });
+
+  it('rotateRefreshToken at rotation limit revokes family and throws unauthorized', async () => {
+    configService.get.mockImplementation((key: string) => {
+      if (key === 'REFRESH_TOKEN_MAX_ROTATIONS') return '100';
+      return '30';
+    });
+
+    repository.findOne.mockResolvedValue({
+      tokenHash: 'hash',
+      userId: 'user-1',
+      family: 'family-1',
+      isRevoked: false,
+      rotationCount: 100,
+      expiresAt: new Date(Date.now() + 60_000),
+    });
+
+    const revokeFamilySpy = jest.spyOn(service, 'revokeFamilyTokens').mockResolvedValue(undefined);
+
+    await expect(service.rotateRefreshToken('raw-token')).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(revokeFamilySpy).toHaveBeenCalledWith('family-1');
+  });
+
   it('rotateRefreshToken with revoked token revokes family and throws unauthorized', async () => {
     repository.findOne.mockResolvedValue({
       tokenHash: 'hash',
       userId: 'user-1',
       family: 'family-1',
       isRevoked: true,
+      rotationCount: 0,
       expiresAt: new Date(Date.now() + 60_000),
     });
 
@@ -86,6 +126,7 @@ describe('RefreshTokenService', () => {
       userId: 'user-1',
       family: 'family-1',
       isRevoked: false,
+      rotationCount: 0,
       expiresAt: new Date(Date.now() - 60_000),
     });
 

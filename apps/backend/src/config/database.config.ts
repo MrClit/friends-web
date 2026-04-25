@@ -9,8 +9,8 @@ export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOp
   password: configService.get('DATABASE_PASSWORD'),
   database: configService.get('DATABASE_NAME'),
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: configService.get('TYPEORM_SYNC') === 'true',
-  logging: configService.get('TYPEORM_LOGGING') === 'true',
+  synchronize: configService.get<boolean>('TYPEORM_SYNC') === true,
+  logging: configService.get<boolean>('TYPEORM_LOGGING') === true,
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-  ssl: configService.get('DATABASE_SSL') === 'true' ? { rejectUnauthorized: false } : false,
+  ssl: configService.get<boolean>('DATABASE_SSL') === true ? { rejectUnauthorized: false } : false,
 });

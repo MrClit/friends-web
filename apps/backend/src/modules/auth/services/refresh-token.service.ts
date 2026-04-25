@@ -9,6 +9,7 @@ import { RefreshToken } from '../entities/refresh-token.entity';
 interface IssuedRefreshToken {
   rawToken: string;
   family: string;
+  rotationCount: number;
 }
 
 interface RotatedRefreshToken {
@@ -24,7 +25,7 @@ export class RefreshTokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  async issueRefreshToken(userId: string, family?: string): Promise<IssuedRefreshToken> {
+  async issueRefreshToken(userId: string, family?: string, rotationCount = 0): Promise<IssuedRefreshToken> {
     const rawToken = randomBytes(64).toString('hex');
     const tokenHash = this.hashToken(rawToken);
     const tokenFamily = family ?? randomUUID();
@@ -35,12 +36,14 @@ export class RefreshTokenService {
         family: tokenFamily,
         userId,
         expiresAt: this.getExpirationDate(),
+        rotationCount,
       }),
     );
 
     return {
       rawToken,
       family: tokenFamily,
+      rotationCount,
     };
   }
 
@@ -61,10 +64,20 @@ export class RefreshTokenService {
       throw new UnauthorizedException('Refresh token has expired');
     }
 
+    const maxRotations = this.getMaxRotations();
+    if (storedToken.rotationCount >= maxRotations) {
+      await this.revokeFamilyTokens(storedToken.family);
+      throw new UnauthorizedException('Refresh token rotation limit exceeded');
+    }
+
     storedToken.isRevoked = true;
     await this.refreshTokenRepository.save(storedToken);
 
-    const { rawToken: newRawToken } = await this.issueRefreshToken(storedToken.userId, storedToken.family);
+    const { rawToken: newRawToken } = await this.issueRefreshToken(
+      storedToken.userId,
+      storedToken.family,
+      storedToken.rotationCount + 1,
+    );
 
     return {
       rawToken: newRawToken,
@@ -103,6 +116,11 @@ export class RefreshTokenService {
 
   private hashToken(rawToken: string): string {
     return createHash('sha256').update(rawToken).digest('hex');
+  }
+
+  private getMaxRotations(): number {
+    const configured = Number(this.configService.get<string>('REFRESH_TOKEN_MAX_ROTATIONS') ?? '100');
+    return Number.isFinite(configured) && configured > 0 ? configured : 100;
   }
 
   private getExpirationDate(): Date {
