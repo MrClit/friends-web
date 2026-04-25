@@ -28,7 +28,7 @@ export class OAuthProviderService {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       this.logger.warn(`Login attempt with unregistered email: ${email}`);
-      throw new UnauthorizedException('No autorizado');
+      throw new UnauthorizedException('Unauthorized');
     }
 
     const resolvedName = this.resolveNameForLogin(user, name);
