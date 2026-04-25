@@ -48,7 +48,7 @@ export function UserMenu() {
             'dark:focus-visible:ring-offset-emerald-950',
             'sm:pr-2.5',
           )}
-          aria-label={t('menu', { ns: 'user', defaultValue: 'Opciones de usuario' })}
+          aria-label={t('menu', { ns: 'user' })}
         >
           <Avatar
             avatar={user.avatar}
@@ -104,7 +104,7 @@ export function UserMenu() {
           className={cn('flex items-center gap-2 cursor-pointer', 'font-semibold text-emerald-800', 'dark:text-emerald-200')}
         >
           <MdPerson className="text-lg" />
-          {t('profile', { ns: 'user', defaultValue: 'Profile' })}
+          {t('profile', { ns: 'user' })}
         </DropdownMenuItem>
 
         {user.role === ADMIN_ROLE && (
@@ -117,7 +117,7 @@ export function UserMenu() {
             )}
           >
             <MdAdminPanelSettings className="text-lg" />
-            {t('menuEntry', { ns: 'adminUsers', defaultValue: 'User Management' })}
+            {t('menuEntry', { ns: 'adminUsers' })}
           </DropdownMenuItem>
         )}
 
@@ -130,7 +130,7 @@ export function UserMenu() {
           )}
         >
           <MdLogout className="text-lg" />
-          {t('logout', { ns: 'user', defaultValue: 'Cerrar sesión' })}
+          {t('logout', { ns: 'user' })}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

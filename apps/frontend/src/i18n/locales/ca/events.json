@@ -65,7 +65,9 @@
   },
   "eventCard": {
     "lastModifiedLabel": "Últim canvi",
-    "archivedLabel": "Arxivat"
+    "archivedLabel": "Arxivat",
+    "noDescription": "Sense descripció",
+    "openAriaLabel": "Obre l'esdeveniment {{title}}"
   },
   "create_success": "Esdeveniment creat",
   "create_error": "Error en crear l'esdeveniment",

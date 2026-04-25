@@ -65,7 +65,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
     if (!createForm.email.trim()) {
       addToast({
         type: 'error',
-        message: t('validation_error', { ns: 'common', defaultValue: 'Please complete all fields' }),
+        message: t('validation_error', { ns: 'common' }),
         duration: 5000,
       });
       return;
@@ -78,17 +78,17 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       });
       addToast({
         type: 'success',
-        message: t('createSuccess', { ns: 'adminUsers', defaultValue: 'User created successfully' }),
+        message: t('createSuccess', { ns: 'adminUsers' }),
         duration: 3500,
       });
       closeCreateDialog();
     } catch (error) {
       addToast({
         type: 'error',
-        message: t('createError', { ns: 'adminUsers', defaultValue: 'Could not create user' }),
+        message: t('createError', { ns: 'adminUsers' }),
         description: getAdminUsersErrorMessage(
           error,
-          t('createError', { ns: 'adminUsers', defaultValue: 'Could not create user' }),
+          t('createError', { ns: 'adminUsers' }),
         ),
         duration: 6000,
       });
@@ -118,7 +118,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
     if (!editForm.email.trim()) {
       addToast({
         type: 'error',
-        message: t('validation_error', { ns: 'common', defaultValue: 'Please complete all fields' }),
+        message: t('validation_error', { ns: 'common' }),
         duration: 5000,
       });
       return;
@@ -136,17 +136,17 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       });
       addToast({
         type: 'success',
-        message: t('updateSuccess', { ns: 'adminUsers', defaultValue: 'User updated successfully' }),
+        message: t('updateSuccess', { ns: 'adminUsers' }),
         duration: 3500,
       });
       cancelEdit();
     } catch (error) {
       addToast({
         type: 'error',
-        message: t('updateError', { ns: 'adminUsers', defaultValue: 'Could not update user' }),
+        message: t('updateError', { ns: 'adminUsers' }),
         description: getAdminUsersErrorMessage(
           error,
-          t('updateError', { ns: 'adminUsers', defaultValue: 'Could not update user' }),
+          t('updateError', { ns: 'adminUsers' }),
         ),
         duration: 6000,
       });
@@ -165,17 +165,17 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
       await deleteUserMutation.mutateAsync(deletingUserId);
       addToast({
         type: 'success',
-        message: t('deleteSuccess', { ns: 'adminUsers', defaultValue: 'User deleted successfully' }),
+        message: t('deleteSuccess', { ns: 'adminUsers' }),
         duration: 3500,
       });
       cancelDelete();
     } catch (error) {
       addToast({
         type: 'error',
-        message: t('deleteError', { ns: 'adminUsers', defaultValue: 'Could not delete user' }),
+        message: t('deleteError', { ns: 'adminUsers' }),
         description: getAdminUsersErrorMessage(
           error,
-          t('deleteError', { ns: 'adminUsers', defaultValue: 'Could not delete user' }),
+          t('deleteError', { ns: 'adminUsers' }),
         ),
         duration: 6000,
       });

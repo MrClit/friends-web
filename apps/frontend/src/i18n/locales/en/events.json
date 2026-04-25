@@ -65,7 +65,9 @@
   },
   "eventCard": {
     "lastModifiedLabel": "Last update",
-    "archivedLabel": "Archived"
+    "archivedLabel": "Archived",
+    "noDescription": "No description",
+    "openAriaLabel": "Open event {{title}}"
   },
   "create_success": "Event created",
   "create_error": "Error creating event",

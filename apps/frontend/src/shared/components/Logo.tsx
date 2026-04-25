@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 type LogoRounded = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
@@ -48,10 +49,11 @@ export function LogoIcon({ size = 40, rounded = '3xl' }: LogoIconProps) {
  * @param showText Si true, muestra el texto "FRI€NDS" debajo del icono.
  */
 export function Logo({ showText = false, size = 40, rounded = '3xl' }: LogoProps) {
+  const { t } = useTranslation('common');
   return (
     <Link
       to="/"
-      aria-label="Friends - Ir a la página principal"
+      aria-label={t('goToHome')}
       className="flex flex-col items-center hover:opacity-90 transition-opacity"
     >
       <LogoIcon size={size} rounded={rounded} />

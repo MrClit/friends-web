@@ -1,5 +1,6 @@
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import { FaCheck, FaCircleXmark, FaCircleInfo, FaTriangleExclamation } from 'react-icons/fa6';
+import { useTranslation } from 'react-i18next';
 import { useToastStore } from '@/shared/store/useToastStore';
 import { cn } from '@/shared/utils/cn';
 
@@ -21,6 +22,7 @@ const bgMap = {
 
 export function Toast() {
   const { toasts, removeToast } = useToastStore();
+  const { t } = useTranslation('common');
 
   return (
     <ToastPrimitive.Provider>
@@ -45,7 +47,7 @@ export function Toast() {
             )}
           </div>
           <ToastPrimitive.Close asChild>
-            <button className="text-current/70 hover:text-current transition-colors" aria-label="Close toast">
+            <button className="text-current/70 hover:text-current transition-colors" aria-label={t('close')}>
               <FaCircleXmark size={14} />
             </button>
           </ToastPrimitive.Close>

@@ -6,6 +6,16 @@ vi.mock('@/shared/utils/format', () => ({
   formatDateShort: (date: string) => (date === 'invalid-date' ? '' : 'Jan 20, 2026'),
 }));
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: Record<string, unknown>) => {
+      if (options && typeof options.title === 'string') return `${key}:${options.title}`;
+      return key;
+    },
+    i18n: { language: 'es' },
+  }),
+}));
+
 describe('EventCard', () => {
   it('renders defaults for description and active status', () => {
     render(
@@ -18,8 +28,8 @@ describe('EventCard', () => {
     );
 
     expect(screen.getByText('Trip to Madrid')).toBeInTheDocument();
-    expect(screen.getByText('Sin descripción')).toBeInTheDocument();
-    expect(screen.getByText('Activo')).toBeInTheDocument();
+    expect(screen.getByText('eventCard.noDescription')).toBeInTheDocument();
+    expect(screen.getByText('status.active')).toBeInTheDocument();
   });
 
   it('calls onClick when card is clicked or activated with keyboard', () => {
@@ -35,7 +45,7 @@ describe('EventCard', () => {
       />,
     );
 
-    const card = screen.getByRole('button', { name: /Abrir evento Weekend Plan/i });
+    const card = screen.getByRole('button', { name: /eventCard.openAriaLabel:Weekend Plan/i });
 
     fireEvent.click(card);
     fireEvent.keyDown(card, { key: 'Enter' });
@@ -58,7 +68,8 @@ describe('EventCard', () => {
       />,
     );
 
-    expect(screen.getAllByText('Archivado')).toHaveLength(2);
+    expect(screen.getByText('status.archived')).toBeInTheDocument();
+    expect(screen.getByText('eventCard.archivedLabel')).toBeInTheDocument();
   });
 
   it('shows only first three avatars and overflow count', () => {

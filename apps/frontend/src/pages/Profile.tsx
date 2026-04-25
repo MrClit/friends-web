@@ -34,11 +34,8 @@ export function Profile() {
   return (
     <MainLayout>
       <HeaderSection
-        title={t('title', { ns: 'profile', defaultValue: 'Profile' })}
-        subtitle={t('subtitle', {
-          ns: 'profile',
-          defaultValue: 'Update your profile information and avatar.',
-        })}
+        title={t('title', { ns: 'profile' })}
+        subtitle={t('subtitle', { ns: 'profile' })}
       />
 
       <ProfileCard

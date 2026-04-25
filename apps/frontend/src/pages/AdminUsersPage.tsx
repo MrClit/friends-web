@@ -43,10 +43,10 @@ export function AdminUsersPage() {
   return (
     <MainLayout>
       <HeaderSection
-        title={t('title', { ns: 'adminUsers', defaultValue: 'User Management' })}
-        subtitle={t('subtitle', { ns: 'adminUsers', defaultValue: 'Manage users and roles' })}
+        title={t('title', { ns: 'adminUsers' })}
+        subtitle={t('subtitle', { ns: 'adminUsers' })}
         onNewEvent={openCreateDialog}
-        actionLabel={t('newUser', { ns: 'adminUsers', defaultValue: 'New User' })}
+        actionLabel={t('newUser', { ns: 'adminUsers' })}
         actionIcon={<MdAdd size={22} />}
       />
 
@@ -57,16 +57,13 @@ export function AdminUsersPage() {
 
         {isI18nReady && Boolean(usersError) && (
           <p className="text-red-600 dark:text-red-300">
-            {t('errorLoading', { ns: 'common', defaultValue: 'Could not load data. Please try again.' })}
+            {t('errorLoading', { ns: 'common' })}
           </p>
         )}
 
         {isI18nReady && !isLoadingUsers && !usersError && users.length === 0 && (
           <p className="text-slate-700 dark:text-emerald-100">
-            {t('empty', {
-              ns: 'adminUsers',
-              defaultValue: 'No users found. Create your first user to start managing access.',
-            })}
+            {t('empty', { ns: 'adminUsers' })}
           </p>
         )}
 

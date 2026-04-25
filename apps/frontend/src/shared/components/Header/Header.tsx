@@ -14,7 +14,7 @@ export function Header() {
   return (
     <nav
       role="navigation"
-      aria-label={t('ariaLabel', { ns: 'header', defaultValue: 'Barra de navegación principal' })}
+      aria-label={t('ariaLabel', { ns: 'header' })}
       className="sticky top-0 z-50 px-6 py-4 border-b border-emerald-100 dark:border-emerald-800/50 bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(2,44,34,0.8)] backdrop-blur-md"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">

@@ -42,7 +42,7 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
   const {
     id,
     title,
-    description = 'Sin descripción',
+    description,
     status = 'active',
     participants = [],
     lastModified,
@@ -55,7 +55,7 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
     <div
       role="button"
       tabIndex={0}
-      aria-label={`Abrir evento ${title}`}
+      aria-label={t('eventCard.openAriaLabel', { title })}
       className={cn(
         'group event-card p-7 rounded-3xl cursor-pointer flex flex-col outline-none focus:ring-2 focus:ring-emerald-600',
         'bg-white dark:bg-emerald-950/60 border-slate-100 dark:border-emerald-800/50 shadow-sm transition-all duration-300',
@@ -83,15 +83,15 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
             statusInfo.className,
           )}
         >
-          {t(statusInfo.labelKey, {
-            defaultValue: status === 'archived' ? 'Archivado' : 'Activo',
-          })}
+          {t(statusInfo.labelKey)}
         </span>
       </div>
       <h3 className="text-2xl font-bold mb-2 group-hover:text-emerald-600 transition-colors text-slate-900 dark:text-white">
         {title}
       </h3>
-      <p className="text-slate-500 dark:text-emerald-200/60 text-sm mb-8 leading-relaxed">{description}</p>
+      <p className="text-slate-500 dark:text-emerald-200/60 text-sm mb-8 leading-relaxed">
+        {description ?? t('eventCard.noDescription')}
+      </p>
       <div className="mt-auto flex items-center justify-between pt-6 border-t border-emerald-50 dark:border-emerald-800/50">
         <div className="flex -space-x-3">
           {participants.slice(0, 3).map((p, i) => (
@@ -99,7 +99,7 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
               key={i}
               avatar={p.avatarUrl}
               name={p.name}
-              alt={p.name || 'Participante'}
+              alt={p.name || t('participant', { ns: 'common' })}
               className="w-10 h-10 rounded-full border-4 border-white dark:border-emerald-950"
               imageClassName="object-cover"
               fallbackClassName="bg-emerald-50 dark:bg-emerald-900 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-300"
@@ -114,8 +114,8 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
         <div className="text-right">
           <p className="text-[10px] font-bold text-emerald-600/50 dark:text-emerald-400/50 uppercase tracking-widest">
             {status === 'archived'
-              ? t('eventCard.archivedLabel', { defaultValue: 'Archivado' })
-              : t('eventCard.lastModifiedLabel', { defaultValue: 'Último cambio' })}
+              ? t('eventCard.archivedLabel')
+              : t('eventCard.lastModifiedLabel')}
           </p>
           {lastModified && formatDateShort(lastModified) && (
             <p className="text-sm font-semibold text-slate-600 dark:text-emerald-200">

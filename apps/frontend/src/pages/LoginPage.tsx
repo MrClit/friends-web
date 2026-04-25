@@ -22,7 +22,7 @@ export function LoginPage() {
         )}
       >
         <p className="text-sm font-medium tracking-wide text-teal-900/80 dark:text-teal-200">
-          {t('loading', { ns: 'auth', defaultValue: 'Loading...' })}
+          {t('loading', { ns: 'auth' })}
         </p>
       </div>
     );

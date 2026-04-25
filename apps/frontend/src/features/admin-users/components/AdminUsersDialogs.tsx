@@ -50,17 +50,17 @@ export function AdminUsersDialogs({
       <DialogFormWrapper
         open={isCreateOpen}
         onOpenChange={onCreateOpenChange}
-        title={t('createTitle', { ns: 'adminUsers', defaultValue: 'Create User' })}
+        title={t('createTitle', { ns: 'adminUsers' })}
         closeAriaLabel={t('close', { ns: 'common' })}
         primaryAction={{
           label: isCreating
-            ? t('creating', { ns: 'adminUsers', defaultValue: 'Creating...' })
-            : t('createAction', { ns: 'adminUsers', defaultValue: 'Create user' }),
+            ? t('creating', { ns: 'adminUsers' })
+            : t('createAction', { ns: 'adminUsers' }),
           onClick: onCreateSubmit,
           disabled: isCreating,
         }}
         secondaryAction={{
-          label: t('close', { ns: 'common', defaultValue: 'Close' }),
+          label: t('close', { ns: 'common' }),
           onClick: () => onCreateOpenChange(false),
           disabled: isCreating,
         }}
@@ -71,17 +71,17 @@ export function AdminUsersDialogs({
       <DialogFormWrapper
         open={isEditOpen}
         onOpenChange={onEditOpenChange}
-        title={t('editTitle', { ns: 'adminUsers', defaultValue: 'Edit User' })}
+        title={t('editTitle', { ns: 'adminUsers' })}
         closeAriaLabel={t('close', { ns: 'common' })}
         primaryAction={{
           label: isUpdating
-            ? t('updating', { ns: 'adminUsers', defaultValue: 'Updating...' })
-            : t('updateAction', { ns: 'adminUsers', defaultValue: 'Update user' }),
+            ? t('updating', { ns: 'adminUsers' })
+            : t('updateAction', { ns: 'adminUsers' }),
           onClick: onEditSubmit,
           disabled: isUpdating,
         }}
         secondaryAction={{
-          label: t('close', { ns: 'common', defaultValue: 'Close' }),
+          label: t('close', { ns: 'common' }),
           onClick: () => onEditOpenChange(false),
           disabled: isUpdating,
         }}
@@ -91,17 +91,14 @@ export function AdminUsersDialogs({
 
       <ConfirmDialog
         open={isDeleteOpen}
-        title={t('deleteTitle', { ns: 'adminUsers', defaultValue: 'Delete user?' })}
-        message={t('deleteMessage', {
-          ns: 'adminUsers',
-          defaultValue: 'This action will soft delete the user and cannot be undone from this screen.',
-        })}
+        title={t('deleteTitle', { ns: 'adminUsers' })}
+        message={t('deleteMessage', { ns: 'adminUsers' })}
         confirmText={
           isDeleting
-            ? t('deleting', { ns: 'adminUsers', defaultValue: 'Deleting...' })
-            : t('delete', { ns: 'common', defaultValue: 'Delete' })
+            ? t('deleting', { ns: 'adminUsers' })
+            : t('delete', { ns: 'common' })
         }
-        cancelText={t('cancel', { ns: 'confirmDialog', defaultValue: 'Cancel' })}
+        cancelText={t('cancel', { ns: 'confirmDialog' })}
         onConfirm={onDeleteConfirm}
         onCancel={() => onDeleteOpenChange(false)}
       />

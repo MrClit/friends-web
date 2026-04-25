@@ -10,5 +10,8 @@
   "retry": "Reintentar",
   "back": "Volver",
   "edit": "Editar",
-  "delete": "Borrar"
+  "delete": "Borrar",
+  "actions": "Acciones",
+  "goToHome": "Friends - Ir a la página principal",
+  "participant": "Participante"
 }
