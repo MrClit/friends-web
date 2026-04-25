@@ -8,7 +8,7 @@ import { NAMESPACES } from './namespaces';
 
 const I18N_DEFAULT_NAMESPACE: I18nNamespace = 'common';
 
-i18n
+export const i18nReady = i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -30,7 +30,8 @@ i18n
       bindI18n: 'languageChanged loaded',
       bindI18nStore: 'added removed',
     },
-  });
+  })
+  .then(() => ensureNamespacesLoaded(i18n.resolvedLanguage ?? i18n.language ?? 'en', ['common']));
 
 // Set initial HTML lang attribute based on detected language
 document.documentElement.lang = i18n.language;
@@ -42,9 +43,6 @@ i18n.on('languageChanged', (lng) => {
   // not get stuck with keys/defaults after a runtime language switch.
   void ensureNamespacesLoaded(lng, NAMESPACES);
 });
-
-// Keep common namespace warm for immediate shell usage.
-void ensureNamespacesLoaded(i18n.resolvedLanguage ?? i18n.language ?? 'en', ['common']);
 
 export async function preloadI18nNamespaces(namespaces: readonly I18nNamespace[]): Promise<void> {
   await ensureNamespacesLoaded(i18n.resolvedLanguage ?? i18n.language ?? 'en', namespaces);
