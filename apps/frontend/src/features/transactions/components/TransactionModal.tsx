@@ -114,7 +114,7 @@ export function TransactionModal() {
             {/* Mobile layout: primary action first, secondary actions grouped */}
             <div className="flex flex-col gap-3 sm:hidden">
               <DialogPrimaryButton
-                onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
+                onClick={(e) => handleSubmit(e)}
                 disabled={!canSubmit || isSaving || isDeleting}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3.5 rounded-2xl font-extrabold shadow-lg shadow-emerald-500/25 transition-all active:scale-95"
               >
@@ -174,7 +174,7 @@ export function TransactionModal() {
                 </DialogCloseButton>
 
                 <DialogPrimaryButton
-                  onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
+                  onClick={(e) => handleSubmit(e)}
                   disabled={!canSubmit || isSaving || isDeleting}
                   className="w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 sm:px-12 py-3.5 rounded-2xl font-extrabold shadow-lg shadow-emerald-500/25 transition-all active:scale-95"
                 >

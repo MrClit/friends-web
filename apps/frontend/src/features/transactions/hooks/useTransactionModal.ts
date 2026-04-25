@@ -93,7 +93,7 @@ interface UseTransactionModalReturn {
   errorMessage: string | null;
 
   // Handlers
-  handleSubmit: (e: React.FormEvent) => void;
+  handleSubmit: (e: React.SyntheticEvent) => void;
   handleDelete: () => void;
   handleConfirmDelete: () => void;
   handleCancelDelete: () => void;
@@ -169,7 +169,7 @@ export function useTransactionModal({
 
   // Handlers
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    (e: React.SyntheticEvent) => {
       e.preventDefault();
       if (!canSubmit || !event) return;
 

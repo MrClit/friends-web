@@ -21,7 +21,7 @@ export interface TransactionFormState {
 interface TransactionFormProps {
   fields: TransactionFormState;
   participants: EventParticipant[];
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: React.SyntheticEvent) => void;
 }
 
 export function TransactionForm({ fields, participants, onSubmit }: TransactionFormProps) {
