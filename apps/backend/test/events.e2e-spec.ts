@@ -325,4 +325,45 @@ describe('Events API (e2e)', () => {
       .set('Authorization', buildAuthHeader(jwtService, userA))
       .expect(403);
   });
+
+  it('DELETE /api/events/:id returns 204 with empty body', async () => {
+    const user = await createUser(userRepository, {
+      email: 'event-delete@example.com',
+      name: 'Event Delete',
+    });
+
+    const event = await eventRepository.save({
+      title: 'Event to Delete',
+      participants: [{ type: 'user', id: user.id }],
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(httpServer)
+      .delete(`/api/events/${event.id}`)
+      .set('Authorization', buildAuthHeader(jwtService, user))
+      .expect(204);
+
+    expect(response.text).toBe('');
+  });
+
+  it('DELETE /api/events/:id returns 404 for non-existing event', async () => {
+    const user = await createUser(userRepository, {
+      email: 'event-delete-404@example.com',
+      name: 'Event Delete 404',
+    });
+
+    const missingId = '99999999-9999-9999-9999-999999999999';
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+
+    const response = await request(httpServer)
+      .delete(`/api/events/${missingId}`)
+      .set('Authorization', buildAuthHeader(jwtService, user))
+      .expect(404);
+
+    expect(response.body).toMatchObject({
+      statusCode: 404,
+      path: `/api/events/${missingId}`,
+      method: 'DELETE',
+    });
+  });
 });
