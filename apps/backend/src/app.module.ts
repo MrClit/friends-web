@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,6 +14,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { envValidationSchema } from './config/env.validation';
+import { CorrelationMiddleware } from './common/middleware/correlation.middleware';
+import { RequestContextService } from './common/request-context/request-context.service';
 
 @Module({
   imports: [
@@ -42,6 +44,12 @@ import { envValidationSchema } from './config/env.validation';
   providers: [
     AppService,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    RequestContextService,
   ],
+  exports: [RequestContextService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(CorrelationMiddleware).forRoutes('*');
+  }
+}

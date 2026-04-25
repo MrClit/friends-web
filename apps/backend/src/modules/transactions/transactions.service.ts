@@ -17,6 +17,7 @@ import { PaginatedTransactionsResponseDto } from './dto/paginated-transactions-r
 import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
 import { ADMIN_ROLE } from '../users/user-role.constants';
+import { RequestContextService } from '../../common/request-context/request-context.service';
 
 @Injectable()
 export class TransactionsService {
@@ -29,6 +30,7 @@ export class TransactionsService {
     private readonly eventRepository: Repository<Event>,
     private readonly participantValidationService: ParticipantValidationService,
     private readonly transactionPaginationService: TransactionPaginationService,
+    private readonly requestContext: RequestContextService,
   ) {}
 
   private isAdmin(actor: AuthenticatedUser): boolean {
@@ -111,7 +113,10 @@ export class TransactionsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(`Failed to fetch transactions for event ${eventId}: ${err.message}`, err.stack);
+      this.logger.error(
+        { msg: 'Failed to fetch transactions for event', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, eventId },
+        err.stack,
+      );
       throw new InternalServerErrorException('Failed to fetch transactions');
     }
   }
@@ -149,7 +154,10 @@ export class TransactionsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(`Failed to fetch transaction ${id}: ${err.message}`, err.stack);
+      this.logger.error(
+        { msg: 'Failed to fetch transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id },
+        err.stack,
+      );
       throw new InternalServerErrorException('Failed to fetch transaction');
     }
   }
@@ -191,7 +199,23 @@ export class TransactionsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(`Failed to create transaction: ${err.message}`, err.stack);
+      this.logger.error(
+        {
+          msg: 'Failed to create transaction',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          eventId,
+          payload: {
+            title: createTransactionDto.title,
+            paymentType: createTransactionDto.paymentType,
+            amount: createTransactionDto.amount,
+            participantId: createTransactionDto.participantId,
+            date: createTransactionDto.date,
+          },
+        },
+        err.stack,
+      );
       throw new InternalServerErrorException('Failed to create transaction');
     }
   }
@@ -233,7 +257,10 @@ export class TransactionsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(`Failed to update transaction ${id}: ${err.message}`, err.stack);
+      this.logger.error(
+        { msg: 'Failed to update transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id, payload: updateTransactionDto },
+        err.stack,
+      );
       throw new InternalServerErrorException('Failed to update transaction');
     }
   }
@@ -257,7 +284,10 @@ export class TransactionsService {
         throw error;
       }
       const err = error as Error;
-      this.logger.error(`Failed to delete transaction ${id}: ${err.message}`, err.stack);
+      this.logger.error(
+        { msg: 'Failed to delete transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id },
+        err.stack,
+      );
       throw new InternalServerErrorException('Failed to delete transaction');
     }
   }

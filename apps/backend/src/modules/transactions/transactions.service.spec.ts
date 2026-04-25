@@ -8,6 +8,7 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
+import { RequestContextService } from '../../common/request-context/request-context.service';
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
@@ -95,6 +96,10 @@ describe('TransactionsService', () => {
         {
           provide: TransactionPaginationService,
           useValue: mockTransactionPaginationService,
+        },
+        {
+          provide: RequestContextService,
+          useValue: { correlationId: 'test-correlation-id' },
         },
       ],
     }).compile();
