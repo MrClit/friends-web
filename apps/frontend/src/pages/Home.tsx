@@ -27,7 +27,7 @@ export function Home() {
         title={t('title', { ns: 'home' })}
         subtitle={t('subtitle', { ns: 'home' })}
         actionLabel={t('newEvent', { ns: 'home' })}
-        onNewEvent={openModal}
+        onNewEvent={() => openModal()}
         actionIcon={<MdAdd size={22} />}
       />
       <EventsList />

@@ -17,7 +17,7 @@ import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 
 export function EventFormModal() {
   const { t } = useTranslation(['events', 'common']);
-  const { open, closeModal, event, onSubmit } = useEventFormModalStore();
+  const { open, closeModal, eventId } = useEventFormModalStore();
 
   const {
     title,
@@ -31,6 +31,7 @@ export function EventFormModal() {
     errorMessage,
     isLoading,
     canSubmit,
+    isEditMode,
     handleOpenChange,
     handleConfirmClose,
     handleCancelClose,
@@ -38,32 +39,29 @@ export function EventFormModal() {
     icon,
     setIcon,
   } = useEventFormModal({
-    open: open,
-    event: event ?? undefined,
+    open,
+    eventId,
     onClose: closeModal,
-    onSubmit: onSubmit,
   });
-  const submitText = isLoading ? t('eventForm.saving') : event ? t('eventForm.update') : t('eventForm.create');
+  const submitText = isLoading ? t('eventForm.saving') : isEditMode ? t('eventForm.update') : t('eventForm.create');
 
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent
           onInteractOutside={(e) => {
-            // Prevent main dialog from closing when ConfirmDialog is open
             if (showConfirm) {
               e.preventDefault();
             }
           }}
           onEscapeKeyDown={(e) => {
-            // Prevent main dialog from closing with Escape when ConfirmDialog is open
             if (showConfirm) {
               e.preventDefault();
             }
           }}
         >
           <DialogHeader className="px-8 pt-8 pb-4 flex justify-between items-center border-b border-transparent">
-            <DialogTitle>{event ? t('eventFormModal.editTitle') : t('eventFormModal.newTitle')}</DialogTitle>
+            <DialogTitle>{isEditMode ? t('eventFormModal.editTitle') : t('eventFormModal.newTitle')}</DialogTitle>
             <DialogCloseButton
               onClick={() => handleOpenChange(false)}
               disabled={isLoading || showConfirm}
@@ -93,7 +91,6 @@ export function EventFormModal() {
           </DialogBody>
 
           <DialogFooter className="px-6 sm:px-8 py-6 bg-slate-50 dark:bg-emerald-900/20 border-t border-emerald-100 dark:border-emerald-800/30">
-            {/* Mobile layout: primary action first with clear secondary affordance */}
             <div className="flex flex-col gap-3 sm:hidden">
               <DialogPrimaryButton
                 form="event-form"
@@ -113,7 +110,6 @@ export function EventFormModal() {
               </DialogCloseButton>
             </div>
 
-            {/* Desktop layout */}
             <div className="hidden sm:flex sm:w-full sm:items-center sm:justify-end sm:gap-3">
               <DialogCloseButton onClick={() => handleOpenChange(false)} disabled={isLoading || showConfirm}>
                 {t('eventFormModal.cancel')}
@@ -128,8 +124,8 @@ export function EventFormModal() {
       </Dialog>
       <ConfirmDialog
         open={showConfirm}
-        title={event ? t('eventFormModal.discardEditTitle') : t('eventFormModal.discardNewTitle')}
-        message={event ? t('eventFormModal.discardEditMessage') : t('eventFormModal.discardNewMessage')}
+        title={isEditMode ? t('eventFormModal.discardEditTitle') : t('eventFormModal.discardNewTitle')}
+        message={isEditMode ? t('eventFormModal.discardEditMessage') : t('eventFormModal.discardNewMessage')}
         confirmText={t('eventFormModal.discard')}
         cancelText={t('eventFormModal.cancel')}
         onConfirm={handleConfirmClose}

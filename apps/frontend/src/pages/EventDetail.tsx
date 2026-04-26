@@ -29,7 +29,6 @@ export function EventDetail() {
     isLoading,
     error,
     refetch,
-    handleEditSubmit,
     handleDelete,
     handleToggleArchive,
     handleBack,
@@ -85,12 +84,7 @@ export function EventDetail() {
         eventTitle={event.title}
         eventStatus={event.status}
         onBack={handleBack}
-        onEdit={() =>
-          eventFormModalStore.openModal({
-            event,
-            onSubmit: (data) => handleEditSubmit(data, eventFormModalStore.closeModal),
-          })
-        }
+        onEdit={() => eventFormModalStore.openModal(event.id)}
         onDelete={() => deleteDialog.confirm(handleDelete)}
         onToggleArchive={handleToggleArchive}
         isMutatingStatus={isMutatingEvent}
