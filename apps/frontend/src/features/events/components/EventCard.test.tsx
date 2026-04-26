@@ -2,6 +2,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { EventCard } from './EventCard';
 
+vi.mock('../constants', () => ({
+  getEventIconComponent: (iconKey?: string) => {
+    if (!iconKey) return undefined;
+    const Icon = () => <span data-testid={`icon-${iconKey}`} />;
+    return Icon;
+  },
+}));
+
 vi.mock('@/shared/utils/format', () => ({
   formatDateShort: (date: string) => (date === 'invalid-date' ? '' : 'Jan 20, 2026'),
 }));
@@ -117,5 +125,18 @@ describe('EventCard', () => {
     );
 
     expect(screen.queryByText('Jan 20, 2026')).not.toBeInTheDocument();
+  });
+
+  it('renders the icon resolved from iconKey', () => {
+    render(<EventCard event={{ id: 'event-7', title: 'Flight Trip', iconKey: 'flight' }} />);
+
+    expect(screen.getByTestId('icon-flight')).toBeInTheDocument();
+  });
+
+  it('renders MdEvent fallback when iconKey is undefined', () => {
+    render(<EventCard event={{ id: 'event-8', title: 'No Icon' }} />);
+
+    expect(screen.queryByTestId(/^icon-/)).not.toBeInTheDocument();
+    expect(document.querySelector('svg')).toBeInTheDocument();
   });
 });

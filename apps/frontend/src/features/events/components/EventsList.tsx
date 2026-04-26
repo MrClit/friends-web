@@ -1,21 +1,15 @@
 import { useEvents } from '@/hooks/api/useEvents';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { EventsListSkeleton } from './EventsListSkeleton';
 import { EventCard } from './EventCard';
 import { CreateEventCard } from './CreateEventCard';
 import { useNavigate } from 'react-router-dom';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
-import { getEventIconComponent } from '../constants';
 import { getParticipantAvatar, getParticipantName } from '../utils/participants';
 import { ErrorState } from '@/shared/components/ErrorState';
 import type { EventStatus } from '@/api/types';
 import { cn } from '@/shared/utils/cn';
-
-function EventIcon({ iconKey }: { iconKey?: string }) {
-  const Comp = getEventIconComponent(iconKey);
-  return Comp ? <Comp fontSize={32} /> : null;
-}
 
 interface EventsStatusToggleProps {
   value: EventStatus;
@@ -70,6 +64,7 @@ export function EventsList() {
   const isArchivedView = statusFilter === 'archived';
 
   const onNewEvent = () => openModal();
+  const handleCardClick = useCallback((id: string) => navigate(`/event/${id}`), [navigate]);
 
   if (isLoading) {
     return <EventsListSkeleton />;
@@ -119,9 +114,9 @@ export function EventsList() {
                     avatarUrl: getParticipantAvatar(p) ?? undefined,
                   })) || [],
                 lastModified: event.lastModified || event.updatedAt,
-                icon: <EventIcon iconKey={event.icon} />,
+                iconKey: event.icon,
               }}
-              onClick={() => navigate(`/event/${event.id}`)}
+              onClick={handleCardClick}
               className="animate-in fade-in duration-500"
               style={{ animationDelay: `${idx * 75}ms`, animationFillMode: 'backwards' }}
             />

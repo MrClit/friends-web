@@ -5,6 +5,7 @@ import type { FC } from 'react';
 import { Avatar } from '@/shared/components/Avatar';
 import { formatDateShort } from '@/shared/utils/format';
 import { useTranslation } from 'react-i18next';
+import { getEventIconComponent } from '../constants';
 
 export interface EventCardParticipant {
   avatarUrl?: string;
@@ -19,7 +20,7 @@ export interface EventCardProps {
     status?: 'active' | 'archived';
     participants?: EventCardParticipant[];
     lastModified?: string | null;
-    icon?: React.ReactNode;
+    iconKey?: string;
   };
   onClick?: (id: string) => void;
   className?: string;
@@ -46,8 +47,10 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
     status = 'active',
     participants = [],
     lastModified,
-    icon,
+    iconKey,
   } = event;
+
+  const IconComp = getEventIconComponent(iconKey);
 
   const statusInfo = statusConfig[status] || statusConfig.active;
 
@@ -75,7 +78,7 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
             status === 'archived' && 'text-emerald-600',
           )}
         >
-          {icon || <MdEvent size={32} />}
+          {IconComp ? <IconComp fontSize={32} /> : <MdEvent size={32} />}
         </div>
         <span
           className={cn(
