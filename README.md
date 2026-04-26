@@ -44,25 +44,45 @@ This is a **pnpm monorepo** containing:
 
 ---
 
+## 🏛️ Architecture
+
+```mermaid
+graph TD
+    Browser -->|HTTP| Frontend["@friends/frontend\nReact 19 · localhost:5173"]
+    Frontend -->|REST API| Backend["@friends/backend\nNestJS · localhost:3000"]
+    Frontend -.->|types| Shared["@friends/shared-types\nTypeScript types"]
+    Backend -.->|types| Shared
+    Backend --> DB[(PostgreSQL 15+\nlocalhost:5432)]
+    Backend --> Google[Google OAuth2]
+    Backend --> Microsoft[Microsoft OAuth2]
+    Backend --> Cloudinary[Cloudinary\nAvatar storage]
+```
+
+---
+
 ## 🚀 Quick Start
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/MrClit/friends-web.git
 cd friends-web
 
-# Install dependencies (uses pnpm workspaces)
+# 2. Install dependencies (uses pnpm workspaces)
 pnpm install
 
-# Start dev servers
-pnpm dev:frontend   # http://localhost:5173
+# 3. Set up environment variables
+cp apps/backend/.env.example apps/backend/.env   # fill in OAuth secrets, etc.
+cp apps/frontend/.env.example apps/frontend/.env # defaults work for local dev
+
+# 4. Start PostgreSQL (backend requires Docker)
+cd apps/backend && docker-compose up -d && cd ../..
+
+# 5. Run database migrations
+pnpm --filter @friends/backend migration:run
+
+# 6. Start dev servers
 pnpm dev:backend    # http://localhost:3000
-
-# Start PostgreSQL (backend requires Docker)
-cd apps/backend && docker-compose up -d
-
-# Build all workspaces
-pnpm build
+pnpm dev:frontend   # http://localhost:5173
 ```
 
 ---
@@ -178,7 +198,7 @@ Workspace-level READMEs:
 - **[Backend README](apps/backend/README.md)** — NestJS + PostgreSQL, API endpoints, migrations, env vars, testing
 - **[Shared Types README](packages/shared-types/README.md)** — shared TS types used across workspaces
 
-Implementation plans and architecture docs live in **[docs/](docs/)**.
+Implementation specs, architecture decisions, and feature plans live in **[docs/](docs/)**.
 
 ---
 

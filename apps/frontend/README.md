@@ -2,7 +2,7 @@
 
 > React 19 + TypeScript frontend application for managing shared expenses at events
 
-This is the frontend workspace of the Friends monorepo. A modern web application for tracking contributions, expenses, and compensations at group events, with support for multiple languages and persistent local storage.
+This is the frontend workspace of the Friends monorepo. A modern web application for tracking contributions, expenses, and compensations at group events, with multi-language support and OAuth authentication.
 
 ## Table of Contents
 
@@ -60,13 +60,19 @@ This is the frontend workspace of the Friends monorepo. A modern web application
 
 ### KPI Dashboard
 
-- 📈 Event summary with key performance indicators:
-  - **Balance:** Current balance per participant
-  - **Contributions:** Total contributed by each participant
-  - **Expenses:** Total spent by each participant
-  - **Pending:** Amounts pending compensation
-- 🔄 Drill-down navigation to detailed KPI views
-- 🏦 Separate display for pot expenses with distinctive styling
+- 📈 Event summary with four KPIs, each with a drill-down detail view:
+  - **Pot Balance:** Current balance of the shared pot
+  - **Contribution Status:** Net contribution vs target per participant
+  - **Total Expenses:** Per-participant expenses (including pot expenses)
+  - **Personal Status:** Individual pending amount per participant
+- 🏦 Pot expenses shown separately with amber styling
+
+### Authentication
+
+- 🔑 **OAuth 2.0:** Google and Microsoft sign-in
+- 🔒 **JWT:** Access + refresh token flow, auto-refresh on expiry
+- 👤 **User profile:** Edit display name and avatar (Cloudinary)
+- 🛡️ **Role-based access:** ADMIN role for user management
 
 ### User Experience
 
@@ -100,7 +106,7 @@ From the **monorepo root**:
 pnpm install
 
 # Start development server
-pnpm dev
+pnpm dev:frontend
 
 # Or specifically target frontend
 pnpm --filter @friends/frontend dev
@@ -149,6 +155,8 @@ src/
 ├─ config/
 │  └─ env.ts         # Environment configuration helper
 ├─ features/         # Domain modules (feature-based organization)
+│  ├─ auth/           # OAuth login flow
+│  ├─ admin-users/    # Admin user management (ADMIN role)
 │  ├─ events/
 │  │  ├─ components/   # Event UI components
 │  │  ├─ hooks/        # Business logic hooks
@@ -158,6 +166,7 @@ src/
 │  │  ├─ components/   # KPI detail components
 │  │  ├─ types.ts      # KPI types
 │  │  └─ index.ts
+│  ├─ profile/        # User profile editing
 │  └─ transactions/
 │     ├─ components/   # Transaction UI components
 │     ├─ constants.ts  # Payment type configuration
@@ -449,14 +458,12 @@ In development mode, `src/config/env.ts` logs the configuration to console:
 
 Configuration in `tailwind.config.js`. Uses TailwindCSS v4 with `@tailwindcss/vite` plugin (not PostCSS).
 
-**Color System:**
+**Semantic Color System:**
 
-- **Teal:** Primary UI elements (buttons, headers)
 - **Blue:** Contributions
-- **Red:** Expenses
-- **Green:** Balance/compensation
-- **Yellow:** Pending amounts
-- **Orange:** Pot expenses
+- **Rose:** Expenses
+- **Emerald:** Compensations
+- **Amber:** Pot expenses (shared costs)
 
 **Utility Helper:**
 
@@ -477,7 +484,7 @@ Rules in `eslint.config.js` (flat config format). Plugins:
 
 ### Translations
 
-Translation files located in `src/i18n/locales/{lang}/translation.json`.
+Translation files are split by namespace in `src/i18n/locales/{lang}/`.
 
 **Supported Languages:**
 
@@ -485,31 +492,34 @@ Translation files located in `src/i18n/locales/{lang}/translation.json`.
 - `en` (English)
 - `ca` (Catalan)
 
-**Key Naming Pattern:**
+**Namespaces** (one JSON file per namespace per language):
 
 ```
-<feature>.<context>.<key>
+src/i18n/locales/en/
+├── adminUsers.json
+├── auth.json
+├── common.json
+├── confirmDialog.json
+├── events.json
+├── kpiDetail.json
+├── transactions.json
+└── ...
 ```
 
-**Examples:**
-
-```json
-{
-  "events": {
-    "form": {
-      "title": "Event Title"
-    }
-  }
-}
-```
+**Key Naming Pattern:** `context.key` within each namespace file.
 
 **Usage:**
 
 ```typescript
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
-const title = t('events.form.title');
+// Default namespace
+const { t } = useTranslation('events');
+const title = t('form.title');
+
+// Explicit namespace
+const { t } = useTranslation('transactions');
+const label = t('transactionForm.participantLabel.expense');
 ```
 
 **Locale Mapping:**

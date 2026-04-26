@@ -2,7 +2,7 @@
 
 > NestJS backend API for Friends expense sharing platform
 
-**Status:** ✅ Operational - Events y Transactions implementados
+**Status:** ✅ Operational - Auth, Events, Transactions, Users, Admin, KPIs
 
 Backend RESTful API built with NestJS, TypeScript, PostgreSQL and TypeORM. Provides a complete REST API for managing events, participants, transactions, and KPIs.
 
@@ -38,7 +38,14 @@ Backend RESTful API built with NestJS, TypeScript, PostgreSQL and TypeORM. Provi
 
 ## 🚀 Quick Start
 
-### 1️⃣ Inicia la Base de Datos
+### 1️⃣ Variables de entorno
+
+```bash
+cp .env.example .env.development
+# Edit .env.development — fill in OAuth credentials (Google, Microsoft), JWT secret, Cloudinary keys
+```
+
+### 2️⃣ Inicia la Base de Datos
 
 ```bash
 docker compose up -d
@@ -48,7 +55,13 @@ docker compose up -d
 
 Esto iniciará PostgreSQL en un contenedor Docker. La base de datos estará disponible en `localhost:5432`.
 
-### 2️⃣ Inicia el Servidor Backend
+### 3️⃣ Ejecuta las migraciones
+
+```bash
+pnpm migration:run
+```
+
+### 5️⃣ Inicia el Servidor Backend
 
 **Desde la raíz del monorepo:**
 
@@ -62,7 +75,7 @@ pnpm --filter @friends/backend start:dev
 pnpm start:dev
 ```
 
-### 3️⃣ Verifica que Funciona
+### 6️⃣ Verifica que Funciona
 
 El servidor debería iniciarse en el puerto **3000** y verás:
 
@@ -136,31 +149,47 @@ envFilePath: `.env.${process.env.NODE_ENV || 'development'}`;
 
 ```bash
 # Server
-PORT=3000                           # Puerto del servidor
-NODE_ENV=development                # Ambiente: development | production | test
+PORT=3000
+NODE_ENV=development                # development | production | test
 
 # Database
-DATABASE_HOST=localhost             # Host de PostgreSQL
-DATABASE_PORT=5432                  # Puerto de PostgreSQL
-DATABASE_USER=postgres              # Usuario de PostgreSQL
-DATABASE_PASSWORD=postgres          # Contraseña de PostgreSQL
-DATABASE_NAME=friends_db            # Nombre de la base de datos
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=friends_db
+DATABASE_SSL=false
 
 # TypeORM
-TYPEORM_SYNC=false                  # ⚠️ NUNCA true en producción
-TYPEORM_LOGGING=true                # Logging de queries SQL
+TYPEORM_SYNC=false                  # ⚠️ NEVER true in production
+TYPEORM_LOGGING=true
 
 # CORS
-CORS_ORIGIN=http://localhost:5173   # Orígenes permitidos para CORS
+CORS_ORIGIN=http://localhost:5173
 
-# JWT (futuro)
-JWT_SECRET=your-secret-key          # Secret para firmar tokens JWT
-JWT_EXPIRATION=1d                   # Tiempo de expiración de tokens
+# JWT
+JWT_SECRET=replace-with-secure-random
+JWT_EXPIRATION=15m
+REFRESH_TOKEN_EXPIRATION_DAYS=30
 
-# Cloudinary (avatar)
-CLOUDINARY_CLOUD_NAME=your-cloud-name      # Cloud name de Cloudinary
-CLOUDINARY_API_KEY=your-api-key            # API key de Cloudinary
-CLOUDINARY_API_SECRET=your-api-secret      # API secret de Cloudinary
+# Google OAuth2
+GOOGLE_CLIENT_ID=replace-with-google-client-id
+GOOGLE_CLIENT_SECRET=replace-with-google-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
+
+# Microsoft OAuth2
+MICROSOFT_CLIENT_ID=replace-with-microsoft-client-id
+MICROSOFT_CLIENT_SECRET=replace-with-microsoft-client-secret
+MICROSOFT_TENANT_ID=common
+MICROSOFT_CALLBACK_URL=http://localhost:3000/api/auth/microsoft/callback
+
+# Cloudinary (avatar storage)
+CLOUDINARY_CLOUD_NAME=replace-with-cloudinary-cloud-name
+CLOUDINARY_API_KEY=replace-with-cloudinary-api-key
+CLOUDINARY_API_SECRET=replace-with-cloudinary-api-secret
+
+# Frontend URL (used for OAuth redirects)
+FRONTEND_URL=http://localhost:5173/friends-web/#
 ```
 
 ### Configuración Inicial
@@ -287,47 +316,56 @@ Notas:
 
 ```
 src/
-├── common/                         # Código compartido
-│   ├── health.controller.ts       # Health check endpoint
-│   ├── filters/                   # Exception filters
-│   │   └── http-exception.filter.ts
-│   ├── interceptors/              # Response transformers
-│   │   └── transform.interceptor.ts
-│   ├── pipes/                     # Validation pipes (futuro)
-│   ├── guards/                    # Auth guards (futuro)
-│   └── decorators/                # Custom decorators (futuro)
+├── common/                          # Shared code
+│   ├── health.controller.ts        # Health check endpoint
+│   ├── decorators/                 # @CurrentUser(), @ApiStandardResponse()
+│   ├── filters/                    # HttpExceptionFilter (global)
+│   ├── interceptors/               # TransformInterceptor — wraps responses in { data }
+│   └── middleware/                 # Request context middleware
 │
-├── config/                         # Configuración
-│   ├── database.config.ts         # TypeORM configuration
-│   └── app.config.ts              # App settings (futuro)
+├── config/                          # Configuration
+│   ├── database.config.ts          # TypeORM configuration
+│   └── app.config.ts               # App settings
 │
-├── modules/                        # Feature modules
-│   ├── events/                    # ✅ Events module
+├── modules/                         # Feature modules
+│   ├── auth/                        # OAuth2 + JWT auth
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── auth.module.ts
+│   │   ├── entities/               # RefreshToken entity
+│   │   ├── roles/                  # RolesGuard + @Roles() decorator
+│   │   ├── services/               # AvatarService, OAuthProviderService, RefreshTokenService
+│   │   └── strategies/             # JWT, Google OAuth, Microsoft OAuth
+│   │
+│   ├── events/                      # Events + KPI calculations
 │   │   ├── events.controller.ts
 │   │   ├── events.service.ts
 │   │   ├── events.module.ts
-│   │   ├── entities/
-│   │   │   └── event.entity.ts
-│   │   └── dto/
-│   │       ├── create-event.dto.ts
-│   │       ├── update-event.dto.ts
-│   │       └── event-participant.dto.ts
+│   │   ├── entities/               # Event entity
+│   │   ├── dto/
+│   │   └── services/               # EventKPIsService, EventParticipantsService, EventQueryService
 │   │
-│   └── transactions/              # ✅ Transactions module
-│       ├── transactions.controller.ts
-│       ├── transactions.service.ts
-│       ├── transactions.module.ts
-│       ├── entities/
-│       │   └── transaction.entity.ts
-│       └── dto/
-│           ├── create-transaction.dto.ts
-│           ├── update-transaction.dto.ts
-│           └── paginated-transactions.dto.ts
+│   ├── transactions/                # Transactions
+│   │   ├── transactions.controller.ts
+│   │   ├── transactions.service.ts
+│   │   ├── transactions.module.ts
+│   │   ├── entities/               # Transaction entity
+│   │   ├── dto/
+│   │   └── services/               # ParticipantValidationService, TransactionPaginationService
+│   │
+│   ├── users/                       # Current user profile
+│   │   ├── users.controller.ts
+│   │   ├── users.service.ts
+│   │   ├── users.module.ts
+│   │   └── user.entity.ts
+│   │
+│   └── admin/                       # Admin user management
+│       ├── admin-users.controller.ts
+│       ├── admin-users.service.ts
+│       └── admin.module.ts
 │
-├── app.module.ts                   # Root module
-├── app.controller.ts               # Default controller
-├── app.service.ts                  # Default service
-└── main.ts                         # Bootstrap application
+├── app.module.ts                    # Root module
+└── main.ts                          # Bootstrap
 ```
 
 ---
@@ -355,25 +393,55 @@ GET    /api               # API status
 GET    /api/health        # Database health check
 ```
 
+### Auth
+
+```
+GET    /api/auth/google              # Redirect to Google OAuth consent
+GET    /api/auth/google/callback     # Google OAuth callback
+GET    /api/auth/microsoft           # Redirect to Microsoft OAuth consent
+GET    /api/auth/microsoft/callback  # Microsoft OAuth callback
+POST   /api/auth/refresh             # Refresh access token (body: { refreshToken })
+POST   /api/auth/logout              # Invalidate refresh token
+GET    /api/auth/me                  # Current authenticated user
+```
+
+### Users (authenticated)
+
+```
+GET    /api/users         # List all users (for participant search)
+GET    /api/users/search  # Search users by name/email
+GET    /api/users/me      # Current user profile
+PATCH  /api/users/me      # Update current user profile (name, avatar)
+```
+
 ### Events
 
 ```
-GET    /api/events           # Listar todos los eventos
-POST   /api/events           # Crear evento
-GET    /api/events/:id       # Obtener evento por ID
-PATCH  /api/events/:id       # Actualizar evento
-DELETE /api/events/:id       # Eliminar evento (cascade delete transactions)
+GET    /api/events           # List events (query: ?status=active|archived)
+POST   /api/events           # Create event
+GET    /api/events/:id       # Get event by ID
+PATCH  /api/events/:id       # Update event
+DELETE /api/events/:id       # Delete event (cascade deletes transactions)
+GET    /api/events/:id/kpis  # Get KPI calculations for an event
 ```
 
 ### Transactions
 
 ```
-GET    /api/events/:eventId/transactions            # Listar transacciones de un evento
-GET    /api/events/:eventId/transactions/paginated  # Transacciones paginadas por fechas
-POST   /api/events/:eventId/transactions            # Crear transacción
-GET    /api/transactions/:id                        # Obtener transacción por ID
-PATCH  /api/transactions/:id                        # Actualizar transacción
-DELETE /api/transactions/:id                        # Eliminar transacción
+GET    /api/events/:eventId/transactions            # List transactions for an event
+GET    /api/events/:eventId/transactions/paginated  # Date-paginated transactions
+POST   /api/events/:eventId/transactions            # Create transaction
+PATCH  /api/transactions/:id                        # Update transaction
+DELETE /api/transactions/:id                        # Delete transaction
+```
+
+### Admin (ADMIN role required)
+
+```
+GET    /api/admin/users       # List all users
+POST   /api/admin/users       # Create user
+PATCH  /api/admin/users/:id   # Update user (role, status)
+DELETE /api/admin/users/:id   # Soft-delete user
 ```
 
 **Paginación de transacciones:**
@@ -490,12 +558,13 @@ CREATE TABLE events (
 );
 ```
 
-**Participants JSONB structure:**
+**Participants JSONB structure** — discriminated union:
 
 ```json
 [
-  { "id": "1", "name": "Alice" },
-  { "id": "2", "name": "Bob" }
+  { "type": "user", "id": "<uuid>", "name": "Alice", "avatar": "...", "contributionTarget": 50 },
+  { "type": "guest", "id": "g-abc123", "name": "Bob", "contributionTarget": 30 },
+  { "type": "pot", "id": "0" }
 ]
 ```
 
@@ -611,37 +680,6 @@ docker exec -it friends-postgres createdb -U postgres friends_db_test
 ```
 
 > Si la base ya existe, el comando `createdb` puede devolver error y se puede ignorar.
-
----
-
-## 🛠️ Scripts Disponibles
-
-```bash
-# Desarrollo
-pnpm start:dev      # Development mode con hot reload
-pnpm start:debug    # Debug mode
-
-# Producción
-pnpm build          # Build para producción
-pnpm start:prod     # Ejecutar en producción
-
-# Testing
-pnpm test           # Run unit tests
-pnpm test:unit      # Run unit tests (alias explícito)
-pnpm test:watch     # Tests en watch mode
-pnpm test:all       # Run unit + integration + e2e
-pnpm test:e2e       # Run e2e smoke tests (requiere PostgreSQL)
-pnpm test:run       # Run unit tests in CI mode
-pnpm test:coverage  # Generar coverage report
-pnpm check:backend  # Lint + full backend test suite
-
-# Code Quality
-pnpm lint           # Lint code
-pnpm lint:fix       # Lint y auto-fix
-
-# Utilidades
-pnpm clean          # Limpiar directorio dist
-```
 
 ---
 
