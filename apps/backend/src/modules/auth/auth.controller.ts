@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiErrorResponseDto } from '../../common/dto/api-error-response.dto';
 import { ConfigService } from '@nestjs/config';
 import { Throttle } from '@nestjs/throttler';
 import { IsOptional, IsString } from 'class-validator';
@@ -53,6 +54,8 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @ApiOperation({ summary: 'Rotate refresh token and get new access token' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token', type: ApiErrorResponseDto })
   async refresh(@Body() body: RefreshTokenDto, @Res() res: express.Response) {
     const rawToken = body.refreshToken;
     if (!rawToken) {
@@ -70,6 +73,9 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Revoke refresh token and log out' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: ApiErrorResponseDto })
   async logout(@Body() body: RefreshTokenDto, @Res() res: express.Response) {
     if (body.refreshToken) {
       await this.authService.revokeRefreshToken(body.refreshToken);
@@ -79,8 +85,10 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current authenticated user profile' })
   @ApiStandardResponse(200, 'Current user profile retrieved successfully', CurrentUserProfileDto)
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: ApiErrorResponseDto })
   getProfile(@Req() req: Request & { user: User }) {
     return this.usersService.toCurrentUserProfile(req.user);
   }

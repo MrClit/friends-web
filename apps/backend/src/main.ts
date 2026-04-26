@@ -52,6 +52,7 @@ async function bootstrap() {
     .setTitle('Friends API')
     .setDescription('REST API for Friends shared expenses management')
     .setVersion('1.0')
+    .addBearerAuth()
     .addTag('Events', 'Event management endpoints')
     .addTag('Event Transactions', 'Transaction endpoints under events')
     .addTag('Transactions', 'Individual transaction operations')

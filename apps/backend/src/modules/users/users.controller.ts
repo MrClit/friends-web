@@ -9,7 +9,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiErrorResponseDto } from '../../common/dto/api-error-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
@@ -30,6 +31,9 @@ interface UploadedAvatarFile {
 }
 
 @ApiTags('Users')
+@ApiBearerAuth()
+@ApiResponse({ status: 401, description: 'Unauthorized', type: ApiErrorResponseDto })
+@ApiResponse({ status: 403, description: 'Forbidden', type: ApiErrorResponseDto })
 @Controller('users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UsersController {
@@ -74,6 +78,7 @@ export class UsersController {
   })
   @ApiOperation({ summary: 'Update current authenticated user profile' })
   @ApiStandardResponse(200, 'Current user profile updated successfully', CurrentUserProfileDto)
+  @ApiResponse({ status: 400, description: 'Invalid input or file validation failed', type: ApiErrorResponseDto })
   async updateCurrentUserProfile(
     @CurrentUser() currentUser: AuthenticatedUser,
     @Body() updateCurrentUserProfileDto: UpdateCurrentUserProfileDto,

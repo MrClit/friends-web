@@ -12,8 +12,9 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
+import { ApiErrorResponseDto } from '../../common/dto/api-error-response.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { EventsService } from './events.service';
@@ -26,6 +27,9 @@ import { AuthGuard } from '@nestjs/passport/dist/auth.guard';
 import { EventStatus } from './entities/event.entity';
 
 @ApiTags('Events')
+@ApiBearerAuth()
+@ApiResponse({ status: 401, description: 'Unauthorized', type: ApiErrorResponseDto })
+@ApiResponse({ status: 403, description: 'Forbidden', type: ApiErrorResponseDto })
 @Controller('events')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class EventsController {
@@ -61,7 +65,7 @@ export class EventsController {
     format: 'uuid',
   })
   @ApiStandardResponse(200, 'Event retrieved successfully', Event)
-  @ApiResponse({ status: 404, description: 'Event not found' })
+  @ApiResponse({ status: 404, description: 'Event not found', type: ApiErrorResponseDto })
   findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.eventsService.findOne(id, user);
   }
@@ -74,7 +78,7 @@ export class EventsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new event' })
   @ApiStandardResponse(201, 'Event created successfully', Event)
-  @ApiResponse({ status: 400, description: 'Invalid input' })
+  @ApiResponse({ status: 400, description: 'Invalid input', type: ApiErrorResponseDto })
   create(@Body() createEventDto: CreateEventDto, @CurrentUser() user: AuthenticatedUser) {
     return this.eventsService.create(createEventDto, user);
   }
@@ -92,8 +96,8 @@ export class EventsController {
     format: 'uuid',
   })
   @ApiStandardResponse(200, 'Event updated successfully', Event)
-  @ApiResponse({ status: 400, description: 'Invalid input' })
-  @ApiResponse({ status: 404, description: 'Event not found' })
+  @ApiResponse({ status: 400, description: 'Invalid input', type: ApiErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'Event not found', type: ApiErrorResponseDto })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateEventDto: UpdateEventDto,
@@ -119,7 +123,7 @@ export class EventsController {
     status: 204,
     description: 'Event deleted successfully',
   })
-  @ApiResponse({ status: 404, description: 'Event not found' })
+  @ApiResponse({ status: 404, description: 'Event not found', type: ApiErrorResponseDto })
   async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     await this.eventsService.remove(id, user);
   }
@@ -137,7 +141,7 @@ export class EventsController {
     format: 'uuid',
   })
   @ApiStandardResponse(200, 'KPIs retrieved successfully', EventKPIsDto)
-  @ApiResponse({ status: 404, description: 'Event not found' })
+  @ApiResponse({ status: 404, description: 'Event not found', type: ApiErrorResponseDto })
   getKPIs(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.eventsService.getKPIs(id, user);
   }
