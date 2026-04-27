@@ -149,3 +149,21 @@ Modules: `auth`, `events`, `transactions`, `users`, `admin`
 3. Add translations to `src/i18n/locales/{en,es,ca}/translation.json`
 
 **Implementation plans** for multi-file features go in `/docs` and must be self-contained (motivation, design, ordered tasks, test cases, env vars).
+
+## Skill References
+
+Detailed best-practice guides live in `.agents/skills/`. Read the relevant file when working in that area — do not duplicate their content in this file.
+
+### Backend
+- **NestJS** (40 rules — architecture, DI, security, performance, testing): [`.agents/skills/nestjs-best-practices/AGENTS.md`](.agents/skills/nestjs-best-practices/AGENTS.md)
+
+### Frontend
+- **React composition** (compound components, state lifting, React 19 APIs): [`.agents/skills/vercel-composition-patterns/AGENTS.md`](.agents/skills/vercel-composition-patterns/AGENTS.md)
+- **React performance** (waterfalls, memoization, bundle size — skip Server Components / `use server` rules, this is a SPA): [`.agents/skills/vercel-react-best-practices/AGENTS.md`](.agents/skills/vercel-react-best-practices/AGENTS.md)
+- **Tailwind patterns**: [`.agents/skills/tailwind-css-patterns/SKILL.md`](.agents/skills/tailwind-css-patterns/SKILL.md)
+- **Accessibility** (WCAG 2.2): [`.agents/skills/accessibility/SKILL.md`](.agents/skills/accessibility/SKILL.md)
+- **Vite config**: [`.agents/skills/vite/SKILL.md`](.agents/skills/vite/SKILL.md)
+
+### Common
+- **TypeScript advanced types**: [`.agents/skills/typescript-advanced-types/SKILL.md`](.agents/skills/typescript-advanced-types/SKILL.md)
+- **Vitest**: [`.agents/skills/vitest/SKILL.md`](.agents/skills/vitest/SKILL.md)

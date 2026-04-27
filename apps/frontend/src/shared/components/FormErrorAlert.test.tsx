@@ -13,6 +13,11 @@ describe('FormErrorAlert', () => {
     expect(screen.getByText('Validation failed')).toBeInTheDocument();
   });
 
+  it('should have role="alert" for screen reader announcement', () => {
+    render(<FormErrorAlert message="Some error" />);
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
+
   it('should render with error styling', () => {
     render(<FormErrorAlert message="Error text" />);
     const alert = screen.getByText('Error text');
