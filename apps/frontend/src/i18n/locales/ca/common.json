@@ -14,6 +14,7 @@
   "actions": "Accions",
   "goToHome": "Friends - Anar a la pàgina principal",
   "participant": "Participant",
+  "skipToContent": "Anar al contingut principal",
   "errors": {
     "400": "Les dades de la sol·licitud no són vàlides.",
     "401": "La teva sessió ha caducat. Si us plau, inicia sessió de nou.",

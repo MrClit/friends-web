@@ -14,6 +14,7 @@
   "actions": "Acciones",
   "goToHome": "Friends - Ir a la página principal",
   "participant": "Participante",
+  "skipToContent": "Ir al contenido principal",
   "errors": {
     "400": "Los datos de la solicitud no son válidos.",
     "401": "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",

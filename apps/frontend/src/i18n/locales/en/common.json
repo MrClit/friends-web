@@ -14,6 +14,7 @@
   "actions": "Actions",
   "goToHome": "Friends - Go to home page",
   "participant": "Participant",
+  "skipToContent": "Skip to main content",
   "errors": {
     "400": "The request data is not valid.",
     "401": "Your session has expired. Please log in again.",
