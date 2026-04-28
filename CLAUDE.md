@@ -139,6 +139,22 @@ Modules: `auth`, `events`, `transactions`, `users`, `admin`
 
 ## Conventions
 
+## GitHub Workflow (MCP)
+
+Repository: `MrClit/friends-web`
+
+Use the GitHub MCP tools (preferred over `gh` CLI) for all issue and PR interactions:
+
+- **Read an issue:** `mcp__github__issue_read` with `owner: "MrClit"`, `repo: "friends-web"`
+- **Update/close an issue:** `mcp__github__issue_write`
+- **Add a comment:** `mcp__github__add_issue_comment`
+
+**Issue lifecycle:**
+1. Move issue to **In Progress** before starting implementation.
+2. When closing: move to **Done** + add a comment summarizing what was done (files changed, approach, key decisions).
+
+## Conventions
+
 **Git commits:** `type(scope): description` — types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore` — scopes: `frontend`, `backend`, `shared-types`, `ci`
 
 **Code language:** All comments, JSDoc, and type descriptions in English. i18n translation files stay in their own languages.
