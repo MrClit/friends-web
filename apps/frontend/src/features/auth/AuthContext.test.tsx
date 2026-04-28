@@ -1,6 +1,6 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useContext } from 'react';
+import { use } from 'react';
 import { AuthProvider, AuthContext } from './AuthContext';
 
 const resetEventFormModal = vi.fn();
@@ -29,7 +29,7 @@ vi.mock('@/shared/store/useDeletingStore', () => ({
 }));
 
 function TestConsumer() {
-  const ctx = useContext(AuthContext);
+  const ctx = use(AuthContext);
   if (!ctx) return <span>no-context</span>;
   return (
     <div>
