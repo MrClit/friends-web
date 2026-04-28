@@ -22,24 +22,23 @@ const DialogClose = DialogPrimitive.Close;
  * - Centers content (flex)
  * - High z-index to stay on top of everything
  */
-const DialogOverlay = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
-    ref={ref}
-    className={cn(
-      // Layout
-      'fixed inset-0 z-50 flex items-center justify-center p-4',
-      // Visuals
-      'bg-emerald-950/40 backdrop-blur-sm',
-      // Animations
-      'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300 motion-reduce:animate-none',
-      className,
-    )}
-    {...props}
-  />
-));
+function DialogOverlay({ ref, className, ...props }: React.ComponentPropsWithRef<typeof DialogPrimitive.Overlay>) {
+  return (
+    <DialogPrimitive.Overlay
+      ref={ref}
+      className={cn(
+        // Layout
+        'fixed inset-0 z-50 flex items-center justify-center p-4',
+        // Visuals
+        'bg-emerald-950/40 backdrop-blur-sm',
+        // Animations
+        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300 motion-reduce:animate-none',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 /**
@@ -50,37 +49,36 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
  * - Rounded corners and shadow
  * - Dark theme support
  */
-const DialogContent = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay>
-      <DialogPrimitive.Content
-        ref={ref}
-        className={cn(
-          // Layout & positioning
-          // Use overlay's flexbox centering and padding so the overlay's `p-4`
-          // creates the lateral margin. Avoid `position: fixed` here because
-          // fixed elements compute `w-full` relative to the viewport and
-          // ignore the overlay padding.
-          'relative z-50 mx-auto',
-          // Size & constraints
-          'w-full max-w-xl',
-          'flex flex-col max-h-[90vh] overflow-hidden',
-          // Visuals
-          'bg-white dark:bg-emerald-950 rounded-4xl shadow-lg',
-          // Animations
-          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 duration-300 motion-reduce:animate-none',
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </DialogPrimitive.Content>
-    </DialogOverlay>
-  </DialogPortal>
-));
+function DialogContent({ ref, className, children, ...props }: React.ComponentPropsWithRef<typeof DialogPrimitive.Content>) {
+  return (
+    <DialogPortal>
+      <DialogOverlay>
+        <DialogPrimitive.Content
+          ref={ref}
+          className={cn(
+            // Layout & positioning
+            // Use overlay's flexbox centering and padding so the overlay's `p-4`
+            // creates the lateral margin. Avoid `position: fixed` here because
+            // fixed elements compute `w-full` relative to the viewport and
+            // ignore the overlay padding.
+            'relative z-50 mx-auto',
+            // Size & constraints
+            'w-full max-w-xl',
+            'flex flex-col max-h-[90vh] overflow-hidden',
+            // Visuals
+            'bg-white dark:bg-emerald-950 rounded-4xl shadow-lg',
+            // Animations
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 duration-300 motion-reduce:animate-none',
+            className,
+          )}
+          {...props}
+        >
+          {children}
+        </DialogPrimitive.Content>
+      </DialogOverlay>
+    </DialogPortal>
+  );
+}
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 /**
@@ -92,38 +90,37 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
  * - Maximum 90vh height
  * - Auto-scroll for long content
  */
-const DialogBottomSheet = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300 motion-reduce:animate-none" />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        'fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-md bg-white dark:bg-emerald-900 rounded-t-3xl p-6 shadow-lg',
-        'min-h-[50vh] max-h-[90vh] overflow-y-auto',
-        'animate-[slideUpDialog_0.3s_cubic-bezier(0.4,0,0.2,1)] motion-reduce:animate-none',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <style>{`
-        @keyframes slideUpDialog {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
+function DialogBottomSheet({ ref, className, children, ...props }: React.ComponentPropsWithRef<typeof DialogPrimitive.Content>) {
+  return (
+    <DialogPortal>
+      <DialogOverlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300 motion-reduce:animate-none" />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-md bg-white dark:bg-emerald-900 rounded-t-3xl p-6 shadow-lg',
+          'min-h-[50vh] max-h-[90vh] overflow-y-auto',
+          'animate-[slideUpDialog_0.3s_cubic-bezier(0.4,0,0.2,1)] motion-reduce:animate-none',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        <style>{`
+          @keyframes slideUpDialog {
+            from {
+              transform: translateY(100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateY(0);
+              opacity: 1;
+            }
           }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
-    </DialogPrimitive.Content>
-  </DialogPortal>
-));
+        `}</style>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  );
+}
 DialogBottomSheet.displayName = 'DialogBottomSheet';
 
 // ============================================================================
@@ -187,8 +184,8 @@ DialogFooter.displayName = 'DialogFooter';
  * - Dark theme support
  * - Fully accessible
  */
-const DialogCloseButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ className, children, ...props }, ref) => (
+function DialogCloseButton({ ref, className, children, ...props }: React.ComponentPropsWithRef<'button'>) {
+  return (
     <DialogPrimitive.Close asChild>
       <button
         ref={ref}
@@ -202,8 +199,8 @@ const DialogCloseButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAt
         {children ?? <span aria-hidden>×</span>}
       </button>
     </DialogPrimitive.Close>
-  ),
-);
+  );
+}
 DialogCloseButton.displayName = 'DialogCloseButton';
 
 /**
@@ -214,8 +211,8 @@ DialogCloseButton.displayName = 'DialogCloseButton';
  * - Dark theme support
  * - Fully accessible
  */
-const DialogPrimaryButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ className, children, ...props }, ref) => (
+function DialogPrimaryButton({ ref, className, children, ...props }: React.ComponentPropsWithRef<'button'>) {
+  return (
     <button
       ref={ref}
       type="button"
@@ -232,8 +229,8 @@ const DialogPrimaryButton = React.forwardRef<HTMLButtonElement, React.ButtonHTML
     >
       {children}
     </button>
-  ),
-);
+  );
+}
 DialogPrimaryButton.displayName = 'DialogPrimaryButton';
 
 // ============================================================================
@@ -247,16 +244,15 @@ DialogPrimaryButton.displayName = 'DialogPrimaryButton';
  * - Teal color with dark theme support
  * - Automatically linked to dialog by Radix for accessibility
  */
-const DialogTitle = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
-    ref={ref}
-    className={cn('text-xl font-bold text-emerald-700 dark:text-emerald-100', className)}
-    {...props}
-  />
-));
+function DialogTitle({ ref, className, ...props }: React.ComponentPropsWithRef<typeof DialogPrimitive.Title>) {
+  return (
+    <DialogPrimitive.Title
+      ref={ref}
+      className={cn('text-xl font-bold text-emerald-700 dark:text-emerald-100', className)}
+      {...props}
+    />
+  );
+}
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 /**
@@ -266,16 +262,15 @@ DialogTitle.displayName = DialogPrimitive.Title.displayName;
  * - Dark theme supported
  * - Automatically linked to dialog by Radix for accessibility
  */
-const DialogDescription = React.forwardRef<
-  React.ComponentRef<typeof DialogPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Description
-    ref={ref}
-    className={cn('text-sm text-slate-600 dark:text-slate-300', className)}
-    {...props}
-  />
-));
+function DialogDescription({ ref, className, ...props }: React.ComponentPropsWithRef<typeof DialogPrimitive.Description>) {
+  return (
+    <DialogPrimitive.Description
+      ref={ref}
+      className={cn('text-sm text-slate-600 dark:text-slate-300', className)}
+      {...props}
+    />
+  );
+}
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 // ============================================================================
