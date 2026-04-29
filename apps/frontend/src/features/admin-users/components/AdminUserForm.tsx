@@ -195,4 +195,3 @@ export function AdminUserForm({ form, onChange, mode, disabled = false }: AdminU
   );
 }
 
-export default AdminUserForm;

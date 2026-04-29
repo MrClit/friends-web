@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import DialogFormWrapper from '@/shared/components/DialogFormWrapper';
+import { DialogFormWrapper } from '@/shared/components/DialogFormWrapper';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 
 import { AdminUserForm } from './AdminUserForm';

@@ -66,4 +66,3 @@ export function DialogFormWrapper({
   );
 }
 
-export default DialogFormWrapper;
