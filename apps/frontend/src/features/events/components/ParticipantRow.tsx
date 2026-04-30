@@ -226,7 +226,7 @@ export const ParticipantRow = memo(function ParticipantRow({
                 id={`target-${participantIndex}`}
                 type="number"
                 min="0"
-                step="1"
+                step="0.01"
                 value={currentTarget === 0 ? '' : currentTarget}
                 onChange={(e) => {
                   const val = e.target.value.trim();
@@ -235,7 +235,7 @@ export const ParticipantRow = memo(function ParticipantRow({
                     return;
                   }
 
-                  const parsedValue = Number(val);
+                  const parsedValue = Math.round(Number(val) * 100) / 100;
                   if (!Number.isFinite(parsedValue)) {
                     onTargetChange(undefined);
                     return;
