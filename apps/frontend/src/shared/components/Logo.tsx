@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { AppName } from '@/shared/components/AppName';
 
 type LogoRounded = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
 
@@ -58,9 +59,7 @@ export function Logo({ showText = false, size = 40, rounded = '3xl' }: LogoProps
     >
       <LogoIcon size={size} rounded={rounded} />
       {showText && (
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-emerald-700 dark:text-emerald-300 mt-2">
-          FRI<span className="text-yellow-400">€</span>NDS
-        </h1>
+        <AppName className="text-3xl sm:text-4xl font-extrabold tracking-tight text-emerald-700 dark:text-emerald-300 mt-2" />
       )}
     </Link>
   );

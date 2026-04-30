@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { LogoIcon } from '@/shared/components/Logo';
+import { AppName } from '@/shared/components/AppName';
 import { LanguageSelector } from '@/shared/components/Header';
 import { ThemeToggle } from '@/shared/components/Header';
 import { UserMenu } from '@/shared/components/Header';
@@ -25,9 +26,7 @@ export function Header() {
         >
           <LogoIcon size={40} rounded="xl" />
 
-          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-slate-700 dark:text-white dark:group-hover:text-emerald-100">
-            FRI<span className="text-yellow-400">€</span>NDS
-          </h1>
+          <AppName className="text-xl font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-slate-700 dark:text-white dark:group-hover:text-emerald-100" />
         </Link>
 
         <div className="flex items-center gap-2 md:gap-4">
