@@ -3,6 +3,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { LoggerModule } from 'nestjs-pino';
+import { randomUUID } from 'crypto';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './common/health.controller';
@@ -19,6 +21,31 @@ import { RequestContextService } from './common/request-context/request-context.
 
 @Module({
   imports: [
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const isProduction = config.get<string>('NODE_ENV') === 'production';
+        const level = config.get<string>('LOG_LEVEL') ?? 'info';
+        return {
+          pinoHttp: {
+            level,
+            genReqId: (req) =>
+              (req.headers['x-correlation-id'] as string) ?? randomUUID(),
+            serializers: {
+              req: (req: { method: string; url: string }) => ({ method: req.method, url: req.url }),
+              res: (res: { statusCode: number }) => ({ statusCode: res.statusCode }),
+            },
+            autoLogging: {
+              ignore: (req) => req.url === '/api/health',
+            },
+            transport: isProduction
+              ? undefined
+              : { target: 'pino-pretty', options: { singleLine: true, colorize: true } },
+          },
+        };
+      },
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
