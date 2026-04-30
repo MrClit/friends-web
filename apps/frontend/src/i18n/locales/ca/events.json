@@ -50,6 +50,8 @@
     "targetLabel": "Objectiu",
     "targetPlaceholder": "0",
     "targetAria": "Import de l'objectiu de contribució",
+    "calculateTargets": "Calcula objectius",
+    "calculateTargetsAria": "Calcula els objectius de contribució proporcionalment als despeses totals",
     "createNew": "Afegir com a convidat"
   },
   "eventContextMenu": {

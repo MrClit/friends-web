@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdAutoGraph } from 'react-icons/md';
 import { useParticipantsList } from '../hooks/useParticipantsList';
 import { ParticipantsCombobox } from './ParticipantsCombobox';
 import { ParticipantRow } from './ParticipantRow';
@@ -11,9 +12,15 @@ interface ParticipantsListProps {
   setParticipantReplacements: (
     replacements: ParticipantReplacement[] | ((prev: ParticipantReplacement[]) => ParticipantReplacement[]),
   ) => void;
+  totalExpenses?: number;
 }
 
-export function ParticipantsList({ participants, setParticipants, setParticipantReplacements }: ParticipantsListProps) {
+export function ParticipantsList({
+  participants,
+  setParticipants,
+  setParticipantReplacements,
+  totalExpenses,
+}: ParticipantsListProps) {
   const { t } = useTranslation('events');
   const listRef = useRef<HTMLDivElement | null>(null);
   const previousParticipantsCountRef = useRef(participants.length);
@@ -36,6 +43,7 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
     handleRenameGuestNameChange,
     handleCommitRenameGuest,
     handleUpdateParticipantTarget,
+    handleCalculateTargets,
   } = useParticipantsList({
     participants,
     setParticipants,
@@ -88,6 +96,19 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
           />
         ))}
       </div>
+      {totalExpenses !== undefined && totalExpenses > 0 && (
+        <div className="flex justify-end pt-2">
+          <button
+            type="button"
+            onClick={() => handleCalculateTargets(totalExpenses)}
+            aria-label={t('participantsInput.calculateTargetsAria')}
+            className="flex items-center gap-1.5 rounded-2xl border border-emerald-300 bg-white px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
+          >
+            <MdAutoGraph className="text-sm" />
+            {t('participantsInput.calculateTargets')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

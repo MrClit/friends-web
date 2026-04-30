@@ -174,8 +174,8 @@ Detailed best-practice guides live in `.agents/skills/`. Read the relevant file 
 - **NestJS** (40 rules — architecture, DI, security, performance, testing): [`.agents/skills/nestjs-best-practices/AGENTS.md`](.agents/skills/nestjs-best-practices/AGENTS.md)
 
 ### Frontend
-- **React composition** (compound components, state lifting, React 19 APIs): [`.agents/skills/vercel-composition-patterns/AGENTS.md`](.agents/skills/vercel-composition-patterns/AGENTS.md)
-- **React performance** (waterfalls, memoization, bundle size — skip Server Components / `use server` rules, this is a SPA): [`.agents/skills/vercel-react-best-practices/AGENTS.md`](.agents/skills/vercel-react-best-practices/AGENTS.md)
+- **React composition** (compound components, state lifting, React 19 APIs): [`.agents/skills/composition-patterns/AGENTS.md`](.agents/skills/composition-patterns/AGENTS.md)
+- **React performance** (waterfalls, memoization, bundle size — skip Server Components / `use server` rules, this is a SPA): [`.agents/skills/react-best-practices/AGENTS.md`](.agents/skills/react-best-practices/AGENTS.md)
 - **Tailwind patterns**: [`.agents/skills/tailwind-css-patterns/SKILL.md`](.agents/skills/tailwind-css-patterns/SKILL.md)
 - **Accessibility** (WCAG 2.2): [`.agents/skills/accessibility/SKILL.md`](.agents/skills/accessibility/SKILL.md)
 - **Vite config**: [`.agents/skills/vite/SKILL.md`](.agents/skills/vite/SKILL.md)

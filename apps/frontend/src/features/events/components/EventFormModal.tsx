@@ -14,10 +14,12 @@ import { EventForm } from './EventForm';
 import { useTranslation } from 'react-i18next';
 import { useEventFormModal } from '../hooks/useEventFormModal';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
+import { useEventKPIs } from '@/hooks/api/useEventKPIs';
 
 export function EventFormModal() {
   const { t } = useTranslation(['events', 'common']);
   const { open, closeModal, eventId } = useEventFormModalStore();
+  const { data: kpis } = useEventKPIs(eventId ?? undefined);
 
   const {
     title,
@@ -84,6 +86,7 @@ export function EventFormModal() {
                   setParticipantReplacements,
                   icon,
                   setIcon,
+                  totalExpenses: kpis?.totalExpenses,
                 }}
                 onSubmit={handleSubmit}
               />

@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { EventParticipant, ParticipantReplacement } from '../types';
+import { calculateSuggestedTargets } from '../utils/calculateSuggestedTargets';
 
 type InlineEditionState =
   | { mode: 'idle' }
@@ -123,6 +124,13 @@ export function useParticipantsList({
     setInlineEdition(IDLE);
   }, [inlineEdition, setParticipants]);
 
+  const handleCalculateTargets = useCallback(
+    (totalExpenses: number) => {
+      setParticipants((prev) => calculateSuggestedTargets(prev, totalExpenses));
+    },
+    [setParticipants],
+  );
+
   const handleUpdateParticipantTarget = useCallback(
     (idx: number, target: number | undefined) => {
       setParticipants((prev) => [
@@ -160,5 +168,6 @@ export function useParticipantsList({
     handleRenameGuestNameChange,
     handleCommitRenameGuest,
     handleUpdateParticipantTarget,
+    handleCalculateTargets,
   };
 }
