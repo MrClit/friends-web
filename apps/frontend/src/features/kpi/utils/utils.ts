@@ -153,7 +153,7 @@ export function buildKPIItems(
     if (isPot) {
       return {
         id,
-        name: t('transactionsList.potLabel'),
+        name: t('participants.potLabel', { ns: 'events' }),
         value: formatAmount(total),
         rawAmount: total,
         isPot: true,

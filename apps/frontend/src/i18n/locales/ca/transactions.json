@@ -6,8 +6,7 @@
       "expense": "Pagat per",
       "compensation": "Pagat a"
     },
-    "potLabel": "El Pot",
-    "unknownParticipant": "Participant desconegut",
+"unknownParticipant": "Participant desconegut",
     "loadingMore": "Carregant més transaccions...",
     "loadMore": "Carregar transaccions anteriors",
     "showingDates": "Mostrant {{loaded}} de {{total}} dies"

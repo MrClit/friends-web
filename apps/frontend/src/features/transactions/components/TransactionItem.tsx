@@ -19,7 +19,7 @@ interface TransactionItemProps {
  * Optimized with React.memo to prevent unnecessary re-renders
  */
 function TransactionItemBase({ transaction, onClick, participantsMap }: TransactionItemProps) {
-  const { t } = useTranslation('transactions');
+  const { t } = useTranslation(['transactions', 'events']);
 
   const isPot = isPotExpense(transaction);
 
@@ -28,7 +28,7 @@ function TransactionItemBase({ transaction, onClick, participantsMap }: Transact
 
   // Get participant name with fallback
   const participantName = isPot
-    ? t('transactionsList.potLabel')
+    ? t('participants.potLabel', { ns: 'events' })
     : participantsMap.get(transaction.participantId) || t('transactionsList.unknownParticipant');
 
   // Determine icon to display

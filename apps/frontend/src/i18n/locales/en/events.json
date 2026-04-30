@@ -75,6 +75,9 @@
   "update_error": "Error updating event",
   "delete_success": "Event deleted",
   "delete_error": "Error deleting event",
+  "participants": {
+    "potLabel": "The Pot"
+  },
   "createEventCard": {
     "ariaLabel": "Create new event",
     "title": "Create new event",

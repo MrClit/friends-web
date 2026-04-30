@@ -75,6 +75,9 @@
   "update_error": "Error al actualizar evento",
   "delete_success": "Evento eliminado",
   "delete_error": "Error al eliminar evento",
+  "participants": {
+    "potLabel": "El Bote"
+  },
   "createEventCard": {
     "ariaLabel": "Crear nuevo evento",
     "title": "Crear nuevo evento",
