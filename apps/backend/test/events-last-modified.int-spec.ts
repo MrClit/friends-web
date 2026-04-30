@@ -49,7 +49,7 @@ describe('EventsService lastModified (integration)', () => {
       description: 'No tx',
       icon: 'calendar',
       status: EventStatus.ACTIVE,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+      participants: [{ type: 'user', id: actor.id }, { type: 'guest', id: 'g1', name: 'Guest 1' }],
     });
 
     const event = await eventsService.findOne(savedEvent.id, actor);
@@ -64,7 +64,7 @@ describe('EventsService lastModified (integration)', () => {
       description: 'Has tx',
       icon: 'wallet',
       status: EventStatus.ACTIVE,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest 1' }],
+      participants: [{ type: 'user', id: actor.id }, { type: 'guest', id: 'g1', name: 'Guest 1' }],
     });
 
     const savedTx = await createTransaction(transactionRepository, {

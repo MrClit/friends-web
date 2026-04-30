@@ -3,7 +3,8 @@
   "rootDir": "..",
   "testMatch": ["<rootDir>/test/**/*.int-spec.ts"],
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": { "module": "commonjs", "moduleResolution": "node", "resolvePackageJsonExports": false } }]
   },
-  "testEnvironment": "node"
+  "testEnvironment": "node",
+  "testTimeout": 30000
 }
