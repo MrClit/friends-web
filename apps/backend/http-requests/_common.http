@@ -7,4 +7,6 @@
 ###############################################
 # Health Check (común a toda la API)
 ###############################################
+@baseUrl = http://localhost:3000/api
+
 GET {{baseUrl}}/health

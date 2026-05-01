@@ -30,14 +30,13 @@ import { RequestContextService } from './common/request-context/request-context.
         return {
           pinoHttp: {
             level,
-            genReqId: (req) =>
-              (req.headers['x-correlation-id'] as string) ?? randomUUID(),
+            genReqId: (req) => (req.headers['x-correlation-id'] as string) ?? randomUUID(),
             serializers: {
               req: (req: { method: string; url: string }) => ({ method: req.method, url: req.url }),
               res: (res: { statusCode: number }) => ({ statusCode: res.statusCode }),
             },
             autoLogging: {
-              ignore: (req) => req.url === '/api/health',
+              ignore: (req) => (req.url ?? '').startsWith('/api/health'),
             },
             transport: isProduction
               ? undefined
@@ -68,11 +67,7 @@ import { RequestContextService } from './common/request-context/request-context.
     AdminModule,
   ],
   controllers: [AppController, HealthController],
-  providers: [
-    AppService,
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
-    RequestContextService,
-  ],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }, RequestContextService],
   exports: [RequestContextService],
 })
 export class AppModule implements NestModule {
