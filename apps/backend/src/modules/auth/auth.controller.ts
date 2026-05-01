@@ -7,11 +7,10 @@ import { Throttle } from '@nestjs/throttler';
 import { IsOptional, IsString } from 'class-validator';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
 import { AuthService } from './auth.service';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { CurrentUserProfileDto } from '../users/dto/current-user-profile.dto';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
-import express from 'express';
 
 class RefreshTokenDto {
   @IsString()
@@ -37,7 +36,7 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: Request & { user: User }, @Res() res: express.Response) {
+  async googleAuthRedirect(@Req() req: Request & { user: User }, @Res() res: Response) {
     return this.redirectToFrontendWithToken(req.user, res);
   }
 
@@ -49,14 +48,14 @@ export class AuthController {
 
   @Get('microsoft/callback')
   @UseGuards(AuthGuard('microsoft'))
-  async microsoftAuthRedirect(@Req() req: Request & { user: User }, @Res() res: express.Response) {
+  async microsoftAuthRedirect(@Req() req: Request & { user: User }, @Res() res: Response) {
     return this.redirectToFrontendWithToken(req.user, res);
   }
 
   @Post('refresh')
   @ApiOperation({ summary: 'Rotate refresh token and get new access token' })
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token', type: ApiErrorResponseDto })
-  async refresh(@Body() body: RefreshTokenDto, @Res() res: express.Response) {
+  async refresh(@Body() body: RefreshTokenDto, @Res() res: Response) {
     const rawToken = body.refreshToken;
     if (!rawToken) {
       throw new UnauthorizedException();
@@ -76,7 +75,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Revoke refresh token and log out' })
   @ApiResponse({ status: 401, description: 'Unauthorized', type: ApiErrorResponseDto })
-  async logout(@Body() body: RefreshTokenDto, @Res() res: express.Response) {
+  async logout(@Body() body: RefreshTokenDto, @Res() res: Response) {
     if (body.refreshToken) {
       await this.authService.revokeRefreshToken(body.refreshToken);
     }
@@ -93,7 +92,7 @@ export class AuthController {
     return this.usersService.toCurrentUserProfile(req.user);
   }
 
-  private async redirectToFrontendWithToken(user: User, res: express.Response) {
+  private async redirectToFrontendWithToken(user: User, res: Response) {
     const { refreshToken } = await this.authService.generateAuthTokens(user);
     const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:5173/friends-web/#');
     const redirectUrl = `${frontendUrl}/auth/callback?success=true&refreshToken=${encodeURIComponent(refreshToken)}`;
