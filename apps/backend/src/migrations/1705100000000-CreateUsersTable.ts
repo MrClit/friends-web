@@ -25,7 +25,7 @@ export class CreateUsersTable1705100000000 implements MigrationInterface {
     // Example: Pre-populate with an admin user (replace with real email)
     await queryRunner.query(`
       INSERT INTO "users" (email, name, avatar, role)
-      VALUES ('victor.sales83@gmail.com', 'Admin User', NULL, 'admin');
+      VALUES ('victor.sales83@gmail.com', 'Admin User', NULL, 'admin')
       ON CONFLICT (email) DO NOTHING;
     `);
   }
