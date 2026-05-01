@@ -1003,6 +1003,7 @@ async function fetchEvent(id: string) {
 ### Related Documentation
 
 - [Frontend Integration](../frontend/README.md) - How the frontend consumes this API
+- [Deployment Guide](../../DEPLOYMENT.md) - Canonical production deployment and rollback runbook
 - [API Integration Guide](../../docs/FRONTEND_API_INTEGRATION.md) - TanStack Query setup
 
 ---

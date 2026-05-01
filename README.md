@@ -182,11 +182,11 @@ friends-web/
 
 ## 🔄 CI/CD
 
-| Workflow              | Trigger              | Description                                              |
-| --------------------- | -------------------- | -------------------------------------------------------- |
-| **deploy.yml**        | Push to `main`       | Lints, tests, builds frontend, deploys to GitHub Pages   |
-| **release-to-prod.yml** | Manual (`workflow_dispatch`) | Merges `develop` → `main` to trigger a production release |
-| **backend-tests.yml** | Manual (`workflow_dispatch`) | Runs backend test suite against a PostgreSQL service container |
+| Workflow                | Trigger                      | Description                                                    |
+| ----------------------- | ---------------------------- | -------------------------------------------------------------- |
+| **deploy.yml**          | Push to `main`               | Lints, tests, builds frontend, deploys to GitHub Pages         |
+| **release-to-prod.yml** | Manual (`workflow_dispatch`) | Merges `develop` → `main` to trigger a production release      |
+| **backend-tests.yml**   | Manual (`workflow_dispatch`) | Runs backend test suite against a PostgreSQL service container |
 
 ---
 
@@ -197,6 +197,10 @@ Workspace-level READMEs:
 - **[Frontend README](apps/frontend/README.md)** — React 19 + TanStack Query, architecture, state management, env vars, testing
 - **[Backend README](apps/backend/README.md)** — NestJS + PostgreSQL, API endpoints, migrations, env vars, testing
 - **[Shared Types README](packages/shared-types/README.md)** — shared TS types used across workspaces
+
+Operational documentation:
+
+- **[Deployment Guide](DEPLOYMENT.md)** — Canonical production deployment and rollback runbook
 
 Implementation specs, architecture decisions, and feature plans live in **[docs/](docs/)**.
 
