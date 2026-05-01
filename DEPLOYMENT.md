@@ -18,6 +18,7 @@ This document is the single source of truth for production deployment and operat
 - Frontend deployment workflow: `.github/workflows/deploy.yml`
 - Backend production start and migrations: `apps/backend/package.json`
 - Backend env validation schema: `apps/backend/src/config/env.validation.ts`
+- Security policy and secret lifecycle: `.github/SECURITY.md`
 - Backend health endpoints: `apps/backend/src/common/health.controller.ts`
 
 ## 3. Release Flow (Develop -> Main)
@@ -146,6 +147,8 @@ CLOUDINARY_AVATAR_FOLDER=friends/prod/avatars
 ```
 
 ## 7. Secret Injection Ownership
+
+Follow `.github/SECURITY.md` as the canonical policy for generation, rotation cadence, and incident response.
 
 - Render environment panel:
   - Backend runtime secrets (database credentials, JWT, OAuth secrets, Cloudinary)

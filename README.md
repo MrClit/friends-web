@@ -201,6 +201,7 @@ Workspace-level READMEs:
 Operational documentation:
 
 - **[Deployment Guide](DEPLOYMENT.md)** — Canonical production deployment and rollback runbook
+- **[Security Policy](.github/SECURITY.md)** — Secret handling, rotation policy, and incident playbook
 
 Implementation specs, architecture decisions, and feature plans live in **[docs/](docs/)**.
 

@@ -38,46 +38,46 @@ Backend RESTful API built with NestJS, TypeScript, PostgreSQL and TypeORM. Provi
 
 ## 🚀 Quick Start
 
-### 1️⃣ Variables de entorno
+### 1️⃣ Environment Variables
 
 ```bash
 cp .env.example .env.development
 # Edit .env.development — fill in OAuth credentials (Google, Microsoft), JWT secret, Cloudinary keys
 ```
 
-### 2️⃣ Inicia la Base de Datos
+### 2️⃣ Start the Database
 
 ```bash
 docker compose up -d
 ```
 
-> **Nota:** Usa `docker compose` (sin guión) si tienes Docker Desktop. Si no funciona, prueba `docker-compose` para instalaciones antiguas.
+> **Note:** Use `docker compose` (no hyphen) if you have Docker Desktop. If it doesn't work, try `docker-compose` for older installations.
 
-Esto iniciará PostgreSQL en un contenedor Docker. La base de datos estará disponible en `localhost:5432`.
+This will start PostgreSQL in a Docker container. The database will be available at `localhost:5432`.
 
-### 3️⃣ Ejecuta las migraciones
+### 3️⃣ Run Migrations
 
 ```bash
 pnpm migration:run
 ```
 
-### 5️⃣ Inicia el Servidor Backend
+### 4️⃣ Start the Backend Server
 
-**Desde la raíz del monorepo:**
+**From the monorepo root:**
 
 ```bash
 pnpm --filter @friends/backend start:dev
 ```
 
-**Desde este directorio (`apps/backend/`):**
+**From this directory (`apps/backend/`):**
 
 ```bash
 pnpm start:dev
 ```
 
-### 6️⃣ Verifica que Funciona
+### 5️⃣ Verify It Works
 
-El servidor debería iniciarse en el puerto **3000** y verás:
+The server should start on port **3000** and you'll see:
 
 ```
 🚀 Application is running on: http://localhost:3000/api
@@ -85,32 +85,32 @@ El servidor debería iniciarse en el puerto **3000** y verás:
 🌐 CORS enabled for: http://localhost:5173
 ```
 
-**Prueba el endpoint por defecto:**
+**Test the default endpoint:**
 
 ```bash
 curl http://localhost:3000/api
 ```
 
-**Accede a la documentación Swagger:**
+**Access Swagger Documentation:**
 
-Abre en tu navegador: **http://localhost:3000/api/docs**
+Open in your browser: **http://localhost:3000/api/docs**
 
-Swagger UI te permite:
+Swagger UI lets you:
 
-- 📖 Ver todos los endpoints documentados
-- 🧪 Probar endpoints interactivamente
-- 📋 Ver schemas de DTOs y validaciones
-- 📝 Generar código cliente automáticamente
+- 📖 View all documented endpoints
+- 🧪 Test endpoints interactively
+- 📋 View DTO schemas and validations
+- 📝 Auto-generate client code
 
 ---
 
-## 🛑 Detener Todo
+## 🛑 Stop Everything
 
 ```bash
-# Detener el servidor backend
-# Presiona Ctrl+C en la terminal donde se está ejecutando
+# Stop the backend server
+# Press Ctrl+C in the terminal where it's running
 
-# Detener la base de datos
+# Stop the database
 docker compose down
 ```
 
@@ -120,32 +120,32 @@ docker compose down
 
 ### Environment Variables
 
-Este proyecto utiliza diferentes archivos `.env` según el ambiente.
+This project uses different `.env` files depending on the environment.
 
-### 📁 Archivos de Entorno
+### 📁 Environment Files
 
 ```
-.env.development    # Variables de desarrollo (local)
-.env.test           # Variables para tests automatizados (local)
-.env.production     # Variables de producción (servidor)
-.env.example        # Plantilla con todas las variables
-.env.test.example   # Plantilla para entorno de tests
+.env.development    # Development variables (local)
+.env.test           # Automated test variables (local)
+.env.production     # Production variables (server)
+.env.example        # Template with all variables
+.env.test.example   # Template for test environment
 ```
 
-### Cómo Funciona
+### How It Works
 
-El archivo cargado se determina automáticamente por la variable `NODE_ENV`:
+The loaded file is determined automatically by the `NODE_ENV` variable:
 
 ```typescript
-// En app.module.ts
+// In app.module.ts
 envFilePath: `.env.${process.env.NODE_ENV || 'development'}`;
 ```
 
-- Si `NODE_ENV=development` → carga `.env.development`
-- Si `NODE_ENV=production` → carga `.env.production`
-- Por defecto (sin NODE_ENV) → carga `.env.development`
+- If `NODE_ENV=development` → loads `.env.development`
+- If `NODE_ENV=production` → loads `.env.production`
+- By default (no NODE_ENV) → loads `.env.development`
 
-### Variables Disponibles
+### Available Variables
 
 ```bash
 # Server
@@ -192,69 +192,73 @@ CLOUDINARY_API_SECRET=replace-with-cloudinary-api-secret
 FRONTEND_URL=http://localhost:5173/friends-web/#
 ```
 
-### Configuración Inicial
+### Initial Configuration
 
 ```bash
-# Copia el archivo de ejemplo
+# Copy the example file
 cp .env.example .env.development
 
-# Edita .env.development si necesitas credenciales diferentes
+# Edit .env.development if you need different credentials
 ```
 
-### 🔒 Seguridad
+### 🔒 Security
 
-**⚠️ NUNCA subir a Git:**
+**⚠️ NEVER commit to Git:**
 
-- ❌ `.env.development` (contraseñas locales)
-- ❌ `.env.production` (contraseñas de producción)
-- ❌ `.env` (archivo genérico)
+- ❌ `.env.development` (local passwords)
+- ❌ `.env.production` (production passwords)
+- ❌ `.env` (generic file)
 
-**✅ Subir a Git:**
+**✅ OK to commit to Git:**
 
-- ✅ `.env.example` (plantilla sin valores sensibles)
+- ✅ `.env.example` (template without sensitive values)
 
-### Ambientes de Ejecución
+**📋 Secret Policy:**
 
-**Desarrollo Local:**
+- Review [Security Policy](../../.github/SECURITY.md) for secret generation, rotation, and incident handling
+
+### Runtime Environments
+
+**Local Development:**
 
 ```bash
-# Automáticamente usa .env.development
+# Automatically uses .env.development
 pnpm start:dev
 
-# O explícitamente
+# Or explicitly
 NODE_ENV=development pnpm start:dev
 ```
 
-**Producción:**
+**Production:**
 
 ```bash
-# Build con variables de producción
+# Build with production variables
 NODE_ENV=production pnpm build
 
-# Start con variables de producción
+# Start with production variables
 NODE_ENV=production pnpm start:prod
 ```
 
 **Testing:**
 
 ```bash
-# Automáticamente usa .env.test (si existe)
+# Automatically uses .env.test (if it exists)
 pnpm test
 ```
 
-### 📌 Notas Importantes
+### 📌 Important Notes
 
 1. **Development:**
-   - `TYPEORM_SYNC=false` → Usa migrations para gestión de schema
-   - Logging SQL activado para debugging
+   - `TYPEORM_SYNC=false` → Use migrations for schema management
+   - SQL logging enabled for debugging
 
 2. **Production:**
-   - `TYPEORM_SYNC=false` → Siempre usar migrations
-   - Logging desactivado para performance
-   - CORS configurado solo para dominios específicos
+   - `TYPEORM_SYNC=false` → Always use migrations
+   - Logging disabled for performance
+   - CORS configured for specific domains only
 
-3. **Prioridad de carga:**
-   - Variables de sistema > Variables en archivo .env
+3. **Load priority:**
+   - System variables > .env file variables
 
 ---
 
@@ -291,24 +295,24 @@ pnpm clean          # Limpiar directorio dist
 
 ## 🗃️ Migrations by Environment
 
-Usamos comandos explícitos por entorno para evitar confusiones entre código fuente TypeScript (`src`) y build de producción (`dist`).
+We use explicit commands per environment to avoid confusion between TypeScript source code (`src`) and production build (`dist`).
 
 ```bash
 # Local (TypeScript datasource)
 pnpm migration:run:local
 pnpm migration:revert:local
 
-# Producción (Render, después de build)
+# Production (Render, after build)
 pnpm migration:run:prod
 
-# Start de producción con migraciones automáticas
+# Production start with automatic migrations
 pnpm start:prod:migrate
 ```
 
-Notas:
+Notes:
 
-- `migration:run` y `migration:revert` siguen disponibles como alias de compatibilidad hacia `:local`.
-- En producción mantener `TYPEORM_SYNC=false` y aplicar cambios de esquema solo con migraciones versionadas.
+- `migration:run` and `migration:revert` remain available as compatibility aliases to `:local`.
+- In production keep `TYPEORM_SYNC=false` and apply schema changes only through versioned migrations.
 
 ---
 
@@ -390,7 +394,8 @@ La documentación Swagger proporciona:
 
 ```
 GET    /api               # API status
-GET    /api/health        # Database health check
+GET    /api/health/live   # Liveness check
+GET    /api/health/ready  # Readiness check
 ```
 
 ### Auth
@@ -418,7 +423,7 @@ PATCH  /api/users/me      # Update current user profile (name, avatar)
 
 ```
 GET    /api/events           # List events (query: ?status=active|archived)
-POST   /api/events           # Create event
+POST   /api/events           # Createte event
 GET    /api/events/:id       # Get event by ID
 PATCH  /api/events/:id       # Update event
 DELETE /api/events/:id       # Delete event (cascade deletes transactions)
@@ -430,7 +435,7 @@ GET    /api/events/:id/kpis  # Get KPI calculations for an event
 ```
 GET    /api/events/:eventId/transactions            # List transactions for an event
 GET    /api/events/:eventId/transactions/paginated  # Date-paginated transactions
-POST   /api/events/:eventId/transactions            # Create transaction
+POST   /api/events/:eventId/transactions            # Createte transaction
 PATCH  /api/transactions/:id                        # Update transaction
 DELETE /api/transactions/:id                        # Delete transaction
 ```
@@ -439,7 +444,7 @@ DELETE /api/transactions/:id                        # Delete transaction
 
 ```
 GET    /api/admin/users       # List all users
-POST   /api/admin/users       # Create user
+POST   /api/admin/users       # Createte user
 PATCH  /api/admin/users/:id   # Update user (role, status)
 DELETE /api/admin/users/:id   # Soft-delete user
 ```
@@ -453,7 +458,7 @@ GET /api/events/:eventId/transactions/paginated?numberOfDates=3&offset=0
 **Query Parameters:**
 
 - `numberOfDates` (opcional): Número de fechas únicas a retornar (default: 3, min: 1, max: 50)
-- `offset` (opcional): Offset para paginación (default: 0, min: 0)
+- `offset` (opcional): Offset para pagination (default: 0, min: 0)
 
 **Respuesta:**
 
@@ -472,19 +477,19 @@ GET /api/events/:eventId/transactions/paginated?numberOfDates=3&offset=0
 
 ---
 
-## 📤 Formato de Respuestas
+## 📤 Response Format
 
-### Envoltura Estándar para Respuestas Exitosas
+### Standard Wrapper for Successful Responses
 
-Todas las respuestas exitosas (200, 201) están envueltas en un formato estándar:
+All successful responses (200, 201) are wrapped in a standard format:
 
 ```json
 {
-  "data": <contenido de la respuesta>
+  "data": <response content>
 }
 ```
 
-**Ejemplos:**
+**Examples:**
 
 ```json
 // GET /api/events/:id (Single entity)
@@ -504,7 +509,7 @@ Todas las respuestas exitosas (200, 201) están envueltas en un formato estánda
   ]
 }
 
-// POST /api/events (Created entity)
+// POST /api/events (Createted entity)
 {
   "data": {
     "id": "uuid",
@@ -514,17 +519,17 @@ Todas las respuestas exitosas (200, 201) están envueltas en un formato estánda
 }
 ```
 
-### Excepciones
+### Exceptions
 
 **DELETE operations (204 No Content):**
 
-- No retornan cuerpo de respuesta
+- No response body returned
 - HTTP Status: 204
 
-**Errores:**
+**Errors:**
 
-- NO usan la envoltura `{ data }`
-- Formato estandarizado con `HttpExceptionFilter`:
+- Do NOT use `{ data }` wrapper
+- Standardized format with `HttpExceptionFilter`:
 
 ```json
 {
@@ -536,11 +541,11 @@ Todas las respuestas exitosas (200, 201) están envueltas en un formato estánda
 }
 ```
 
-### Implementación
+### Implementation
 
-- **Interceptor**: `TransformInterceptor` (activado globalmente)
-- **Swagger**: Respuestas documentadas con `@ApiStandardResponse`
-- **Cliente**: Siempre accede a `.data` para obtener el contenido
+- **Interceptor**: `TransformInterceptor` (activated globally)
+- **Swagger**: Responses documented with `@ApiStandardResponse`
+- **Client**: Always access `.data` to get the content
 
 ---
 
@@ -576,7 +581,7 @@ CREATE TABLE transactions (
   title VARCHAR(255) NOT NULL,
   payment_type payment_type_enum NOT NULL,  -- 'contribution' | 'expense' | 'compensation'
   amount DECIMAL(10, 2) NOT NULL,
-  participant_id VARCHAR(50) NOT NULL,      -- '0' para POT o ID de participante
+  participant_id VARCHAR(50) NOT NULL,      -- '0' for POT or participant ID
   date DATE NOT NULL,
   event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
   created_at TIMESTAMP DEFAULT NOW()
@@ -585,19 +590,19 @@ CREATE TABLE transactions (
 CREATE TYPE payment_type_enum AS ENUM ('contribution', 'expense', 'compensation');
 ```
 
-**Participant ID Especial:**
+**Special Participant ID:**
 
-- `'0'`: Representa el "bote común" (POT) para gastos compartidos
+- `'0'`: Represents the "common pot" (POT) for shared expenses
 
 ---
 
-## ⚠️ Dependencias de Base de Datos
+## ⚠️ Database Dependencies
 
 ### PostgreSQL Window Functions
 
-El endpoint de **paginación de transacciones** (`GET /api/events/:eventId/transactions/paginated`) utiliza **window functions de PostgreSQL** (específicamente `DENSE_RANK()`) para optimizar el rendimiento al paginar por fechas únicas.
+The **transaction pagination** endpoint (`GET /api/events/:eventId/transactions/paginated`) uses **PostgreSQL window functions** (specifically `DENSE_RANK()`) to optimize performance when paginating by unique dates.
 
-**Query optimizada:**
+**Optimized query:**
 
 ```sql
 WITH RankedTransactions AS (
@@ -612,32 +617,32 @@ WHERE date_rank > :offset AND date_rank <= :offset + :numberOfDates
 ORDER BY date DESC, createdAt DESC;
 ```
 
-**Consideraciones:**
+**Considerations:**
 
-- ✅ **Window functions** son parte del estándar SQL:2003
-- ✅ Soportadas por: **PostgreSQL 8.4+**, MySQL 8.0+, SQL Server 2005+, Oracle 8i+, SQLite 3.25+
-- ⚠️ **Elementos específicos de PostgreSQL:**
-  - Comillas dobles para columnas case-sensitive: `t."eventId"`
-  - Si migras a otra BD, ajusta comillas (MySQL usa backticks `` `eventId` ``, SQL Server usa `[eventId]`)
+- ✅ **Window functions** are part of the SQL:2003 standard
+- ✅ Supported by: **PostgreSQL 8.4+**, MySQL 8.0+, SQL Server 2005+, Oracle 8i+, SQLite 3.25+
+- ⚠️ **PostgreSQL-specific elements:**
+  - Double quotes for case-sensitive columns: `t."eventId"`
+  - If migrating to another DB, adjust quotes (MySQL uses backticks `` `eventId` ``, SQL Server uses `[eventId]`)
 
-**Impacto en migración de BD:**
+**Impact on database migration:**
 
-- Si migras a otra BD moderna → Cambio menor (ajustar comillas)
-- Si migras a BD sin window functions → Implementar fallback con 2 queries
-- **Decisión:** Mantenemos optimización porque:
-  - PostgreSQL es nuestro target principal
-  - Beneficio en rendimiento > riesgo de migración
-  - Migración de BD es poco frecuente
+- If migrating to another modern DB → Minor change (adjust quotes)
+- If migrating to DB without window functions → Implement fallback with 2 queries
+- **Decision:** We maintain the optimization because:
+  - PostgreSQL is our primary target
+  - Performance benefit > migration risk
+  - DB migration is infrequent
 
-**Alternativa portable (no implementada):**
+**Portable alternative (not implemented):**
 
 ```typescript
-// Fallback sin window functions (2 queries)
+// Fallback without window functions (2 queries)
 const dates = await getDates(eventId, numberOfDates, offset);
 const transactions = await getTransactionsByDates(eventId, dates);
 ```
 
-> 💡 **Tip:** Si en el futuro necesitas máxima portabilidad, refactoriza a TypeORM QueryBuilder o implementa fallback condicional por tipo de BD.
+> 💡 **Tip:** If you need maximum portability in the future, refactor to TypeORM QueryBuilder or implement conditional fallback by DB type.
 
 ---
 
@@ -656,7 +661,7 @@ pnpm test:run
 # Watch mode
 pnpm test:watch
 
-# E2E smoke tests (JWT real + DB real)
+# E2E smoke tests (real JWT + real DB)
 pnpm test:e2e
 
 # Coverage report
@@ -669,80 +674,80 @@ pnpm check:backend
 pnpm test:debug
 ```
 
-Preparación recomendada para e2e:
+Recommended preparation for e2e:
 
 ```bash
-# 1) Crea tu archivo de entorno de tests
+# 1) Createte your test environment file
 cp .env.test.example .env.test
 
-# 2) Crea la base de datos de tests (una vez)
+# 2) Createte the test database (once)
 docker exec -it friends-postgres createdb -U postgres friends_db_test
 ```
 
-> Si la base ya existe, el comando `createdb` puede devolver error y se puede ignorar.
+> If the database already exists, the `createdb` command may return an error and can be ignored.
 
 ---
 
-## 🔧 Comandos Útiles
+## 🔧 Useful Commands
 
-### Base de Datos
+### Database
 
 ```bash
-# Ver logs de la base de datos
+# View database logs
 docker compose logs -f
 
-# Conectarse a PostgreSQL
+# Connect to PostgreSQL
 docker exec -it friends-postgres psql -U postgres -d friends_db
 
-# Reiniciar la base de datos (inicio limpio)
+# Restart the database (clean start)
 docker compose down -v && docker compose up -d
 
-# Detener y remover volúmenes
+# Stop and remove volumes
 docker compose down -v
 ```
 
 ### Backend
 
 ```bash
-# Verificar estado del servidor
+# Check server status
 curl http://localhost:3000/api
 
 # Health check
-curl http://localhost:3000/api/health
+curl http://localhost:3000/api/health/live
 
-# Ver logs (aparecen en la terminal en modo dev)
+# View logs (appear in terminal in dev mode)
 ```
 
 ---
 
-## � HTTP Requests - Testing Interactivo
+## � HTTP Requests - Interactive Testing
 
-Este proyecto incluye una colección de archivos `.http` para probar la API de forma interactiva directamente desde VS Code.
+This project includes a collection of `.http` files to test the API interactively directly from VS Code.
 
-### Requisitos
+### Requirements
 
-**Extensión de VS Code:**
+**VS Code Extension:**
 
-- [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) de Huachao Mao
+- [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) by Huachao Mao
 
 ```bash
-# Instalación rápida desde CLI
+# Quick install from CLI
 code --install-extension humao.rest-client
 ```
 
-### Estructura de Archivos
+### File Structure
 
 ```
 http-requests/
-├── _common.http          # Health check y variables comunes
-├── events.http           # CRUD completo de eventos + casos de error
-├── transactions.http     # CRUD completo de transacciones + paginación
-└── .gitignore           # Ignora variables privadas
+├── _common.http          # Health check and common variables
+├── events.http           # Full event CRUD + error cases
+├── transactions.http     # Full transaction CRUD + pagination
+└── .gitignore           # Ignore private variables
 ```
 
-### Configuración de Variables
+### Variable Configuration
 
-Los archivos `.http` usan variables que se configuran en `.vscode/settings.json`:
+The `.http` files use variables configured in `.vscode/settings.json`:
 
 ```json
 {
@@ -759,146 +764,146 @@ Los archivos `.http` usan variables que se configuran en `.vscode/settings.json`
 }
 ```
 
-> **Nota:** Si no existe `.vscode/settings.json`, créalo en la raíz del monorepo con la configuración anterior.
+> **Note:** If `.vscode/settings.json` doesn't exist, create it in the monorepo root with the above configuration.
 
-### Cómo Usar
+### How to Use
 
-**1. Cambiar de Ambiente:**
+**1. Switch Environment:**
 
-- Abre cualquier archivo `.http`
-- Haz clic en el selector de ambiente en la barra inferior de VS Code
-- O usa: `Cmd+Shift+P` → "REST Client: Switch Environment"
-- Selecciona `development` o `production`
+- Open any `.http` file
+- Click the environment selector in the VS Code bottom bar
+- Or use: `Cmd+Shift+P` → "REST Client: Switch Environment"
+- Select `development` or `production`
 
-**2. Ejecutar Requests:**
+**2. Execute Requests:**
 
-- Abre `http-requests/events.http` o `http-requests/transactions.http`
-- Haz clic en "Send Request" que aparece sobre cada request
-- O usa: `Cmd+Alt+R` (Mac) / `Ctrl+Alt+R` (Windows/Linux)
-- Los resultados aparecen en un panel lateral
+- Open `http-requests/events.http` or `http-requests/transactions.http`
+- Click "Send Request" that appears above each request
+- Or use: `Cmd+Alt+R` (Mac) / `Ctrl+Alt+R` (Windows/Linux)
+- Results appear in a side panel
 
-**3. Variables Dinámicas:**
+**3. Dynamic Variables:**
 
-Los archivos usan variables que se capturan automáticamente:
+Files use variables that are captured automatically:
 
 ```http
-### Crear evento y guardar su ID
+### Createte event and save its ID
 # @name createEvent
 POST {{baseUrl}}/events
 Content-Type: {{contentType}}
 
 {
-  "title": "Mi Evento",
+  "title": "My Event",
   "participants": [...]
 }
 
-### Guardar ID del evento creado
+### Save the created event ID
 @createdEventId = {{createEvent.response.body.id}}
 
-### Usar el ID en requests siguientes
+### Use the ID in following requests
 GET {{baseUrl}}/events/{{createdEventId}}
 ```
 
-### Colecciones Disponibles
+### Available Collections
 
 #### **\_common.http**
 
 ```http
-# Health check de la API
-GET {{baseUrl}}/health
+# API health check
+GET {{baseUrl}}/health/live
 ```
 
 #### **events.http**
 
-- ✅ Listar todos los eventos
-- ✅ Crear evento con participantes
-- ✅ Obtener evento por ID
-- ✅ Actualizar título del evento
-- ✅ Actualizar participantes del evento
-- ✅ Eliminar evento (cascade delete)
-- ❌ Casos de error (validación, 404, UUID inválido)
+- ✅ List all events
+- ✅ Createte event with participants
+- ✅ Get event by ID
+- ✅ Update event title
+- ✅ Update event participants
+- ✅ Delete event (cascade delete)
+- ❌ Error cases (validation, 404, invalid UUID)
 
 #### **transactions.http**
 
-- ✅ Listar transacciones por evento
-- ✅ Crear contribución
-- ✅ Crear gasto de participante
-- ✅ Crear gasto del POT (`participantId: "0"`)
-- ✅ Crear compensación
-- ✅ Obtener transacción por ID
-- ✅ Actualizar transacción
-- ✅ Eliminar transacción
-- ✅ Paginación por fechas únicas
-- ❌ Casos de error (validación, tipos inválidos)
-- 🔄 Workflow completo de ejemplo
+- ✅ List transactions by event
+- ✅ Createte contribution
+- ✅ Createte participant expense
+- ✅ Createte POT expense (`participantId: "0"`)
+- ✅ Createte compensation
+- ✅ Get transaction by ID
+- ✅ Update transaction
+- ✅ Delete transaction
+- ✅ Pagination by unique dates
+- ❌ Error cases (validation, invalid types)
+- 🔄 Complete workflow example
 
-### Ejemplos de Uso
+### Usage Examples
 
-**Workflow típico con Events:**
-
-```bash
-1. Abre: http-requests/events.http
-2. Ejecuta: "CREATE EVENT" (línea ~16)
-3. El ID se guarda automáticamente en @createdEventId
-4. Ejecuta: "GET EVENT BY ID" (usa @createdEventId)
-5. Ejecuta: "UPDATE EVENT" (modifica el evento)
-6. Ejecuta: "DELETE EVENT" (limpia)
-```
-
-**Workflow típico con Transactions:**
+**Typical workflow with Events:**
 
 ```bash
-1. Abre: http-requests/transactions.http
-2. Cambia @eventId con un ID real de tu BD (línea ~9)
-3. Ejecuta: "CREATE TRANSACTION - Contribución"
-4. Ejecuta: "CREATE TRANSACTION - Gasto"
-5. Ejecuta: "LIST TRANSACTIONS BY EVENT"
-6. Ejecuta: "GET PAGINATED TRANSACTIONS" (ver paginación)
+1. Open: http-requests/events.http
+2. Execute: "CREATE EVENT" (line ~16)
+3. ID is automatically saved to @createdEventId
+4. Execute: "GET EVENT BY ID" (uses @createdEventId)
+5. Execute: "UPDATE EVENT" (modify the event)
+6. Execute: "DELETE EVENT" (cleanup)
 ```
 
-**Testing de validaciones:**
+**Typical workflow with Transactions:**
 
 ```bash
-1. Busca la sección "ERROR CASES" en cualquier archivo
-2. Ejecuta requests inválidos para ver cómo responde la API
-3. Verifica códigos de estado: 400, 404, etc.
+1. Open: http-requests/transactions.http
+2. Change @eventId with a real ID from your DB (line ~9)
+3. Execute: "CREATE TRANSACTION - Contribution"
+4. Execute: "CREATE TRANSACTION - Expense"
+5. Execute: "LIST TRANSACTIONS BY EVENT"
+6. Execute: "GET PAGINATED TRANSACTIONS" (see pagination)
 ```
 
-### Ventajas sobre Postman/Thunder Client
+**Testing validations:**
 
-- ✅ **Versionable:** Los archivos `.http` se incluyen en el repo
-- ✅ **Sin configuración extra:** Funciona directamente en VS Code
-- ✅ **Variables dinámicas:** Captura respuestas automáticamente
-- ✅ **Lightweight:** No requiere aplicación externa
-- ✅ **Documentación viva:** Los requests sirven como ejemplos de uso
+```bash
+1. Find the "ERROR CASES" section in any file
+2. Execute invalid requests to see how the API responds
+3. Check status codes: 400, 404, etc.
+```
+
+### Advantages over Postman/Thunder Client
+
+- ✅ **Versionable:** `.http` files are included in the repo
+- ✅ **No extra config:** Works directly in VS Code
+- ✅ **Dynamic variables:** Captures responses automatically
+- ✅ **Lightweight:** No external application needed
+- ✅ **Living documentation:** Requests serve as usage examples
 
 ### Tips
 
-- **Atajos de teclado:**
-  - `Cmd+Alt+R` / `Ctrl+Alt+R`: Ejecutar request
-  - `Cmd+Alt+C` / `Ctrl+Alt+C`: Cancelar request
-  - `Cmd+Alt+H` / `Ctrl+Alt+H`: Ver historial
+- **Keyboard shortcuts:**
+  - `Cmd+Alt+R` / `Ctrl+Alt+R`: Execute request
+  - `Cmd+Alt+C` / `Ctrl+Alt+C`: Cancel request
+  - `Cmd+Alt+H` / `Ctrl+Alt+H`: View history
 
-- **Variables de entorno privadas:**
-  - Crea `http-client.private.env.json` para tokens/secrets
-  - Este archivo está en `.gitignore` automáticamente
+- **Private environment variables:**
+  - Createte `http-client.private.env.json` for tokens/secrets
+  - This file is in `.gitignore` automatically
 
-- **Múltiples requests:**
-  - Selecciona varios requests con `Shift+Click` sobre "Send Request"
-  - O usa `Cmd+Alt+K` / `Ctrl+Alt+K` para ejecutar todos
+- **Multiple requests:**
+  - Select multiple requests with `Shift+Click` on "Send Request"
+  - Or use `Cmd+Alt+K` / `Ctrl+Alt+K` to execute all
 
 ---
 
-## 🔗 Integración con Frontend
+## 🔗 Frontend Integration
 
-El backend se integra con [@friends/frontend](../frontend/) vía REST API.
+The backend integrates with [@friends/frontend](../frontend/) via REST API.
 
-### Formato de Respuestas
+### Response Format
 
-**Todas las respuestas exitosas están envueltas en `{ data: T }`:**
+**All successful responses are wrapped in `{ data: T }`:**
 
 ```typescript
-// Ejemplo de cliente API en el frontend
+// Example API client in frontend
 const API_BASE = 'http://localhost:3000/api';
 
 export const api = {
@@ -906,47 +911,47 @@ export const api = {
     getAll: () =>
       fetch(`${API_BASE}/events`)
         .then((r) => r.json())
-        .then((response) => response.data), // ⚠️ Accede a .data
+        .then((response) => response.data), // ⚠️ Access .data
 
     getById: (id: string) =>
       fetch(`${API_BASE}/events/${id}`)
         .then((r) => r.json())
-        .then((response) => response.data), // ⚠️ Accede a .data
+        .then((response) => response.data), // ⚠️ Access .data
 
-    create: (data: CreateEventDto) =>
+    create: (data: CreateteEventDto) =>
       fetch(`${API_BASE}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
         .then((r) => r.json())
-        .then((response) => response.data), // ⚠️ Accede a .data
+        .then((response) => response.data), // ⚠️ Access .data
   },
 
   transactions: {
     getByEvent: (eventId: string) =>
       fetch(`${API_BASE}/events/${eventId}/transactions`)
         .then((r) => r.json())
-        .then((response) => response.data), // ⚠️ Accede a .data
+        .then((response) => response.data), // ⚠️ Access .data
 
     getPaginated: (eventId: string, numberOfDates = 3, offset = 0) =>
       fetch(`${API_BASE}/events/${eventId}/transactions/paginated?numberOfDates=${numberOfDates}&offset=${offset}`)
         .then((r) => r.json())
-        .then((response) => response.data), // ⚠️ Accede a .data
+        .then((response) => response.data), // ⚠️ Access .data
 
-    create: (eventId: string, data: CreateTransactionDto) =>
+    create: (eventId: string, data: CreateteTransactionDto) =>
       fetch(`${API_BASE}/events/${eventId}/transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
         .then((r) => r.json())
-        .then((response) => response.data), // ⚠️ Accede a .data
+        .then((response) => response.data), // ⚠️ Access .data
   },
 };
 ```
 
-### Manejo de Errores
+### Error Handling
 
 ```typescript
 async function fetchEvent(id: string) {
@@ -955,7 +960,7 @@ async function fetchEvent(id: string) {
 
     if (!response.ok) {
       const error = await response.json();
-      // Estructura de error: { statusCode, timestamp, path, method, message }
+      // Error structure: { statusCode, timestamp, path, method, message }
       throw new Error(error.message);
     }
 
@@ -970,24 +975,24 @@ async function fetchEvent(id: string) {
 
 - ✅ Unit tests
 
-### Módulo Transactions
+### Transactions Module
 
-- ✅ CRUD completo de transacciones
-- ✅ Entity con UUID, title, paymentType (enum), amount, participantId, date
-- ✅ Relación ManyToOne con Events (ON DELETE CASCADE)
-- ✅ DTOs validados (CreateTransactionDto, UpdateTransactionDto, PaginationQueryDto)
-- ✅ Service con lógica de negocio completa
-- ✅ Controller con endpoints anidados bajo events
-- ✅ Paginación por fechas únicas (optimizada con SQL window functions)
-- ✅ Soporte para POT (participant_id = '0')
-- ✅ Swagger documentation completa
+- ✅ Complete transaction CRUD
+- ✅ Entity with UUID, title, paymentType (enum), amount, participantId, date
+- ✅ ManyToOne relationship with Events (ON DELETE CASCADE)
+- ✅ Validated DTOs (CreateteTransactionDto, UpdateTransactionDto, PaginationQueryDto)
+- ✅ Service with complete business logic
+- ✅ Controller with nested endpoints under events
+- ✅ Pagination by unique dates (optimized with SQL window functions)
+- ✅ POT support (participant_id = '0')
+- ✅ Complete Swagger documentation
 - ✅ Unit tests
 
 ### Health & Monitoring
 
-- ✅ Health check endpoint (`/api/health`)
+- ✅ Health check endpoints (`/api/health/live`, `/api/health/ready`)
 - ✅ Database connectivity check
-- ✅ Logging contextual en todos los servicios
+- ✅ Contextual logging in all services
 
 ---
 
@@ -1004,7 +1009,7 @@ async function fetchEvent(id: string) {
 
 - [Frontend Integration](../frontend/README.md) - How the frontend consumes this API
 - [Deployment Guide](../../DEPLOYMENT.md) - Canonical production deployment and rollback runbook
-- [API Integration Guide](../../docs/FRONTEND_API_INTEGRATION.md) - TanStack Query setup
+- [Security Policy](../../.github/SECURITY.md) - Secret management and security guidelines
 
 ---
 
