@@ -51,8 +51,8 @@ Backend has three Jest configs: `test/jest.unit.json`, `test/jest.integration.js
 ### Feature structure
 
 ```
-src/features/{feature}/   components/, types.ts, constants.ts, index.ts
-src/api/                  client.ts + per-entity modules (events.api.ts, etc.)
+src/features/{feature}/   components/, types.ts, constants.ts, index.ts (hooks/ optional)
+src/api/                  client.ts, types.ts + per-entity modules (events.api.ts, transactions.api.ts, users.api.ts, admin-users.api.ts)
 src/hooks/api/            TanStack Query hooks + centralized keys.ts
 src/shared/store/         Zustand stores (theme, modals, toast, delete state)
 src/pages/                Route-level components
@@ -60,7 +60,7 @@ src/i18n/locales/         es/ (default), en/, ca/
 src/config/env.ts         Validated env vars via VITE_ prefix
 ```
 
-Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`
+Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`, `profile`
 
 ### State management layers
 
@@ -87,7 +87,10 @@ Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`
 - `/` — Home (event list, protected)
 - `/event/:id` — Event detail (protected)
 - `/event/:id/kpi/:kpi` — KPI drill-down (protected)
+- `/profile` — User profile (protected)
+- `/settings` → redirects to `/profile` (protected alias)
 - `/admin/users` — Admin user management (protected, ADMIN role)
+- `*` — 404 Not Found
 
 ### i18n
 
@@ -136,8 +139,6 @@ Modules: `auth`, `events`, `transactions`, `users`, `admin`
 **Event:** id, title, description?, icon?, status (`active` | `archived`), participants (JSONB), timestamps
 
 **Transaction:** id, title, paymentType (`contribution` | `expense` | `compensation`), amount (decimal 10,2), participantId, date, eventId (FK), timestamps
-
-## Conventions
 
 ## GitHub Workflow (MCP)
 
