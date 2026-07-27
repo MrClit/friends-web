@@ -51,8 +51,8 @@ Backend has three Jest configs: `test/jest.unit.json`, `test/jest.integration.js
 ### Feature structure
 
 ```
-src/features/{feature}/   components/, types.ts, constants.ts, index.ts
-src/api/                  client.ts + per-entity modules (events.api.ts, etc.)
+src/features/{feature}/   components/, types.ts, constants.ts, index.ts (hooks/ optional)
+src/api/                  client.ts, types.ts + per-entity modules (events.api.ts, transactions.api.ts, users.api.ts, admin-users.api.ts)
 src/hooks/api/            TanStack Query hooks + centralized keys.ts
 src/shared/store/         Zustand stores (theme, modals, toast, delete state)
 src/pages/                Route-level components
@@ -60,7 +60,7 @@ src/i18n/locales/         es/ (default), en/, ca/
 src/config/env.ts         Validated env vars via VITE_ prefix
 ```
 
-Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`
+Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`, `profile`
 
 ### State management layers
 
@@ -87,7 +87,10 @@ Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`
 - `/` — Home (event list, protected)
 - `/event/:id` — Event detail (protected)
 - `/event/:id/kpi/:kpi` — KPI drill-down (protected)
+- `/profile` — User profile (protected)
+- `/settings` → redirects to `/profile` (protected alias)
 - `/admin/users` — Admin user management (protected, ADMIN role)
+- `*` — 404 Not Found
 
 ### i18n
 
@@ -137,21 +140,17 @@ Modules: `auth`, `events`, `transactions`, `users`, `admin`
 
 **Transaction:** id, title, paymentType (`contribution` | `expense` | `compensation`), amount (decimal 10,2), participantId, date, eventId (FK), timestamps
 
-## Conventions
-
-## GitHub Workflow (MCP)
+## GitHub Workflow
 
 Repository: `MrClit/friends-web`
 
-Use the GitHub MCP tools (preferred over `gh` CLI) for all issue and PR interactions:
+Any GitHub operation — issues, project board, branches, commits, PRs, merges, releases — goes
+through the `gh-workflow` skill (and the `release` skill for production releases). Delegate the
+execution to the `gh-ops` agent.
 
-- **Read an issue:** `mcp__github__issue_read` with `owner: "MrClit"`, `repo: "friends-web"`
-- **Update/close an issue:** `mcp__github__issue_write`
-- **Add a comment:** `mcp__github__add_issue_comment`
-
-**Issue lifecycle:**
-1. Move issue to **In Progress** before starting implementation.
-2. When closing: move to **Done** + add a comment summarizing what was done (files changed, approach, key decisions).
+This repo's coordinates — board ids, branch model, labels, validation command, release pre-flight —
+live in [`.claude/gh-project.md`](.claude/gh-project.md). It is the single source of truth; do not
+duplicate any of it here.
 
 ## Conventions
 
