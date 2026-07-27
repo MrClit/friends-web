@@ -96,15 +96,17 @@ la coreografía vía PR; usar el script solo si el usuario lo pide.
 
 ### Pre-vuelo del release
 
-De [`DEPLOYMENT.md`](../DEPLOYMENT.md) §8. Lo que depende de un panel externo lo verifica **el usuario**:
-
 - [ ] `pnpm lint && pnpm test && pnpm build` en verde en local sobre `develop`
-- [ ] `main` contendrá los ficheros de migración necesarios
-- [ ] Las migraciones nuevas compilan y no se han editado tras aplicarse en un entorno persistente
-- [ ] **Migraciones de base de datos aplicadas ANTES del merge a `main`**, no después
-- [ ] *(usuario)* Env vars de Render revisadas: DB, callbacks de OAuth, CORS, `FRONTEND_URL`
-- [ ] *(usuario)* Backup de base de datos si el release es arriesgado:
-      `pg_dump "$DATABASE_URL" -Fc -f backup_pre_release.dump`
+- [ ] Los checks de infraestructura de [`DEPLOYMENT.md`](../DEPLOYMENT.md) §8 — **es la lista
+      canónica, no la copies aquí**: migraciones, build del backend, env vars de Render, backup.
+- [ ] *(usuario)* Lo que dependa de un panel externo (Render, Neon, consolas de OAuth) lo verifica
+      **el usuario**, no el agente.
+
+> **Excepción a la regla genérica de la skill `release`.** La skill dice que las migraciones van
+> aplicadas antes del merge. Aquí **no se puede**: corren en el arranque del backend
+> (`start:prod:migrate` = `migration:run:prod && node dist/main`), o sea después de que el push a
+> `main` dispare el redeploy de Render. Lo que aplica aquí es **verificar** que la migración es
+> correcta y reversible antes de mergear; una que falle deja la API caída.
 
 Post-deploy: checklist de validación en `DEPLOYMENT.md` §9. Rollback: §10.
 

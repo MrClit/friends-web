@@ -2,7 +2,8 @@
 
 Canonical deployment runbook for the Friends monorepo.
 
-This document is the single source of truth for production deployment and operations.
+This document is the single source of truth for **infrastructure and production operations**. The
+release *sequence* is not owned here — see §3.
 
 ## 1. Production Topology
 
@@ -13,8 +14,8 @@ This document is the single source of truth for production deployment and operat
 
 ## 2. Canonical Sources in This Repository
 
-- Release command: `pnpm release:prod` in root `package.json`
-- Release automation script: `scripts/release-to-prod.mjs`
+- Release coordinates (branches, board, pre-flight): `.claude/gh-project.md`
+- Emergency release shortcut: `pnpm release:prod` / `scripts/release-to-prod.mjs` (see §3)
 - Frontend deployment workflow: `.github/workflows/deploy.yml`
 - Backend production start and migrations: `apps/backend/package.json`
 - Backend env validation schema: `apps/backend/src/config/env.validation.ts`
@@ -23,27 +24,31 @@ This document is the single source of truth for production deployment and operat
 
 ## 3. Release Flow (Develop -> Main)
 
-### Option A: Local command (recommended)
+The canonical procedure lives in the `release` skill, which reads this repo's coordinates from
+[`.claude/gh-project.md`](.claude/gh-project.md). Follow that flow, not an ad-hoc merge.
 
-Run from monorepo root:
+In summary:
+
+1. Bump the root `package.json` and add the `CHANGELOG.md` entry on a `release/vX.Y.Z` branch
+2. Run the project validations, then open a PR into `develop` and **squash** merge it
+3. Open a PR `develop` -> `main` and merge it with a **merge commit** (preserves history)
+4. Annotated tag `vX.Y.Z` on `main`, plus a GitHub Release
+
+Versioning is SemVer over the root `package.json`; the packages under `apps/` and `packages/` stay
+at `0.0.0`.
+
+### Emergency shortcut: `pnpm release:prod`
 
 ```bash
 pnpm release:prod
 ```
 
-What it does:
+Merges `develop` into `main` locally and pushes it. **It skips versioning entirely** — no version
+bump, no `CHANGELOG.md` entry, no tag, no GitHub Release — and it writes straight to the production
+branch with no PR.
 
-1. Validates clean git working tree
-2. Fetches origin
-3. Checks out `main`
-4. Pulls latest `main`
-5. Merges `develop` into `main`
-6. Pushes `main` to origin
-7. Returns to the original branch
-
-### Option B: GitHub Actions manual workflow
-
-Run workflow `Release to Production` from GitHub Actions UI.
+Use it only when the normal flow is unavailable, and reconcile the version afterwards. Otherwise the
+tags stop matching what is deployed, silently.
 
 ## 4. Frontend Deployment (GitHub Pages)
 
@@ -161,11 +166,18 @@ Follow `.github/SECURITY.md` as the canonical policy for generation, rotation ca
 
 ## 8. Pre-Deploy Checklist
 
+Infrastructure checks. The release flow reads its pre-flight from
+[`.claude/gh-project.md`](.claude/gh-project.md), which points here — keep the list in one place.
+
 - `main` contains required migration files
 - Backend build is green
-- New migrations compile and are not edited after being applied in persistent environments
+- New migrations compile, are reversible, and are not edited after being applied in persistent environments
 - Render env vars reviewed (DB, OAuth callback URLs, CORS, frontend redirect URL)
 - Database backup generated before risky releases
+
+> Migrations run **on backend startup** (`start:prod:migrate`), which happens after `main` is pushed
+> and Render redeploys — there is no pre-merge migration step. A migration that fails takes the API
+> down with it, so it has to be verified *before* merging, not applied earlier.
 
 Recommended backup command:
 
@@ -238,6 +250,10 @@ Resolve conflicts in `develop`, then retry release.
 
 ## 12. Documentation Policy
 
-- This file is canonical for deployment operations.
+- This file is canonical for **infrastructure and production operations**: topology, environment
+  variables, Render and Pages configuration, rollback and smoke checks. If those instructions
+  conflict with any other document, this file takes precedence.
+- The **release sequence** is not owned here. It belongs to the `release` skill, with this repo's
+  coordinates in `.claude/gh-project.md`. If the two disagree about *how a release is cut*, the
+  skill wins; if they disagree about *how production is configured*, this file wins.
 - Files under `docs/` may contain planning notes or historical snapshots.
-- If deployment instructions conflict, this file takes precedence.
