@@ -165,7 +165,7 @@ friends-web/
 │   └── shared-types/       # @friends/shared-types — shared TS types
 │       ├── src/
 │       └── package.json
-├── docs/                   # Implementation specs and architecture docs
+├── docs/                   # Pending designs and valid runbooks only (no shipped-work plans)
 ├── scripts/
 │   └── release-to-prod.mjs # Production release script
 ├── .github/
@@ -203,7 +203,10 @@ Operational documentation:
 - **[Deployment Guide](DEPLOYMENT.md)** — Canonical production deployment and rollback runbook
 - **[Security Policy](.github/SECURITY.md)** — Secret handling, rotation policy, and incident playbook
 
-Implementation specs, architecture decisions, and feature plans live in **[docs/](docs/)**.
+**[docs/](docs/)** holds only living documents: designs still pending execution and runbooks still
+valid. Plans for work already shipped are deleted — the code is the truth and the issue plus its PR
+are the record. Architecture and conventions live in [CLAUDE.md](CLAUDE.md); the API contract is the
+Swagger UI at `/api/docs`.
 
 ---
 

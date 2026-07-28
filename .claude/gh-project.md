@@ -86,9 +86,10 @@ Nunca `--no-verify`.
 Versionado en el **`package.json` raíz** únicamente (una sola versión para todo el producto). Los
 manifiestos de `apps/*` y `packages/*` son privados y se quedan en `0.0.0`.
 
-Estado actual: **sin tags publicados** y root en `0.0.0` → el primer release es `v0.1.0`.
+La versión publicada vive en el `version` del `package.json` raíz y en el último tag `vX.Y.Z`; ambos
+deben coincidir. Consúltalos (`git tag -l`, `gh release list`) en vez de fiarte de este documento.
 
-No existe `CHANGELOG.md`: el primer release debe crearlo.
+`CHANGELOG.md` existe en la raíz y se actualiza en el commit de bump (`chore(release): vX.Y.Z`).
 
 Alternativa scriptada al paso «PR de integración a producción»: `pnpm release:prod`
 (`scripts/release-to-prod.mjs`) hace el merge `develop` → `main` en local. La skill `release` prefiere

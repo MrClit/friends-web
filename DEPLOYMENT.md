@@ -256,4 +256,5 @@ Resolve conflicts in `develop`, then retry release.
 - The **release sequence** is not owned here. It belongs to the `release` skill, with this repo's
   coordinates in `.claude/gh-project.md`. If the two disagree about *how a release is cut*, the
   skill wins; if they disagree about *how production is configured*, this file wins.
-- Files under `docs/` may contain planning notes or historical snapshots.
+- Files under `docs/` are limited to designs pending execution and runbooks still valid. They never
+  override this file on infrastructure matters.
