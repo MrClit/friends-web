@@ -170,9 +170,7 @@ friends-web/
 │   └── release-to-prod.mjs # Production release script
 ├── .github/
 │   └── workflows/
-│       ├── deploy.yml          # Auto-deploy frontend on push to main
-│       ├── release-to-prod.yml # Manual production release
-│       └── backend-tests.yml   # Manual backend test run
+│       └── deploy.yml          # Auto-deploy frontend on push to main
 ├── package.json            # Root package (friends-monorepo)
 ├── pnpm-workspace.yaml     # pnpm workspaces config
 └── pnpm-lock.yaml          # Lockfile
@@ -182,11 +180,14 @@ friends-web/
 
 ## 🔄 CI/CD
 
-| Workflow                | Trigger                      | Description                                                    |
-| ----------------------- | ---------------------------- | -------------------------------------------------------------- |
-| **deploy.yml**          | Push to `main`               | Lints, tests, builds frontend, deploys to GitHub Pages         |
-| **release-to-prod.yml** | Manual (`workflow_dispatch`) | Merges `develop` → `main` to trigger a production release      |
-| **backend-tests.yml**   | Manual (`workflow_dispatch`) | Runs backend test suite against a PostgreSQL service container |
+| Workflow       | Trigger        | Description                                            |
+| -------------- | -------------- | ------------------------------------------------------ |
+| **deploy.yml** | Push to `main` | Lints, tests, builds frontend, deploys to GitHub Pages |
+
+CI only validates the frontend. The full check across all three workspaces is `pnpm lint && pnpm test
+&& pnpm build`, run locally before opening a PR — deliberately stricter than CI, since it is what
+keeps the backend from breaking. Production promotion is `pnpm release:prod`, a local script, not a
+workflow.
 
 ---
 
