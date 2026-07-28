@@ -165,6 +165,11 @@ This repo's coordinates — board ids, branch model, labels, validation command,
 live in [`.claude/gh-project.md`](.claude/gh-project.md). It is the single source of truth; do not
 duplicate any of it here.
 
+Those two skills and the agent are **user-level configuration, deliberately not vendored into this
+repo** — they are generic and shared across several projects, while `gh-project.md` holds everything
+specific to this one. If they are not available in the current environment, say so and stop: do not
+improvise a GitHub flow, and do not commit, push, open or merge anything without them.
+
 ## Conventions
 
 **Git commits:** `type(scope): description` — types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore` — scopes: `frontend`, `backend`, `shared-types`, `ci`
