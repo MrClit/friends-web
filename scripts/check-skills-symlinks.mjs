@@ -43,7 +43,7 @@ for (const name of vendored) {
   if (!existsSync(link)) {
     problems.push(
       `.agents/skills/${name} has no symlink in .claude/skills/ — it will never load.\n` +
-        `    Fix: ln -s ../../.agents/skills/${name} .claude/skills/${name}`
+        `    Fix: ln -s ../../.agents/skills/${name} .claude/skills/${name}`,
     );
     continue;
   }
@@ -63,7 +63,7 @@ for (const name of loaded) {
   if (lstatSync(link).isSymbolicLink() && !existsSync(link)) {
     problems.push(
       `.claude/skills/${name} is a dangling symlink — its target under .agents/skills/ is gone.\n` +
-        `    Fix: remove the symlink, or reinstall the skill.`
+        `    Fix: remove the symlink, or reinstall the skill.`,
     );
   }
 }
@@ -91,7 +91,7 @@ for (const name of loaded) {
   const declaredName = match[1].trim();
   if (declared.has(declaredName)) {
     problems.push(
-      `${name} and ${declared.get(declaredName)} both declare name "${declaredName}" — one shadows the other.`
+      `${name} and ${declared.get(declaredName)} both declare name "${declaredName}" — one shadows the other.`,
     );
   } else {
     declared.set(declaredName, name);
