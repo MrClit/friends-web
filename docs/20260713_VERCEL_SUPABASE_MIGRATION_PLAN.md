@@ -5,7 +5,7 @@
 **Scope:** Infrastructure / Deployment (no product features)
 **Author:** Víctor Sales (with Claude Code)
 
-> Note: `docs/SPEC_TEMPLATE.md` is feature-oriented (behavior/API contracts), so this plan adapts its structure to an infrastructure migration: motivation, current-state analysis, target design, ordered tasks, validation, env vars, and rollback.
+> Note: this is an infrastructure migration, so it is structured as motivation, current-state analysis, target design, ordered tasks, validation, env vars, and rollback. It lives in `/docs` because it is a design still pending execution; delete it once the migration ships.
 
 ---
 

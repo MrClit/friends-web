@@ -79,6 +79,7 @@ Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`, `profile`
 - `React.lazy` → `lazy(() => import('./Foo').then(m => ({ default: m.Foo })))`
 - `cn()` helper from `@/shared/utils` for conditional Tailwind classes (clsx + tailwind-merge); use when a `className` has 8+ utilities or mixes state/theme/responsive variants
 - Tailwind class order: layout → spacing → typography → visual → interaction → state/theme → responsive
+- Full className rules and the refactor procedure live in the `tailwind-inline-cn` skill
 - Semantic colors: blue=contributions, rose=expenses, emerald=compensations, amber=pot
 
 ### Routes
@@ -91,6 +92,11 @@ Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`, `profile`
 - `/settings` → redirects to `/profile` (protected alias)
 - `/admin/users` — Admin user management (protected, ADMIN role)
 - `*` — 404 Not Found
+
+### Testing
+
+Vitest + Testing Library. Tests are **co-located** with the source (`Foo.test.ts` next to `Foo.ts`), not in a
+separate tree. Global setup: `src/test/setup.ts`.
 
 ### i18n
 
@@ -126,8 +132,15 @@ Modules: `auth`, `events`, `transactions`, `users`, `admin`
 - Controllers handle HTTP only (routing, validation, Swagger decorators)
 - Services own business logic; throw NestJS exceptions (`NotFoundException`, etc.)
 - DTOs use `class-validator` decorators
+- Swagger: `@ApiOperation` + `@ApiStandardResponse(status, description, type, isArray?)`
 - User entity uses soft deletes (`@DeleteDateColumn`)
 - Cascade delete: transactions deleted when parent event is deleted
+
+### Database
+
+Config in `src/config/database.config.ts` (env-based via `ConfigService`). Migration scripts:
+`migration:generate`, `migration:run` (local), `migration:run:prod` (runs against `dist/`, executed on
+production boot), `migration:revert`.
 
 ## Domain Model
 
@@ -163,22 +176,34 @@ duplicate any of it here.
 2. Add API methods in `src/api/`, hooks in `src/hooks/api/`, query keys in `keys.ts`
 3. Add translations to `src/i18n/locales/{en,es,ca}/translation.json`
 
-**Implementation plans** for multi-file features go in `/docs` and must be self-contained (motivation, design, ordered tasks, test cases, env vars).
+**Planning a feature.** Two separate artifacts, do not merge them:
 
-## Skill References
+- **The what and the why → the GitHub issue.** Motivation, behavior contract (happy path + edge cases),
+  what is explicitly out of scope, open questions. This is human input; it cannot be derived from the code.
+  Write it before planning — otherwise the plan is built on guesses.
+- **The how → plan mode / the `Plan` agent, in session.** Task order, files to touch, test cases. Ephemeral
+  and regenerated from the current code, so it never goes stale. Do not write it to a file.
 
-Detailed best-practice guides live in `.agents/skills/`. Read the relevant file when working in that area — do not duplicate their content in this file.
+`/docs` is **not** the folder for implementation plans. It holds only living reference documents — a design
+that is still pending execution, or a runbook that is still valid. A doc that describes work already shipped
+must be deleted, not archived: the code is the truth, and the issue plus its PR are the record. An agent
+cannot tell a stale doc from a current one, so a wrong doc costs more than a missing one.
 
-### Backend
-- **NestJS** (40 rules — architecture, DI, security, performance, testing): [`.agents/skills/nestjs-best-practices/AGENTS.md`](.agents/skills/nestjs-best-practices/AGENTS.md)
+## Skills
 
-### Frontend
-- **React composition** (compound components, state lifting, React 19 APIs): [`.agents/skills/composition-patterns/AGENTS.md`](.agents/skills/composition-patterns/AGENTS.md)
-- **React performance** (waterfalls, memoization, bundle size — skip Server Components / `use server` rules, this is a SPA): [`.agents/skills/react-best-practices/AGENTS.md`](.agents/skills/react-best-practices/AGENTS.md)
-- **Tailwind patterns**: [`.agents/skills/tailwind-css-patterns/SKILL.md`](.agents/skills/tailwind-css-patterns/SKILL.md)
-- **Accessibility** (WCAG 2.2): [`.agents/skills/accessibility/SKILL.md`](.agents/skills/accessibility/SKILL.md)
-- **Vite config**: [`.agents/skills/vite/SKILL.md`](.agents/skills/vite/SKILL.md)
+Best-practice guides load **automatically** by description — there is no need to link or read them by
+path from here: `nestjs-best-practices`, `vercel-react-best-practices`, `vercel-composition-patterns`,
+`tailwind-css-patterns`, `tailwind-inline-cn`, `accessibility`, `typescript-advanced-types`, `vite`,
+`vitest`.
 
-### Common
-- **TypeScript advanced types**: [`.agents/skills/typescript-advanced-types/SKILL.md`](.agents/skills/typescript-advanced-types/SKILL.md)
-- **Vitest**: [`.agents/skills/vitest/SKILL.md`](.agents/skills/vitest/SKILL.md)
+Only the project-specific caveats belong in this file:
+
+- **`vercel-react-best-practices`** — ignore its `server-*` rules (React Server Components, `use server`,
+  Next.js data fetching). This frontend is a Vite SPA; those rules do not apply. Everything else
+  (waterfalls, memoization, bundle size) does.
+- **`tailwind-css-patterns`** is generic. Where it disagrees with **`tailwind-inline-cn`** — this repo's
+  own `cn()` and class-ordering rules — `tailwind-inline-cn` wins.
+
+Vendored skills live in `.agents/skills/` (tracked in `skills-lock.json`, updated by the skills CLI) and
+are exposed to Claude Code through symlinks in `.claude/skills/`. Adding a vendored skill means adding
+the symlink too, or it will not load. Skills written for this repo live directly in `.claude/skills/`.

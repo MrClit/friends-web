@@ -589,4 +589,4 @@ Configuration in `src/test/setup.ts`:
 
 - [Backend API Documentation](../backend/README.md) - REST API endpoints and database schema
 - [Deployment Guide](../../DEPLOYMENT.md) - Canonical production deployment and rollback runbook
-- [API Integration Guide](../../docs/FRONTEND_API_INTEGRATION.md) - How this frontend integrates with the backend
+- API contract - Swagger UI at `/api/docs` on the running backend (canonical source)

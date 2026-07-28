@@ -24,6 +24,9 @@ apps/*/coverage
 .env.production.local
 .env.test.local
 
+# Claude Code - local, per-developer overrides (project settings.json IS committed)
+.claude/settings.local.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
