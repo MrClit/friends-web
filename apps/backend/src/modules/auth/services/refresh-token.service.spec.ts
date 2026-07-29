@@ -4,6 +4,10 @@ import type { Repository } from 'typeorm';
 import { RefreshTokenService } from './refresh-token.service';
 import { RefreshToken } from '../entities/refresh-token.entity';
 
+// `expect.any` is typed as `any`; these aliases keep the matchers usable inside object literals.
+const anyString = expect.any(String) as unknown as string;
+const anyObject = expect.any(Object) as unknown as object;
+
 describe('RefreshTokenService', () => {
   let service: RefreshTokenService;
   let repository: {
@@ -42,8 +46,8 @@ describe('RefreshTokenService', () => {
     expect(repository.create).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: 'user-1',
-        tokenHash: expect.any(String) as unknown as string,
-        family: expect.any(String) as unknown as string,
+        tokenHash: anyString,
+        family: anyString,
       }),
     );
     expect(repository.save).toHaveBeenCalledTimes(1);
@@ -78,9 +82,7 @@ describe('RefreshTokenService', () => {
 
     await service.rotateRefreshToken('raw-token');
 
-    expect(repository.create).toHaveBeenCalledWith(
-      expect.objectContaining({ rotationCount: 6 }),
-    );
+    expect(repository.create).toHaveBeenCalledWith(expect.objectContaining({ rotationCount: 6 }));
   });
 
   it('rotateRefreshToken at rotation limit revokes family and throws unauthorized', async () => {
@@ -166,7 +168,7 @@ describe('RefreshTokenService', () => {
     expect(repository.delete).toHaveBeenCalledTimes(1);
     expect(repository.delete).toHaveBeenCalledWith(
       expect.objectContaining({
-        expiresAt: expect.any(Object) as unknown as object,
+        expiresAt: anyObject,
       }),
     );
   });

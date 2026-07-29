@@ -30,7 +30,7 @@ describe('TransactionPaginationService (integration)', () => {
       return false;
     }
 
-    const maybeDate = (value as { date: unknown }).date;
+    const maybeDate = (value).date;
     return typeof maybeDate === 'string' || maybeDate instanceof Date;
   };
 

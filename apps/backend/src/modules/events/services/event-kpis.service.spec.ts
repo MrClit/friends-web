@@ -1,7 +1,6 @@
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Event } from '../entities/event.entity';
 import { Transaction } from '../../transactions/entities/transaction.entity';
 import { TransactionsService } from '../../transactions/transactions.service';
@@ -32,11 +31,11 @@ describe('EventKPIsService', () => {
         EventKPIsService,
         {
           provide: getRepositoryToken(Event),
-          useValue: eventRepository as unknown as Repository<Event>,
+          useValue: eventRepository,
         },
         {
           provide: TransactionsService,
-          useValue: transactionsService as unknown as TransactionsService,
+          useValue: transactionsService,
         },
       ],
     }).compile();
@@ -51,7 +50,7 @@ describe('EventKPIsService', () => {
         { type: 'user', id: 'u1' },
         { type: 'user', id: 'u2' },
       ],
-    } as unknown as Event);
+    });
 
     const transactions = [
       {
@@ -156,7 +155,7 @@ describe('EventKPIsService', () => {
   });
 
   it('builds balance breakdown correctly when only contributions exist', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-2' } as Event);
+    eventRepository.findOne.mockResolvedValue({ id: 'event-2' });
     transactionsService.findByEvent.mockResolvedValue([
       {
         id: 'tx-10',
@@ -182,7 +181,7 @@ describe('EventKPIsService', () => {
   });
 
   it('builds balance breakdown correctly when only pot expenses exist', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-3' } as Event);
+    eventRepository.findOne.mockResolvedValue({ id: 'event-3' });
     transactionsService.findByEvent.mockResolvedValue([
       {
         id: 'tx-20',
@@ -237,7 +236,7 @@ describe('EventKPIsService', () => {
         { type: 'user', id: 'u2' },
         { type: 'pot', id: '0' },
       ],
-    } as unknown as Event);
+    });
 
     transactionsService.findByEvent.mockResolvedValue([
       {
@@ -288,7 +287,7 @@ describe('EventKPIsService', () => {
   });
 
   it('wraps unexpected errors in InternalServerErrorException', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-1' } as Event);
+    eventRepository.findOne.mockResolvedValue({ id: 'event-1' });
     transactionsService.findByEvent.mockRejectedValue(new Error('DB failure'));
 
     await expect(service.getKPIs('event-1', actor)).rejects.toThrow(InternalServerErrorException);
@@ -296,7 +295,7 @@ describe('EventKPIsService', () => {
   });
 
   it('calculates exact totals with floating-point-prone amounts (0.10 + 0.20 = 0.30)', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-fp', participants: [] } as unknown as Event);
+    eventRepository.findOne.mockResolvedValue({ id: 'event-fp', participants: [] });
     transactionsService.findByEvent.mockResolvedValue([
       {
         id: 'tx-fp-1',
@@ -314,7 +313,7 @@ describe('EventKPIsService', () => {
         amount: '0.20',
         date: new Date('2026-01-02'),
       },
-    ] as unknown as Transaction[]);
+    ] as unknown);
 
     const result = await service.getKPIs('event-fp', actor);
 
@@ -324,7 +323,7 @@ describe('EventKPIsService', () => {
   });
 
   it('accumulates many small amounts without rounding drift (10 × 0.10 = 1.00)', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-acc', participants: [] } as unknown as Event);
+    eventRepository.findOne.mockResolvedValue({ id: 'event-acc', participants: [] });
     transactionsService.findByEvent.mockResolvedValue(
       Array.from({ length: 10 }, (_, i) => ({
         id: `tx-acc-${i}`,
@@ -333,7 +332,7 @@ describe('EventKPIsService', () => {
         paymentType: 'contribution' as const,
         amount: '0.10',
         date: new Date('2026-01-01'),
-      })) as unknown as Transaction[],
+      })),
     );
 
     const result = await service.getKPIs('event-acc', actor);
