@@ -14,7 +14,7 @@ describe('RolesGuard', () => {
   function createContext(userRole?: string, rolesMeta?: string[]) {
     const handler = () => {};
     class DummyClass {}
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(rolesMeta as any);
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(rolesMeta);
 
     const ctx = {
       getHandler: () => handler,

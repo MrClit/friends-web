@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, ForbiddenException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
-import type { Repository } from 'typeorm';
 import { EventsService } from './events.service';
 import { Event, EventStatus } from './entities/event.entity';
 import type { EventParticipant } from './entities/event.entity';
@@ -127,7 +126,7 @@ describe('EventsService', () => {
         EventsService,
         {
           provide: getRepositoryToken(Event),
-          useValue: mockRepository as unknown as Repository<Event>,
+          useValue: mockRepository,
         },
         {
           provide: EventQueryService,
@@ -139,7 +138,7 @@ describe('EventsService', () => {
         },
         {
           provide: EventKPIsService,
-          useValue: mockEventKPIsService as unknown as EventKPIsService,
+          useValue: mockEventKPIsService,
         },
       ],
     }).compile();
@@ -223,7 +222,7 @@ describe('EventsService', () => {
         ...mockEvent,
         title: createDto.title,
         participants,
-      } as Event;
+      };
 
       mockRepository.create.mockReturnValue(savedEvent);
       mockRepository.save.mockResolvedValue(savedEvent);
@@ -251,7 +250,7 @@ describe('EventsService', () => {
         ...mockEvent,
         title: createDto.title,
         participants: expectedParticipants,
-      } as Event;
+      };
 
       mockRepository.create.mockReturnValue(savedEvent);
       mockRepository.save.mockResolvedValue(savedEvent);
@@ -281,7 +280,7 @@ describe('EventsService', () => {
   describe('update', () => {
     it('updates event for authorized actor', async () => {
       const updateDto: UpdateEventDto = { title: 'Updated Event' };
-      const updatedEvent = { ...mockEvent, title: 'Updated Event' } as Event;
+      const updatedEvent = { ...mockEvent, title: 'Updated Event' };
 
       mockRepository.merge.mockReturnValue(updatedEvent);
       mockRepository.save.mockResolvedValue(updatedEvent);

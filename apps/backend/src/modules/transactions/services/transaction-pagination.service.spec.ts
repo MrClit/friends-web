@@ -1,7 +1,6 @@
 import { BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Event } from '../../events/entities/event.entity';
 import { Transaction } from '../entities/transaction.entity';
 import { TransactionPaginationService } from './transaction-pagination.service';
@@ -25,11 +24,11 @@ describe('TransactionPaginationService', () => {
         TransactionPaginationService,
         {
           provide: getRepositoryToken(Transaction),
-          useValue: transactionRepository as unknown as Repository<Transaction>,
+          useValue: transactionRepository,
         },
         {
           provide: getRepositoryToken(Event),
-          useValue: eventRepository as unknown as Repository<Event>,
+          useValue: eventRepository,
         },
       ],
     }).compile();
@@ -38,7 +37,7 @@ describe('TransactionPaginationService', () => {
   });
 
   it('returns paginated transactions mapped from raw SQL results', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-1' } as Event);
+    eventRepository.findOne.mockResolvedValue({ id: 'event-1' });
     transactionRepository.query.mockResolvedValue([
       {
         id: 'tx-1',
@@ -92,14 +91,14 @@ describe('TransactionPaginationService', () => {
   });
 
   it('passes through BadRequestException from query flow', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-1' } as Event);
+    eventRepository.findOne.mockResolvedValue({ id: 'event-1' });
     transactionRepository.query.mockRejectedValue(new BadRequestException('Invalid pagination params'));
 
     await expect(service.findByEventPaginated('event-1', 2, 0)).rejects.toThrow(BadRequestException);
   });
 
   it('wraps unexpected errors in InternalServerErrorException', async () => {
-    eventRepository.findOne.mockResolvedValue({ id: 'event-1' } as Event);
+    eventRepository.findOne.mockResolvedValue({ id: 'event-1' });
     transactionRepository.query.mockRejectedValue(new Error('DB failure'));
 
     await expect(service.findByEventPaginated('event-1', 2, 0)).rejects.toThrow(InternalServerErrorException);

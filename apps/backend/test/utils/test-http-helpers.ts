@@ -6,10 +6,6 @@ export interface AuthLikeUser {
   role: string;
 }
 
-interface ApiDataResponse {
-  data: unknown;
-}
-
 export function buildAuthHeader(jwtService: JwtService, user: AuthLikeUser): string {
   const token = jwtService.sign({
     sub: user.id,
@@ -25,8 +21,7 @@ export function getDataFromBody(body: unknown): unknown {
     throw new Error('Expected response body to contain a data property');
   }
 
-  const response = body as ApiDataResponse;
-  return response.data;
+  return body.data;
 }
 
 export function getDataObjectFromBody(body: unknown): Record<string, unknown> {

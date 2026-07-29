@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import { QueryFailedError, Repository } from 'typeorm';
+import { QueryFailedError } from 'typeorm';
 import { User } from '../users/user.entity';
 import { AdminUsersService } from './admin-users.service';
 
@@ -33,7 +33,7 @@ describe('AdminUsersService', () => {
         AdminUsersService,
         {
           provide: getRepositoryToken(User),
-          useValue: mockRepository as unknown as Repository<User>,
+          useValue: mockRepository,
         },
       ],
     }).compile();
