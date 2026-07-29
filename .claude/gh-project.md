@@ -64,8 +64,8 @@ fix(backend): return 403 instead of 500 on unauthorized event access
 
 Scopes habituales del repo: `frontend`, `backend`, `shared-types`, `ci`, `docs`, `a11y`.
 
-Los **títulos de issue** siguen el mismo formato que el commit que las resolverá
-(p. ej. `fix(a11y): add skip navigation link to index.html`).
+Los **títulos de issue** usan el mismo prefijo `type(scope):` que el commit que las resolverá, pero
+la descripción va en castellano (p. ej. `fix(a11y): añadir enlace de salto a la navegación principal`).
 
 ## Validaciones antes de abrir PR
 
@@ -113,6 +113,7 @@ Post-deploy: checklist de validación en `DEPLOYMENT.md` §9. Rollback: §10.
 
 ## Idioma
 
-- **Issues, PRs, commits, comentarios y código:** inglés.
+- **Issues y PRs (título y cuerpo):** castellano.
+- **Commits y código (comentarios, JSDoc):** inglés — ver Conventional Commits arriba y `CLAUDE.md`.
 - **Documentos de `/docs`:** inglés.
 - **Conversación con el usuario:** español.
