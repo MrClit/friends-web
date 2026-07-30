@@ -165,14 +165,12 @@ friends-web/
 │   └── shared-types/       # @friends/shared-types — shared TS types
 │       ├── src/
 │       └── package.json
-├── docs/                   # Implementation specs and architecture docs
+├── docs/                   # Pending designs and valid runbooks only (no shipped-work plans)
 ├── scripts/
 │   └── release-to-prod.mjs # Production release script
 ├── .github/
 │   └── workflows/
-│       ├── deploy.yml          # Auto-deploy frontend on push to main
-│       ├── release-to-prod.yml # Manual production release
-│       └── backend-tests.yml   # Manual backend test run
+│       └── deploy.yml          # Auto-deploy frontend on push to main
 ├── package.json            # Root package (friends-monorepo)
 ├── pnpm-workspace.yaml     # pnpm workspaces config
 └── pnpm-lock.yaml          # Lockfile
@@ -182,11 +180,14 @@ friends-web/
 
 ## 🔄 CI/CD
 
-| Workflow                | Trigger                      | Description                                                    |
-| ----------------------- | ---------------------------- | -------------------------------------------------------------- |
-| **deploy.yml**          | Push to `main`               | Lints, tests, builds frontend, deploys to GitHub Pages         |
-| **release-to-prod.yml** | Manual (`workflow_dispatch`) | Merges `develop` → `main` to trigger a production release      |
-| **backend-tests.yml**   | Manual (`workflow_dispatch`) | Runs backend test suite against a PostgreSQL service container |
+| Workflow       | Trigger        | Description                                            |
+| -------------- | -------------- | ------------------------------------------------------ |
+| **deploy.yml** | Push to `main` | Lints, tests, builds frontend, deploys to GitHub Pages |
+
+CI only validates the frontend. The full check across all three workspaces is `pnpm lint && pnpm test
+&& pnpm build`, run locally before opening a PR — deliberately stricter than CI, since it is what
+keeps the backend from breaking. Production promotion is `pnpm release:prod`, a local script, not a
+workflow.
 
 ---
 
@@ -203,7 +204,10 @@ Operational documentation:
 - **[Deployment Guide](DEPLOYMENT.md)** — Canonical production deployment and rollback runbook
 - **[Security Policy](.github/SECURITY.md)** — Secret handling, rotation policy, and incident playbook
 
-Implementation specs, architecture decisions, and feature plans live in **[docs/](docs/)**.
+**[docs/](docs/)** holds only living documents: designs still pending execution and runbooks still
+valid. Plans for work already shipped are deleted — the code is the truth and the issue plus its PR
+are the record. Architecture and conventions live in [CLAUDE.md](CLAUDE.md); the API contract is the
+Swagger UI at `/api/docs`.
 
 ---
 

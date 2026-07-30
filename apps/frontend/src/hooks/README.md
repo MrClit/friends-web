@@ -138,5 +138,4 @@ src/hooks/common/useModalState.ts    ✅
 
 - [Common Hooks README](./common/README.md)
 - [Domain Hooks README](./domain/README.md)
-- [UI State Management Strategy](../../docs/UI_STATE_MANAGEMENT_STRATEGY.md)
-- [Frontend API Integration](../../docs/FRONTEND_API_INTEGRATION.md)
+- [State management layers](../../../../CLAUDE.md) - see "Frontend Architecture"

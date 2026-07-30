@@ -55,7 +55,7 @@ describe('AdminUsersController', () => {
   });
 
   it('update delegates with actor context', async () => {
-    const req = { user: { id: 'admin-1', role: 'admin' } as User } as { user: User };
+    const req = { user: { id: 'admin-1', role: 'admin' } as User };
     const payload = { name: 'Updated' };
     const updated = { id: 'u1', email: 'u@test.com', role: 'user', ...payload };
     adminUsersService.update.mockResolvedValue(updated);
@@ -70,7 +70,7 @@ describe('AdminUsersController', () => {
   });
 
   it('remove delegates with actor context', async () => {
-    const req = { user: { id: 'admin-1', role: 'admin' } as User } as { user: User };
+    const req = { user: { id: 'admin-1', role: 'admin' } as User };
     adminUsersService.softDelete.mockResolvedValue({ success: true });
 
     const result = await controller.remove('u1', req as never);

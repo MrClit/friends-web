@@ -1,7 +1,7 @@
 {
   "name": "friends-monorepo",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "$schema": "https://json.schemastore.org/package.json",
   "type": "module",
   "packageManager": "pnpm@10.30.1",
@@ -12,7 +12,8 @@
     "build:frontend": "pnpm --filter @friends/frontend build",
     "build:backend": "pnpm --filter @friends/backend build",
     "preview": "pnpm --filter @friends/frontend preview",
-    "lint": "pnpm -r lint",
+    "check:skills": "node scripts/check-skills-symlinks.mjs",
+    "lint": "pnpm check:skills && pnpm -r lint",
     "lint:fix": "pnpm -r lint:fix",
     "test": "pnpm -r test:run",
     "test:watch": "pnpm -r --parallel test:watch",
@@ -24,11 +25,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.2.0",
+    "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.3.0",
-    "prettier": "^3.8.1",
-    "typescript-eslint": "^8.58.0"
+    "globals": "^17.8.0",
+    "prettier": "^3.9.6",
+    "typescript-eslint": "^8.65.0"
   },
   "pnpm": {
     "overrides": {
@@ -36,7 +37,8 @@
       "brace-expansion@^1.1.7": "1.1.13",
       "brace-expansion@^2.0.2": "2.0.3",
       "handlebars": ">=4.7.9",
-      "multer": ">=2.1.1",
+      "js-yaml@^5.0.0": ">=5.2.2",
+      "multer": ">=2.2.0",
       "path-to-regexp": ">=8.4.0",
       "rollup": ">=4.59.0",
       "serialize-javascript": ">=7.0.3",

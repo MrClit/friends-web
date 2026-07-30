@@ -64,8 +64,8 @@ fix(backend): return 403 instead of 500 on unauthorized event access
 
 Scopes habituales del repo: `frontend`, `backend`, `shared-types`, `ci`, `docs`, `a11y`.
 
-Los **títulos de issue** siguen el mismo formato que el commit que las resolverá
-(p. ej. `fix(a11y): add skip navigation link to index.html`).
+Los **títulos de issue** usan el mismo prefijo `type(scope):` que el commit que las resolverá, pero
+la descripción va en castellano (p. ej. `fix(a11y): añadir enlace de salto a la navegación principal`).
 
 ## Validaciones antes de abrir PR
 
@@ -73,11 +73,16 @@ Los **títulos de issue** siguen el mismo formato que el commit que las resolver
 pnpm lint && pnpm test && pnpm build
 ```
 
-Cubre frontend, backend y `shared-types`. La CI (`deploy.yml`) solo valida el frontend, así que
-**este comando es más estricto que la CI a propósito**: es lo que evita romper el backend.
+Cubre frontend, backend y `shared-types`. `.github/workflows/ci.yml` corre lo mismo en cada PR hacia
+`develop` o `main` (job `quality`: lint + tests del frontend + build; job `backend`: las tres suites
+contra un Postgres de CI), pero ejecutarlo en local antes de abrir el PR sigue siendo lo que evita
+el ciclo push–esperar–arreglar.
 
 Los tests del backend que necesitan PostgreSQL requieren la base levantada:
-`cd apps/backend && docker-compose up -d`.
+`cd apps/backend && docker-compose up -d`, y un `apps/backend/.env.test` (no commiteado) copiado de
+`.env.test.example`.
+
+Ambos checks son **requeridos** en `develop` y `main`; `main` exige además PR.
 
 Nunca `--no-verify`.
 
@@ -86,13 +91,14 @@ Nunca `--no-verify`.
 Versionado en el **`package.json` raíz** únicamente (una sola versión para todo el producto). Los
 manifiestos de `apps/*` y `packages/*` son privados y se quedan en `0.0.0`.
 
-Estado actual: **sin tags publicados** y root en `0.0.0` → el primer release es `v0.1.0`.
+La versión publicada vive en el `version` del `package.json` raíz y en el último tag `vX.Y.Z`; ambos
+deben coincidir. Consúltalos (`git tag -l`, `gh release list`) en vez de fiarte de este documento.
 
-No existe `CHANGELOG.md`: el primer release debe crearlo.
+`CHANGELOG.md` existe en la raíz y se actualiza en el commit de bump (`chore(release): vX.Y.Z`).
 
-Alternativa scriptada al paso «PR de integración a producción»: `pnpm release:prod`
-(`scripts/release-to-prod.mjs`) hace el merge `develop` → `main` en local. La skill `release` prefiere
-la coreografía vía PR; usar el script solo si el usuario lo pide.
+> `pnpm release:prod` (`scripts/release-to-prod.mjs`) mergeaba `develop` → `main` en local y hacía
+> push directo. **Ya no sirve**: `main` exige PR y checks en verde, así que el push se rechaza. La
+> única vía es la coreografía por PR de la skill `release`.
 
 ### Pre-vuelo del release
 
@@ -112,6 +118,7 @@ Post-deploy: checklist de validación en `DEPLOYMENT.md` §9. Rollback: §10.
 
 ## Idioma
 
-- **Issues, PRs, commits, comentarios y código:** inglés.
+- **Issues y PRs (título y cuerpo):** castellano.
+- **Commits y código (comentarios, JSDoc):** inglés — ver Conventional Commits arriba y `CLAUDE.md`.
 - **Documentos de `/docs`:** inglés.
 - **Conversación con el usuario:** español.

@@ -91,7 +91,7 @@ describe('AuthController', () => {
     });
     usersService.findByIdOrThrow.mockResolvedValue(baseUser);
 
-    await controller.refresh(body as Parameters<typeof controller.refresh>[0], res);
+    await controller.refresh(body, res);
 
     expect(authService.rotateRefreshToken).toHaveBeenCalledWith('refresh-token');
     expect(usersService.findByIdOrThrow).toHaveBeenCalledWith('user-1');
@@ -106,7 +106,7 @@ describe('AuthController', () => {
 
     authService.revokeRefreshToken.mockResolvedValue(undefined);
 
-    await controller.logout(body as Parameters<typeof controller.logout>[0], res);
+    await controller.logout(body, res);
 
     expect(authService.revokeRefreshToken).toHaveBeenCalledWith('refresh-token');
     expect(json).toHaveBeenCalledWith({ data: null });

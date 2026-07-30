@@ -30,7 +30,7 @@ describe('MicrosoftStrategy', () => {
     const invalidProfile = {} as Record<string, unknown>;
 
     await new Promise<void>((resolve) => {
-      void strategy.validate(fakeReq, 'at', 'rt', invalidProfile as unknown as Express.User, (err, user) => {
+      void strategy.validate(fakeReq, 'at', 'rt', invalidProfile, (err, user) => {
         try {
           expect(err).toBeInstanceOf(Error);
           expect(user).toBeFalsy();
@@ -54,7 +54,7 @@ describe('MicrosoftStrategy', () => {
 
     const fakeReq = {} as unknown as Request;
     await new Promise<void>((resolve) => {
-      void strategy.validate(fakeReq, 'at', 'rt', profile as unknown as Express.User, (err, user) => {
+      void strategy.validate(fakeReq, 'at', 'rt', profile, (err, user) => {
         try {
           expect(err).toBeNull();
           expect(user).toBeDefined();

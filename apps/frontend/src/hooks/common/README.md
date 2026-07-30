@@ -122,7 +122,7 @@ pnpm test:coverage useModalState useConfirmDialog
 
 ## Architecture
 
-These hooks follow the UI State Management Strategy documented in `/docs/UI_STATE_MANAGEMENT_STRATEGY.md`:
+These hooks follow the state management layers described in `CLAUDE.md`:
 
 - ✅ **Modal state**: Always use `useModalState` or `useConfirmDialog`
 - ✅ **Business logic**: Separate in custom hooks (e.g., `useEventDetail`)
@@ -132,5 +132,5 @@ These hooks follow the UI State Management Strategy documented in `/docs/UI_STAT
 
 ## See Also
 
-- [UI State Management Strategy](/docs/UI_STATE_MANAGEMENT_STRATEGY.md)
+- [Hooks overview](../README.md)
 - [useInfiniteScroll](./useInfiniteScroll.ts)

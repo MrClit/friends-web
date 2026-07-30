@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In } from 'typeorm';
 import { User } from '../../users/user.entity';
 import { Event } from '../entities/event.entity';
 import { EventParticipantsService } from './event-participants.service';
@@ -23,7 +23,7 @@ describe('EventParticipantsService.enrichParticipants', () => {
         EventParticipantsService,
         {
           provide: getRepositoryToken(User),
-          useValue: userRepository as unknown as Repository<User>,
+          useValue: userRepository,
         },
       ],
     }).compile();

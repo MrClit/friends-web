@@ -2,6 +2,7 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
+import globals from 'globals';
 
 /**
  * Base ESLint configuration for the Friends monorepo
@@ -25,6 +26,13 @@ export default [
           varsIgnorePattern: '^_',
         },
       ],
+    },
+  },
+  {
+    // Root maintenance scripts run on Node, not in a browser or a workspace
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: globals.node,
     },
   },
 ];
