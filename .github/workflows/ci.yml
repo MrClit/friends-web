@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop # post-merge signal; pushes to main are covered by deploy.yml
+
+# A new push to the same branch makes the previous run obsolete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PNPM_VERSION: 10.30.1
+  NODE_VERSION: '24'
+
+jobs:
+  quality:
+    name: Lint, frontend tests and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linter
+        run: pnpm lint # includes check:skills
+
+      - name: Build all packages
+        run: pnpm build # shared-types + frontend (tsc -b) + backend (nest build)
+
+      - name: Run frontend tests
+        run: pnpm --filter @friends/frontend test:run
+
+  backend:
+    name: Backend tests (unit, integration, e2e)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: friends_db_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The committed dist could lag behind the sources; the backend imports it at runtime.
+      - name: Build shared-types
+        run: pnpm --filter @friends/shared-types build
+
+      # .env.test is gitignored: the example is the source of truth for the test config.
+      - name: Create test environment file
+        run: cp .env.test.example .env.test
+        working-directory: apps/backend
+
+      - name: Run unit tests
+        run: pnpm --filter @friends/backend test:run
+
+      # TYPEORM_SYNC=true creates the schema, so no migrations are needed here.
+      - name: Run integration tests
+        run: pnpm --filter @friends/backend test:int
+
+      - name: Run e2e tests
+        run: pnpm --filter @friends/backend test:e2e

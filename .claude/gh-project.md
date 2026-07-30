@@ -73,11 +73,16 @@ la descripción va en castellano (p. ej. `fix(a11y): añadir enlace de salto a l
 pnpm lint && pnpm test && pnpm build
 ```
 
-Cubre frontend, backend y `shared-types`. La CI (`deploy.yml`) solo valida el frontend, así que
-**este comando es más estricto que la CI a propósito**: es lo que evita romper el backend.
+Cubre frontend, backend y `shared-types`. `.github/workflows/ci.yml` corre lo mismo en cada PR hacia
+`develop` o `main` (job `quality`: lint + tests del frontend + build; job `backend`: las tres suites
+contra un Postgres de CI), pero ejecutarlo en local antes de abrir el PR sigue siendo lo que evita
+el ciclo push–esperar–arreglar.
 
 Los tests del backend que necesitan PostgreSQL requieren la base levantada:
-`cd apps/backend && docker-compose up -d`.
+`cd apps/backend && docker-compose up -d`, y un `apps/backend/.env.test` (no commiteado) copiado de
+`.env.test.example`.
+
+Ambos checks son **requeridos** en `develop` y `main`; `main` exige además PR.
 
 Nunca `--no-verify`.
 
@@ -91,9 +96,9 @@ deben coincidir. Consúltalos (`git tag -l`, `gh release list`) en vez de fiarte
 
 `CHANGELOG.md` existe en la raíz y se actualiza en el commit de bump (`chore(release): vX.Y.Z`).
 
-Alternativa scriptada al paso «PR de integración a producción»: `pnpm release:prod`
-(`scripts/release-to-prod.mjs`) hace el merge `develop` → `main` en local. La skill `release` prefiere
-la coreografía vía PR; usar el script solo si el usuario lo pide.
+> `pnpm release:prod` (`scripts/release-to-prod.mjs`) mergeaba `develop` → `main` en local y hacía
+> push directo. **Ya no sirve**: `main` exige PR y checks en verde, así que el push se rechaza. La
+> única vía es la coreografía por PR de la skill `release`.
 
 ### Pre-vuelo del release
 
