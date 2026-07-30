@@ -5,6 +5,42 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-07-30
+
+Tooling, CI and dependency maintenance. No product features and no database migrations.
+
+### Added
+
+- Continuous integration on pull requests (`.github/workflows/ci.yml`): a `quality` job running
+  lint, the monorepo build and the frontend tests, and a `backend` job running the three backend
+  suites against a `postgres:17-alpine` service container. Until now the only workflow triggered
+  on push to `main`, so the first signal of a broken build was a red production deploy.
+- `scripts/check-skills-symlinks.mjs`, wired into `pnpm lint` via `pnpm check:skills`. Vendored
+  skills only load through their symlinks in `.claude/skills/`, and that wiring broke silently.
+
+### Changed
+
+- Production dependencies refreshed to resolve reported vulnerabilities: `react-router` unpinned,
+  lockfile updated within semver ranges, `js-yaml` override added. Code adapted to the stricter
+  typings from the `typescript-eslint` and `i18next` bumps.
+- Agent tooling migrated from GitHub Copilot to Claude Code: the Copilot configuration layer is
+  gone, the Tailwind `className` rules now live in the `tailwind-inline-cn` skill, and the
+  vendored skills are exposed through symlinks (`skills-lock.json` resynced, 13 → 8 entries).
+- Issue and PR content is written in Spanish; commits and code stay in English.
+- `eslint.config.js` grants Node globals to `scripts/**/*.mjs`, replacing the per-file
+  `eslint-disable` workaround.
+
+### Fixed
+
+- `apps/backend/.env.test.example`: `JWT_SECRET` was 15 characters where the Joi validation schema
+  requires 32, so copying the example made the integration and e2e suites fail at startup.
+
+### Removed
+
+- 39 stale documents from `/docs` — implementation plans for shipped work and architecture
+  documents frozen since January 2026 — plus the resulting dangling links in `README`,
+  `DEPLOYMENT.md` and the frontend READMEs.
+
 ## [0.1.1] - 2026-07-27
 
 Documentation only. Resolves contradictions between the deployment guide and the release
