@@ -1,12 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-import cookieParser from 'cookie-parser';
+import { configureApp } from './common/bootstrap/configure-app';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -25,28 +23,8 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Global API prefix
-  app.setGlobalPrefix('api');
-
-  // Global Validation Pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true, // Strip properties that don't have decorators
-      forbidNonWhitelisted: true, // Throw error if non-whitelisted properties are present
-      transform: true, // Automatically transform payloads to DTO instances
-      transformOptions: {
-        enableImplicitConversion: true, // Enable implicit type conversion
-      },
-    }),
-  );
-
-  // Global Exception Filter
-  app.useGlobalFilters(new HttpExceptionFilter());
-
-  // Global Response Transformer
-  app.useGlobalInterceptors(new TransformInterceptor());
-
-  app.use(cookieParser());
+  // Security headers, global prefix, validation, error contract and response envelope
+  configureApp(app);
 
   // Swagger Configuration
   const config = new DocumentBuilder()
