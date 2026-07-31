@@ -37,12 +37,14 @@ y start descritos en [`DEPLOYMENT.md`](../DEPLOYMENT.md)).
 | Estado | option-id |
 |---|---|
 | Todo | `f75ad846` |
+| Ready | `90c1ddbf` |
 | In Progress | `47fc9ee4` |
+| In Review | `97172d5f` |
 | Done | `98236657` |
 
-> El tablero tiene **tres** estados, no los cinco del flujo genérico. Mapeo:
-> `Ready` → **Todo**, `In progress` → **In Progress**, `In review` → se queda en **In Progress**
-> (no hay estado de revisión), `Done` → **Done**.
+> El tablero tiene los cinco estados del flujo genérico, así que no hace falta ningún mapeo: cada
+> estado de la skill se corresponde con el del mismo nombre. Verifica los ids con
+> `gh project field-list 1 --owner MrClit --format json` si algo no cuadra.
 
 ## Labels
 
