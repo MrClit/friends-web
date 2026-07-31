@@ -1,4 +1,5 @@
 import * as Joi from 'joi';
+import { DEFAULT_JWT_EXPIRATION } from './auth.constants';
 
 export const envValidationSchema = Joi.object({
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
@@ -18,7 +19,7 @@ export const envValidationSchema = Joi.object({
   CORS_ORIGIN: Joi.string().default('http://localhost:5173'),
 
   JWT_SECRET: Joi.string().min(32).required(),
-  JWT_EXPIRATION: Joi.string().default('1d'),
+  JWT_EXPIRATION: Joi.string().default(DEFAULT_JWT_EXPIRATION),
 
   GOOGLE_CLIENT_ID: Joi.string().required(),
   GOOGLE_CLIENT_SECRET: Joi.string().required(),
