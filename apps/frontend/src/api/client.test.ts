@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { apiRequest, REFRESH_TOKEN_KEY } from '@/api/client';
+import { apiRequest, setAccessToken, REFRESH_TOKEN_KEY } from '@/api/client';
 
 vi.mock('@/config/env', () => ({
   ENV: { API_URL: 'http://test.api' },
@@ -24,6 +24,7 @@ describe('apiRequest', () => {
   });
 
   afterEach(() => {
+    setAccessToken(null);
     vi.unstubAllGlobals();
   });
 
@@ -73,7 +74,7 @@ describe('apiRequest', () => {
 
   describe('401 / token refresh', () => {
     it('retries request with new token after successful refresh', async () => {
-      localStorage.setItem('token', 'old-token');
+      setAccessToken('old-token');
       localStorage.setItem(REFRESH_TOKEN_KEY, 'refresh-token');
 
       vi.mocked(fetch)
@@ -84,12 +85,15 @@ describe('apiRequest', () => {
       const result = await apiRequest<{ id: string }>('/events/1');
 
       expect(result).toEqual({ id: '1' });
-      expect(localStorage.getItem('token')).toBe('new-token');
+      // The retried request must carry the freshly issued access token
+      const retryHeaders = new Headers((vi.mocked(fetch).mock.calls[2][1] as RequestInit).headers);
+      expect(retryHeaders.get('Authorization')).toBe('Bearer new-token');
+      expect(localStorage.getItem('token')).toBeNull();
       expect(fetch).toHaveBeenCalledTimes(3);
     });
 
     it('removes refresh_token and dispatches auth:logout when refresh endpoint returns non-ok', async () => {
-      localStorage.setItem('token', 'old-token');
+      setAccessToken('old-token');
       localStorage.setItem(REFRESH_TOKEN_KEY, 'refresh-token');
 
       vi.mocked(fetch)
@@ -108,7 +112,7 @@ describe('apiRequest', () => {
     });
 
     it('dispatches auth:logout immediately when no refresh token is stored', async () => {
-      localStorage.setItem('token', 'old-token');
+      setAccessToken('old-token');
 
       vi.mocked(fetch).mockResolvedValueOnce(mockResponse(401, { message: 'Unauthorized' }));
 
@@ -124,7 +128,7 @@ describe('apiRequest', () => {
     });
 
     it('does not retry /auth/refresh endpoint on 401', async () => {
-      localStorage.setItem('token', 'old-token');
+      setAccessToken('old-token');
       localStorage.setItem(REFRESH_TOKEN_KEY, 'refresh-token');
 
       vi.mocked(fetch).mockResolvedValueOnce(mockResponse(401, { message: 'Invalid' }));
@@ -134,7 +138,7 @@ describe('apiRequest', () => {
     });
 
     it('deduplicates concurrent refresh calls (race condition)', async () => {
-      localStorage.setItem('token', 'old-token');
+      setAccessToken('old-token');
       localStorage.setItem(REFRESH_TOKEN_KEY, 'refresh-token');
 
       vi.mocked(fetch)

@@ -38,4 +38,5 @@ export const envValidationSchema = Joi.object({
 
   REFRESH_TOKEN_EXPIRATION_DAYS: Joi.number().integer().default(30),
   REFRESH_TOKEN_MAX_ROTATIONS: Joi.number().integer().min(1).default(100),
+  AUTH_EXCHANGE_CODE_TTL_SECONDS: Joi.number().integer().min(10).default(60),
 });

@@ -184,13 +184,32 @@ describe('Auth access control (integration)', () => {
       await oauthApp.close();
     });
 
-    it('redirects to the frontend callback URL with success=true and a refreshToken', async () => {
+    it('redirects to the frontend callback URL with success=true and a one-time code, never a token', async () => {
       const httpServer = oauthApp.getHttpServer() as Parameters<typeof request>[0];
       const response = await request(httpServer).get('/api/auth/google/callback').expect(302);
 
       expect(response.headers.location).toContain('/auth/callback');
       expect(response.headers.location).toContain('success=true');
-      expect(response.headers.location).toContain('refreshToken=');
+      expect(response.headers.location).toContain('code=');
+      expect(response.headers.location).not.toContain('refreshToken=');
+    });
+
+    it('the code from the callback URL can be exchanged once for the token pair', async () => {
+      const httpServer = oauthApp.getHttpServer() as Parameters<typeof request>[0];
+      const redirectRes = await request(httpServer).get('/api/auth/google/callback').expect(302);
+
+      const location = String(redirectRes.headers.location);
+      const code = new URLSearchParams(location.split('?')[1]).get('code');
+      expect(code).toBeTruthy();
+
+      const exchangeRes = await request(httpServer).post('/api/auth/exchange').send({ code }).expect(201);
+
+      const body = exchangeRes.body as { data: { accessToken: string; refreshToken: string } };
+      expect(typeof body.data.accessToken).toBe('string');
+      expect(typeof body.data.refreshToken).toBe('string');
+
+      // Second redemption must fail: the code is single use
+      await request(httpServer).post('/api/auth/exchange').send({ code }).expect(401);
     });
   });
 });

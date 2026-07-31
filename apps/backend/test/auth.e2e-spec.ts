@@ -100,4 +100,14 @@ describe('AuthController (e2e)', () => {
     expect(typeof responseBody.data.createdAt).toBe('string');
     expect(typeof responseBody.data.updatedAt).toBe('string');
   });
+
+  it('POST /api/auth/exchange should return 401 for an unknown code', async () => {
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(httpServer).post('/api/auth/exchange').send({ code: 'nonexistent-code' }).expect(401);
+  });
+
+  it('POST /api/auth/exchange should return 400 when code is missing', async () => {
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    await request(httpServer).post('/api/auth/exchange').send({}).expect(400);
+  });
 });

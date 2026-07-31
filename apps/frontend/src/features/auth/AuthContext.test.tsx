@@ -8,8 +8,15 @@ const resetTransactionModal = vi.fn();
 const resetToast = vi.fn();
 const resetDeleting = vi.fn();
 
+const { refreshAccessTokenMock, setAccessTokenMock } = vi.hoisted(() => ({
+  refreshAccessTokenMock: vi.fn(),
+  setAccessTokenMock: vi.fn(),
+}));
+
 vi.mock('@/api/client', () => ({
   REFRESH_TOKEN_KEY: 'refresh_token',
+  refreshAccessToken: refreshAccessTokenMock,
+  setAccessToken: setAccessTokenMock,
 }));
 
 vi.mock('@/shared/store/useEventFormModalStore', () => ({
@@ -61,18 +68,20 @@ describe('AuthProvider', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
     vi.clearAllMocks();
+    refreshAccessTokenMock.mockResolvedValue('my-jwt');
   });
 
-  it('sets loading to false when no token is stored', async () => {
+  it('sets loading to false without refreshing when no refresh token is stored', async () => {
     renderProvider();
     await waitFor(() => {
       expect(screen.getByTestId('loading')).toHaveTextContent('false');
     });
+    expect(refreshAccessTokenMock).not.toHaveBeenCalled();
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it('fetches user on mount when token is stored', async () => {
-    localStorage.setItem('token', 'my-jwt');
+  it('bootstraps the session from the refresh token on mount', async () => {
+    localStorage.setItem('refresh_token', 'stored-refresh');
     vi.mocked(fetch).mockResolvedValueOnce(userResponse());
 
     renderProvider();
@@ -80,11 +89,25 @@ describe('AuthProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('user')).toHaveTextContent('user@test.com');
     });
+    expect(refreshAccessTokenMock).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('loading')).toHaveTextContent('false');
   });
 
+  it('sets loading to false without fetching user when the refresh fails', async () => {
+    localStorage.setItem('refresh_token', 'stored-refresh');
+    refreshAccessTokenMock.mockResolvedValue(null);
+
+    renderProvider();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('loading')).toHaveTextContent('false');
+    });
+    expect(screen.getByTestId('user')).toHaveTextContent('null');
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
   it('clears user and token when /auth/me returns 401', async () => {
-    localStorage.setItem('token', 'expired-jwt');
+    localStorage.setItem('refresh_token', 'stored-refresh');
     vi.mocked(fetch).mockResolvedValueOnce({ ok: false, status: 401 } as Response);
 
     renderProvider();
@@ -93,11 +116,11 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('loading')).toHaveTextContent('false');
     });
     expect(screen.getByTestId('user')).toHaveTextContent('null');
-    expect(localStorage.getItem('token')).toBeNull();
+    expect(setAccessTokenMock).toHaveBeenCalledWith(null);
   });
 
   it('sets error when /auth/me returns non-401 server error', async () => {
-    localStorage.setItem('token', 'my-jwt');
+    localStorage.setItem('refresh_token', 'stored-refresh');
     vi.mocked(fetch).mockResolvedValueOnce({ ok: false, status: 500 } as Response);
 
     renderProvider();
@@ -108,7 +131,7 @@ describe('AuthProvider', () => {
   });
 
   it('sets error on network failure during fetchUser', async () => {
-    localStorage.setItem('token', 'my-jwt');
+    localStorage.setItem('refresh_token', 'stored-refresh');
     vi.mocked(fetch).mockRejectedValueOnce(new Error('Network down'));
 
     renderProvider();
@@ -118,8 +141,8 @@ describe('AuthProvider', () => {
     });
   });
 
-  it('clears user, token and localStorage on logout', async () => {
-    localStorage.setItem('token', 'my-jwt');
+  it('clears user, in-memory token and stored refresh token on logout', async () => {
+    localStorage.setItem('refresh_token', 'stored-refresh');
     vi.mocked(fetch).mockResolvedValueOnce(userResponse());
 
     renderProvider();
@@ -133,11 +156,12 @@ describe('AuthProvider', () => {
     });
 
     expect(screen.getByTestId('user')).toHaveTextContent('null');
-    expect(localStorage.getItem('token')).toBeNull();
+    expect(setAccessTokenMock).toHaveBeenCalledWith(null);
+    expect(localStorage.getItem('refresh_token')).toBeNull();
   });
 
   it('resets all stores on logout', async () => {
-    localStorage.setItem('token', 'my-jwt');
+    localStorage.setItem('refresh_token', 'stored-refresh');
     vi.mocked(fetch).mockResolvedValueOnce(userResponse());
 
     renderProvider();
@@ -157,7 +181,7 @@ describe('AuthProvider', () => {
   });
 
   it('calls logout when auth:logout event is dispatched', async () => {
-    localStorage.setItem('token', 'my-jwt');
+    localStorage.setItem('refresh_token', 'stored-refresh');
     vi.mocked(fetch).mockResolvedValueOnce(userResponse());
 
     renderProvider();
@@ -173,6 +197,6 @@ describe('AuthProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('user')).toHaveTextContent('null');
     });
-    expect(localStorage.getItem('token')).toBeNull();
+    expect(localStorage.getItem('refresh_token')).toBeNull();
   });
 });

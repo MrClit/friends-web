@@ -10,7 +10,9 @@ import { UsersModule } from '../users/users.module';
 import { AvatarService } from './services/avatar.service';
 import { OAuthProviderService } from './services/oauth-provider.service';
 import { RefreshTokenService } from './services/refresh-token.service';
+import { AuthExchangeCodeService } from './services/auth-exchange-code.service';
 import { RefreshToken } from './entities/refresh-token.entity';
+import { AuthExchangeCode } from './entities/auth-exchange-code.entity';
 import { AUTH_STRATEGIES } from './strategies';
 
 @Module({
@@ -18,7 +20,7 @@ import { AUTH_STRATEGIES } from './strategies';
     ConfigModule,
     UsersModule,
     PassportModule,
-    TypeOrmModule.forFeature([RefreshToken]),
+    TypeOrmModule.forFeature([RefreshToken, AuthExchangeCode]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
@@ -28,7 +30,15 @@ import { AUTH_STRATEGIES } from './strategies';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, AvatarService, OAuthProviderService, RefreshTokenService, ...AUTH_STRATEGIES, RolesGuard],
+  providers: [
+    AuthService,
+    AvatarService,
+    OAuthProviderService,
+    RefreshTokenService,
+    AuthExchangeCodeService,
+    ...AUTH_STRATEGIES,
+    RolesGuard,
+  ],
   controllers: [AuthController],
   exports: [AuthService],
 })

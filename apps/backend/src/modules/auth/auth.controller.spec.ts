@@ -1,7 +1,9 @@
+import { UnauthorizedException } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import type { AuthService } from './auth.service';
 import type { UsersService } from '../users/users.service';
 import type { ConfigService } from '@nestjs/config';
+import type { AuthExchangeCodeService } from './services/auth-exchange-code.service';
 import type { User } from '../users/user.entity';
 import type { Response } from 'express';
 
@@ -15,6 +17,7 @@ describe('AuthController', () => {
   };
   let usersService: { toCurrentUserProfile: jest.Mock; findByIdOrThrow: jest.Mock };
   let configService: { get: jest.Mock };
+  let authExchangeCodeService: { issueCode: jest.Mock; consumeCode: jest.Mock };
 
   const baseUser: User = {
     id: 'user-1',
@@ -47,37 +50,81 @@ describe('AuthController', () => {
       get: jest.fn().mockReturnValue('http://localhost:5173/friends-web/#'),
     };
 
+    authExchangeCodeService = {
+      issueCode: jest.fn().mockResolvedValue({ rawCode: 'exchange-code' }),
+      consumeCode: jest.fn(),
+    };
+
     controller = new AuthController(
       authService as unknown as AuthService,
       usersService as unknown as UsersService,
       configService as unknown as ConfigService,
+      authExchangeCodeService as unknown as AuthExchangeCodeService,
     );
   });
 
-  it('redirects Google callback to frontend with success flag and refresh token in query param', async () => {
+  it('redirects Google callback to frontend with success flag and one-time code, never a refresh token', async () => {
     const req = { user: baseUser } as Parameters<typeof controller.googleAuthRedirect>[0];
     const redirect = jest.fn();
     const res = { redirect } as unknown as Response;
 
     await controller.googleAuthRedirect(req, res);
 
-    expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
+    expect(authExchangeCodeService.issueCode).toHaveBeenCalledWith(baseUser.id);
+    expect(authService.generateAuthTokens).not.toHaveBeenCalled();
     expect(redirect).toHaveBeenCalledTimes(1);
     expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?success=true'));
-    expect(redirect).toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
+    expect(redirect).toHaveBeenCalledWith(expect.stringContaining('code=exchange-code'));
+    expect(redirect).not.toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
   });
 
-  it('redirects Microsoft callback to frontend with success flag and refresh token in query param', async () => {
+  it('redirects Microsoft callback to frontend with success flag and one-time code, never a refresh token', async () => {
     const req = { user: baseUser } as Parameters<typeof controller.microsoftAuthRedirect>[0];
     const redirect = jest.fn();
     const res = { redirect } as unknown as Response;
 
     await controller.microsoftAuthRedirect(req, res);
 
-    expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
+    expect(authExchangeCodeService.issueCode).toHaveBeenCalledWith(baseUser.id);
+    expect(authService.generateAuthTokens).not.toHaveBeenCalled();
     expect(redirect).toHaveBeenCalledTimes(1);
     expect(redirect).toHaveBeenCalledWith(expect.stringContaining('/auth/callback?success=true'));
-    expect(redirect).toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
+    expect(redirect).toHaveBeenCalledWith(expect.stringContaining('code=exchange-code'));
+    expect(redirect).not.toHaveBeenCalledWith(expect.stringContaining('refreshToken='));
+  });
+
+  it('exchange consumes the code and returns the token pair', async () => {
+    const json = jest.fn();
+    const res = { json } as unknown as Response;
+
+    authExchangeCodeService.consumeCode.mockResolvedValue('user-1');
+    usersService.findByIdOrThrow.mockResolvedValue(baseUser);
+
+    await controller.exchange({ code: 'exchange-code' }, res);
+
+    expect(authExchangeCodeService.consumeCode).toHaveBeenCalledWith('exchange-code');
+    expect(usersService.findByIdOrThrow).toHaveBeenCalledWith('user-1');
+    expect(authService.generateAuthTokens).toHaveBeenCalledWith(baseUser);
+    expect(json).toHaveBeenCalledWith({ data: { accessToken: 'jwt-token', refreshToken: 'refresh-token' } });
+  });
+
+  it('exchange rejects an invalid code with UnauthorizedException', async () => {
+    const res = { json: jest.fn() } as unknown as Response;
+
+    authExchangeCodeService.consumeCode.mockRejectedValue(new UnauthorizedException());
+
+    await expect(controller.exchange({ code: 'bad-code' }, res)).rejects.toThrow(UnauthorizedException);
+    expect(authService.generateAuthTokens).not.toHaveBeenCalled();
+  });
+
+  it('exchange rejects when the code owner no longer exists', async () => {
+    const res = { json: jest.fn() } as unknown as Response;
+
+    authExchangeCodeService.consumeCode.mockResolvedValue('user-gone');
+    usersService.findByIdOrThrow.mockRejectedValue(new Error('not found'));
+
+    await expect(controller.exchange({ code: 'exchange-code' }, res)).rejects.toThrow(UnauthorizedException);
+    expect(authService.generateAuthTokens).not.toHaveBeenCalled();
   });
 
   it('refresh rotates token and returns new access token and refresh token in body', async () => {
