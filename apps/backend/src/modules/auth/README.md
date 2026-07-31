@@ -24,6 +24,8 @@ El módulo `auth` gestiona la autenticación y autorización de usuarios en la A
 - **services/**:
   - **oauth-provider.service.ts**: Lógica común de validación/login OAuth para proveedores.
   - **avatar.service.ts**: Gestión de avatares en Cloudinary.
+  - **refresh-token.service.ts**: Emisión, rotación y revocación de refresh tokens (hash SHA-256, familias, detección de brechas).
+  - **auth-exchange-code.service.ts**: Códigos de intercambio de un solo uso (TTL corto) para el callback OAuth.
 - **strategies/**:
   - **index.ts**: Registro centralizado de estrategias (`AUTH_STRATEGIES`).
   - **jwt/jwt.strategy.ts**: Validación JWT para rutas protegidas.
@@ -41,8 +43,12 @@ El módulo `auth` gestiona la autenticación y autorización de usuarios en la A
 1. El usuario accede a `/auth/google` o `/auth/microsoft` para iniciar sesión con su proveedor.
 2. El proveedor OAuth redirige al backend con el código de autorización.
 3. `google.strategy.ts` o `microsoft.strategy.ts` validan el perfil y delegan en `auth.service.ts`.
-4. `auth.controller.ts` genera un JWT y redirige al frontend a `/auth/callback` con el token.
-5. Las rutas protegidas usan `jwt.strategy.ts` para validar el token.
+4. `auth.controller.ts` emite un **código de intercambio de un solo uso** (TTL configurable vía
+   `AUTH_EXCHANGE_CODE_TTL_SECONDS`, 60 s por defecto) y redirige al frontend a `/auth/callback?code=…`.
+   Ningún token viaja en la URL.
+5. El frontend canjea el código vía `POST /auth/exchange` y recibe el par `accessToken` + `refreshToken`.
+6. `POST /auth/refresh` rota el refresh token; `POST /auth/logout` lo revoca.
+7. Las rutas protegidas usan `jwt.strategy.ts` para validar el access token.
 
 ## 4. Estrategias de Autenticación
 

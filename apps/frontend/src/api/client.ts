@@ -9,15 +9,19 @@ interface ApiRequestInit extends RequestInit {
   _retried?: boolean;
 }
 
-function getAuthToken() {
-  return localStorage.getItem('token');
+// The access token lives only in memory so a persistent XSS cannot read it
+// from storage; on page load a new one is obtained via the refresh token.
+let accessToken: string | null = null;
+
+export function setAccessToken(token: string | null) {
+  accessToken = token;
 }
 
 function getRefreshToken() {
   return localStorage.getItem(REFRESH_TOKEN_KEY);
 }
 
-async function refreshAccessToken(): Promise<string | null> {
+export async function refreshAccessToken(): Promise<string | null> {
   if (refreshPromise) {
     return refreshPromise;
   }
@@ -41,7 +45,11 @@ async function refreshAccessToken(): Promise<string | null> {
       if (newRefreshToken) {
         localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
       }
-      return body.data?.accessToken ?? null;
+      const newAccessToken = body.data?.accessToken ?? null;
+      if (newAccessToken) {
+        setAccessToken(newAccessToken);
+      }
+      return newAccessToken;
     })
     .catch(() => null)
     .finally(() => {
@@ -78,7 +86,7 @@ export async function apiRequest<T>(endpoint: string, options?: ApiRequestInit):
   const { _retried: hasRetried = false, ...baseOptions } = requestOptions;
 
   let response: Response;
-  const token = getAuthToken();
+  const token = accessToken;
   const isFormData = typeof FormData !== 'undefined' && baseOptions.body instanceof FormData;
 
   try {
@@ -107,7 +115,6 @@ export async function apiRequest<T>(endpoint: string, options?: ApiRequestInit):
       const newToken = await refreshAccessToken();
 
       if (newToken) {
-        localStorage.setItem('token', newToken);
         return apiRequest<T>(endpoint, {
           ...baseOptions,
           _retried: true,

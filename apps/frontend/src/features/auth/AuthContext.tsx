@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useState, type ReactNode } from 'react';
-import { REFRESH_TOKEN_KEY } from '@/api/client';
+import { REFRESH_TOKEN_KEY, refreshAccessToken, setAccessToken } from '@/api/client';
 import type { AuthContextType, AuthProvider, User } from './types';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
@@ -7,8 +7,6 @@ import { useDeletingStore } from '@/shared/store/useDeletingStore';
 import { useToastStore } from '@/shared/store/useToastStore';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const TOKEN_KEY = 'token';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -32,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.status === 401) {
         setUser(null);
         setToken(null);
-        localStorage.removeItem(TOKEN_KEY);
+        setAccessToken(null);
         return null;
       }
 
@@ -49,14 +47,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem(TOKEN_KEY);
-    if (!storedToken) {
+    // The access token lives only in memory: on page load, bootstrap the
+    // session from the stored refresh token instead.
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!refreshToken) {
       setLoading(false);
       return;
     }
 
-    setToken(storedToken);
-    void fetchUser(storedToken);
+    void (async () => {
+      const newAccessToken = await refreshAccessToken();
+      if (!newAccessToken) {
+        setLoading(false);
+        return;
+      }
+
+      setToken(newAccessToken);
+      await fetchUser(newAccessToken);
+    })();
   }, [fetchUser]);
 
   const login = (provider: AuthProvider = 'google') => {
@@ -77,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setUser(null);
     setToken(null);
-    localStorage.removeItem(TOKEN_KEY);
+    setAccessToken(null);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
 
     useEventFormModalStore.getState().reset();
@@ -111,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const setAuth = (nextUser: User, nextToken: string) => {
     setUser(nextUser);
     setToken(nextToken);
-    localStorage.setItem(TOKEN_KEY, nextToken);
+    setAccessToken(nextToken);
   };
 
   const refreshUser = useCallback(() => {
