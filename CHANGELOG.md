@@ -5,6 +5,43 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-07-31
+
+Security hardening of the authentication flow. Includes a database migration; no changes to
+OAuth console configuration or Render environment variables are required.
+
+### Added
+
+- One-time exchange codes for the OAuth callback (`auth_exchange_codes` table, migration
+  `1705700000000-CreateAuthExchangeCodesTable`). `AuthExchangeCodeService` issues opaque codes
+  stored as SHA-256 hashes with a configurable TTL (`AUTH_EXCHANGE_CODE_TTL_SECONDS`, default 60
+  seconds) and redeems them through a conditional `UPDATE … RETURNING`, so concurrent redemptions
+  can never both succeed. Expired rows are swept hourly by a cron job.
+- `POST /auth/exchange`, which trades a valid code for the access/refresh token pair.
+
+### Changed
+
+- The OAuth callback now redirects with `?code=…` instead of `?refreshToken=…`. A refresh token
+  that used to sit in browser history for 30 days is replaced by a single-use code valid for 60
+  seconds. The refresh token is no longer minted at redirect time but when the code is redeemed,
+  so an abandoned login leaves no long-lived token behind.
+- The access token lives only in memory on the frontend. `AuthContext` bootstraps the session from
+  the stored refresh token on page load, and the retry-after-401 path no longer writes it to
+  storage.
+- Per-endpoint rate limits on the auth controller: `POST /auth/exchange` at 5/min and
+  `POST /auth/refresh` at 30/min, replacing the single 10/min class-level limit. Page loads now
+  trigger a refresh, so the previous shared budget was too tight for several devices behind one
+  NAT.
+
+### Security
+
+- No token of any kind appears in a URL. Closes [#92]. The remaining acceptance criterion of that
+  issue — the refresh token being unreadable from JavaScript via an `httpOnly` cookie — is out of
+  scope: the frontend (GitHub Pages) and the backend (Render) are cross-site, both `github.io` and
+  `onrender.com` being on the Public Suffix List, so a `SameSite=None` cookie would be blocked by
+  Safari's ITP and partitioned by Firefox. Tracked in [#111]; the tab-rotation race it interacts
+  with is tracked in [#112].
+
 ## [0.1.2] - 2026-07-30
 
 Tooling, CI and dependency maintenance. No product features and no database migrations.
@@ -95,5 +132,11 @@ JWT secret validation. No product features and no database migrations.
 
 - Outdated GitHub Actions workflows: `backend-tests.yml` and `release-to-prod.yml`.
 
+[#92]: https://github.com/MrClit/friends-web/issues/92
+[#111]: https://github.com/MrClit/friends-web/issues/111
+[#112]: https://github.com/MrClit/friends-web/issues/112
+
+[0.1.3]: https://github.com/MrClit/friends-web/releases/tag/v0.1.3
+[0.1.2]: https://github.com/MrClit/friends-web/releases/tag/v0.1.2
 [0.1.1]: https://github.com/MrClit/friends-web/releases/tag/v0.1.1
 [0.1.0]: https://github.com/MrClit/friends-web/releases/tag/v0.1.0
