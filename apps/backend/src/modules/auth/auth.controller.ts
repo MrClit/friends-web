@@ -4,9 +4,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiErrorResponseDto } from '../../common/dto/api-error-response.dto';
 import { ConfigService } from '@nestjs/config';
 import { Throttle } from '@nestjs/throttler';
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiStandardResponse } from '../../common/decorators/api-standard-response.decorator';
 import { AuthService } from './auth.service';
+import { AuthExchangeCodeService } from './services/auth-exchange-code.service';
 import type { Request, Response } from 'express';
 import { CurrentUserProfileDto } from '../users/dto/current-user-profile.dto';
 import { User } from '../users/user.entity';
@@ -18,6 +19,12 @@ class RefreshTokenDto {
   refreshToken?: string;
 }
 
+class ExchangeCodeDto {
+  @IsString()
+  @IsNotEmpty()
+  code!: string;
+}
+
 @Throttle({ default: { ttl: 60_000, limit: 10 } })
 @ApiTags('Auth')
 @Controller('auth')
@@ -26,6 +33,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
+    private readonly authExchangeCodeService: AuthExchangeCodeService,
   ) {}
 
   @Get('google')
@@ -37,7 +45,7 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req: Request & { user: User }, @Res() res: Response) {
-    return this.redirectToFrontendWithToken(req.user, res);
+    return this.redirectToFrontendWithCode(req.user, res);
   }
 
   @Get('microsoft')
@@ -49,10 +57,27 @@ export class AuthController {
   @Get('microsoft/callback')
   @UseGuards(AuthGuard('microsoft'))
   async microsoftAuthRedirect(@Req() req: Request & { user: User }, @Res() res: Response) {
-    return this.redirectToFrontendWithToken(req.user, res);
+    return this.redirectToFrontendWithCode(req.user, res);
+  }
+
+  @Post('exchange')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiOperation({ summary: 'Exchange a one-time OAuth callback code for auth tokens' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired exchange code', type: ApiErrorResponseDto })
+  async exchange(@Body() body: ExchangeCodeDto, @Res() res: Response) {
+    const userId = await this.authExchangeCodeService.consumeCode(body.code);
+    const user = await this.usersService.findByIdOrThrow(userId).catch(() => {
+      throw new UnauthorizedException();
+    });
+    const { accessToken, refreshToken } = await this.authService.generateAuthTokens(user);
+
+    return res.json({ data: { accessToken, refreshToken } });
   }
 
   @Post('refresh')
+  // Access tokens live only in memory, so every tab load triggers a refresh;
+  // keep this limit generous enough for several devices behind one NAT.
+  @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Rotate refresh token and get new access token' })
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token', type: ApiErrorResponseDto })
   async refresh(@Body() body: RefreshTokenDto, @Res() res: Response) {
@@ -92,10 +117,10 @@ export class AuthController {
     return this.usersService.toCurrentUserProfile(req.user);
   }
 
-  private async redirectToFrontendWithToken(user: User, res: Response) {
-    const { refreshToken } = await this.authService.generateAuthTokens(user);
+  private async redirectToFrontendWithCode(user: User, res: Response) {
+    const { rawCode } = await this.authExchangeCodeService.issueCode(user.id);
     const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:5173/friends-web/#');
-    const redirectUrl = `${frontendUrl}/auth/callback?success=true&refreshToken=${encodeURIComponent(refreshToken)}`;
+    const redirectUrl = `${frontendUrl}/auth/callback?success=true&code=${encodeURIComponent(rawCode)}`;
     return res.redirect(redirectUrl);
   }
 }

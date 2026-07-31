@@ -22,29 +22,27 @@ export function AuthCallback() {
     bootstrappedRef.current = true;
 
     const params = new URLSearchParams(location.search);
-    const refreshToken = params.get('refreshToken');
-    if (!params.get('success') || !refreshToken) {
+    const code = params.get('code');
+    if (!params.get('success') || !code) {
       navigate('/', { replace: true });
       return;
     }
 
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-
     async function bootstrap() {
       try {
-        const refreshRes = await fetch(`${ENV.API_URL}/auth/refresh`, {
+        // Redeem the one-time exchange code for the token pair; the refresh
+        // token itself never travels in the callback URL.
+        const exchangeRes = await fetch(`${ENV.API_URL}/auth/exchange`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken }),
+          body: JSON.stringify({ code }),
         });
-        if (!refreshRes.ok) throw new Error('refresh failed');
-        const refreshBody = (await refreshRes.json()) as { data?: { accessToken?: string; refreshToken?: string } };
-        const accessToken = refreshBody.data?.accessToken;
-        const newRefreshToken = refreshBody.data?.refreshToken;
-        if (!accessToken) throw new Error('no access token');
-        if (newRefreshToken) {
-          localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
-        }
+        if (!exchangeRes.ok) throw new Error('exchange failed');
+        const exchangeBody = (await exchangeRes.json()) as { data?: { accessToken?: string; refreshToken?: string } };
+        const accessToken = exchangeBody.data?.accessToken;
+        const refreshToken = exchangeBody.data?.refreshToken;
+        if (!accessToken || !refreshToken) throw new Error('no tokens');
+        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 
         const meRes = await fetch(`${ENV.API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
