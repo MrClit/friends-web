@@ -129,6 +129,29 @@ describe('UsersService', () => {
     expect(queryBuilder.getMany).toHaveBeenCalledTimes(1);
   });
 
+  it.each([
+    ['50%', '%50\\%%'],
+    ['a_b', '%a\\_b%'],
+    ['c:\\', '%c:\\\\%'],
+    ['%_\\', '%\\%\\_\\\\%'],
+  ])('search escapes LIKE wildcards in %p', async (rawQuery, expectedPattern) => {
+    const queryBuilder = {
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([]),
+    };
+    mockRepository.createQueryBuilder.mockReturnValue(queryBuilder);
+
+    await service.search(rawQuery);
+
+    expect(queryBuilder.where).toHaveBeenCalledWith('(user.name ILIKE :query OR user.email ILIKE :query)', {
+      query: expectedPattern,
+    });
+  });
+
   it('getCurrentUserProfileByIdOrThrow returns current user profile projection', async () => {
     const now = new Date();
     const user = {

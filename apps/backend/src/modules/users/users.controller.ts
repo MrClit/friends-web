@@ -9,7 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiErrorResponseDto } from '../../common/dto/api-error-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
@@ -19,6 +19,7 @@ import type { AuthenticatedUser } from '../../common/types/authenticated-user.ty
 import { AvatarService } from '../auth/services/avatar.service';
 import { RolesGuard } from '../auth/roles/roles.guard';
 import { CurrentUserProfileDto } from './dto/current-user-profile.dto';
+import { SearchUsersQueryDto } from './dto/search-users-query.dto';
 import { UpdateCurrentUserProfileDto } from './dto/update-current-user-profile.dto';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
@@ -43,18 +44,30 @@ export class UsersController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all users for participant selection' })
+  @ApiOperation({
+    summary: 'Get all users for participant selection',
+    description:
+      'Returns the whole user directory, email included, to any authenticated user. This is a ' +
+      'deliberate product decision: the participant picker needs the full list, and email is what ' +
+      'disambiguates people with the same name. It is acceptable only while sign-up stays limited ' +
+      'to the circle of friends this app was built for. Revisit it once registration opens up or ' +
+      'the directory grows past a few hundred users — `GET /users/search` is the bounded ' +
+      'alternative to migrate to.',
+  })
   @ApiStandardResponse(200, 'Users retrieved successfully', UserDto, true)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get('search')
-  @ApiOperation({ summary: 'Search users by name or email' })
-  @ApiQuery({ name: 'q', description: 'Search query' })
+  @ApiOperation({
+    summary: 'Search users by name or email',
+    description: 'Wildcards in the search term are matched literally, not interpreted as patterns.',
+  })
   @ApiStandardResponse(200, 'Users found', UserDto, true)
-  search(@Query('q') query: string) {
-    return this.usersService.search(query);
+  @ApiResponse({ status: 400, description: 'Invalid or missing search query', type: ApiErrorResponseDto })
+  search(@Query() { q }: SearchUsersQueryDto) {
+    return this.usersService.search(q);
   }
 
   @Get('me')
