@@ -87,6 +87,16 @@ export class UsersService {
     return this.toCurrentUserProfile(user);
   }
 
+  /**
+   * Returns the whole user directory — including every user's email — to any authenticated caller.
+   *
+   * This is a deliberate product decision, not an oversight: the participant picker needs to offer
+   * the full list of users, and email is what disambiguates people with the same name. It is
+   * acceptable only while sign-up stays limited to the circle of friends the app was built for.
+   *
+   * Revisit it once that stops holding — registration opening up, or the directory growing past a
+   * few hundred users. `search` is the bounded alternative the client should migrate to then.
+   */
   async findAll(): Promise<User[]> {
     return this.userRepository.find({
       select: ['id', 'email', 'name', 'avatar', 'role'],
@@ -95,10 +105,16 @@ export class UsersService {
   }
 
   async search(query: string): Promise<User[]> {
+    // Escape the LIKE wildcards so the caller's input is matched literally instead of being
+    // interpreted as a pattern. The backslash itself goes first, otherwise it would be escaped
+    // twice. PostgreSQL uses a backslash as the default LIKE escape character, so no ESCAPE
+    // clause is needed.
+    const escapedQuery = query.replace(/[\\%_]/g, (char) => `\\${char}`);
+
     return this.userRepository
       .createQueryBuilder('user')
       .where('(user.name ILIKE :query OR user.email ILIKE :query)', {
-        query: `%${query}%`,
+        query: `%${escapedQuery}%`,
       })
       .andWhere('user.deleted_at IS NULL')
       .select(['user.id', 'user.email', 'user.name', 'user.avatar', 'user.role'])

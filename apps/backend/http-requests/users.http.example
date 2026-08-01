@@ -9,6 +9,8 @@
 ###############################################
 # Retrieve all users (for participant selection)
 # @returns List of all users with basic info (id, email, name, avatar, role)
+# NOTE: this deliberately exposes the whole directory, email included, to any authenticated user.
+# See the endpoint description in /api/docs for the decision and when to revisit it.
 GET {{baseUrl}}/users
 Authorization: Bearer {{token}}
 
@@ -16,8 +18,8 @@ Authorization: Bearer {{token}}
 # SEARCH USERS
 ###############################################
 # Search users by name or email
-# @param q - Search query string
-# @returns Filtered list of users matching the query
+# @param q - Search query string, required, 2 to 100 characters (trimmed)
+# @returns Filtered list of users matching the query, max 20
 
 ### Search by name
 GET {{baseUrl}}/users/search?q=john
@@ -31,6 +33,14 @@ Authorization: Bearer {{token}}
 GET {{baseUrl}}/users/search?q=gma
 Authorization: Bearer {{token}}
 
-### Search with empty query (should return all users or empty)
+### Search with empty query (400 - q is required)
 GET {{baseUrl}}/users/search?q=
+Authorization: Bearer {{token}}
+
+### Search with a single character (400 - minimum length is 2)
+GET {{baseUrl}}/users/search?q=j
+Authorization: Bearer {{token}}
+
+### Search with a LIKE wildcard (200 - % is matched literally, not as a pattern)
+GET {{baseUrl}}/users/search?q=%25%25
 Authorization: Bearer {{token}}
