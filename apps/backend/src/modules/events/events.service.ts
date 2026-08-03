@@ -17,7 +17,7 @@ import { EventKPIsService } from './services/event-kpis.service';
 import { EventQueryService } from './services/event-query.service';
 import { EventParticipantsService } from './services/event-participants.service';
 import { EventKPIsDto } from './dto/event-kpis.dto';
-import { ADMIN_ROLE } from '../users/user-role.constants';
+import { EventAccessService } from '../event-access/event-access.service';
 
 @Injectable()
 export class EventsService {
@@ -26,6 +26,7 @@ export class EventsService {
   constructor(
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
+    private readonly eventAccessService: EventAccessService,
     private readonly eventQueryService: EventQueryService,
     private readonly eventParticipantsService: EventParticipantsService,
     private readonly eventKPIsService: EventKPIsService,
@@ -46,23 +47,8 @@ export class EventsService {
     return cleanUpdate;
   }
 
-  private isAdmin(actor: AuthenticatedUser): boolean {
-    return actor.role === ADMIN_ROLE;
-  }
-
-  private isUserParticipant(event: Event, userId: string): boolean {
-    return (event.participants ?? []).some((p) => p.type === 'user' && p.id === userId);
-  }
-
-  private ensureCanAccessEvent(event: Event, actor: AuthenticatedUser): void {
-    if (this.isAdmin(actor)) return;
-    if (!this.isUserParticipant(event, actor.id)) {
-      throw new ForbiddenException(`Access to event ${event.id} is not allowed`);
-    }
-  }
-
   private ensureActorParticipant(participants: EventParticipant[], actor: AuthenticatedUser): EventParticipant[] {
-    if (this.isAdmin(actor)) return participants;
+    if (this.eventAccessService.isAdmin(actor)) return participants;
     const hasCurrentUser = participants.some((p) => p.type === 'user' && p.id === actor.id);
     return hasCurrentUser ? participants : [...participants, { type: 'user', id: actor.id }];
   }
@@ -82,9 +68,7 @@ export class EventsService {
         order: { createdAt: 'DESC' },
       });
 
-      if (!this.isAdmin(actor)) {
-        events = events.filter((event) => this.isUserParticipant(event, actor.id));
-      }
+      events = events.filter((event) => this.eventAccessService.canAccessEvent(event, actor));
 
       await this.eventParticipantsService.enrichParticipants(events);
       await this.eventQueryService.calculateLastModified(events);
@@ -104,8 +88,7 @@ export class EventsService {
   async findOne(id: string, actor: AuthenticatedUser): Promise<Event> {
     try {
       this.logger.log(`Fetching event with ID: ${id}`);
-      const event = await this.eventQueryService.findEventOrThrow(id);
-      this.ensureCanAccessEvent(event, actor);
+      const event = await this.eventAccessService.loadAccessibleEvent(id, actor);
 
       await this.eventParticipantsService.enrichParticipants(event);
       await this.eventQueryService.calculateLastModified(event);
@@ -158,8 +141,7 @@ export class EventsService {
     try {
       this.logger.log(`Updating event with ID: ${id}`);
 
-      const event = await this.eventQueryService.findEventOrThrow(id);
-      this.ensureCanAccessEvent(event, actor);
+      const event = await this.eventAccessService.loadAccessibleEvent(id, actor);
 
       const normalizedParticipants = this.eventParticipantsService.normalizeParticipants(updateEventDto.participants, true);
 
@@ -182,7 +164,7 @@ export class EventsService {
             throw new NotFoundException(`Event with ID ${id} not found`);
           }
 
-          this.ensureCanAccessEvent(eventToUpdate, actor);
+          this.eventAccessService.ensureCanAccessEvent(eventToUpdate, actor);
 
           const updatedEvent = transactionalEventRepository.merge(eventToUpdate, cleanUpdate);
           const transactionSavedEvent = await transactionalEventRepository.save(updatedEvent);
@@ -218,8 +200,7 @@ export class EventsService {
     try {
       this.logger.log(`Deleting event with ID: ${id}`);
 
-      const event = await this.eventQueryService.findEventOrThrow(id);
-      this.ensureCanAccessEvent(event, actor);
+      await this.eventAccessService.loadAccessibleEvent(id, actor);
 
       await this.eventRepository.delete(id);
       this.logger.log(`Event ${id} deleted successfully`);
@@ -235,8 +216,7 @@ export class EventsService {
    * Get KPIs for a specific event.
    */
   async getKPIs(eventId: string, actor: AuthenticatedUser): Promise<EventKPIsDto> {
-    const event = await this.eventQueryService.findEventOrThrow(eventId);
-    this.ensureCanAccessEvent(event, actor);
+    await this.eventAccessService.loadAccessibleEvent(eventId, actor);
     return this.eventKPIsService.getKPIs(eventId, actor);
   }
 }

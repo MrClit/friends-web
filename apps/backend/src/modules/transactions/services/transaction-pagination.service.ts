@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from '../entities/transaction.entity';
-import { Event } from '../../events/entities/event.entity';
+import { EventAccessService } from '../../event-access/event-access.service';
 import { PaginatedTransactionsResponseDto } from '../dto/paginated-transactions-response.dto';
 
 /**
@@ -34,8 +34,7 @@ export class TransactionPaginationService {
   constructor(
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
-    @InjectRepository(Event)
-    private readonly eventRepository: Repository<Event>,
+    private readonly eventAccessService: EventAccessService,
   ) {}
 
   /**
@@ -56,13 +55,7 @@ export class TransactionPaginationService {
       );
 
       // Verify event exists
-      const event = await this.eventRepository.findOne({
-        where: { id: eventId },
-      });
-
-      if (!event) {
-        throw new NotFoundException(`Event with ID ${eventId} not found`);
-      }
+      await this.eventAccessService.findEventOrThrow(eventId);
 
       const query = this.getPaginatedQuery();
       const rawResults: RankedTransactionRow[] = await this.transactionRepository.query(query, [

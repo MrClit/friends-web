@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from '../entities/event.entity';
@@ -20,14 +20,6 @@ export class EventQueryService {
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
   ) {}
-
-  async findEventOrThrow(id: string): Promise<Event> {
-    const event = await this.eventRepository.findOne({ where: { id } });
-    if (!event) {
-      throw new NotFoundException(`Event with ID ${id} not found`);
-    }
-    return event;
-  }
 
   /**
    * Calculate lastModified for event(s) as the greatest between event.updatedAt

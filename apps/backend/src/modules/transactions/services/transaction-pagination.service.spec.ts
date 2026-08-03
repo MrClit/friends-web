@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Event } from '../../events/entities/event.entity';
 import { Transaction } from '../entities/transaction.entity';
 import { TransactionPaginationService } from './transaction-pagination.service';
+import { EventAccessService } from '../../event-access/event-access.service';
 
 describe('TransactionPaginationService', () => {
   let service: TransactionPaginationService;
@@ -26,6 +27,9 @@ describe('TransactionPaginationService', () => {
           provide: getRepositoryToken(Transaction),
           useValue: transactionRepository,
         },
+        // The real EventAccessService is wired over the mocked event repository, so eventRepository
+        // still drives the "event does not exist" cases below.
+        EventAccessService,
         {
           provide: getRepositoryToken(Event),
           useValue: eventRepository,
