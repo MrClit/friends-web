@@ -20,7 +20,7 @@
     "test": "NODE_ENV=test jest --config ./test/jest.unit.json",
     "test:unit": "NODE_ENV=test jest --config ./test/jest.unit.json",
     "test:watch": "NODE_ENV=test jest --config ./test/jest.unit.json --watch",
-    "test:run": "NODE_ENV=test jest --config ./test/jest.unit.json --runInBand",
+    "test:run": "NODE_ENV=test jest --config ./test/jest.unit.json --runInBand --coverage",
     "test:int": "NODE_ENV=test jest --config ./test/jest.integration.json --runInBand",
     "test:e2e": "NODE_ENV=test jest --config ./test/jest.e2e.json --runInBand",
     "test:all": "pnpm test:run && pnpm test:int && pnpm test:e2e",
