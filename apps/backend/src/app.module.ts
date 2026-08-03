@@ -17,7 +17,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { envValidationSchema } from './config/env.validation';
 import { CorrelationMiddleware } from './common/middleware/correlation.middleware';
-import { RequestContextService } from './common/request-context/request-context.service';
+import { RequestContextModule } from './common/request-context/request-context.module';
 
 @Module({
   imports: [
@@ -52,6 +52,7 @@ import { RequestContextService } from './common/request-context/request-context.
       validationSchema: envValidationSchema,
       validationOptions: { abortEarly: false },
     }),
+    RequestContextModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     // TypeORM con configuración async para usar ConfigService
@@ -67,8 +68,7 @@ import { RequestContextService } from './common/request-context/request-context.
     AdminModule,
   ],
   controllers: [AppController, HealthController],
-  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }, RequestContextService],
-  exports: [RequestContextService],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
