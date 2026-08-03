@@ -480,7 +480,23 @@ describe('Transactions API (e2e)', () => {
       .expect(403);
 
     await request(httpServer)
+      .get(`/api/events/${event.id}/transactions/paginated`)
+      .set('Authorization', buildAuthHeader(jwtService, outsider))
+      .expect(403);
+
+    await request(httpServer)
       .get(`/api/transactions/${transaction.id}`)
+      .set('Authorization', buildAuthHeader(jwtService, outsider))
+      .expect(403);
+
+    await request(httpServer)
+      .patch(`/api/transactions/${transaction.id}`)
+      .set('Authorization', buildAuthHeader(jwtService, outsider))
+      .send({ title: 'Outsider Rename' })
+      .expect(403);
+
+    await request(httpServer)
+      .delete(`/api/transactions/${transaction.id}`)
       .set('Authorization', buildAuthHeader(jwtService, outsider))
       .expect(403);
 
