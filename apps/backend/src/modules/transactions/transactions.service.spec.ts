@@ -7,6 +7,7 @@ import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
+import { EventAccessService } from '../event-access/event-access.service';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { RequestContextService } from '../../common/request-context/request-context.service';
 
@@ -85,6 +86,9 @@ describe('TransactionsService', () => {
           provide: getRepositoryToken(Transaction),
           useValue: mockTransactionRepository,
         },
+        // The real EventAccessService is wired over a mocked event repository so these tests keep
+        // exercising the access rule itself, not just the delegation to it.
+        EventAccessService,
         {
           provide: getRepositoryToken(Event),
           useValue: mockEventRepository,
