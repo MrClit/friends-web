@@ -10,10 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-!packages/shared-types/dist
 coverage
 apps/*/coverage
 *.local
+
+# TypeScript incremental build state. Committing it makes `tsc -b` a no-op when the
+# outputs are missing, so a build can silently produce nothing.
+*.tsbuildinfo
 
 # Environment variables - Local overrides
 # Commitear: .env, .env.development, .env.production, .env.test
