@@ -35,6 +35,22 @@ export default [
     },
   },
   {
+    // Every HTTP call goes through apiRequest, which owns the JWT refresh, the
+    // { data } unwrapping and the ApiError contract. src/api/client.ts is the
+    // one place allowed to touch fetch directly.
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/api/client.ts', 'src/**/*.test.{ts,tsx}', 'src/test/**'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        {
+          name: 'fetch',
+          message: 'Use apiRequest from @/api/client instead of calling fetch directly.',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.js'],
     languageOptions: {
       globals: {

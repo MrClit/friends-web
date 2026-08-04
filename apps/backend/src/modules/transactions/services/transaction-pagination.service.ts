@@ -144,6 +144,8 @@ export class TransactionPaginationService {
       transaction.eventId = row.event_id;
       transaction.participantId = row.participant_id;
       transaction.paymentType = row.payment_type as Transaction['paymentType'];
+      // Raw SQL bypasses the entity's column transformer, so the decimal still
+      // arrives as a string here and has to be parsed by hand.
       transaction.amount = parseFloat(row.amount);
       transaction.title = row.title;
       transaction.date = row.date;
