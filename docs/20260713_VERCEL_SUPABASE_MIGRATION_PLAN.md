@@ -108,7 +108,7 @@ No changes needed for: response wrapping, JWT/refresh flow (body-based), Cloudin
 1. Supabase project up → run migrations from local (`migration:run` pointing at Supabase session port) → smoke test backend locally against Supabase.
 2. Create Vercel **backend** project with full env set (§9), `CORS_ORIGIN` temporarily set to the current GitHub Pages origin **and** the new frontend domain is not possible (single-origin string) — test with the new frontend preview instead.
 3. Create Vercel **frontend** project; preview deployment pointing `VITE_API_URL` at the new backend; validate login + CRUD end-to-end on previews (add preview OAuth callback URLs in Google/Microsoft consoles alongside the existing ones).
-4. Land the code changes (§5–6) on `develop` → `main` via `pnpm release:prod`.
+4. Land the code changes (§5–6) on `develop`, then promote them to `main` with a `develop` → `main` pull request merged with a merge commit (see `DEPLOYMENT.md` §3).
 5. **Cutover window:** announce/accept brief write freeze → data dump/restore (§7.5) → flip `VITE_API_URL`/`CORS_ORIGIN`/`FRONTEND_URL` to final domains → promote Vercel production deployments.
 6. Update OAuth consoles: production callback URLs → `https://<backend-domain>/api/auth/google/callback` and `/api/auth/microsoft/callback` (add first, remove Render ones after validation).
 7. Validate (§10). Then decommission: disable GH Pages, suspend (don't delete) the Render service and keep a final Neon snapshot for ~2 weeks as rollback.
