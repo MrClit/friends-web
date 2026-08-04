@@ -56,7 +56,11 @@ export function UserMenu() {
             email={user.email}
             alt={user.name || user.email || 'User'}
             className="h-9 w-9 shrink-0 rounded-full"
-            imageClassName={cn('h-9 w-9 object-cover', 'ring-1 ring-emerald-300/80 shadow-sm', 'dark:ring-emerald-700/80')}
+            imageClassName={cn(
+              'h-9 w-9 object-cover',
+              'ring-1 ring-emerald-300/80 shadow-sm',
+              'dark:ring-emerald-700/80',
+            )}
             fallbackClassName={cn(
               'flex h-9 w-9 items-center justify-center',
               'text-xs font-bold text-white',
@@ -101,7 +105,11 @@ export function UserMenu() {
 
         <DropdownMenuItem
           onClick={() => navigate('/profile')}
-          className={cn('flex items-center gap-2 cursor-pointer', 'font-semibold text-emerald-800', 'dark:text-emerald-200')}
+          className={cn(
+            'flex items-center gap-2 cursor-pointer',
+            'font-semibold text-emerald-800',
+            'dark:text-emerald-200',
+          )}
         >
           <MdPerson className="text-lg" />
           {t('profile', { ns: 'user' })}

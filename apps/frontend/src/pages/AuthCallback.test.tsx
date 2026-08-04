@@ -91,9 +91,7 @@ describe('AuthCallback', () => {
     });
 
     expect(setAccessTokenMock).toHaveBeenCalledWith('access-jwt');
-    expect(setAccessTokenMock.mock.invocationCallOrder[0]).toBeLessThan(
-      getCurrentUserMock.mock.invocationCallOrder[0],
-    );
+    expect(setAccessTokenMock.mock.invocationCallOrder[0]).toBeLessThan(getCurrentUserMock.mock.invocationCallOrder[0]);
   });
 
   it('navigates home unauthenticated when the exchange fails', async () => {

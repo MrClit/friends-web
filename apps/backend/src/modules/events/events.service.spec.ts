@@ -1,6 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException, ForbiddenException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ForbiddenException,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import { EventsService } from './events.service';
 import { Event, EventStatus } from './entities/event.entity';
 import type { EventParticipant } from './entities/event.entity';

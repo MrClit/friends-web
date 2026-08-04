@@ -80,7 +80,8 @@ export class EventKPIsService {
           switch (paymentType) {
             case 'contribution':
               totalCashContributions = totalCashContributions.plus(decAmount);
-              participantDirectContributions[participantId] = participantDirectContributions[participantId].plus(decAmount);
+              participantDirectContributions[participantId] =
+                participantDirectContributions[participantId].plus(decAmount);
               break;
             case 'expense':
               totalExpenses = totalExpenses.plus(decAmount);
@@ -88,7 +89,8 @@ export class EventKPIsService {
               break;
             case 'compensation':
               totalCompensations = totalCompensations.plus(decAmount);
-              participantDirectCompensations[participantId] = participantDirectCompensations[participantId].plus(decAmount);
+              participantDirectCompensations[participantId] =
+                participantDirectCompensations[participantId].plus(decAmount);
               break;
           }
         } else if (paymentType === 'expense') {

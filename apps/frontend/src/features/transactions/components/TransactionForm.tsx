@@ -42,7 +42,10 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
     <form id="transaction-form" className="space-y-8 pb-6" onSubmit={onSubmit}>
       {/* Title input */}
       <div className="space-y-2">
-        <label htmlFor="transaction-title" className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
+        <label
+          htmlFor="transaction-title"
+          className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1"
+        >
           {t('transactionForm.titleLabel')}
         </label>
         <input
@@ -59,7 +62,10 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {/* Amount input with € symbol */}
         <div className="space-y-2">
-          <label htmlFor="transaction-amount" className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
+          <label
+            htmlFor="transaction-amount"
+            className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1"
+          >
             {t('transactionForm.amountLabel')}
           </label>
           <div className="relative">
@@ -73,13 +79,18 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
-            <span aria-hidden className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-slate-400">€</span>
+            <span aria-hidden className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-slate-400">
+              €
+            </span>
           </div>
         </div>
 
         {/* Date input */}
         <div className="space-y-2 min-w-0 w-full">
-          <label htmlFor="transaction-date" className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1">
+          <label
+            htmlFor="transaction-date"
+            className="block text-sm font-bold text-slate-700 dark:text-emerald-100 px-1"
+          >
             {t('transactionForm.dateLabel')}
           </label>
           <div className="relative">

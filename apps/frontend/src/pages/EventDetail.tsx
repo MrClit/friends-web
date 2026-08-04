@@ -23,17 +23,8 @@ export function EventDetail() {
   const { t } = useTranslation(EVENT_DETAIL_NAMESPACES);
   const isI18nReady = useI18nNamespacesReady(EVENT_DETAIL_NAMESPACES);
   const { user } = useAuth();
-  const {
-    event,
-    kpis,
-    isLoading,
-    error,
-    refetch,
-    handleDelete,
-    handleToggleArchive,
-    handleBack,
-    isMutatingEvent,
-  } = useEventDetail(id);
+  const { event, kpis, isLoading, error, refetch, handleDelete, handleToggleArchive, handleBack, isMutatingEvent } =
+    useEventDetail(id);
 
   // UI state management
   const eventFormModalStore = useEventFormModalStore();

@@ -23,7 +23,7 @@ describe('TransactionPaginationService (integration)', () => {
       return false;
     }
 
-    return typeof (value).date === 'string';
+    return typeof value.date === 'string';
   };
 
   const parseDistinctDateRows = (value: unknown): DistinctDateRow[] => {

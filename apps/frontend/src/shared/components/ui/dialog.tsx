@@ -49,7 +49,12 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
  * - Rounded corners and shadow
  * - Dark theme support
  */
-function DialogContent({ ref, className, children, ...props }: React.ComponentPropsWithRef<typeof DialogPrimitive.Content>) {
+function DialogContent({
+  ref,
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithRef<typeof DialogPrimitive.Content>) {
   return (
     <DialogPortal>
       <DialogOverlay>
@@ -90,7 +95,12 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
  * - Maximum 90vh height
  * - Auto-scroll for long content
  */
-function DialogBottomSheet({ ref, className, children, ...props }: React.ComponentPropsWithRef<typeof DialogPrimitive.Content>) {
+function DialogBottomSheet({
+  ref,
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithRef<typeof DialogPrimitive.Content>) {
   return (
     <DialogPortal>
       <DialogOverlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300 motion-reduce:animate-none" />
@@ -262,7 +272,11 @@ DialogTitle.displayName = DialogPrimitive.Title.displayName;
  * - Dark theme supported
  * - Automatically linked to dialog by Radix for accessibility
  */
-function DialogDescription({ ref, className, ...props }: React.ComponentPropsWithRef<typeof DialogPrimitive.Description>) {
+function DialogDescription({
+  ref,
+  className,
+  ...props
+}: React.ComponentPropsWithRef<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
       ref={ref}

@@ -143,7 +143,10 @@ export class EventsService {
 
       const event = await this.eventAccessService.loadAccessibleEvent(id, actor);
 
-      const normalizedParticipants = this.eventParticipantsService.normalizeParticipants(updateEventDto.participants, true);
+      const normalizedParticipants = this.eventParticipantsService.normalizeParticipants(
+        updateEventDto.participants,
+        true,
+      );
 
       const rawParticipantReplacements = (updateEventDto as { participantReplacements?: ParticipantReplacementDto[] })
         .participantReplacements;
@@ -186,7 +189,12 @@ export class EventsService {
       this.logger.log(`Event ${id} updated successfully`);
       return savedEvent;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) throw error;
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException ||
+        error instanceof BadRequestException
+      )
+        throw error;
       const err = error as Error;
       this.logger.error(`Failed to update event ${id}: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to update event');

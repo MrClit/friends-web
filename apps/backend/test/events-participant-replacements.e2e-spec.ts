@@ -99,7 +99,10 @@ describe('Event participant replacements (e2e)', () => {
 
     const otherEvent = await createEvent(eventRepository, {
       title: 'Untouched Event',
-      participants: [{ type: 'user', id: owner.id }, { type: 'guest', id: GUEST_ID, name: 'Guest One' }],
+      participants: [
+        { type: 'user', id: owner.id },
+        { type: 'guest', id: GUEST_ID, name: 'Guest One' },
+      ],
     });
 
     const otherEventTransaction = await createTransaction(transactionRepository, {
@@ -147,9 +150,7 @@ describe('Event participant replacements (e2e)', () => {
       .set('Authorization', buildAuthHeader(jwtService, owner))
       .expect(200);
 
-    const participants = (getDataObjectFromBody(getResponse.body).participants ?? []) as Array<
-      Record<string, unknown>
-    >;
+    const participants = (getDataObjectFromBody(getResponse.body).participants ?? []) as Array<Record<string, unknown>>;
 
     expect(participants).not.toContainEqual(expect.objectContaining({ id: GUEST_ID }));
     expect(participants).toContainEqual(

@@ -2,12 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useAdminUsersPage } from './useAdminUsersPage';
-import {
-  useAdminUsers,
-  useCreateAdminUser,
-  useDeleteAdminUser,
-  useUpdateAdminUser,
-} from '@/hooks/api/useAdminUsers';
+import { useAdminUsers, useCreateAdminUser, useDeleteAdminUser, useUpdateAdminUser } from '@/hooks/api/useAdminUsers';
 
 const addToastMock = vi.fn();
 const createMutateAsyncMock = vi.fn();

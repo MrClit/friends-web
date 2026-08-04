@@ -71,7 +71,9 @@ export function TransactionsList({ event }: TransactionsListProps) {
   );
 
   if (isLoading) {
-    return <div className="w-full max-w-2xl mb-8 text-center text-emerald-400 py-8">{t('loading', { ns: 'common' })}</div>;
+    return (
+      <div className="w-full max-w-2xl mb-8 text-center text-emerald-400 py-8">{t('loading', { ns: 'common' })}</div>
+    );
   }
 
   if (error) {

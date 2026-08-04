@@ -3,17 +3,13 @@ import type { EventParticipant } from '../types';
 export function calculateSuggestedTargets(participants: EventParticipant[], totalExpenses: number): EventParticipant[] {
   if (!Number.isFinite(totalExpenses) || totalExpenses <= 0) return participants;
 
-  const nonPotIndices = participants
-    .map((p, i) => (p.type !== 'pot' ? i : -1))
-    .filter((i) => i !== -1);
+  const nonPotIndices = participants.map((p, i) => (p.type !== 'pot' ? i : -1)).filter((i) => i !== -1);
 
   if (nonPotIndices.length === 0) return participants;
 
   const weights = nonPotIndices.map((i) => {
     const p = participants[i];
-    return p && p.type !== 'pot' && p.contributionTarget && p.contributionTarget > 0
-      ? p.contributionTarget
-      : 1;
+    return p && p.type !== 'pot' && p.contributionTarget && p.contributionTarget > 0 ? p.contributionTarget : 1;
   });
   const totalWeight = weights.reduce((sum, w) => sum + w, 0);
 

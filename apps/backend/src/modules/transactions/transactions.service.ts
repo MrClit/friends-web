@@ -80,12 +80,22 @@ export class TransactionsService {
       this.logger.log(`Found ${transactions.length} transactions for event ${eventId}`);
       return transactions;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       const err = error as Error;
       this.logger.error(
-        { msg: 'Failed to fetch transactions for event', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, eventId },
+        {
+          msg: 'Failed to fetch transactions for event',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          eventId,
+        },
         err.stack,
       );
       throw new InternalServerErrorException('Failed to fetch transactions');
@@ -125,7 +135,13 @@ export class TransactionsService {
       }
       const err = error as Error;
       this.logger.error(
-        { msg: 'Failed to fetch transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id },
+        {
+          msg: 'Failed to fetch transaction',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          transactionId: id,
+        },
         err.stack,
       );
       throw new InternalServerErrorException('Failed to fetch transaction');
@@ -164,7 +180,11 @@ export class TransactionsService {
       this.logger.log(`Transaction created successfully with ID: ${savedTransaction.id}`);
       return savedTransaction;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       const err = error as Error;
@@ -216,12 +236,23 @@ export class TransactionsService {
       this.logger.log(`Transaction ${id} updated successfully`);
       return updatedTransaction;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       const err = error as Error;
       this.logger.error(
-        { msg: 'Failed to update transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id, payload: updateTransactionDto },
+        {
+          msg: 'Failed to update transaction',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          transactionId: id,
+          payload: updateTransactionDto,
+        },
         err.stack,
       );
       throw new InternalServerErrorException('Failed to update transaction');
@@ -248,7 +279,13 @@ export class TransactionsService {
       }
       const err = error as Error;
       this.logger.error(
-        { msg: 'Failed to delete transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id },
+        {
+          msg: 'Failed to delete transaction',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          transactionId: id,
+        },
         err.stack,
       );
       throw new InternalServerErrorException('Failed to delete transaction');
