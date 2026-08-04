@@ -56,15 +56,11 @@ export function AdminUsersPage() {
         )}
 
         {isI18nReady && Boolean(usersError) && (
-          <p className="text-red-600 dark:text-red-300">
-            {t('errorLoading', { ns: 'common' })}
-          </p>
+          <p className="text-red-600 dark:text-red-300">{t('errorLoading', { ns: 'common' })}</p>
         )}
 
         {isI18nReady && !isLoadingUsers && !usersError && users.length === 0 && (
-          <p className="text-slate-700 dark:text-emerald-100">
-            {t('empty', { ns: 'adminUsers' })}
-          </p>
+          <p className="text-slate-700 dark:text-emerald-100">{t('empty', { ns: 'adminUsers' })}</p>
         )}
 
         {isI18nReady && !isLoadingUsers && !usersError && users.length > 0 && (

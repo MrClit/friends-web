@@ -40,15 +40,7 @@ const statusConfig = {
 
 export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, style }) => {
   const { t } = useTranslation('events');
-  const {
-    id,
-    title,
-    description,
-    status = 'active',
-    participants = [],
-    lastModified,
-    iconKey,
-  } = event;
+  const { id, title, description, status = 'active', participants = [], lastModified, iconKey } = event;
 
   const IconComp = getEventIconComponent(iconKey);
 
@@ -116,9 +108,7 @@ export const EventCard: FC<EventCardProps> = memo(({ event, onClick, className, 
         </div>
         <div className="text-right">
           <p className="text-[10px] font-bold text-emerald-600/50 dark:text-emerald-400/50 uppercase tracking-widest">
-            {status === 'archived'
-              ? t('eventCard.archivedLabel')
-              : t('eventCard.lastModifiedLabel')}
+            {status === 'archived' ? t('eventCard.archivedLabel') : t('eventCard.lastModifiedLabel')}
           </p>
           {lastModified && formatDateShort(lastModified) && (
             <p className="text-sm font-semibold text-slate-600 dark:text-emerald-200">

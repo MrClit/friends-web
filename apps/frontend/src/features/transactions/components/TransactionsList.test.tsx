@@ -80,10 +80,7 @@ describe('TransactionsList day grouping', () => {
   });
 
   it('renders one header per calendar day, newest first', () => {
-    mockTransactions([
-      makeTransaction('t1', 'Dinner', '2026-02-25'),
-      makeTransaction('t2', 'Taxi', '2026-02-24'),
-    ]);
+    mockTransactions([makeTransaction('t1', 'Dinner', '2026-02-25'), makeTransaction('t2', 'Taxi', '2026-02-24')]);
 
     render(<TransactionsList event={event} />);
 

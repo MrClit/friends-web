@@ -9,8 +9,7 @@ import { RefreshTokenService } from '../src/modules/auth/services/refresh-token.
 import { User } from '../src/modules/users/user.entity';
 import { createUser } from './utils/test-factories';
 
-const hashToken = (rawToken: string): string =>
-  createHash('sha256').update(rawToken).digest('hex');
+const hashToken = (rawToken: string): string => createHash('sha256').update(rawToken).digest('hex');
 
 describe('RefreshTokenService (integration)', () => {
   let app: INestApplication;
@@ -70,19 +69,14 @@ describe('RefreshTokenService (integration)', () => {
   });
 
   it('rotateRefreshToken: throws UnauthorizedException for an unknown token', async () => {
-    await expect(refreshTokenService.rotateRefreshToken('nonexistent-token')).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(refreshTokenService.rotateRefreshToken('nonexistent-token')).rejects.toThrow(UnauthorizedException);
   });
 
   it('rotateRefreshToken: throws UnauthorizedException for an expired token', async () => {
     const user = await createUser(userRepository, { email: 'expired@test.com', name: 'Expired User' });
     const { rawToken } = await refreshTokenService.issueRefreshToken(user.id);
 
-    await refreshTokenRepository.update(
-      { tokenHash: hashToken(rawToken) },
-      { expiresAt: new Date('2000-01-01') },
-    );
+    await refreshTokenRepository.update({ tokenHash: hashToken(rawToken) }, { expiresAt: new Date('2000-01-01') });
 
     await expect(refreshTokenService.rotateRefreshToken(rawToken)).rejects.toThrow(UnauthorizedException);
   });

@@ -11,8 +11,7 @@ import { EventParticipantsService } from './event-participants.service';
 const makeUser = (id: string): User =>
   ({ id, name: `User ${id}`, email: `${id}@example.com`, avatar: `https://avatar/${id}` }) as User;
 
-const makeEvent = (participants: Event['participants']): Event =>
-  ({ id: 'evt', participants }) as unknown as Event;
+const makeEvent = (participants: Event['participants']): Event => ({ id: 'evt', participants }) as unknown as Event;
 
 interface QueryBuilderDouble {
   update: jest.Mock;
@@ -84,7 +83,9 @@ describe('EventParticipantsService', () => {
 
       await service.enrichParticipants(events);
 
-      const calledWith = (userRepository.find.mock.calls[0] as unknown[])[0] as { where: { id: ReturnType<typeof In> } };
+      const calledWith = (userRepository.find.mock.calls[0] as unknown[])[0] as {
+        where: { id: ReturnType<typeof In> };
+      };
       const ids = (calledWith.where.id as unknown as { _value: string[] })._value;
       expect(ids).toHaveLength(1);
       expect(ids).toContain('u1');
@@ -243,7 +244,10 @@ describe('EventParticipantsService', () => {
 
       it('reports the index of the offending participant', () => {
         expect(() =>
-          service.normalizeParticipants([{ type: 'pot', id: '0' }, { type: 'guest', id: 'g1' }]),
+          service.normalizeParticipants([
+            { type: 'pot', id: '0' },
+            { type: 'guest', id: 'g1' },
+          ]),
         ).toThrow('participants[1].name is required for guest participant');
       });
     });

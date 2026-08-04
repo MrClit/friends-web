@@ -113,7 +113,9 @@ describe('Events API (e2e)', () => {
     });
 
     it('returns 400 for negative contributionTarget on guest', async () => {
-      const response = await postEvent([{ type: 'guest', id: 'g-1', name: 'Alice', contributionTarget: -1 }]).expect(400);
+      const response = await postEvent([{ type: 'guest', id: 'g-1', name: 'Alice', contributionTarget: -1 }]).expect(
+        400,
+      );
       expect(response.body).toMatchObject({ statusCode: 400, path: '/api/events', method: 'POST' });
     });
   });

@@ -76,9 +76,7 @@ vi.mock('@/shared/components/ActionButton', () => ({
 vi.mock('@/shared/components', () => ({
   ConfirmDialog: () => null,
   ErrorState: ({ onRetry }: { onRetry?: () => void }) => (
-    <div data-testid="error-state">
-      {onRetry && <button onClick={onRetry}>retry</button>}
-    </div>
+    <div data-testid="error-state">{onRetry && <button onClick={onRetry}>retry</button>}</div>
   ),
 }));
 

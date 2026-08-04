@@ -52,11 +52,7 @@ export function LogoIcon({ size = 40, rounded = '3xl' }: LogoIconProps) {
 export function Logo({ showText = false, size = 40, rounded = '3xl' }: LogoProps) {
   const { t } = useTranslation('common');
   return (
-    <Link
-      to="/"
-      aria-label={t('goToHome')}
-      className="flex flex-col items-center hover:opacity-90 transition-opacity"
-    >
+    <Link to="/" aria-label={t('goToHome')} className="flex flex-col items-center hover:opacity-90 transition-opacity">
       <LogoIcon size={size} rounded={rounded} />
       {showText && (
         <AppName className="text-3xl sm:text-4xl font-extrabold tracking-tight text-emerald-700 dark:text-emerald-300 mt-2" />

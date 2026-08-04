@@ -1,6 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException, ForbiddenException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { Transaction } from './entities/transaction.entity';
 import { Event } from '../events/entities/event.entity';
@@ -257,11 +262,13 @@ describe('TransactionsService', () => {
 
     it('throws BadRequestException for invalid participantId', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, _paymentType: string) => {
-        if (participantId === '999') {
-          throw new BadRequestException('Invalid participant');
-        }
-      });
+      mockParticipantValidationService.validateParticipantId.mockImplementation(
+        (participantId: string, _paymentType: string) => {
+          if (participantId === '999') {
+            throw new BadRequestException('Invalid participant');
+          }
+        },
+      );
 
       const invalidDto: CreateTransactionDto = {
         ...createDto,
@@ -299,11 +306,13 @@ describe('TransactionsService', () => {
     it('validates participantId when updating', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, _paymentType: string) => {
-        if (participantId === '999') {
-          throw new BadRequestException('Invalid participant');
-        }
-      });
+      mockParticipantValidationService.validateParticipantId.mockImplementation(
+        (participantId: string, _paymentType: string) => {
+          if (participantId === '999') {
+            throw new BadRequestException('Invalid participant');
+          }
+        },
+      );
 
       const updateDtoWithInvalidParticipant = {
         ...updateDto,
@@ -319,11 +328,13 @@ describe('TransactionsService', () => {
       const potTransaction = { ...mockTransaction, participantId: '0', paymentType: 'expense' as const };
       mockTransactionRepository.findOne.mockResolvedValue(potTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, paymentType: string) => {
-        if (participantId === '0' && paymentType !== 'expense') {
-          throw new BadRequestException(`POT participant can only be used with payment type 'expense'`);
-        }
-      });
+      mockParticipantValidationService.validateParticipantId.mockImplementation(
+        (participantId: string, paymentType: string) => {
+          if (participantId === '0' && paymentType !== 'expense') {
+            throw new BadRequestException(`POT participant can only be used with payment type 'expense'`);
+          }
+        },
+      );
 
       await expect(
         service.update('transaction-uuid-1', { paymentType: 'compensation' as const }, adminActor),

@@ -33,10 +33,7 @@ export function Profile() {
 
   return (
     <MainLayout>
-      <HeaderSection
-        title={t('title', { ns: 'profile' })}
-        subtitle={t('subtitle', { ns: 'profile' })}
-      />
+      <HeaderSection title={t('title', { ns: 'profile' })} subtitle={t('subtitle', { ns: 'profile' })} />
 
       <ProfileCard
         user={user}
