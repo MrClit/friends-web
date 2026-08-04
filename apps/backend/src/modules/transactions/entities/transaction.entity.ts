@@ -38,8 +38,10 @@ export class Transaction {
   @Column({ length: 50, name: 'participant_id' })
   participantId: string; // '0' for POT or participant ID from event
 
+  // A Postgres `date` column carries no time: TypeORM hydrates it as a
+  // 'YYYY-MM-DD' string, so that is what the declared type says.
   @Column('date')
-  date: Date;
+  date: string;
 
   @Column({ name: 'event_id' })
   eventId: string;

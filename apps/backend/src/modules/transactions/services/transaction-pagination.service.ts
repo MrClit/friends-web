@@ -21,7 +21,7 @@ interface RankedTransactionRow {
   payment_type: string;
   amount: string;
   title: string;
-  date: Date;
+  date: string;
   created_at: Date;
   date_rank: number;
   total_dates: number | string;
@@ -122,7 +122,7 @@ export class TransactionPaginationService {
         rt.payment_type,
         rt.amount,
         rt.participant_id,
-        rt.date,
+        TO_CHAR(rt.date, 'YYYY-MM-DD') AS date,
         rt.event_id,
         rt.created_at,
         rt.date_rank,
@@ -148,6 +148,8 @@ export class TransactionPaginationService {
       // arrives as a string here and has to be parsed by hand.
       transaction.amount = parseFloat(row.amount);
       transaction.title = row.title;
+      // The query formats the date column, so no local-midnight Date is ever built
+      // and this path agrees with the entity reads.
       transaction.date = row.date;
       transaction.createdAt = row.created_at;
       return transaction;
@@ -164,7 +166,7 @@ export class TransactionPaginationService {
     numberOfDates: number,
   ): { totalDates: number; hasMore: boolean; loadedDates: number } {
     const totalDates = rawResults.length > 0 ? Number(rawResults[0].total_dates) : 0;
-    const uniqueDatesLoaded = new Set(transactions.map((t) => t.date.toISOString().split('T')[0])).size;
+    const uniqueDatesLoaded = new Set(transactions.map((t) => t.date)).size;
     const hasMore = offset + numberOfDates < totalDates;
 
     return {

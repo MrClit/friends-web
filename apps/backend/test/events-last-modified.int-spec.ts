@@ -72,7 +72,7 @@ describe('EventsService lastModified (integration)', () => {
       paymentType: 'expense',
       amount: 25,
       participantId: 'g1',
-      date: new Date('2026-02-20T12:00:00.000Z'),
+      date: '2026-02-20',
       eventId: savedEvent.id,
     });
 
