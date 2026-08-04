@@ -25,7 +25,8 @@ interface CreateTransactionInput {
   amount: number;
   participantId: string;
   eventId: string;
-  date?: Date;
+  /** Calendar day in YYYY-MM-DD, matching the entity's declared type. */
+  date?: string;
 }
 
 export async function createUser(repository: Repository<User>, input: CreateUserInput): Promise<User> {
@@ -57,6 +58,6 @@ export async function createTransaction(
     amount: input.amount,
     participantId: input.participantId,
     eventId: input.eventId,
-    date: input.date ?? new Date('2026-02-25T12:00:00.000Z'),
+    date: input.date ?? '2026-02-25',
   });
 }

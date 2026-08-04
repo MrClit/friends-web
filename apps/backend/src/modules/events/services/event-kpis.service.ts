@@ -95,15 +95,11 @@ export class EventKPIsService {
           potExpenses = potExpenses.plus(decAmount);
           totalExpenses = totalExpenses.plus(decAmount);
 
-          const dateValue =
-            transaction.date instanceof Date ? transaction.date.toISOString() : String(transaction.date);
-          const normalizedDate = dateValue.includes('T') ? dateValue.split('T')[0] : dateValue;
-
           potExpensesTransactions.push({
             id: transaction.id,
             title: transaction.title,
             amount: decAmount.toNumber(),
-            date: normalizedDate,
+            date: transaction.date,
           });
         }
       }

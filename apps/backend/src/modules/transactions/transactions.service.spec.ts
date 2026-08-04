@@ -49,7 +49,7 @@ describe('TransactionsService', () => {
     paymentType: 'contribution' as const,
     amount: 50.0,
     participantId: 'g1',
-    date: new Date('2026-01-01'),
+    date: '2026-01-01',
     eventId: 'event-uuid-1',
     createdAt: new Date(),
   };

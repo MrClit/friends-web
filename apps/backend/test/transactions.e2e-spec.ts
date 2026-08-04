@@ -434,13 +434,13 @@ describe('Transactions API (e2e)', () => {
     });
   });
 
-  // Characterization of how `date` is serialized today by each read path. The entity
-  // routes and the raw-SQL paginated route do not agree, and these assertions pin the
-  // current (inconsistent) contract before it is unified.
+  // Every read path must serialize `date` as the plain calendar day it is. The entity
+  // routes and the raw-SQL paginated route used to disagree, the latter returning a
+  // full UTC timestamp that drifted to the previous day east of UTC.
   describe('date serialization across read paths', () => {
     const REQUESTED_DATE = '2026-02-25';
 
-    it('serializes date differently depending on the route', async () => {
+    it('serializes date as YYYY-MM-DD on every route', async () => {
       const user = await createUser(userRepository, {
         email: 'tx-date-shape@example.com',
         name: 'Tx Date Shape',
@@ -497,12 +497,7 @@ describe('Transactions API (e2e)', () => {
       const paginated = getDataObjectFromBody(paginatedResponse.body) as {
         transactions: Array<Record<string, unknown>>;
       };
-      // The raw SQL bypasses the entity, so the driver hands back a Date built at the
-      // server's local midnight and JSON serializes it as a full UTC timestamp instead
-      // of the plain calendar day. East of UTC that timestamp even lands on the previous
-      // day: '2026-02-24T23:00:00.000Z' at UTC+1. Asserted by shape to stay portable.
-      expect(paginated.transactions[0].date).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-      expect(paginated.transactions[0].date).not.toBe(REQUESTED_DATE);
+      expect(paginated.transactions[0].date).toBe(REQUESTED_DATE);
     });
   });
 
