@@ -169,6 +169,9 @@ describe('Transactions API (e2e)', () => {
       participantId: 'g1',
       eventId: event.id,
     });
+    // The three routes below read the amount through different code paths (save
+    // result, entity read, raw SQL); all must serialize it as a JSON number.
+    expect(createData.amount).toBe(33.5);
 
     const listResponse = await request(httpServer)
       .get(`/api/events/${event.id}/transactions`)
@@ -177,8 +180,9 @@ describe('Transactions API (e2e)', () => {
 
     const listData = getDataFromBody(listResponse.body);
     expect(Array.isArray(listData)).toBe(true);
-    const list = listData as unknown[];
+    const list = listData as Array<Record<string, unknown>>;
     expect(list).toHaveLength(1);
+    expect(list[0].amount).toBe(33.5);
 
     const paginatedResponse = await request(httpServer)
       .get(`/api/events/${event.id}/transactions/paginated?numberOfDates=3&offset=0`)
@@ -191,7 +195,9 @@ describe('Transactions API (e2e)', () => {
       totalDates: 1,
       loadedDates: 1,
     });
-    expect(Array.isArray((paginatedData as { transactions?: unknown }).transactions)).toBe(true);
+    const paginatedTransactions = (paginatedData as { transactions?: unknown }).transactions;
+    expect(Array.isArray(paginatedTransactions)).toBe(true);
+    expect((paginatedTransactions as Array<Record<string, unknown>>)[0].amount).toBe(33.5);
   });
 
   it('GET /api/events/:eventId/transactions/paginated returns 400 for invalid query params', async () => {
@@ -260,6 +266,7 @@ describe('Transactions API (e2e)', () => {
       eventId: event.id,
       participantId: 'g1',
     });
+    expect(data.amount).toBe(18);
   });
 
   it('GET /api/transactions/:id returns 404 for non-existing transaction', async () => {
@@ -322,7 +329,7 @@ describe('Transactions API (e2e)', () => {
       id: created.id,
       title: 'Museum Updated',
     });
-    expect(Number(data.amount)).toBe(21);
+    expect(data.amount).toBe(21);
   });
 
   it('PATCH /api/transactions/:id returns 404 for non-existing transaction', async () => {
