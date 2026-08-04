@@ -123,7 +123,7 @@ FRONTEND_URL=<frontend-url-with-hash-base>
 ### JWT and refresh tokens
 
 ```bash
-JWT_SECRET=<strong-secret>
+JWT_SECRET=<strong-secret>          # minimum 32 characters, or the backend refuses to boot
 JWT_EXPIRATION=15m
 REFRESH_TOKEN_EXPIRATION_DAYS=30
 REFRESH_TOKEN_MAX_ROTATIONS=100

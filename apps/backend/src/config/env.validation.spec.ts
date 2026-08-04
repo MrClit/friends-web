@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import * as dotenv from 'dotenv';
 import type { ValidationError } from 'joi';
 import { envValidationSchema } from './env.validation';
 import { DEFAULT_JWT_EXPIRATION } from './auth.constants';
@@ -39,6 +42,19 @@ describe('envValidationSchema', () => {
 
       expect(error).toBeUndefined();
       expect(value.JWT_EXPIRATION).toBe('30m');
+    });
+  });
+
+  // The example files are what a fresh clone copies into .env.development / .env.test, so a schema
+  // change that they do not follow makes the backend unbootable and the DB-backed suites unrunnable.
+  describe('example env files', () => {
+    it.each(['.env.example', '.env.test.example'])('%s satisfies the schema as-is', (fileName) => {
+      const parsed = dotenv.parse(readFileSync(join(__dirname, '..', '..', fileName)));
+
+      // allowUnknown: the examples may document variables the schema does not own.
+      const { error } = envValidationSchema.validate(parsed, { abortEarly: false, allowUnknown: true });
+
+      expect(error).toBeUndefined();
     });
   });
 });
