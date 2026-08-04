@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/utils';
+import { authApi } from '@/api/auth.api';
 
-const GOOGLE_AUTH_URL = `${import.meta.env.VITE_API_URL || '/api'}/auth/google`;
+const GOOGLE_AUTH_URL = authApi.oauthLoginUrl('google');
 
 type GoogleLoginButtonProps = {
   fullWidth?: boolean;
