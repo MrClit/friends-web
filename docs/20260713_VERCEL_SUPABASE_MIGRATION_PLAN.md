@@ -75,7 +75,7 @@ The remainder of the plan assumes **Option A**.
 
 ## 6. Backend Tasks (Option A)
 
-1. **Serverless entry:** add `apps/backend/api/index.ts` that bootstraps the Nest app onto an Express instance once (cached promise), applying everything currently in `main.ts` (CORS, global prefix, pipes, filter, interceptor, cookie-parser, Swagger), and exports the Express handler. Keep `main.ts` for local dev.
+1. **Serverless entry:** add `apps/backend/api/index.ts` that bootstraps the Nest app onto an Express instance once (cached promise), applying everything currently in `main.ts` (CORS, global prefix, pipes, filter, interceptor, Swagger), and exports the Express handler. Keep `main.ts` for local dev.
 2. **`apps/backend/vercel.json`:** route all paths to the function; set `maxDuration` (e.g. 30 s covers OAuth round-trips); define the cron entry.
 3. **Cleanup endpoint for cron:** new guarded endpoint (e.g. `POST /api/auth/maintenance/cleanup-refresh-tokens`, checked against a `CRON_SECRET` header) that calls the existing cleanup logic; register in `vercel.json` `crons` (daily). Remove/keep `@Cron` decorator harmlessly (it simply never fires on Vercel; it still works in local dev).
 4. **Migrations in CI:** GitHub Actions workflow on push to `main`: `pnpm install && pnpm --filter @friends/backend build && pnpm --filter @friends/backend migration:run:prod`, using **session-mode** connection secrets (port 5432). Run before/independent of the Vercel deploy; migrations must remain backward-compatible for the seconds of skew.

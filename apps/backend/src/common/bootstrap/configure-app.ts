@@ -1,5 +1,4 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { HttpExceptionFilter } from '../filters/http-exception.filter';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
@@ -32,6 +31,4 @@ export function configureApp(app: INestApplication): void {
 
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
-
-  app.use(cookieParser());
 }
