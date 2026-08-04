@@ -434,6 +434,78 @@ describe('Transactions API (e2e)', () => {
     });
   });
 
+  // Characterization of how `date` is serialized today by each read path. The entity
+  // routes and the raw-SQL paginated route do not agree, and these assertions pin the
+  // current (inconsistent) contract before it is unified.
+  describe('date serialization across read paths', () => {
+    const REQUESTED_DATE = '2026-02-25';
+
+    it('serializes date differently depending on the route', async () => {
+      const user = await createUser(userRepository, {
+        email: 'tx-date-shape@example.com',
+        name: 'Tx Date Shape',
+      });
+
+      const event = await createEvent(eventRepository, {
+        title: 'Date Shape Event',
+        description: 'Date serialization',
+        status: EventStatus.ACTIVE,
+        participants: [
+          { type: 'user', id: user.id },
+          { type: 'guest', id: 'g1', name: 'Guest 1' },
+        ],
+      });
+
+      const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+      const authHeader = buildAuthHeader(jwtService, user);
+
+      const createResponse = await request(httpServer)
+        .post(`/api/events/${event.id}/transactions`)
+        .set('Authorization', authHeader)
+        .send({
+          title: 'Lunch',
+          paymentType: 'expense',
+          amount: 12,
+          participantId: 'g1',
+          date: REQUESTED_DATE,
+        })
+        .expect(201);
+
+      const created = getDataObjectFromBody(createResponse.body);
+      expect(created.date).toBe(REQUESTED_DATE);
+
+      const singleResponse = await request(httpServer)
+        .get(`/api/transactions/${created.id as string}`)
+        .set('Authorization', authHeader)
+        .expect(200);
+
+      expect(getDataObjectFromBody(singleResponse.body).date).toBe(REQUESTED_DATE);
+
+      const listResponse = await request(httpServer)
+        .get(`/api/events/${event.id}/transactions`)
+        .set('Authorization', authHeader)
+        .expect(200);
+
+      const list = getDataFromBody(listResponse.body) as Array<Record<string, unknown>>;
+      expect(list[0].date).toBe(REQUESTED_DATE);
+
+      const paginatedResponse = await request(httpServer)
+        .get(`/api/events/${event.id}/transactions/paginated?numberOfDates=3&offset=0`)
+        .set('Authorization', authHeader)
+        .expect(200);
+
+      const paginated = getDataObjectFromBody(paginatedResponse.body) as {
+        transactions: Array<Record<string, unknown>>;
+      };
+      // The raw SQL bypasses the entity, so the driver hands back a Date built at the
+      // server's local midnight and JSON serializes it as a full UTC timestamp instead
+      // of the plain calendar day. East of UTC that timestamp even lands on the previous
+      // day: '2026-02-24T23:00:00.000Z' at UTC+1. Asserted by shape to stay portable.
+      expect(paginated.transactions[0].date).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(paginated.transactions[0].date).not.toBe(REQUESTED_DATE);
+    });
+  });
+
   it('returns 403 for user not participating in event transactions while admin keeps global access', async () => {
     const owner = await createUser(userRepository, {
       email: 'tx-owner-access@example.com',
