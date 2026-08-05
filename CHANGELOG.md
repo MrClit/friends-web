@@ -5,6 +5,72 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-08-05
+
+API contract corrections and backend hardening. **No database migration and no new environment
+variables**; nothing to change in the Render dashboard or the OAuth consoles before deploying.
+
+### Added
+
+- `helmet()` security headers on the backend, applied first in `configureApp()` so they cover
+  every downstream response, including errors and Swagger. Closes [#118].
+- `EventAccessService` (`modules/event-access/`) as the single owner of the event access rule:
+  an actor may access an event if it is an admin or a participant of `type: 'user'`. Imported by
+  `EventsModule` and `TransactionsModule`, which also deduplicates the four copies of
+  `findEventOrThrow`. Closes [#124].
+- `auth.api.ts` on the frontend (`exchangeCode`, `getCurrentUser`, `logout`, `oauthLoginUrl`), so
+  the four remaining raw `fetch` calls in the auth flow go through `apiRequest` like every other
+  module. `apiRequest` gains a `skipAuthRefresh` option for the endpoints that are part of the
+  refresh cycle itself. An ESLint `no-restricted-globals` rule on `fetch` keeps it that way.
+- Prettier is now enforced: `pnpm lint` runs `format:check`, and `lint:fix` ends with `pnpm format`
+  so it has the last word over ESLint's autofixes. Closes [#104].
+
+### Changed
+
+- **`Transaction.amount` is a real `number` on every read path.** The column was declared `number`
+  but Postgres returns decimals as strings, so the API served three different runtime types
+  depending on the route. A `ColumnNumericTransformer` on the column makes all of them agree.
+  Application-layer only, no migration. Closes [#100].
+- **`Transaction.date` is a plain `'YYYY-MM-DD'` string on every read path.** It was typed `Date`
+  while TypeORM hydrates a Postgres `date` as a string, and the raw-SQL paginated route built a
+  `Date` at the server's local midnight — which east of UTC serialized to the *previous* day. The
+  paginated query now formats with `TO_CHAR(rt.date, 'YYYY-MM-DD')`. On the input side,
+  `CreateTransactionDto.date` moves from `@IsDateString()` to a strict `YYYY-MM-DD` match, the only
+  input contract change; the frontend already sent that format. Closes [#129].
+- **`JWT_EXPIRATION` now defaults to `15m` instead of `1d`**, centralized in `auth.constants.ts`.
+  Deployments that set the variable explicitly are unaffected; those relying on the default get
+  shorter-lived access tokens, transparently renewed by the refresh flow. Closes [#115].
+- `GET /users/search` validates its query through a DTO, and the user directory exposure is
+  documented. Closes [#119].
+- `RequestContextService` is registered once in a global module instead of per-module, which was
+  producing a fresh instance per consumer and losing the correlation id. Closes [#97].
+- `.env.example`'s `JWT_SECRET` placeholder raised to the schema's 32-character minimum, so
+  `cp .env.example .env.development` no longer aborts on boot. A regression test now validates both
+  example files against the schema. Closes [#103].
+- Monorepo reformatted with Prettier: 44 files that had drifted from the root `.prettierrc`.
+  Formatting only, no behavioral change.
+- `CLAUDE.md` revised against the actual code: the three backend test suites and their configs,
+  the environment/Joi model, the frontend token model, `configureApp()`, the exchange-code auth
+  flow, and the nested-vs-flat transactions API surface.
+
+### Removed
+
+- The `cookie-parser` middleware, which had no consumers: no endpoint reads cookies and the
+  frontend never sends them. Closes [#125].
+- `packages/shared-types/dist/` and `tsconfig.tsbuildinfo` are no longer tracked. With the
+  tsbuildinfo committed, `tsc -b` believed the package was already built and silently produced
+  nothing when `dist/` was missing.
+- The `release:prod` script, unusable now that `main` is protected and requires a PR. Closes [#107].
+
+### Tests
+
+- `event-participants.service.ts` coverage raised from 26% to 99% statements (~55 unit tests plus
+  e2e coverage of the guest→user replacement flow, including rollback on a DB failure), with a
+  per-file threshold in `jest.unit.json` and `--coverage` wired into `test:run` so it is enforced
+  rather than decorative. Closes [#98].
+- New frontend `TransactionsList.test.tsx` covering day grouping and the round-trip identity that
+  the unified date format makes possible.
+
 ## [0.1.3] - 2026-07-31
 
 Security hardening of the authentication flow. Includes a database migration; no changes to
@@ -132,10 +198,24 @@ JWT secret validation. No product features and no database migrations.
 
 - Outdated GitHub Actions workflows: `backend-tests.yml` and `release-to-prod.yml`.
 
+[#97]: https://github.com/MrClit/friends-web/issues/97
+[#98]: https://github.com/MrClit/friends-web/issues/98
+[#100]: https://github.com/MrClit/friends-web/issues/100
+[#103]: https://github.com/MrClit/friends-web/issues/103
+[#104]: https://github.com/MrClit/friends-web/issues/104
+[#107]: https://github.com/MrClit/friends-web/issues/107
+[#115]: https://github.com/MrClit/friends-web/issues/115
+[#118]: https://github.com/MrClit/friends-web/issues/118
+[#119]: https://github.com/MrClit/friends-web/issues/119
+[#124]: https://github.com/MrClit/friends-web/issues/124
+[#125]: https://github.com/MrClit/friends-web/issues/125
+[#129]: https://github.com/MrClit/friends-web/issues/129
+
 [#92]: https://github.com/MrClit/friends-web/issues/92
 [#111]: https://github.com/MrClit/friends-web/issues/111
 [#112]: https://github.com/MrClit/friends-web/issues/112
 
+[0.2.0]: https://github.com/MrClit/friends-web/releases/tag/v0.2.0
 [0.1.3]: https://github.com/MrClit/friends-web/releases/tag/v0.1.3
 [0.1.2]: https://github.com/MrClit/friends-web/releases/tag/v0.1.2
 [0.1.1]: https://github.com/MrClit/friends-web/releases/tag/v0.1.1
