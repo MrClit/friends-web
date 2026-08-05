@@ -142,7 +142,6 @@ pnpm format:check     # Check Prettier formatting
 
 # Other
 pnpm clean            # Remove all node_modules and build artifacts
-pnpm release:prod     # Merge develop → main and trigger production deploy
 ```
 
 ---
@@ -167,7 +166,7 @@ friends-web/
 │       └── package.json
 ├── docs/                   # Pending designs and valid runbooks only (no shipped-work plans)
 ├── scripts/
-│   └── release-to-prod.mjs # Production release script
+│   └── check-skills-symlinks.mjs # Skill symlink wiring check (pnpm check:skills)
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml          # Auto-deploy frontend on push to main
@@ -186,8 +185,10 @@ friends-web/
 
 CI only validates the frontend. The full check across all three workspaces is `pnpm lint && pnpm test
 && pnpm build`, run locally before opening a PR — deliberately stricter than CI, since it is what
-keeps the backend from breaking. Production promotion is `pnpm release:prod`, a local script, not a
-workflow.
+keeps the backend from breaking. Production promotion is a pull request from `develop` into `main`,
+merged with a merge commit — `main` is protected and rejects direct pushes. The full sequence (version
+bump, `CHANGELOG.md`, tag and GitHub Release) lives in the `release` skill, with this repo's
+coordinates in [`.claude/gh-project.md`](.claude/gh-project.md).
 
 ---
 

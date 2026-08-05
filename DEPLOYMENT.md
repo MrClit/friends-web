@@ -15,7 +15,6 @@ release *sequence* is not owned here — see §3.
 ## 2. Canonical Sources in This Repository
 
 - Release coordinates (branches, board, pre-flight): `.claude/gh-project.md`
-- Emergency release shortcut: `pnpm release:prod` / `scripts/release-to-prod.mjs` (see §3)
 - Frontend deployment workflow: `.github/workflows/deploy.yml`
 - Backend production start and migrations: `apps/backend/package.json`
 - Backend env validation schema: `apps/backend/src/config/env.validation.ts`
@@ -37,18 +36,9 @@ In summary:
 Versioning is SemVer over the root `package.json`; the packages under `apps/` and `packages/` stay
 at `0.0.0`.
 
-### Emergency shortcut: `pnpm release:prod`
-
-```bash
-pnpm release:prod
-```
-
-Merges `develop` into `main` locally and pushes it. **It skips versioning entirely** — no version
-bump, no `CHANGELOG.md` entry, no tag, no GitHub Release — and it writes straight to the production
-branch with no PR.
-
-Use it only when the normal flow is unavailable, and reconcile the version afterwards. Otherwise the
-tags stop matching what is deployed, silently.
+There is no shortcut around this: `main` is protected and requires a pull request with green checks,
+so a local merge pushed straight to the production branch is rejected. Bypassing the flow would also
+leave the tags silently out of sync with what is deployed.
 
 ## 4. Frontend Deployment (GitHub Pages)
 
@@ -123,8 +113,8 @@ FRONTEND_URL=<frontend-url-with-hash-base>
 ### JWT and refresh tokens
 
 ```bash
-JWT_SECRET=<strong-secret>
-JWT_EXPIRATION=1d
+JWT_SECRET=<strong-secret>          # minimum 32 characters, or the backend refuses to boot
+JWT_EXPIRATION=15m
 REFRESH_TOKEN_EXPIRATION_DAYS=30
 REFRESH_TOKEN_MAX_ROTATIONS=100
 ```
@@ -224,10 +214,6 @@ pg_restore --clean --if-exists --no-owner --no-privileges -d "$DATABASE_URL" bac
 Avoid relying on `migration:revert` in production unless `down` paths were tested specifically for that release.
 
 ## 11. Troubleshooting
-
-### Release command fails due to uncommitted changes
-
-- Commit or stash changes, then retry `pnpm release:prod`
 
 ### Merge conflicts during release
 

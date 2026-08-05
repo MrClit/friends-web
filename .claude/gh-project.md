@@ -37,12 +37,14 @@ y start descritos en [`DEPLOYMENT.md`](../DEPLOYMENT.md)).
 | Estado | option-id |
 |---|---|
 | Todo | `f75ad846` |
+| Ready | `90c1ddbf` |
 | In Progress | `47fc9ee4` |
+| In Review | `97172d5f` |
 | Done | `98236657` |
 
-> El tablero tiene **tres** estados, no los cinco del flujo genérico. Mapeo:
-> `Ready` → **Todo**, `In progress` → **In Progress**, `In review` → se queda en **In Progress**
-> (no hay estado de revisión), `Done` → **Done**.
+> El tablero tiene los cinco estados del flujo genérico, así que no hace falta ningún mapeo: cada
+> estado de la skill se corresponde con el del mismo nombre. Verifica los ids con
+> `gh project field-list 1 --owner MrClit --format json` si algo no cuadra.
 
 ## Labels
 
@@ -96,9 +98,8 @@ deben coincidir. Consúltalos (`git tag -l`, `gh release list`) en vez de fiarte
 
 `CHANGELOG.md` existe en la raíz y se actualiza en el commit de bump (`chore(release): vX.Y.Z`).
 
-> `pnpm release:prod` (`scripts/release-to-prod.mjs`) mergeaba `develop` → `main` en local y hacía
-> push directo. **Ya no sirve**: `main` exige PR y checks en verde, así que el push se rechaza. La
-> única vía es la coreografía por PR de la skill `release`.
+`main` exige PR y checks en verde: no hay atajo por push directo. La única vía es la coreografía por
+PR de la skill `release`.
 
 ### Pre-vuelo del release
 

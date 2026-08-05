@@ -93,10 +93,7 @@ describe('AuthExchangeCodeService (integration)', () => {
     const user = await createUser(userRepository, { email: 'expired@test.com', name: 'Expired User' });
     const { rawCode } = await exchangeCodeService.issueCode(user.id);
 
-    await exchangeCodeRepository.update(
-      { codeHash: hashCode(rawCode) },
-      { expiresAt: new Date('2000-01-01') },
-    );
+    await exchangeCodeRepository.update({ codeHash: hashCode(rawCode) }, { expiresAt: new Date('2000-01-01') });
 
     await expect(exchangeCodeService.consumeCode(rawCode)).rejects.toThrow(UnauthorizedException);
   });
@@ -110,10 +107,7 @@ describe('AuthExchangeCodeService (integration)', () => {
     const { rawCode: activeRawCode } = await exchangeCodeService.issueCode(user.id);
     const { rawCode: expiredRawCode } = await exchangeCodeService.issueCode(user.id);
 
-    await exchangeCodeRepository.update(
-      { codeHash: hashCode(expiredRawCode) },
-      { expiresAt: new Date('2000-01-01') },
-    );
+    await exchangeCodeRepository.update({ codeHash: hashCode(expiredRawCode) }, { expiresAt: new Date('2000-01-01') });
 
     await exchangeCodeService.deleteExpiredCodes();
 

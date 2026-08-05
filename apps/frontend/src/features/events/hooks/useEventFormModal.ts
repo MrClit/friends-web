@@ -133,7 +133,19 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
         });
       }
     },
-    [canSubmit, title, description, eventId, cleanParticipants, icon, cleanParticipantReplacements, updateEvent, createEvent, modal, t],
+    [
+      canSubmit,
+      title,
+      description,
+      eventId,
+      cleanParticipants,
+      icon,
+      cleanParticipantReplacements,
+      updateEvent,
+      createEvent,
+      modal,
+      t,
+    ],
   );
 
   const isLoading = createEvent.isPending || updateEvent.isPending;

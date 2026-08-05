@@ -20,6 +20,17 @@ describe('parseDateForFormatting', () => {
     expect(parseDateForFormatting('2025-02-30')).toBeNull();
   });
 
+  it('round-trips a calendar day unchanged, whatever the timezone', () => {
+    // The API now sends day-only strings on every route, so parse -> format must be
+    // an identity: any drift here would move a transaction to a neighbouring day.
+    for (const day of ['2026-01-01', '2026-02-25', '2026-06-30', '2026-12-31']) {
+      const parsed = parseDateForFormatting(day);
+
+      expect(parsed).not.toBeNull();
+      expect(formatDateToInputValue(parsed!)).toBe(day);
+    }
+  });
+
   it('parses ISO datetime strings', () => {
     const parsed = parseDateForFormatting('2025-01-15T10:30:00.000Z');
 

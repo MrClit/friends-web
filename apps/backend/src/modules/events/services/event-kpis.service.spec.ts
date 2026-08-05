@@ -59,7 +59,7 @@ describe('EventKPIsService', () => {
         participantId: 'u1',
         paymentType: 'contribution',
         amount: 100,
-        date: new Date('2026-01-01'),
+        date: '2026-01-01',
       },
       {
         id: 'tx-2',
@@ -67,7 +67,7 @@ describe('EventKPIsService', () => {
         participantId: 'u1',
         paymentType: 'expense',
         amount: 40,
-        date: new Date('2026-01-02'),
+        date: '2026-01-02',
       },
       {
         id: 'tx-3',
@@ -75,7 +75,7 @@ describe('EventKPIsService', () => {
         participantId: 'u1',
         paymentType: 'compensation',
         amount: 10,
-        date: new Date('2026-01-03'),
+        date: '2026-01-03',
       },
       {
         id: 'tx-4',
@@ -83,7 +83,7 @@ describe('EventKPIsService', () => {
         participantId: '0',
         paymentType: 'expense',
         amount: 20,
-        date: new Date('2026-01-04'),
+        date: '2026-01-04',
       },
       {
         id: 'tx-5',
@@ -91,7 +91,7 @@ describe('EventKPIsService', () => {
         participantId: 'u2',
         paymentType: 'contribution',
         amount: '60',
-        date: new Date('2026-01-05'),
+        date: '2026-01-05',
       },
     ] as Transaction[];
 
@@ -163,7 +163,7 @@ describe('EventKPIsService', () => {
         participantId: 'u1',
         paymentType: 'contribution',
         amount: 50,
-        date: new Date('2026-01-06'),
+        date: '2026-01-06',
       },
     ] as Transaction[]);
 
@@ -189,7 +189,7 @@ describe('EventKPIsService', () => {
         participantId: '0',
         paymentType: 'expense',
         amount: 30,
-        date: new Date('2026-01-07'),
+        date: '2026-01-07',
       },
     ] as Transaction[]);
 
@@ -245,7 +245,7 @@ describe('EventKPIsService', () => {
         participantId: 'u1',
         paymentType: 'contribution',
         amount: 100,
-        date: new Date('2026-01-08'),
+        date: '2026-01-08',
       },
       {
         id: 'tx-31',
@@ -253,7 +253,7 @@ describe('EventKPIsService', () => {
         participantId: 'g1',
         paymentType: 'expense',
         amount: 10,
-        date: new Date('2026-01-08'),
+        date: '2026-01-08',
       },
     ] as Transaction[]);
 
@@ -303,7 +303,7 @@ describe('EventKPIsService', () => {
         participantId: 'u1',
         paymentType: 'contribution',
         amount: '0.10',
-        date: new Date('2026-01-01'),
+        date: '2026-01-01',
       },
       {
         id: 'tx-fp-2',
@@ -311,7 +311,7 @@ describe('EventKPIsService', () => {
         participantId: 'u1',
         paymentType: 'contribution',
         amount: '0.20',
-        date: new Date('2026-01-02'),
+        date: '2026-01-02',
       },
     ] as unknown);
 
@@ -331,7 +331,7 @@ describe('EventKPIsService', () => {
         participantId: 'u1',
         paymentType: 'contribution' as const,
         amount: '0.10',
-        date: new Date('2026-01-01'),
+        date: '2026-01-01',
       })),
     );
 

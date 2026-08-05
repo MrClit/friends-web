@@ -167,8 +167,8 @@ TYPEORM_LOGGING=true
 # CORS
 CORS_ORIGIN=http://localhost:5173
 
-# JWT
-JWT_SECRET=replace-with-secure-random
+# JWT — envValidationSchema requires at least 32 characters.
+JWT_SECRET=replace-with-a-secure-random-string-min-32-chars
 JWT_EXPIRATION=15m
 REFRESH_TOKEN_EXPIRATION_DAYS=30
 

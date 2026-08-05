@@ -1,12 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException, ForbiddenException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { Transaction } from './entities/transaction.entity';
 import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
+import { EventAccessService } from '../event-access/event-access.service';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { RequestContextService } from '../../common/request-context/request-context.service';
 
@@ -48,7 +54,7 @@ describe('TransactionsService', () => {
     paymentType: 'contribution' as const,
     amount: 50.0,
     participantId: 'g1',
-    date: new Date('2026-01-01'),
+    date: '2026-01-01',
     eventId: 'event-uuid-1',
     createdAt: new Date(),
   };
@@ -85,6 +91,9 @@ describe('TransactionsService', () => {
           provide: getRepositoryToken(Transaction),
           useValue: mockTransactionRepository,
         },
+        // The real EventAccessService is wired over a mocked event repository so these tests keep
+        // exercising the access rule itself, not just the delegation to it.
+        EventAccessService,
         {
           provide: getRepositoryToken(Event),
           useValue: mockEventRepository,
@@ -253,11 +262,13 @@ describe('TransactionsService', () => {
 
     it('throws BadRequestException for invalid participantId', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, _paymentType: string) => {
-        if (participantId === '999') {
-          throw new BadRequestException('Invalid participant');
-        }
-      });
+      mockParticipantValidationService.validateParticipantId.mockImplementation(
+        (participantId: string, _paymentType: string) => {
+          if (participantId === '999') {
+            throw new BadRequestException('Invalid participant');
+          }
+        },
+      );
 
       const invalidDto: CreateTransactionDto = {
         ...createDto,
@@ -295,11 +306,13 @@ describe('TransactionsService', () => {
     it('validates participantId when updating', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, _paymentType: string) => {
-        if (participantId === '999') {
-          throw new BadRequestException('Invalid participant');
-        }
-      });
+      mockParticipantValidationService.validateParticipantId.mockImplementation(
+        (participantId: string, _paymentType: string) => {
+          if (participantId === '999') {
+            throw new BadRequestException('Invalid participant');
+          }
+        },
+      );
 
       const updateDtoWithInvalidParticipant = {
         ...updateDto,
@@ -315,11 +328,13 @@ describe('TransactionsService', () => {
       const potTransaction = { ...mockTransaction, participantId: '0', paymentType: 'expense' as const };
       mockTransactionRepository.findOne.mockResolvedValue(potTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation((participantId: string, paymentType: string) => {
-        if (participantId === '0' && paymentType !== 'expense') {
-          throw new BadRequestException(`POT participant can only be used with payment type 'expense'`);
-        }
-      });
+      mockParticipantValidationService.validateParticipantId.mockImplementation(
+        (participantId: string, paymentType: string) => {
+          if (participantId === '0' && paymentType !== 'expense') {
+            throw new BadRequestException(`POT participant can only be used with payment type 'expense'`);
+          }
+        },
+      );
 
       await expect(
         service.update('transaction-uuid-1', { paymentType: 'compensation' as const }, adminActor),

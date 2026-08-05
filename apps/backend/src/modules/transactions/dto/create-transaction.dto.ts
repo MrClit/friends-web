@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEnum, IsNumber, Min, IsDateString } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsNumber, Min, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PaymentType } from '@friends/shared-types';
 
@@ -29,7 +29,8 @@ export class CreateTransactionDto {
   @IsNotEmpty()
   participantId: string;
 
-  @ApiProperty({ description: 'Transaction date in ISO format', example: '2026-04-26' })
-  @IsDateString()
+  @ApiProperty({ description: 'Transaction date as a calendar day (YYYY-MM-DD)', example: '2026-04-26' })
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'date must be a calendar day in YYYY-MM-DD format' })
   date: string;
 }

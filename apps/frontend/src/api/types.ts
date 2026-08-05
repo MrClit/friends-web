@@ -5,7 +5,12 @@
 
 // ============= Shared types (single source of truth) =============
 import { EventStatus, PaymentType } from '@friends/shared-types';
-import type { EventParticipant as EventParticipantDto, UserParticipant, GuestParticipant, PotParticipant } from '@friends/shared-types';
+import type {
+  EventParticipant as EventParticipantDto,
+  UserParticipant,
+  GuestParticipant,
+  PotParticipant,
+} from '@friends/shared-types';
 
 export { EventStatus, PaymentType };
 export type { EventParticipantDto, UserParticipant, GuestParticipant, PotParticipant };

@@ -50,10 +50,7 @@ describe('Auth access control (integration)', () => {
       const { rawToken } = await refreshTokenService.issueRefreshToken(user.id);
 
       const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
-      const response = await request(httpServer)
-        .post('/api/auth/refresh')
-        .send({ refreshToken: rawToken })
-        .expect(201);
+      const response = await request(httpServer).post('/api/auth/refresh').send({ refreshToken: rawToken }).expect(201);
 
       const data = getDataObjectFromBody(response.body);
       expect(typeof data.accessToken).toBe('string');
@@ -72,10 +69,7 @@ describe('Auth access control (integration)', () => {
       await refreshTokenService.revokeByRawToken(rawToken);
 
       const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
-      await request(httpServer)
-        .post('/api/auth/refresh')
-        .send({ refreshToken: rawToken })
-        .expect(401);
+      await request(httpServer).post('/api/auth/refresh').send({ refreshToken: rawToken }).expect(401);
     });
 
     it('returns 401 when the user has been soft-deleted after the token was issued', async () => {
@@ -84,10 +78,7 @@ describe('Auth access control (integration)', () => {
       await userRepository.softDelete(user.id);
 
       const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
-      await request(httpServer)
-        .post('/api/auth/refresh')
-        .send({ refreshToken: rawToken })
-        .expect(401);
+      await request(httpServer).post('/api/auth/refresh').send({ refreshToken: rawToken }).expect(401);
     });
   });
 
@@ -104,10 +95,7 @@ describe('Auth access control (integration)', () => {
         .send({ refreshToken: rawToken })
         .expect(201);
 
-      await request(httpServer)
-        .post('/api/auth/refresh')
-        .send({ refreshToken: rawToken })
-        .expect(401);
+      await request(httpServer).post('/api/auth/refresh').send({ refreshToken: rawToken }).expect(401);
     });
   });
 
@@ -169,9 +157,7 @@ describe('Auth access control (integration)', () => {
       await oauthApp.init();
 
       oauthUserRepository = moduleFixture.get<Repository<User>>(getRepositoryToken(User));
-      oauthRefreshTokenRepository = moduleFixture.get<Repository<RefreshToken>>(
-        getRepositoryToken(RefreshToken),
-      );
+      oauthRefreshTokenRepository = moduleFixture.get<Repository<RefreshToken>>(getRepositoryToken(RefreshToken));
     });
 
     beforeEach(async () => {

@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/utils';
+import { authApi } from '@/api/auth.api';
 
-const MICROSOFT_AUTH_URL = `${import.meta.env.VITE_API_URL || '/api'}/auth/microsoft`;
+const MICROSOFT_AUTH_URL = authApi.oauthLoginUrl('microsoft');
 
 type MicrosoftLoginButtonProps = {
   fullWidth?: boolean;

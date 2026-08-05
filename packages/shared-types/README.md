@@ -16,8 +16,8 @@ Const object + derived union type for event status values.
 ```ts
 import { EventStatus } from '@friends/shared-types';
 
-EventStatus.ACTIVE    // 'active'
-EventStatus.ARCHIVED  // 'archived'
+EventStatus.ACTIVE; // 'active'
+EventStatus.ARCHIVED; // 'archived'
 
 type EventStatus = 'active' | 'archived';
 ```
@@ -29,9 +29,9 @@ Const object + derived union type for transaction payment types.
 ```ts
 import { PaymentType } from '@friends/shared-types';
 
-PaymentType.CONTRIBUTION  // 'contribution'
-PaymentType.EXPENSE       // 'expense'
-PaymentType.COMPENSATION  // 'compensation'
+PaymentType.CONTRIBUTION; // 'contribution'
+PaymentType.EXPENSE; // 'expense'
+PaymentType.COMPENSATION; // 'compensation'
 
 type PaymentType = 'contribution' | 'expense' | 'compensation';
 ```

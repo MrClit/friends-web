@@ -14,6 +14,7 @@ import { AuthExchangeCodeService } from './services/auth-exchange-code.service';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { AuthExchangeCode } from './entities/auth-exchange-code.entity';
 import { AUTH_STRATEGIES } from './strategies';
+import { DEFAULT_JWT_EXPIRATION, type JwtExpiration } from '../../config/auth.constants';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { AUTH_STRATEGIES } from './strategies';
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
         secret: config.get('JWT_SECRET'),
-        signOptions: { expiresIn: config.get('JWT_EXPIRATION') || '15m' },
+        signOptions: { expiresIn: config.get<JwtExpiration>('JWT_EXPIRATION') ?? DEFAULT_JWT_EXPIRATION },
       }),
       inject: [ConfigService],
     }),

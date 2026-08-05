@@ -127,6 +127,36 @@ describe('apiRequest', () => {
       window.removeEventListener('auth:logout', logoutListener);
     });
 
+    it('does not refresh, retry or dispatch auth:logout when skipAuthRefresh is set', async () => {
+      setAccessToken('old-token');
+      localStorage.setItem(REFRESH_TOKEN_KEY, 'refresh-token');
+
+      vi.mocked(fetch).mockResolvedValueOnce(mockResponse(401, { message: 'Unauthorized' }));
+
+      const logoutListener = vi.fn();
+      window.addEventListener('auth:logout', logoutListener);
+
+      await expect(apiRequest('/auth/logout', { method: 'POST', skipAuthRefresh: true })).rejects.toMatchObject({
+        status: 401,
+      });
+
+      // Otherwise logging out would fail its own refresh, emit auth:logout and
+      // call itself again, forever.
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(logoutListener).not.toHaveBeenCalled();
+      expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBe('refresh-token');
+
+      window.removeEventListener('auth:logout', logoutListener);
+    });
+
+    it('does not leak skipAuthRefresh into the fetch options', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce(mockResponse(200, { data: { ok: true } }));
+
+      await apiRequest('/auth/exchange', { method: 'POST', skipAuthRefresh: true });
+
+      expect(vi.mocked(fetch).mock.calls[0][1]).not.toHaveProperty('skipAuthRefresh');
+    });
+
     it('does not retry /auth/refresh endpoint on 401', async () => {
       setAccessToken('old-token');
       localStorage.setItem(REFRESH_TOKEN_KEY, 'refresh-token');

@@ -14,15 +14,8 @@ describe('TransactionPaginationService (integration)', () => {
   let eventRepository: Repository<Event>;
   let transactionRepository: Repository<Transaction>;
 
-  const normalizeDate = (value: Date | string): string => {
-    if (typeof value === 'string') {
-      return value.split('T')[0];
-    }
-    return value.toISOString().split('T')[0];
-  };
-
   interface DistinctDateRow {
-    date: Date | string;
+    date: string;
   }
 
   const isDistinctDateRow = (value: unknown): value is DistinctDateRow => {
@@ -30,8 +23,7 @@ describe('TransactionPaginationService (integration)', () => {
       return false;
     }
 
-    const maybeDate = (value).date;
-    return typeof maybeDate === 'string' || maybeDate instanceof Date;
+    return typeof value.date === 'string';
   };
 
   const parseDistinctDateRows = (value: unknown): DistinctDateRow[] => {
@@ -93,7 +85,7 @@ describe('TransactionPaginationService (integration)', () => {
         paymentType: 'expense',
         amount: 10,
         participantId: 'g1',
-        date: new Date('2026-02-03T12:00:00.000Z'),
+        date: '2026-02-03',
         eventId: event.id,
       }),
       createTransaction(transactionRepository, {
@@ -101,7 +93,7 @@ describe('TransactionPaginationService (integration)', () => {
         paymentType: 'expense',
         amount: 20,
         participantId: 'g1',
-        date: new Date('2026-02-03T12:00:00.000Z'),
+        date: '2026-02-03',
         eventId: event.id,
       }),
       createTransaction(transactionRepository, {
@@ -109,7 +101,7 @@ describe('TransactionPaginationService (integration)', () => {
         paymentType: 'contribution',
         amount: 30,
         participantId: 'g1',
-        date: new Date('2026-02-02T12:00:00.000Z'),
+        date: '2026-02-02',
         eventId: event.id,
       }),
       createTransaction(transactionRepository, {
@@ -117,7 +109,7 @@ describe('TransactionPaginationService (integration)', () => {
         paymentType: 'expense',
         amount: 40,
         participantId: 'g1',
-        date: new Date('2026-02-01T12:00:00.000Z'),
+        date: '2026-02-01',
         eventId: event.id,
       }),
       createTransaction(transactionRepository, {
@@ -125,7 +117,7 @@ describe('TransactionPaginationService (integration)', () => {
         paymentType: 'compensation',
         amount: 50,
         participantId: 'g1',
-        date: new Date('2026-02-01T12:00:00.000Z'),
+        date: '2026-02-01',
         eventId: event.id,
       }),
       createTransaction(transactionRepository, {
@@ -133,24 +125,24 @@ describe('TransactionPaginationService (integration)', () => {
         paymentType: 'expense',
         amount: 999,
         participantId: 'g1',
-        date: new Date('2026-02-03T12:00:00.000Z'),
+        date: '2026-02-03',
         eventId: otherEvent.id,
       }),
     ]);
 
     const rawDistinctDates: unknown = await transactionRepository.query(
       `
-        SELECT DISTINCT t.date
+        SELECT DISTINCT TO_CHAR(t.date, 'YYYY-MM-DD') AS date
         FROM transactions t
         WHERE t.event_id = $1
-        ORDER BY t.date DESC
+        ORDER BY date DESC
       `,
       [event.id],
     );
     const distinctDates = parseDistinctDateRows(rawDistinctDates);
 
-    const expectedPage1Dates = distinctDates.slice(0, 2).map((row: { date: Date | string }) => normalizeDate(row.date));
-    const expectedPage2Dates = distinctDates.slice(2).map((row: { date: Date | string }) => normalizeDate(row.date));
+    const expectedPage1Dates = distinctDates.slice(0, 2).map((row) => row.date);
+    const expectedPage2Dates = distinctDates.slice(2).map((row) => row.date);
 
     const page1 = await service.findByEventPaginated(event.id, 2, 0);
 
@@ -159,7 +151,12 @@ describe('TransactionPaginationService (integration)', () => {
     expect(page1.hasMore).toBe(true);
     expect(page1.transactions).toHaveLength(3);
 
-    const page1Dates = page1.transactions.map((tx) => normalizeDate(tx.date));
+    // The raw-SQL path must hand back the same calendar-day string as an entity read,
+    // with no normalization in between.
+    expect(typeof page1.transactions[0].date).toBe('string');
+    expect(page1.transactions[0].date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+    const page1Dates = page1.transactions.map((tx) => tx.date);
     expect(new Set(page1Dates)).toEqual(new Set(expectedPage1Dates));
     expect(page1.transactions.every((tx) => tx.eventId === event.id)).toBe(true);
 
@@ -170,7 +167,7 @@ describe('TransactionPaginationService (integration)', () => {
     expect(page2.hasMore).toBe(false);
     expect(page2.transactions).toHaveLength(2);
 
-    const page2Dates = page2.transactions.map((tx) => normalizeDate(tx.date));
+    const page2Dates = page2.transactions.map((tx) => tx.date);
     expect(new Set(page2Dates)).toEqual(new Set(expectedPage2Dates));
     expect(page2.transactions.every((tx) => tx.eventId === event.id)).toBe(true);
   });

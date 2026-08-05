@@ -59,7 +59,7 @@ describe('UsersController', () => {
     const users = [{ id: 'u1', email: 'alice@example.com', name: 'Alice' }];
     usersService.search.mockResolvedValue(users);
 
-    const result = await controller.search('ali');
+    const result = await controller.search({ q: 'ali' });
 
     expect(result).toEqual(users);
     expect(usersService.search).toHaveBeenCalledWith('ali');

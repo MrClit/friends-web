@@ -5,13 +5,16 @@ import { ParticipantValidationService } from './services/participant-validation.
 import { TransactionPaginationService } from './services/transaction-pagination.service';
 import { TransactionsController, EventTransactionsController } from './transactions.controller';
 import { Transaction } from './entities/transaction.entity';
-import { Event } from '../events/entities/event.entity';
-import { RequestContextService } from '../../common/request-context/request-context.service';
+import { EventAccessModule } from '../event-access/event-access.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction, Event])],
+  // The Event entity is deliberately absent: event access goes through EventAccessModule instead of a
+  // second repository over the events table.
+  imports: [TypeOrmModule.forFeature([Transaction]), EventAccessModule],
   controllers: [EventTransactionsController, TransactionsController],
-  providers: [TransactionsService, ParticipantValidationService, TransactionPaginationService, RequestContextService],
+  // RequestContextService is not declared here on purpose: it lives in the global RequestContextModule
+  // so the middleware and this module's services share the same AsyncLocalStorage instance.
+  providers: [TransactionsService, ParticipantValidationService, TransactionPaginationService],
   exports: [TransactionsService],
 })
 export class TransactionsModule {}

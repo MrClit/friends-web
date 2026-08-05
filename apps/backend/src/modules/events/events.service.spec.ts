@@ -1,6 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException, ForbiddenException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ForbiddenException,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import { EventsService } from './events.service';
 import { Event, EventStatus } from './entities/event.entity';
 import type { EventParticipant } from './entities/event.entity';
@@ -9,6 +14,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { EventKPIsService } from './services/event-kpis.service';
 import { EventQueryService } from './services/event-query.service';
 import { EventParticipantsService } from './services/event-participants.service';
+import { EventAccessService } from '../event-access/event-access.service';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 
 describe('EventsService', () => {
@@ -16,6 +22,7 @@ describe('EventsService', () => {
 
   let mockRepository: {
     find: jest.Mock;
+    findOne: jest.Mock;
     create: jest.Mock;
     save: jest.Mock;
     merge: jest.Mock;
@@ -30,7 +37,6 @@ describe('EventsService', () => {
     save: jest.Mock;
   };
   let mockEventQueryService: {
-    findEventOrThrow: jest.Mock;
     calculateLastModified: jest.Mock;
   };
   let mockEventParticipantsService: {
@@ -77,6 +83,8 @@ describe('EventsService', () => {
   beforeEach(async () => {
     mockRepository = {
       find: jest.fn(),
+      // Consumed by the real EventAccessService below, which loads the event before authorizing it
+      findOne: jest.fn().mockResolvedValue(mockEvent),
       create: jest.fn(),
       save: jest.fn(),
       merge: jest.fn(),
@@ -106,7 +114,6 @@ describe('EventsService', () => {
     });
 
     mockEventQueryService = {
-      findEventOrThrow: jest.fn().mockResolvedValue(mockEvent),
       calculateLastModified: jest.fn().mockResolvedValue(undefined),
     };
 
@@ -128,6 +135,9 @@ describe('EventsService', () => {
           provide: getRepositoryToken(Event),
           useValue: mockRepository,
         },
+        // The real EventAccessService is wired over the mocked repository so these tests keep
+        // exercising the access rule itself, not just the delegation to it.
+        EventAccessService,
         {
           provide: EventQueryService,
           useValue: mockEventQueryService,
@@ -194,13 +204,11 @@ describe('EventsService', () => {
       const result = await service.findOne(mockEvent.id, adminActor);
 
       expect(result).toEqual(mockEvent);
-      expect(mockEventQueryService.findEventOrThrow).toHaveBeenCalledWith(mockEvent.id);
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: mockEvent.id } });
     });
 
     it('throws NotFoundException when event does not exist', async () => {
-      mockEventQueryService.findEventOrThrow.mockRejectedValue(
-        new NotFoundException(`Event with ID non-existent-id not found`),
-      );
+      mockRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findOne('non-existent-id', adminActor)).rejects.toThrow(NotFoundException);
     });
@@ -420,9 +428,7 @@ describe('EventsService', () => {
     });
 
     it('throws NotFoundException when event does not exist', async () => {
-      mockEventQueryService.findEventOrThrow.mockRejectedValue(
-        new NotFoundException('Event with ID non-existent-id not found'),
-      );
+      mockRepository.findOne.mockResolvedValue(null);
 
       await expect(service.getKPIs('non-existent-id', adminActor)).rejects.toThrow(NotFoundException);
       expect(mockEventKPIsService.getKPIs).not.toHaveBeenCalled();

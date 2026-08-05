@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Event } from '../../events/entities/event.entity';
 import { PaymentType } from '@friends/shared-types';
+import { columnNumericTransformer } from '../../../common/transformers/column-numeric.transformer';
 
 export type { PaymentType } from '@friends/shared-types';
 
@@ -29,14 +30,18 @@ export class Transaction {
   })
   paymentType: PaymentType;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  // The transformer is what makes `number` true at runtime: without it the
+  // driver hands back a string for decimal columns.
+  @Column('decimal', { precision: 10, scale: 2, transformer: columnNumericTransformer })
   amount: number;
 
   @Column({ length: 50, name: 'participant_id' })
   participantId: string; // '0' for POT or participant ID from event
 
+  // A Postgres `date` column carries no time: TypeORM hydrates it as a
+  // 'YYYY-MM-DD' string, so that is what the declared type says.
   @Column('date')
-  date: Date;
+  date: string;
 
   @Column({ name: 'event_id' })
   eventId: string;

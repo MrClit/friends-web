@@ -56,6 +56,35 @@ describe('UsersService.search (integration)', () => {
     expect(result.map((user) => user.email)).toEqual(['ana@example.com', 'zz+banana@example.com']);
   });
 
+  it('matches LIKE wildcards literally instead of interpreting them as patterns', async () => {
+    await Promise.all([
+      createUser(userRepository, {
+        email: 'discount@example.com',
+        name: '50% Off',
+      }),
+      createUser(userRepository, {
+        email: 'ana@example.com',
+        name: 'Ana',
+      }),
+      createUser(userRepository, {
+        email: 'underscore@example.com',
+        name: 'a_b',
+      }),
+    ]);
+
+    // A bare `%` used to return the whole directory. It now only matches the literal character,
+    // so a single user comes back instead of all three.
+    const percentOnly = await usersService.search('%');
+    expect(percentOnly.map((user) => user.name)).toEqual(['50% Off']);
+
+    // `_` must not act as a single-character wildcard either.
+    const underscoreOnly = await usersService.search('_');
+    expect(underscoreOnly.map((user) => user.name)).toEqual(['a_b']);
+
+    const percentMatches = await usersService.search('50%');
+    expect(percentMatches.map((user) => user.name)).toEqual(['50% Off']);
+  });
+
   it('returns at most 20 users', async () => {
     await Promise.all(
       Array.from({ length: 25 }, (_, index) =>

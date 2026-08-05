@@ -10,13 +10,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { Transaction } from './entities/transaction.entity';
-import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { PaginatedTransactionsResponseDto } from './dto/paginated-transactions-response.dto';
 import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
-import { ADMIN_ROLE } from '../users/user-role.constants';
+import { EventAccessService } from '../event-access/event-access.service';
 import { RequestContextService } from '../../common/request-context/request-context.service';
 
 @Injectable()
@@ -26,42 +25,11 @@ export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
-    @InjectRepository(Event)
-    private readonly eventRepository: Repository<Event>,
+    private readonly eventAccessService: EventAccessService,
     private readonly participantValidationService: ParticipantValidationService,
     private readonly transactionPaginationService: TransactionPaginationService,
     private readonly requestContext: RequestContextService,
   ) {}
-
-  private isAdmin(actor: AuthenticatedUser): boolean {
-    return actor.role === ADMIN_ROLE;
-  }
-
-  private isUserParticipant(event: Event, userId: string): boolean {
-    return (event.participants ?? []).some((participant) => participant.type === 'user' && participant.id === userId);
-  }
-
-  private ensureCanAccessEvent(event: Event, actor: AuthenticatedUser): void {
-    if (this.isAdmin(actor)) {
-      return;
-    }
-
-    if (!this.isUserParticipant(event, actor.id)) {
-      throw new ForbiddenException(`Access to event ${event.id} is not allowed`);
-    }
-  }
-
-  private async findEventOrThrow(eventId: string): Promise<Event> {
-    const event = await this.eventRepository.findOne({
-      where: { id: eventId },
-    });
-
-    if (!event) {
-      throw new NotFoundException(`Event with ID ${eventId} not found`);
-    }
-
-    return event;
-  }
 
   private async findTransactionOrThrow(id: string): Promise<Transaction> {
     const transaction = await this.transactionRepository.findOne({ where: { id } });
@@ -73,16 +41,20 @@ export class TransactionsService {
     return transaction;
   }
 
+  /**
+   * Authorize a transaction through its parent event. A missing parent event is reported as a missing
+   * transaction on purpose, so the response never reveals whether the event exists.
+   */
   private async ensureCanAccessTransaction(transaction: Transaction, actor: AuthenticatedUser): Promise<void> {
-    if (this.isAdmin(actor)) {
+    if (this.eventAccessService.isAdmin(actor)) {
       return;
     }
 
-    const event = await this.eventRepository.findOne({ where: { id: transaction.eventId } });
+    const event = await this.eventAccessService.findEvent(transaction.eventId);
     if (!event) {
       throw new NotFoundException(`Transaction with ID ${transaction.id} not found`);
     }
-    if (!this.isUserParticipant(event, actor.id)) {
+    if (!this.eventAccessService.canAccessEvent(event, actor)) {
       throw new ForbiddenException(`Access to transaction ${transaction.id} is not allowed`);
     }
   }
@@ -94,9 +66,8 @@ export class TransactionsService {
     try {
       this.logger.log(`Fetching transactions for event: ${eventId}`);
 
-      // Verify event exists
-      const event = await this.findEventOrThrow(eventId);
-      this.ensureCanAccessEvent(event, actor);
+      // Verify the event exists and the actor can access it
+      await this.eventAccessService.loadAccessibleEvent(eventId, actor);
 
       const transactions = await this.transactionRepository.find({
         where: { eventId },
@@ -109,12 +80,22 @@ export class TransactionsService {
       this.logger.log(`Found ${transactions.length} transactions for event ${eventId}`);
       return transactions;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       const err = error as Error;
       this.logger.error(
-        { msg: 'Failed to fetch transactions for event', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, eventId },
+        {
+          msg: 'Failed to fetch transactions for event',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          eventId,
+        },
         err.stack,
       );
       throw new InternalServerErrorException('Failed to fetch transactions');
@@ -134,8 +115,7 @@ export class TransactionsService {
     offset: number,
     actor: AuthenticatedUser,
   ): Promise<PaginatedTransactionsResponseDto> {
-    const event = await this.findEventOrThrow(eventId);
-    this.ensureCanAccessEvent(event, actor);
+    await this.eventAccessService.loadAccessibleEvent(eventId, actor);
     return this.transactionPaginationService.findByEventPaginated(eventId, numberOfDates, offset);
   }
 
@@ -155,7 +135,13 @@ export class TransactionsService {
       }
       const err = error as Error;
       this.logger.error(
-        { msg: 'Failed to fetch transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id },
+        {
+          msg: 'Failed to fetch transaction',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          transactionId: id,
+        },
         err.stack,
       );
       throw new InternalServerErrorException('Failed to fetch transaction');
@@ -174,9 +160,8 @@ export class TransactionsService {
     try {
       this.logger.log(`Creating new transaction for event ${eventId}: ${createTransactionDto.title}`);
 
-      // Verify event exists
-      const event = await this.findEventOrThrow(eventId);
-      this.ensureCanAccessEvent(event, actor);
+      // Verify the event exists and the actor can access it
+      const event = await this.eventAccessService.loadAccessibleEvent(eventId, actor);
 
       // Validate participantId
       this.participantValidationService.validateParticipantId(
@@ -195,7 +180,11 @@ export class TransactionsService {
       this.logger.log(`Transaction created successfully with ID: ${savedTransaction.id}`);
       return savedTransaction;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       const err = error as Error;
@@ -233,13 +222,7 @@ export class TransactionsService {
 
       // If participantId or paymentType is being updated, re-validate the combination
       if (updateTransactionDto.participantId || updateTransactionDto.paymentType) {
-        const event = await this.eventRepository.findOne({
-          where: { id: transaction.eventId },
-        });
-
-        if (!event) {
-          throw new NotFoundException(`Event with ID ${transaction.eventId} not found`);
-        }
+        const event = await this.eventAccessService.findEventOrThrow(transaction.eventId);
 
         const participantId = updateTransactionDto.participantId ?? transaction.participantId;
         const paymentType = updateTransactionDto.paymentType ?? transaction.paymentType;
@@ -253,12 +236,23 @@ export class TransactionsService {
       this.logger.log(`Transaction ${id} updated successfully`);
       return updatedTransaction;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       const err = error as Error;
       this.logger.error(
-        { msg: 'Failed to update transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id, payload: updateTransactionDto },
+        {
+          msg: 'Failed to update transaction',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          transactionId: id,
+          payload: updateTransactionDto,
+        },
         err.stack,
       );
       throw new InternalServerErrorException('Failed to update transaction');
@@ -285,7 +279,13 @@ export class TransactionsService {
       }
       const err = error as Error;
       this.logger.error(
-        { msg: 'Failed to delete transaction', error: err.message, correlationId: this.requestContext.correlationId, actorId: actor.id, transactionId: id },
+        {
+          msg: 'Failed to delete transaction',
+          error: err.message,
+          correlationId: this.requestContext.correlationId,
+          actorId: actor.id,
+          transactionId: id,
+        },
         err.stack,
       );
       throw new InternalServerErrorException('Failed to delete transaction');

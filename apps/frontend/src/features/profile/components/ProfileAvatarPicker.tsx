@@ -43,7 +43,11 @@ export const ProfileAvatarPicker = memo(function ProfileAvatarPicker({
           email={user.email}
           alt={displayName || user.email}
           className="h-24 w-24 rounded-full"
-          imageClassName={cn('h-24 w-24 object-cover', 'ring-2 ring-emerald-300/80 shadow-sm', 'dark:ring-emerald-700/70')}
+          imageClassName={cn(
+            'h-24 w-24 object-cover',
+            'ring-2 ring-emerald-300/80 shadow-sm',
+            'dark:ring-emerald-700/70',
+          )}
           fallbackClassName={cn(
             'flex h-24 w-24 items-center justify-center rounded-full',
             'text-2xl font-bold text-white',
@@ -81,7 +85,9 @@ export const ProfileAvatarPicker = memo(function ProfileAvatarPicker({
       </p>
 
       {avatarFile && (
-        <p className="max-w-28 truncate text-center text-xs text-emerald-600 dark:text-emerald-400">{avatarFile.name}</p>
+        <p className="max-w-28 truncate text-center text-xs text-emerald-600 dark:text-emerald-400">
+          {avatarFile.name}
+        </p>
       )}
 
       <input

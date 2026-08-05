@@ -5,8 +5,15 @@ let refreshPromise: Promise<string | null> | null = null;
 
 export const REFRESH_TOKEN_KEY = 'refresh_token';
 
-interface ApiRequestInit extends RequestInit {
+export interface ApiRequestInit extends RequestInit {
   _retried?: boolean;
+  /**
+   * Opt out of the 401 refresh-and-replay. Needed by the auth endpoints that are
+   * part of the refresh cycle themselves: logging out clears the refresh token
+   * first, so a 401 there would fail the refresh, emit `auth:logout` and call
+   * logout again, forever.
+   */
+  skipAuthRefresh?: boolean;
 }
 
 // The access token lives only in memory so a persistent XSS cannot read it
@@ -83,7 +90,7 @@ export class ApiError extends Error {
  */
 export async function apiRequest<T>(endpoint: string, options?: ApiRequestInit): Promise<T> {
   const requestOptions = options ?? {};
-  const { _retried: hasRetried = false, ...baseOptions } = requestOptions;
+  const { _retried: hasRetried = false, skipAuthRefresh = false, ...baseOptions } = requestOptions;
 
   let response: Response;
   const token = accessToken;
@@ -111,7 +118,7 @@ export async function apiRequest<T>(endpoint: string, options?: ApiRequestInit):
   const contentType = response.headers.get('content-type') || '';
 
   if (!response.ok) {
-    if (response.status === 401 && !hasRetried && endpoint !== '/auth/refresh') {
+    if (response.status === 401 && !hasRetried && !skipAuthRefresh && endpoint !== '/auth/refresh') {
       const newToken = await refreshAccessToken();
 
       if (newToken) {

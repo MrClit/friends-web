@@ -53,9 +53,7 @@ export function AdminUsersDialogs({
         title={t('createTitle', { ns: 'adminUsers' })}
         closeAriaLabel={t('close', { ns: 'common' })}
         primaryAction={{
-          label: isCreating
-            ? t('creating', { ns: 'adminUsers' })
-            : t('createAction', { ns: 'adminUsers' }),
+          label: isCreating ? t('creating', { ns: 'adminUsers' }) : t('createAction', { ns: 'adminUsers' }),
           onClick: onCreateSubmit,
           disabled: isCreating,
         }}
@@ -74,9 +72,7 @@ export function AdminUsersDialogs({
         title={t('editTitle', { ns: 'adminUsers' })}
         closeAriaLabel={t('close', { ns: 'common' })}
         primaryAction={{
-          label: isUpdating
-            ? t('updating', { ns: 'adminUsers' })
-            : t('updateAction', { ns: 'adminUsers' }),
+          label: isUpdating ? t('updating', { ns: 'adminUsers' }) : t('updateAction', { ns: 'adminUsers' }),
           onClick: onEditSubmit,
           disabled: isUpdating,
         }}
@@ -93,11 +89,7 @@ export function AdminUsersDialogs({
         open={isDeleteOpen}
         title={t('deleteTitle', { ns: 'adminUsers' })}
         message={t('deleteMessage', { ns: 'adminUsers' })}
-        confirmText={
-          isDeleting
-            ? t('deleting', { ns: 'adminUsers' })
-            : t('delete', { ns: 'common' })
-        }
+        confirmText={isDeleting ? t('deleting', { ns: 'adminUsers' }) : t('delete', { ns: 'common' })}
         cancelText={t('cancel', { ns: 'confirmDialog' })}
         onConfirm={onDeleteConfirm}
         onCancel={() => onDeleteOpenChange(false)}
