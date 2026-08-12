@@ -4,6 +4,7 @@ import type { EventParticipant } from '../../events/types';
 import { useTranslation } from 'react-i18next';
 import { FaRegCalendarAlt } from 'react-icons/fa';
 import { cn } from '@/shared/utils/cn';
+import { sanitizeAmountInput } from '@/shared/utils/format/sanitizeAmountInput';
 import { TransactionParticipantCombobox } from './TransactionParticipantCombobox';
 
 export interface TransactionFormState {
@@ -73,11 +74,11 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
               id="transaction-amount"
               className="w-full pl-5 pr-12 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
               placeholder="0,00"
-              type="number"
-              min="0.01"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => setAmount(sanitizeAmountInput(e.target.value))}
             />
             <span aria-hidden className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-slate-400">
               €

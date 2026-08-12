@@ -44,19 +44,20 @@ describe('TransactionForm', () => {
     expect(screen.getByTestId('participant-combobox')).toBeInTheDocument();
   });
 
-  it('amount input has type=number, min=0.01 and step=0.01', () => {
+  // type=number is deliberately avoided: Safari on iOS reports an empty value for a half-typed
+  // decimal, which silently blocked the form. See sanitizeAmountInput.
+  it('amount input is a text field with a decimal keyboard', () => {
     render(<TransactionForm fields={makeFields()} participants={[]} onSubmit={vi.fn()} />);
     const amountInput = screen.getByLabelText('transactionForm.amountLabel');
-    expect(amountInput).toHaveAttribute('type', 'number');
-    expect(amountInput).toHaveAttribute('min', '0.01');
-    expect(amountInput).toHaveAttribute('step', '0.01');
+    expect(amountInput).toHaveAttribute('type', 'text');
+    expect(amountInput).toHaveAttribute('inputmode', 'decimal');
   });
 
   it('renders initial values from fields prop', () => {
     const fields = makeFields({ title: 'Dinner', amount: '25.50', date: '2026-01-15' });
     render(<TransactionForm fields={fields} participants={[]} onSubmit={vi.fn()} />);
     expect(screen.getByLabelText('transactionForm.titleLabel')).toHaveValue('Dinner');
-    expect(screen.getByLabelText('transactionForm.amountLabel')).toHaveValue(25.5);
+    expect(screen.getByLabelText('transactionForm.amountLabel')).toHaveValue('25.50');
     expect(screen.getByLabelText('transactionForm.dateLabel')).toHaveValue('2026-01-15');
   });
 
@@ -76,6 +77,33 @@ describe('TransactionForm', () => {
       target: { value: '10.99' },
     });
     expect(setAmount).toHaveBeenCalledWith('10.99');
+  });
+
+  it('normalizes a comma typed as decimal separator', () => {
+    const setAmount = vi.fn();
+    render(<TransactionForm fields={makeFields({ setAmount })} participants={[]} onSubmit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('transactionForm.amountLabel'), {
+      target: { value: '10,99' },
+    });
+    expect(setAmount).toHaveBeenCalledWith('10.99');
+  });
+
+  it('keeps a half-typed decimal so the user can keep typing', () => {
+    const setAmount = vi.fn();
+    render(<TransactionForm fields={makeFields({ setAmount })} participants={[]} onSubmit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('transactionForm.amountLabel'), {
+      target: { value: '10,' },
+    });
+    expect(setAmount).toHaveBeenCalledWith('10.');
+  });
+
+  it('drops characters that are not digits or separators', () => {
+    const setAmount = vi.fn();
+    render(<TransactionForm fields={makeFields({ setAmount })} participants={[]} onSubmit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('transactionForm.amountLabel'), {
+      target: { value: '1o,99e' },
+    });
+    expect(setAmount).toHaveBeenCalledWith('1.99');
   });
 
   it('calls setDate when date input changes', () => {

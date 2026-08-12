@@ -1,11 +1,17 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { MdCheck, MdClose, MdDelete, MdEdit, MdSwapHoriz } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/utils/cn';
+import { sanitizeAmountInput } from '@/shared/utils/format/sanitizeAmountInput';
 import { Avatar } from '@/shared/components/Avatar';
 import { ParticipantsCombobox } from './ParticipantsCombobox';
 import type { EventParticipant } from '../types';
 import { getParticipantAvatar, getParticipantName } from '../utils/participants';
+
+/** An unset target is stored as 0 but shown as an empty field. */
+function formatTargetDraft(target: number): string {
+  return target === 0 ? '' : String(target);
+}
 
 interface ParticipantRowProps {
   participant: EventParticipant;
@@ -54,6 +60,20 @@ export const ParticipantRow = memo(function ParticipantRow({
   const participantName = getParticipantName(participant, t);
   const participantEmail = participant.type === 'user' ? participant.email : undefined;
   const currentTarget = participant.type !== 'pot' ? (participant.contributionTarget ?? 0) : 0;
+
+  // The target field is text-based (see sanitizeAmountInput), so it owns its draft: a half-typed
+  // decimal such as '10.' has no numeric representation to render back from the participant.
+  const [targetDraft, setTargetDraft] = useState(() => formatTargetDraft(currentTarget));
+  const [lastExternalTarget, setLastExternalTarget] = useState(currentTarget);
+
+  if (currentTarget !== lastExternalTarget) {
+    setLastExternalTarget(currentTarget);
+
+    // Only overwrite the draft when the change did not come from this field.
+    if (parseFloat(targetDraft) !== currentTarget) {
+      setTargetDraft(formatTargetDraft(currentTarget));
+    }
+  }
 
   return (
     <div>
@@ -224,24 +244,16 @@ export const ParticipantRow = memo(function ParticipantRow({
             <div className="relative w-28">
               <input
                 id={`target-${participantIndex}`}
-                type="number"
-                min="0"
-                step="0.01"
-                value={currentTarget === 0 ? '' : currentTarget}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={targetDraft}
                 onChange={(e) => {
-                  const val = e.target.value.trim();
-                  if (val === '') {
-                    onTargetChange(undefined);
-                    return;
-                  }
+                  const sanitized = sanitizeAmountInput(e.target.value);
+                  setTargetDraft(sanitized);
 
-                  const parsedValue = Math.round(Number(val) * 100) / 100;
-                  if (!Number.isFinite(parsedValue)) {
-                    onTargetChange(undefined);
-                    return;
-                  }
-
-                  onTargetChange(parsedValue < 0 ? 0 : parsedValue);
+                  const parsedValue = parseFloat(sanitized);
+                  onTargetChange(Number.isFinite(parsedValue) ? parsedValue : undefined);
                 }}
                 placeholder={t('participantsInput.targetPlaceholder')}
                 className={cn(

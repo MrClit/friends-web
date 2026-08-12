@@ -2,3 +2,4 @@ export * from './formatAmount';
 export * from './formatDateLong';
 export * from './formatDateShort';
 export * from './parseDateForFormatting';
+export * from './sanitizeAmountInput';
