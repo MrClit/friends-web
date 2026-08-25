@@ -7,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { Event } from '../../events/entities/event.entity';
 import { PaymentType } from '@friends/shared-types';
@@ -14,6 +15,12 @@ import { columnNumericTransformer } from '../../../common/transformers/column-nu
 
 export type { PaymentType } from '@friends/shared-types';
 
+// Backs both readers of the per-event transaction list: the repository find in
+// TransactionsService and the window-function query in TransactionPaginationService. Partial on
+// deleted_at because every one of those readers filters soft-deleted rows out.
+@Index('idx_transactions_event_date_created_active', ['eventId', 'date', 'createdAt'], {
+  where: 'deleted_at IS NULL',
+})
 @Entity('transactions')
 export class Transaction {
   @PrimaryGeneratedColumn('uuid')
