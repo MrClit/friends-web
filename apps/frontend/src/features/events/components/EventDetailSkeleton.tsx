@@ -1,8 +1,9 @@
 import { Skeleton } from '@/shared/components/Skeleton';
+import { EventSectionSkeleton } from './EventSectionSkeleton';
 
 /**
- * Skeleton loading state that mirrors the EventDetail layout:
- * Header (back button + title + action buttons) + KPI grid (2x2) + transaction list items
+ * Skeleton loading state that mirrors the event hub layout:
+ * Header (back button + title + action buttons) + the section body skeleton.
  */
 export function EventDetailSkeleton() {
   return (
@@ -21,19 +22,7 @@ export function EventDetailSkeleton() {
         </div>
       </section>
 
-      {/* KPI grid skeleton */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-20 sm:h-24 rounded-xl" />
-        ))}
-      </section>
-
-      {/* Transactions list skeleton */}
-      <div className="space-y-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 rounded-xl" />
-        ))}
-      </div>
+      <EventSectionSkeleton />
     </div>
   );
 }

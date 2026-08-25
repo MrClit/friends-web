@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/shared/utils/cn';
 
+/**
+ * Position of the single floating primary action, shared by every event section
+ * so they all render their contextual FAB in the same spot.
+ */
+export const FAB_POSITION_CLASSES = 'fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2';
+
 interface ActionButtonProps {
   onClick: () => void;
   actionLabel: string;
