@@ -1,0 +1,6 @@
+# Normalize all text files to LF in the index and the working tree.
+# Keeps `prettier --check` (endOfLine: "lf") passing on Windows clones.
+* text=auto eol=lf
+
+# Never run line-ending conversion on binaries.
+*.png binary
