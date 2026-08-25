@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
 import { Transaction } from '../../transactions/entities/transaction.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { EventStatus, type EventParticipant } from '@friends/shared-types';
@@ -6,6 +6,9 @@ import { EventStatus, type EventParticipant } from '@friends/shared-types';
 export { EventStatus, type EventParticipant } from '@friends/shared-types';
 export type { UserParticipant, GuestParticipant, PotParticipant } from '@friends/shared-types';
 
+// Backs the event listing: filter by status, order by creation date. Declared here as well as
+// in the migration because the DB-backed test suites build their schema from the entities.
+@Index('idx_events_status_created_at', ['status', 'createdAt'])
 @Entity('events')
 export class Event {
   @PrimaryGeneratedColumn('uuid')
