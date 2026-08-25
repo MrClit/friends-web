@@ -34,6 +34,7 @@
     "titleLabel": "Title",
     "titlePlaceholder": "E.g. Dinner at the port",
     "amountLabel": "Amount",
+    "amountPlaceholder": "0.00",
     "dateLabel": "Date",
     "participantLabel": {
       "contribution": "Received from",

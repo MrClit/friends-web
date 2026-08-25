@@ -56,12 +56,19 @@ export const LOCALE_MAP: Record<string, string> = {
 };
 
 /**
- * Get the current locale code for formatting dates and numbers
+ * Get the current locale code for formatting dates and numbers.
+ *
+ * Uses `resolvedLanguage` because `language` may carry a region the detector
+ * picked up from the browser (e.g. 'en-GB'), which is not a key of LOCALE_MAP.
+ * The region is stripped as a second chance so an unmapped regional code still
+ * resolves through its base language instead of falling back.
+ *
  * @returns The locale code (e.g., 'es-ES', 'en-US', 'ca-ES')
  */
 export function getCurrentLocale(): string {
-  const language = i18n.language || 'es';
-  return LOCALE_MAP[language] || 'es-ES';
+  const language = i18n.resolvedLanguage ?? i18n.language ?? 'en';
+  const baseLanguage = language.split('-')[0]?.toLowerCase() ?? 'en';
+  return LOCALE_MAP[language] ?? LOCALE_MAP[baseLanguage] ?? LOCALE_MAP.en;
 }
 
 export { i18n };
