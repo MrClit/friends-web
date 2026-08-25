@@ -10,7 +10,7 @@ describe('formatDateLong', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     // Reset to Spanish by default
-    vi.spyOn(i18n, 'language', 'get').mockReturnValue('es');
+    vi.spyOn(i18n, 'resolvedLanguage', 'get').mockReturnValue('es');
   });
 
   describe('Invalid input handling', () => {
@@ -89,7 +89,7 @@ describe('formatDateLong', () => {
 
   describe('English locale', () => {
     beforeEach(() => {
-      vi.spyOn(i18n, 'language', 'get').mockReturnValue('en');
+      vi.spyOn(i18n, 'resolvedLanguage', 'get').mockReturnValue('en');
     });
 
     it('should format a date in long English format', () => {
@@ -109,7 +109,7 @@ describe('formatDateLong', () => {
 
   describe('Catalan locale', () => {
     beforeEach(() => {
-      vi.spyOn(i18n, 'language', 'get').mockReturnValue('ca');
+      vi.spyOn(i18n, 'resolvedLanguage', 'get').mockReturnValue('ca');
     });
 
     it('should format a date in long Catalan format', () => {

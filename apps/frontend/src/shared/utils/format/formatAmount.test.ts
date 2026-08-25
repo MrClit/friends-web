@@ -9,7 +9,7 @@ import { i18n } from '@/i18n';
 describe('formatAmount', () => {
   beforeEach(() => {
     // Reset to Spanish by default
-    vi.spyOn(i18n, 'language', 'get').mockReturnValue('es');
+    vi.spyOn(i18n, 'resolvedLanguage', 'get').mockReturnValue('es');
   });
 
   describe('Spanish locale (es-ES)', () => {
@@ -56,7 +56,7 @@ describe('formatAmount', () => {
 
   describe('English locale (en-US)', () => {
     beforeEach(() => {
-      vi.spyOn(i18n, 'language', 'get').mockReturnValue('en');
+      vi.spyOn(i18n, 'resolvedLanguage', 'get').mockReturnValue('en');
     });
 
     it('should format amount with default EUR currency', () => {
@@ -78,7 +78,7 @@ describe('formatAmount', () => {
 
   describe('Catalan locale (ca-ES)', () => {
     beforeEach(() => {
-      vi.spyOn(i18n, 'language', 'get').mockReturnValue('ca');
+      vi.spyOn(i18n, 'resolvedLanguage', 'get').mockReturnValue('ca');
     });
 
     it('should format amount with default EUR currency', () => {

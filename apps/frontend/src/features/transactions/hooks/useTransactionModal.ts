@@ -55,7 +55,9 @@ function checkIsDirty(
   return (
     type !== transaction.paymentType ||
     title.trim() !== transaction.title.trim() ||
-    amount !== transaction.amount.toString() ||
+    // Compared numerically: the field is a string, so '25.50' and '25.5' are the
+    // same amount and must not count as a change.
+    parseFloat(amount) !== Number(transaction.amount) ||
     participantId !== (transaction.participantId || '') ||
     date !== normalizeDateForInput(transaction.date)
   );
@@ -131,7 +133,9 @@ export function useTransactionModal({
       // Edit mode: populate with transaction data
       setType(transaction.paymentType);
       setTitle(transaction.title);
-      setAmount(transaction.amount.toString());
+      // Two decimals so the field matches how the amount reads in the list.
+      // Number() because the API can serialize the decimal column as a string.
+      setAmount(Number(transaction.amount).toFixed(2));
       setDate(normalizeDateForInput(transaction.date));
       setParticipantId(transaction.participantId || '');
     } else {
