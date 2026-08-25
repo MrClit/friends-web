@@ -11,7 +11,10 @@ import { Toast } from './shared/components/Toast';
 
 // Lazy-loaded components for code-splitting
 const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })));
-const EventDetail = lazy(() => import('./pages/EventDetail').then((m) => ({ default: m.EventDetail })));
+const EventLayout = lazy(() => import('./pages/EventLayout').then((m) => ({ default: m.EventLayout })));
+const EventMoneySection = lazy(() =>
+  import('./pages/EventMoneySection').then((m) => ({ default: m.EventMoneySection })),
+);
 const KPIDetail = lazy(() => import('./pages/KPIDetail').then((m) => ({ default: m.KPIDetail })));
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
@@ -40,10 +43,12 @@ export function App() {
                 path="/event/:id"
                 element={
                   <RequireAuth>
-                    <EventDetail />
+                    <EventLayout />
                   </RequireAuth>
                 }
-              />
+              >
+                <Route index element={<EventMoneySection />} />
+              </Route>
               <Route
                 path="/event/:id/kpi/:kpi"
                 element={

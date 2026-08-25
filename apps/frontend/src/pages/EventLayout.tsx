@@ -1,34 +1,33 @@
-import { MainLayout } from './MainLayout';
-import { useParams } from 'react-router-dom';
+import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Outlet, useParams } from 'react-router-dom';
 import { ApiError } from '@/api/client';
-import { useEventDetail } from '@/features/events/hooks';
-import { useConfirmDialog } from '@/hooks/common';
-import { EventDetailHeader, EventKPIGrid, EventFormModal } from '@/features/events';
+import { EventDetailHeader, EventFormModal, EventSectionTabs } from '@/features/events';
 import { EventDetailSkeleton } from '@/features/events/components/EventDetailSkeleton';
-import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
-import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
-import { TransactionModal } from '../features/transactions/components/TransactionModal';
-import { TransactionsList } from '../features/transactions/components/TransactionsList';
-import { ActionButton } from '@/shared/components/ActionButton';
+import { EventSectionSkeleton } from '@/features/events/components/EventSectionSkeleton';
+import { useEventDetail, type EventLayoutContext } from '@/features/events/hooks';
+import { useConfirmDialog } from '@/hooks/common';
 import { ConfirmDialog, ErrorState } from '@/shared/components';
-import { MdAdd } from 'react-icons/md';
-import { useAuth } from '@/features/auth/useAuth';
 import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
+import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
+import { MainLayout } from './MainLayout';
 
-const EVENT_DETAIL_NAMESPACES = ['eventDetail', 'events', 'transactions', 'common'] as const;
+const EVENT_LAYOUT_NAMESPACES = ['eventDetail', 'events', 'common'] as const;
 
-export function EventDetail() {
+/**
+ * Shell of the event hub: it owns the event fetch, its loading/error/not-found
+ * states, the header and the event-level modals. Sections render inside the
+ * outlet and receive the loaded event through the outlet context.
+ */
+export function EventLayout() {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation(EVENT_DETAIL_NAMESPACES);
-  const isI18nReady = useI18nNamespacesReady(EVENT_DETAIL_NAMESPACES);
-  const { user } = useAuth();
+  const { t } = useTranslation(EVENT_LAYOUT_NAMESPACES);
+  const isI18nReady = useI18nNamespacesReady(EVENT_LAYOUT_NAMESPACES);
   const { event, kpis, isLoading, error, refetch, handleDelete, handleToggleArchive, handleBack, isMutatingEvent } =
     useEventDetail(id);
 
   // UI state management
   const eventFormModalStore = useEventFormModalStore();
-  const transactionModalStore = useTransactionModalStore();
   const deleteDialog = useConfirmDialog();
 
   // Validate id after all hooks
@@ -69,6 +68,8 @@ export function EventDetail() {
     );
   }
 
+  const outletContext: EventLayoutContext = { event, kpis };
+
   return (
     <MainLayout>
       <EventDetailHeader
@@ -81,25 +82,15 @@ export function EventDetail() {
         isMutatingStatus={isMutatingEvent}
       />
 
-      <EventKPIGrid
-        eventId={event.id}
-        currentUserId={user?.id}
-        participants={event.participants}
-        potBalance={kpis?.potBalance ?? 0}
-        totalContributions={kpis?.totalContributions ?? 0}
-        totalExpenses={kpis?.totalExpenses ?? 0}
-        participantPending={kpis?.participantPending ?? {}}
-      />
+      <EventSectionTabs />
 
-      <TransactionsList event={event} />
-      <ActionButton
-        onClick={() => transactionModalStore.openModal(event)}
-        actionLabel={t('addTransaction')}
-        actionIcon={<MdAdd size={22} />}
-        className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2"
-      />
+      {/* Local Suspense: without it, loading a section chunk would unmount the
+          header and tabs behind the app-wide fallback. */}
+      <Suspense fallback={<EventSectionSkeleton />}>
+        <Outlet context={outletContext} />
+      </Suspense>
+
       <EventFormModal />
-      <TransactionModal />
       <ConfirmDialog
         open={deleteDialog.isOpen}
         title={t('deleteTitle')}

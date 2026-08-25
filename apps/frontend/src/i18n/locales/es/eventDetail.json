@@ -14,6 +14,10 @@
     "expenses": "Gastos Totales",
     "pending": "Pendiente de Pagar"
   },
+  "tabs": {
+    "ariaLabel": "Secciones del evento",
+    "money": "Dinero"
+  },
   "addTransaction": "Añadir Transacción",
   "deleteTitle": "¿Borrar evento?",
   "deleteMessage": "Esta acción no se puede deshacer. ¿Seguro que quieres borrar este evento?",
