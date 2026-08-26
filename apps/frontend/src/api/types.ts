@@ -81,6 +81,34 @@ export interface UpdateTransactionDto {
   date?: string;
 }
 
+// ============= Shopping List Types =============
+
+export interface ShoppingItem {
+  id: string;
+  eventId: string;
+  /** The whole item, quantity included in the text ('2 cajas de cerveza'). */
+  name: string;
+  createdBy: string | null;
+  purchasedBy: string | null;
+  /** Non-null means the item has been bought. */
+  purchasedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateShoppingItemDto {
+  name: string;
+}
+
+/**
+ * Exactly the two fields the API accepts. The backend validates with forbidNonWhitelisted, so sending
+ * a whole ShoppingItem back as the payload would be a 400.
+ */
+export interface UpdateShoppingItemDto {
+  name?: string;
+  purchased?: boolean;
+}
+
 // ============= Pagination Types =============
 
 export interface PaginatedTransactionsResponse {

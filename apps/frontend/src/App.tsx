@@ -15,6 +15,9 @@ const EventLayout = lazy(() => import('./pages/EventLayout').then((m) => ({ defa
 const EventMoneySection = lazy(() =>
   import('./pages/EventMoneySection').then((m) => ({ default: m.EventMoneySection })),
 );
+const EventShoppingSection = lazy(() =>
+  import('./pages/EventShoppingSection').then((m) => ({ default: m.EventShoppingSection })),
+);
 const KPIDetail = lazy(() => import('./pages/KPIDetail').then((m) => ({ default: m.KPIDetail })));
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
@@ -48,6 +51,7 @@ export function App() {
                 }
               >
                 <Route index element={<EventMoneySection />} />
+                <Route path="shopping" element={<EventShoppingSection />} />
               </Route>
               <Route
                 path="/event/:id/kpi/:kpi"

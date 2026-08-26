@@ -1,5 +1,5 @@
 import type { IconType } from 'react-icons';
-import { MdAccountBalanceWallet } from 'react-icons/md';
+import { MdAccountBalanceWallet, MdShoppingCart } from 'react-icons/md';
 
 /**
  * A section of the event hub, rendered as a tab under the event header and as a
@@ -26,6 +26,14 @@ export const EVENT_SECTIONS: readonly EventSectionConfig[] = [
     end: true,
     labelKey: 'tabs.money',
     icon: MdAccountBalanceWallet,
+    activeClasses: 'text-emerald-700 border-emerald-600 dark:text-emerald-300 dark:border-emerald-400',
+  },
+  {
+    key: 'shopping',
+    path: 'shopping',
+    end: false,
+    labelKey: 'tabs.shopping',
+    icon: MdShoppingCart,
     activeClasses: 'text-emerald-700 border-emerald-600 dark:text-emerald-300 dark:border-emerald-400',
   },
 ];
