@@ -11,6 +11,7 @@ import { HealthController } from './common/health.controller';
 import { getDatabaseConfig } from './config/database.config';
 import { EventsModule } from './modules/events/events.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
+import { ShoppingListModule } from './modules/shopping-list/shopping-list.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
@@ -63,6 +64,7 @@ import { RequestContextModule } from './common/request-context/request-context.m
     // Feature modules
     EventsModule,
     TransactionsModule,
+    ShoppingListModule,
     UsersModule,
     AuthModule,
     AdminModule,

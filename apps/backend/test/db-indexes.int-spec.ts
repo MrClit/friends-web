@@ -60,4 +60,14 @@ describe('Performance indexes (integration)', () => {
     // every reader of this path carries would not be covered.
     expect(index?.indexdef).toMatch(/WHERE \(?deleted_at IS NULL\)?/);
   });
+
+  it('indexes shopping items by event and creation date', async () => {
+    const index = (await indexesFor('shopping_items')).find(
+      (row) => row.indexname === 'idx_shopping_items_event_created_at',
+    );
+
+    expect(index).toBeDefined();
+    expect(index?.indexdef).toContain('event_id');
+    expect(index?.indexdef).toContain('created_at');
+  });
 });
