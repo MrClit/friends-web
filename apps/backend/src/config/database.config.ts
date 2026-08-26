@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { ENTITY_GLOB, MIGRATION_GLOB } from './typeorm-paths';
 
 export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -8,9 +9,9 @@ export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOp
   username: configService.get('DATABASE_USER'),
   password: configService.get('DATABASE_PASSWORD'),
   database: configService.get('DATABASE_NAME'),
-  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  entities: [ENTITY_GLOB],
   synchronize: configService.get<boolean>('TYPEORM_SYNC') === true,
   logging: configService.get<boolean>('TYPEORM_LOGGING') === true,
-  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+  migrations: [MIGRATION_GLOB],
   ssl: configService.get<boolean>('DATABASE_SSL') === true ? { rejectUnauthorized: false } : false,
 });
