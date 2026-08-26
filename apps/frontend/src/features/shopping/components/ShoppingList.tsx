@@ -12,7 +12,7 @@ import {
   useToggleShoppingItemPurchased,
   useDeleteShoppingItem,
 } from '@/hooks/api/useShoppingItems';
-import { ConfirmDialog, ErrorState, IconButton } from '@/shared/components';
+import { ConfirmDialog, ErrorState } from '@/shared/components';
 import { cn } from '@/shared/utils/cn';
 import { ShoppingAddForm } from './ShoppingAddForm';
 import { ShoppingItemRow } from './ShoppingItemRow';
@@ -96,7 +96,7 @@ export function ShoppingList({ event }: ShoppingListProps) {
 
   return (
     <section className="pb-24">
-      <div className="flex items-center justify-between gap-3 mb-3 px-1">
+      <div className="flex items-center justify-between gap-3 mb-3">
         {/* Polite live region: a tick made by somebody else arrives through polling, with no
             interaction of ours to announce it. */}
         <p
@@ -106,14 +106,31 @@ export function ShoppingList({ event }: ShoppingListProps) {
           {t('pendingCount', { count: pending.length })}
         </p>
 
-        <IconButton
-          ariaLabel={t('share.button')}
+        {/* Labelled secondary button rather than a bare icon square: stacked right above the add
+            button, two identical icon squares would read as a pair of related actions, which the
+            primary "add" and this utility are not. The visible label also carries its own weight,
+            since the share glyph is drawn differently on every platform. The fuller aria-label
+            contains the visible text, so voice control still matches on "Compartir". */}
+        <button
+          type="button"
           onClick={handleShare}
           disabled={pending.length === 0}
-          className={cn('shrink-0', 'disabled:opacity-40 disabled:cursor-not-allowed')}
+          aria-label={t('share.button')}
+          className={cn(
+            'flex items-center gap-2 shrink-0',
+            'h-10 px-3',
+            'text-sm font-medium',
+            'bg-white dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300',
+            'border border-emerald-300 dark:border-emerald-800 rounded-xl shadow-sm',
+            'cursor-pointer transition-colors',
+            'enabled:hover:bg-emerald-50 dark:enabled:hover:bg-emerald-900',
+            'focus:outline-none focus:ring-2 focus:ring-emerald-500',
+            'disabled:opacity-40 disabled:cursor-not-allowed',
+          )}
         >
-          <MdShare className="text-lg text-emerald-700 dark:text-emerald-300" />
-        </IconButton>
+          <MdShare className="text-lg" aria-hidden="true" />
+          {t('share.label')}
+        </button>
       </div>
 
       <ShoppingAddForm onAdd={handleAdd} />

@@ -26,8 +26,10 @@ export function ShoppingPurchasedGroup({ count, children }: ShoppingPurchasedGro
         aria-controls={listId}
         onClick={() => setIsOpen((open) => !open)}
         className={cn(
+          // No horizontal padding: the counter, the capture input, the rows and this toggle all share
+          // one left edge.
           'flex items-center gap-1 w-full',
-          'px-1 py-2',
+          'py-2',
           'text-xs font-semibold uppercase tracking-wide',
           'text-slate-500 dark:text-slate-400 cursor-pointer',
           'hover:text-slate-700 dark:hover:text-slate-200',

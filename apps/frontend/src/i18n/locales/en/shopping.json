@@ -14,6 +14,7 @@
     "delete": "Delete {{name}}"
   },
   "share": {
+    "label": "Share",
     "button": "Share the list",
     "header": "Shopping list",
     "count_one": "1 item left",

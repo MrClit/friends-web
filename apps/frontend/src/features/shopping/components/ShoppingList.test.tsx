@@ -121,6 +121,17 @@ describe('ShoppingList', () => {
     expect(screen.getByRole('button', { name: 'share.button' })).toBeDisabled();
   });
 
+  // Sharing carries a visible label instead of a bare icon: the glyph is drawn differently on every
+  // platform, and an unlabelled square would mirror the add button sitting right below it.
+  it('labels the share button visibly, with the visible text inside its accessible name', () => {
+    givenItems([makeItem({ id: '1', name: 'Pan' })]);
+
+    render(<ShoppingList event={mockEvent} />);
+
+    const shareButton = screen.getByRole('button', { name: 'share.button' });
+    expect(shareButton).toHaveTextContent('share.label');
+  });
+
   it('shares the built text when there is something pending', () => {
     givenItems([makeItem({ id: '1', name: 'Pan' })]);
 

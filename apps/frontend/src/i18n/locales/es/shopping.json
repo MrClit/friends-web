@@ -14,6 +14,7 @@
     "delete": "Eliminar {{name}}"
   },
   "share": {
+    "label": "Compartir",
     "button": "Compartir la lista",
     "header": "Lista de la compra",
     "count_one": "1 item pendiente",
