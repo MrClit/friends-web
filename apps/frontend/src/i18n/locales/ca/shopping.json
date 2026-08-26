@@ -31,6 +31,5 @@
   "create_error": "No s'ha pogut afegir l'item",
   "rename_error": "No s'ha pogut reanomenar l'item",
   "toggle_error": "No s'ha pogut actualitzar l'item",
-  "delete_success": "Item eliminat",
   "delete_error": "No s'ha pogut eliminar l'item"
 }

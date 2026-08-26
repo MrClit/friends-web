@@ -137,20 +137,21 @@ export function useToggleShoppingItemPurchased(eventId: string, currentUserId?: 
 }
 
 /**
- * Mutation hook to delete an item. Keeps its success toast: it is destructive, confirmed, and the row
- * it removes may well be off-screen.
+ * Mutation hook to delete an item.
+ * Silent on success, like every other mutation in this section: the user already deliberated in the
+ * confirmation dialog and the row disappears in front of them, so a toast would only repeat visible
+ * feedback while covering the top of the list. Failures do get one, since nothing else signals them.
  * @param eventId - Event ID the item belongs to
  * @returns Mutation object with mutate function and status
  */
 export function useDeleteShoppingItem(eventId: string) {
-  const { success, error } = useToast();
+  const { error } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: queryKeys.shoppingItems.byEvent(eventId),
     mutationFn: (id: string) => shoppingApi.delete(id),
     onSuccess: () => {
-      success('delete_success', undefined, undefined, { ns: 'shopping' });
       void queryClient.invalidateQueries({ queryKey: queryKeys.shoppingItems.byEvent(eventId) });
     },
     onError: () => {
