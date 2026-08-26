@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
 import { MdAccountBalanceWallet, MdCalendarMonth } from 'react-icons/md';
 import { EventSectionTabs } from './EventSectionTabs';
-import type { EventSectionConfig } from '../sections';
+import { EVENT_SECTIONS, type EventSectionConfig } from '../sections';
 
 vi.mock('react-i18next', async () => {
   const actual = await vi.importActual<typeof import('react-i18next')>('react-i18next');
@@ -55,8 +55,13 @@ function renderTabs(sections: EventSectionConfig[], initialEntry = '/event/event
 }
 
 describe('EventSectionTabs', () => {
-  it('renders nothing while a single section exists', () => {
-    // Uses the real EVENT_SECTIONS registry, which only holds the money section.
+  it('renders nothing while fewer than two sections exist', () => {
+    renderTabs([twoSections[0]]);
+
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
+
+  it('renders the real registry, which holds more than one section', () => {
     render(
       <MemoryRouter initialEntries={['/event/event-123']}>
         <Routes>
@@ -65,7 +70,8 @@ describe('EventSectionTabs', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'tabs.ariaLabel' })).toBeInTheDocument();
+    expect(screen.getAllByRole('link')).toHaveLength(EVENT_SECTIONS.length);
   });
 
   it('renders one link per section inside a labelled nav', () => {

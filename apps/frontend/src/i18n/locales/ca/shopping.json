@@ -1,0 +1,35 @@
+{
+  "pendingCount_one": "1 item pendent",
+  "pendingCount_other": "{{count}} items pendents",
+  "purchasedGroup_one": "1 comprat",
+  "purchasedGroup_other": "{{count}} comprats",
+  "empty": "La llista és buida. Afegeix el primer que falti.",
+  "addForm": {
+    "placeholder": "Ex: 2 caixes de cervesa",
+    "label": "Nou item de la llista",
+    "submit": "Afegir item"
+  },
+  "item": {
+    "editName": "Editar el nom de l'item",
+    "delete": "Eliminar {{name}}"
+  },
+  "share": {
+    "button": "Compartir la llista",
+    "header": "Llista de la compra",
+    "count_one": "1 item pendent",
+    "count_other": "{{count}} items pendents"
+  },
+  "deleteDialog": {
+    "title": "Eliminar item",
+    "message": "Segur que vols eliminar «{{name}}» de la llista?",
+    "confirm": "Eliminar",
+    "cancel": "Cancel·lar"
+  },
+  "share_copied": "Llista copiada",
+  "share_error": "No s'ha pogut copiar la llista",
+  "create_error": "No s'ha pogut afegir l'item",
+  "rename_error": "No s'ha pogut reanomenar l'item",
+  "toggle_error": "No s'ha pogut actualitzar l'item",
+  "delete_success": "Item eliminat",
+  "delete_error": "No s'ha pogut eliminar l'item"
+}

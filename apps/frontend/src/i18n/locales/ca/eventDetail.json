@@ -16,7 +16,8 @@
   },
   "tabs": {
     "ariaLabel": "Seccions de l'esdeveniment",
-    "money": "Diners"
+    "money": "Diners",
+    "shopping": "Compra"
   },
   "addTransaction": "Afegir Transacció",
   "deleteTitle": "Vols esborrar l'esdeveniment?",

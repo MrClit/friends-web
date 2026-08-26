@@ -60,6 +60,20 @@ export const queryKeys = {
     detail: (id: string) => ['transactions', id] as const,
   },
 
+  shoppingItems: {
+    /**
+     * Key for all shopping item queries
+     */
+    all: ['shopping-items'] as const,
+
+    /**
+     * Key for the shopping list of an event. Doubles as the mutation key of every shopping mutation,
+     * so the polling interval can suspend itself while any of them is in flight.
+     * @param eventId - Event ID
+     */
+    byEvent: (eventId: string) => ['shopping-items', 'event', eventId] as const,
+  },
+
   users: {
     all: ['users'] as const,
   },

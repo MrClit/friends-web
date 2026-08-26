@@ -104,8 +104,11 @@ export function useDeleteEvent() {
       // Cancel any ongoing requests and remove queries from cache before deletion
       await queryClient.cancelQueries({ queryKey: ['events'] });
       await queryClient.cancelQueries({ queryKey: ['transactions'] });
+      await queryClient.cancelQueries({ queryKey: ['shopping-items'] });
       queryClient.removeQueries({ queryKey: ['events', deletedId], exact: false });
       queryClient.removeQueries({ queryKey: ['transactions', 'event', deletedId], exact: false });
+      // The shopping list polls, so leaving it in the cache would keep a timer hammering a 404.
+      queryClient.removeQueries({ queryKey: ['shopping-items', 'event', deletedId], exact: false });
     },
     onSuccess: async (_, deletedId) => {
       success('delete_success', undefined, undefined, { ns: 'events' });
@@ -115,6 +118,7 @@ export function useDeleteEvent() {
       queryClient.removeQueries({ queryKey: queryKeys.events.detail(deletedId) });
       queryClient.removeQueries({ queryKey: queryKeys.events.kpis(deletedId) });
       queryClient.removeQueries({ queryKey: queryKeys.transactions.byEvent(deletedId) });
+      queryClient.removeQueries({ queryKey: queryKeys.shoppingItems.byEvent(deletedId) });
 
       // Invalidate lists to trigger refetch for unrelated queries
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
