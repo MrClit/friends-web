@@ -1,14 +1,11 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
+import { ENTITY_GLOB, MIGRATION_GLOB } from './config/typeorm-paths';
 
-// No importar entidades directamente, usar rutas glob absolutas
-// Soporta rutas diferentes para desarrollo (TS) y producción (JS compilado)
-
-const isProd = process.env.NODE_ENV === 'production';
-
-const entitiesPath = isProd ? 'dist/modules/**/entities/*.entity.js' : 'src/modules/**/entities/*.entity.{ts,js}';
-
-const migrationsPath = isProd ? 'dist/migrations/*.js' : 'src/migrations/*{.ts,.js}';
+// The DataSource the TypeORM CLI runs with (migration:generate, migration:run, migration:revert).
+// Entity and migration paths come from typeorm-paths.ts, shared with the application's own config so
+// both always describe the same schema. They resolve from that file's directory, which is why nothing
+// here branches on NODE_ENV or depends on the directory the CLI is invoked from.
 
 export default new DataSource({
   type: 'postgres',
@@ -17,7 +14,7 @@ export default new DataSource({
   username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
-  entities: [entitiesPath],
-  migrations: [migrationsPath],
+  entities: [ENTITY_GLOB],
+  migrations: [MIGRATION_GLOB],
   ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
