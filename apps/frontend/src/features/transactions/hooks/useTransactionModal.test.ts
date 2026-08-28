@@ -59,6 +59,14 @@ describe('useTransactionModal', () => {
       expect(result.current.participantId).toBe('p1');
       expect(result.current.date).toBe('2026-01-15');
     });
+
+    it('preloads a type that differs from the create-mode default', () => {
+      // Guards the assertion above from passing by coincidence: 'expense' is also
+      // the default for new transactions, so edit mode must be checked with another type.
+      const { result } = renderModal(makeTransaction({ paymentType: 'contribution' }));
+      expect(result.current.type).toBe('contribution');
+      expect(result.current.isDirty).toBe(false);
+    });
   });
 
   describe('isDirty', () => {
@@ -93,6 +101,18 @@ describe('useTransactionModal', () => {
       const { result } = renderModal(null);
       expect(result.current.amount).toBe('');
       expect(result.current.canSubmit).toBe(false);
+    });
+
+    it('preselects the expense type', () => {
+      const { result } = renderModal(null);
+      expect(result.current.type).toBe('expense');
+    });
+
+    it('is not dirty right after opening an untouched form', () => {
+      // Guards the pairing between the initial type and the create-mode dirty check:
+      // if they drift apart, closing an untouched form asks to discard changes.
+      const { result } = renderModal(null);
+      expect(result.current.isDirty).toBe(false);
     });
   });
 });
