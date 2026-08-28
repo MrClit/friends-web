@@ -7,3 +7,5 @@ export { ParticipantsCombobox } from './ParticipantsCombobox';
 export { KPIBox } from './KPIBox';
 export { EventDetailHeader } from './EventDetailHeader';
 export { EventKPIGrid } from './EventKPIGrid';
+export { EventSectionTabs } from './EventSectionTabs';
+export { EventSectionSkeleton } from './EventSectionSkeleton';

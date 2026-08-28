@@ -34,6 +34,7 @@
     "titleLabel": "Títol",
     "titlePlaceholder": "Ex. Sopar al port",
     "amountLabel": "Import",
+    "amountPlaceholder": "0,00",
     "dateLabel": "Data",
     "participantLabel": {
       "contribution": "Rebut de",

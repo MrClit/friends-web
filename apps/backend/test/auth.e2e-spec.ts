@@ -28,7 +28,10 @@ describe('AuthController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await userRepository.clear();
+    // A delete rather than clear(): clear() issues a TRUNCATE, which Postgres refuses on a table any
+    // foreign key references, even when the referencing table is empty. This is also what every other
+    // DB-backed spec does.
+    await userRepository.createQueryBuilder().delete().from(User).execute();
   });
 
   afterAll(async () => {

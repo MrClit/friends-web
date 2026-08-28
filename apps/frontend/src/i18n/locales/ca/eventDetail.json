@@ -14,6 +14,11 @@
     "expenses": "Despesa Total",
     "pending": "Pendent de Pagar"
   },
+  "tabs": {
+    "ariaLabel": "Seccions de l'esdeveniment",
+    "money": "Diners",
+    "shopping": "Compra"
+  },
   "addTransaction": "Afegir Transacció",
   "deleteTitle": "Vols esborrar l'esdeveniment?",
   "deleteMessage": "Aquesta acció no es pot desfer. Segur que vols esborrar aquest esdeveniment?",

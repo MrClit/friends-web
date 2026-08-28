@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { Event, EventParticipant, EventStatus } from '../../src/modules/events/entities/event.entity';
 import { Transaction, PaymentType } from '../../src/modules/transactions/entities/transaction.entity';
+import { ShoppingItem } from '../../src/modules/shopping-list/entities/shopping-item.entity';
 import { User } from '../../src/modules/users/user.entity';
 import { UserRole } from '../../src/modules/users/user-role.constants';
 
@@ -27,6 +28,14 @@ interface CreateTransactionInput {
   eventId: string;
   /** Calendar day in YYYY-MM-DD, matching the entity's declared type. */
   date?: string;
+}
+
+interface CreateShoppingItemInput {
+  name: string;
+  eventId: string;
+  createdBy?: string | null;
+  purchasedBy?: string | null;
+  purchasedAt?: Date | null;
 }
 
 export async function createUser(repository: Repository<User>, input: CreateUserInput): Promise<User> {
@@ -59,5 +68,18 @@ export async function createTransaction(
     participantId: input.participantId,
     eventId: input.eventId,
     date: input.date ?? '2026-02-25',
+  });
+}
+
+export async function createShoppingItem(
+  repository: Repository<ShoppingItem>,
+  input: CreateShoppingItemInput,
+): Promise<ShoppingItem> {
+  return repository.save({
+    name: input.name,
+    eventId: input.eventId,
+    createdBy: input.createdBy ?? null,
+    purchasedBy: input.purchasedBy ?? null,
+    purchasedAt: input.purchasedAt ?? null,
   });
 }

@@ -14,6 +14,11 @@
     "expenses": "Total Expenses",
     "pending": "Pending to Pay"
   },
+  "tabs": {
+    "ariaLabel": "Event sections",
+    "money": "Money",
+    "shopping": "Shopping"
+  },
   "addTransaction": "Add Transaction",
   "deleteTitle": "Delete event?",
   "deleteMessage": "This action cannot be undone. Are you sure you want to delete this event?",

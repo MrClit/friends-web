@@ -72,7 +72,7 @@ export function TransactionForm({ fields, participants, onSubmit }: TransactionF
             <input
               id="transaction-amount"
               className="w-full pl-5 pr-12 py-4 rounded-2xl border border-slate-200 dark:border-emerald-800 bg-slate-50/50 dark:bg-emerald-900/30 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 font-medium"
-              placeholder="0,00"
+              placeholder={t('transactionForm.amountPlaceholder')}
               type="number"
               min="0.01"
               step="0.01"

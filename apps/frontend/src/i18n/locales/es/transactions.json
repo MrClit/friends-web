@@ -34,6 +34,7 @@
     "titleLabel": "Título",
     "titlePlaceholder": "Ej. Cena en el puerto",
     "amountLabel": "Importe",
+    "amountPlaceholder": "0,00",
     "dateLabel": "Fecha",
     "participantLabel": {
       "contribution": "Recibido de",
