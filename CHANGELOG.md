@@ -5,6 +5,29 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-08-28
+
+Event hub expansion with a shared shopping list, plus data-integrity fixes that align the entity
+schema with the migrations already applied in production.
+
+### Added
+
+- Shared shopping list per event, added as a new section of the event hub. Closes [#143].
+- Event detail restructured as a sectioned hub with tabs and nested routes. Closes [#152].
+- Indexes on the hot query paths for events and transactions. Closes [#28].
+
+### Fixed
+
+- Entity schema aligned with existing migrations: timestamp column types and foreign keys toward
+  users. Closes [#157], [#160].
+- A single entity path definition shared by both DataSources, instead of two independent copies
+  that could drift. Closes [#156].
+- Decimal separator alignment in the amount input placeholder and edit preload. Closes [#141].
+
+### Changed
+
+- `.gitattributes` added to normalize line endings to LF. Closes [#145].
+
 ## [0.2.0] - 2026-08-05
 
 API contract corrections and backend hardening. **No database migration and no new environment
@@ -200,6 +223,15 @@ JWT secret validation. No product features and no database migrations.
 
 [#97]: https://github.com/MrClit/friends-web/issues/97
 [#98]: https://github.com/MrClit/friends-web/issues/98
+[#28]: https://github.com/MrClit/friends-web/issues/28
+[#141]: https://github.com/MrClit/friends-web/issues/141
+[#143]: https://github.com/MrClit/friends-web/issues/143
+[#145]: https://github.com/MrClit/friends-web/issues/145
+[#152]: https://github.com/MrClit/friends-web/issues/152
+[#156]: https://github.com/MrClit/friends-web/issues/156
+[#157]: https://github.com/MrClit/friends-web/issues/157
+[#160]: https://github.com/MrClit/friends-web/issues/160
+
 [#100]: https://github.com/MrClit/friends-web/issues/100
 [#103]: https://github.com/MrClit/friends-web/issues/103
 [#104]: https://github.com/MrClit/friends-web/issues/104
@@ -215,6 +247,7 @@ JWT secret validation. No product features and no database migrations.
 [#111]: https://github.com/MrClit/friends-web/issues/111
 [#112]: https://github.com/MrClit/friends-web/issues/112
 
+[0.3.0]: https://github.com/MrClit/friends-web/releases/tag/v0.3.0
 [0.2.0]: https://github.com/MrClit/friends-web/releases/tag/v0.2.0
 [0.1.3]: https://github.com/MrClit/friends-web/releases/tag/v0.1.3
 [0.1.2]: https://github.com/MrClit/friends-web/releases/tag/v0.1.2
