@@ -52,15 +52,8 @@ export function App() {
               >
                 <Route index element={<EventMoneySection />} />
                 <Route path="shopping" element={<EventShoppingSection />} />
+                <Route path="kpi/:kpi" element={<KPIDetail />} />
               </Route>
-              <Route
-                path="/event/:id/kpi/:kpi"
-                element={
-                  <RequireAuth>
-                    <KPIDetail />
-                  </RequireAuth>
-                }
-              />
               <Route
                 path="/profile"
                 element={

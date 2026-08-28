@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Route, Routes, useOutletContext } from 'react-router-dom';
 import { EventLayout } from './EventLayout';
@@ -19,9 +19,11 @@ vi.mock('react-i18next', async () => {
 });
 
 const mockUseEventDetail = vi.fn();
+const mockUseIsEventSectionRoute = vi.fn();
 
 vi.mock('@/features/events/hooks', () => ({
   useEventDetail: (...args: unknown[]) => mockUseEventDetail(...args),
+  useIsEventSectionRoute: () => mockUseIsEventSectionRoute(),
 }));
 
 vi.mock('@/hooks/common', () => ({
@@ -46,7 +48,11 @@ vi.mock('./MainLayout', () => ({
 }));
 
 vi.mock('@/features/events', () => ({
-  EventDetailHeader: () => <div data-testid="event-detail-header" />,
+  EventDetailHeader: ({ onBack, onEdit, onDelete, onToggleArchive }: Record<string, (() => void) | undefined>) => (
+    <div data-testid="event-detail-header" data-has-actions={String(Boolean(onEdit || onDelete || onToggleArchive))}>
+      <button onClick={onBack}>back</button>
+    </div>
+  ),
   EventFormModal: () => null,
   EventSectionTabs: () => <div data-testid="event-section-tabs" />,
 }));
@@ -82,9 +88,13 @@ function defaultHookReturn(overrides = {}) {
     isLoading: false,
     error: null,
     refetch: vi.fn(),
+    isLoadingKpis: false,
+    kpisError: null,
+    refetchKpis: vi.fn(),
     handleDelete: vi.fn(),
     handleToggleArchive: vi.fn(),
     handleBack: vi.fn(),
+    handleBackToEvent: vi.fn(),
     isMutatingEvent: false,
     ...overrides,
   };
@@ -107,6 +117,7 @@ function renderLayout(initialEntry = '/event/event-123') {
       <Routes>
         <Route path="/event/:id" element={<EventLayout />}>
           <Route index element={<SectionProbe />} />
+          <Route path="kpi/:kpi" element={<div data-testid="kpi-probe" />} />
         </Route>
         <Route path="/event" element={<EventLayout />} />
       </Routes>
@@ -117,6 +128,7 @@ function renderLayout(initialEntry = '/event/event-123') {
 describe('EventLayout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseIsEventSectionRoute.mockReturnValue(true);
   });
 
   it('shows skeleton while loading', () => {
@@ -163,5 +175,33 @@ describe('EventLayout', () => {
     expect(screen.getByTestId('section-probe')).toHaveTextContent('Test Event');
     expect(screen.getByTestId('section-probe')).toHaveAttribute('data-kpis', '42');
     expect(screen.queryByTestId('event-detail-skeleton')).not.toBeInTheDocument();
+  });
+
+  it('gives a section route the tabs, the event actions and a back button to the event list', () => {
+    const hookReturn = defaultHookReturn({ event: mockEvent });
+    mockUseEventDetail.mockReturnValue(hookReturn);
+    renderLayout();
+
+    expect(screen.getByTestId('event-section-tabs')).toBeInTheDocument();
+    expect(screen.getByTestId('event-detail-header')).toHaveAttribute('data-has-actions', 'true');
+
+    fireEvent.click(screen.getByRole('button', { name: 'back' }));
+    expect(hookReturn.handleBack).toHaveBeenCalled();
+    expect(hookReturn.handleBackToEvent).not.toHaveBeenCalled();
+  });
+
+  it('keeps tabs and event actions out of a detail route and sends back to the event', () => {
+    const hookReturn = defaultHookReturn({ event: mockEvent });
+    mockUseEventDetail.mockReturnValue(hookReturn);
+    mockUseIsEventSectionRoute.mockReturnValue(false);
+    renderLayout('/event/event-123/kpi/balance');
+
+    expect(screen.getByTestId('kpi-probe')).toBeInTheDocument();
+    expect(screen.queryByTestId('event-section-tabs')).not.toBeInTheDocument();
+    expect(screen.getByTestId('event-detail-header')).toHaveAttribute('data-has-actions', 'false');
+
+    fireEvent.click(screen.getByRole('button', { name: 'back' }));
+    expect(hookReturn.handleBackToEvent).toHaveBeenCalled();
+    expect(hookReturn.handleBack).not.toHaveBeenCalled();
   });
 });

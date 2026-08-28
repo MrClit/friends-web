@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ApiError } from '@/api/client';
-import { ErrorState } from '@/shared/components';
+import type { EventKPIs } from '@/api/types';
 import { useAuth } from '@/features/auth/useAuth';
+import type { Event } from '@/features/events/types';
 import type {
   KPIType,
   KPIParticipantItem,
@@ -21,35 +21,23 @@ import {
   buildUserStatusSummaryData,
 } from '../index';
 
-// React Query hooks
-import { useEvent } from '../../../hooks/api/useEvents';
-import { useEventKPIs } from '../../../hooks/api/useEventKPIs';
-import { useDeletingStore } from '@/shared/store/useDeletingStore';
-
 import { KPIDetailContent } from './KPIDetailContent.tsx';
+
+interface KPIDetailViewProps {
+  event: Event;
+  kpis: EventKPIs;
+  kpi: string;
+}
 
 /**
  * KPI Detail View Container
- * Handles all business logic: data fetching, validation, state management
- * Renders KPIDetailContent for presentation
+ * Handles the KPI-specific logic: URL validation, participant selection and
+ * the derived view models. The event and its KPIs come loaded from the layout.
  */
-export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: string }) {
-  const navigate = useNavigate();
+export function KPIDetailView({ event, kpis, kpi: rawKpi }: KPIDetailViewProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation(['kpiDetail', 'common', 'transactions', 'events']);
   const { user } = useAuth();
-  const setDeleting = useDeletingStore((state) => state.setDeleting);
-
-  // React Query hooks - MUST be called before any early returns
-  const { data: event, isLoading: isLoadingEvent, error: eventError, refetch: refetchEvent } = useEvent(eventId);
-  const { data: kpis, isLoading: isLoadingKPIs, error: kpisError, refetch: refetchKPIs } = useEventKPIs(eventId);
-
-  useEffect(() => {
-    return () => {
-      // Ensure detail queries are re-enabled after leaving the page.
-      setDeleting(false);
-    };
-  }, [setDeleting]);
 
   // Keep legacy links alive after KPI fusion.
   const normalizedRawKpi = rawKpi === 'contributions' || rawKpi === 'pending' ? 'contributionStatus' : rawKpi;
@@ -57,9 +45,7 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
   const kpi: KPIType | undefined = isKpiValid ? (normalizedRawKpi as KPIType) : undefined;
   const currentUserId = user?.id;
   const requestedParticipantId = searchParams.get('participantId') ?? undefined;
-  const userStatusSelectableParticipants: KPISelectableParticipant[] = event
-    ? buildUserStatusSelectableParticipants(event, t)
-    : [];
+  const userStatusSelectableParticipants: KPISelectableParticipant[] = buildUserStatusSelectableParticipants(event, t);
   const selectedUserStatusParticipantId = resolveUserStatusParticipantId(
     userStatusSelectableParticipants,
     currentUserId,
@@ -67,7 +53,7 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
   );
 
   useEffect(() => {
-    if (kpi !== 'userStatus' || !event) {
+    if (kpi !== 'userStatus') {
       return;
     }
 
@@ -88,41 +74,12 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
     }
 
     setSearchParams(nextSearchParams, { replace: true });
-  }, [event, kpi, requestedParticipantId, searchParams, selectedUserStatusParticipantId, setSearchParams]);
+  }, [kpi, requestedParticipantId, searchParams, selectedUserStatusParticipantId, setSearchParams]);
 
   // Get KPI configuration
   const KPI_CONFIG = getKPIConfig(t);
 
   if (!kpi) {
-    return <div className="text-center mt-10">{t('notFound', { ns: 'kpiDetail' })}</div>;
-  }
-
-  // Loading state
-  if (isLoadingEvent || isLoadingKPIs) {
-    return <div className="text-center mt-10">{t('loading', { ns: 'common' })}</div>;
-  }
-
-  // Error state
-  const requestError = eventError ?? kpisError;
-  if (requestError) {
-    const isNotFoundOrNoAccess = requestError instanceof ApiError && requestError.status === 404;
-
-    return (
-      <ErrorState
-        message={isNotFoundOrNoAccess ? t('notFoundOrNoAccess', { ns: 'common' }) : undefined}
-        onRetry={
-          isNotFoundOrNoAccess
-            ? undefined
-            : () => {
-                void refetchEvent();
-                void refetchKPIs();
-              }
-        }
-      />
-    );
-  }
-
-  if (!event || !kpis) {
     return <div className="text-center mt-10">{t('notFound', { ns: 'kpiDetail' })}</div>;
   }
 
@@ -190,7 +147,6 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
 
   return (
     <KPIDetailContent
-      event={event}
       kpi={kpi}
       items={items}
       kpiValue={kpiValue}
@@ -202,7 +158,6 @@ export function KPIDetailView({ eventId, kpi: rawKpi }: { eventId: string; kpi: 
       selectedUserStatusParticipantId={selectedUserStatusParticipantId}
       isCurrentUserParticipant={isCurrentUserParticipant}
       onUserStatusParticipantChange={handleUserStatusParticipantChange}
-      onBack={() => navigate(`/event/${event.id}`)}
     />
   );
 }
