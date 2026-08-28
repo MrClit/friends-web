@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/hooks/api/useTransactions';
 import { useModalForm } from '@/hooks/common';
 import { formatDateToInputValue, parseDateForFormatting, getApiErrorMessage } from '@/shared/utils';
+import { DEFAULT_PAYMENT_TYPE } from '../constants';
 import type { Transaction, PaymentType } from '../types';
 import type { Event } from '@/features/events/types';
 
@@ -43,7 +44,7 @@ function checkIsDirty(
   if (!transaction) {
     // Create mode: check if any field is non-default
     return (
-      type !== 'contribution' ||
+      type !== DEFAULT_PAYMENT_TYPE ||
       title.trim() !== '' ||
       amount.trim() !== '' ||
       participantId.trim() !== '' ||
@@ -111,7 +112,7 @@ export function useTransactionModal({
   onClose,
 }: UseTransactionModalProps): UseTransactionModalReturn {
   // Form state
-  const [type, setType] = useState<PaymentType>('contribution');
+  const [type, setType] = useState<PaymentType>(DEFAULT_PAYMENT_TYPE);
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(() => getTodayLocalDate());
@@ -140,7 +141,7 @@ export function useTransactionModal({
       setParticipantId(transaction.participantId || '');
     } else {
       // Create mode: reset to default values
-      setType('contribution');
+      setType(DEFAULT_PAYMENT_TYPE);
       setTitle('');
       setAmount('');
       setDate(getTodayLocalDate());

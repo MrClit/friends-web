@@ -8,6 +8,12 @@ import type { ComponentType } from 'react';
 export const PAYMENT_TYPES: readonly PaymentType[] = ['contribution', 'expense', 'compensation'] as const;
 
 /**
+ * Type preselected when creating a transaction; expenses are the common case.
+ * The create-mode dirty check compares against it too, so a fresh form is not dirty.
+ */
+export const DEFAULT_PAYMENT_TYPE: PaymentType = 'expense';
+
+/**
  * Color palette interface for consistent styling across components
  */
 interface ColorPalette {
