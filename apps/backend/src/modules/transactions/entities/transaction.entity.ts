@@ -56,13 +56,13 @@ export class Transaction {
   @ManyToOne(() => Event, 'transactions', {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'event_id' })
+  @JoinColumn({ name: 'event_id', foreignKeyConstraintName: 'fk_transactions_event_id' })
   event: Event;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })

@@ -91,10 +91,10 @@ describe('ShoppingItem persistence (integration)', () => {
     expect(found.purchasedAt?.toISOString()).toBe(purchasedAt.toISOString());
   });
 
-  // The attribution columns hold plain user ids with no foreign key, like RefreshToken and
-  // AuthExchangeCode do. This pins that decision: a user disappearing never takes somebody else's
-  // item with it, and never blocks a TRUNCATE of the users table.
-  it('keeps the item and its attribution when the referenced user is hard deleted', async () => {
+  // The attribution columns carry a foreign key with ON DELETE SET NULL. This pins that decision: a
+  // user disappearing empties the attribution but never takes the item — which belongs to the event,
+  // not to the person who typed it — with it.
+  it('clears the attribution when the referenced user is hard deleted, keeping the item', async () => {
     const user = await createUser(userRepository, { email: 'creator@example.com', name: 'Creator' });
     const saved = await createShoppingItem(shoppingItemRepository, {
       name: 'Cerveza',
@@ -108,8 +108,9 @@ describe('ShoppingItem persistence (integration)', () => {
     await userRepository.createQueryBuilder().delete().from(User).where('id = :id', { id: user.id }).execute();
 
     const found = await shoppingItemRepository.findOneOrFail({ where: { id: saved.id } });
-    expect(found.createdBy).toBe(user.id);
-    expect(found.purchasedBy).toBe(user.id);
+    expect(found.name).toBe('Cerveza');
+    expect(found.createdBy).toBeNull();
+    expect(found.purchasedBy).toBeNull();
   });
 
   it('keeps the lists of two events apart', async () => {
