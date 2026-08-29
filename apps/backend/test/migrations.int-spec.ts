@@ -2,6 +2,7 @@ import { config as loadEnv } from 'dotenv';
 import { join } from 'node:path';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ENTITY_GLOB, MIGRATION_GLOB } from '../src/config/typeorm-paths';
+import { EXPECTED_INDEXES, readIndexNamesByTable } from './utils/expected-indexes';
 
 /**
  * The only place the migration SQL runs today is the backend's startup on Render
@@ -26,6 +27,11 @@ import { ENTITY_GLOB, MIGRATION_GLOB } from '../src/config/typeorm-paths';
  *   migration's `down()` does not fail this suite.
  * - Only the most recent migration is reverted. The older ones are exercised upwards only, which is
  *   deliberate: 1705200000000's `down()` is a documented no-op, so a full unwind cannot pass.
+ *
+ * The last test does prove one thing about the resulting schema: that its indexes are the ones
+ * test/utils/expected-indexes.ts lists. db-indexes.int-spec.ts asserts that same list against the
+ * schema the entities build, so an index added to only one of the two sides fails a suite instead of
+ * drifting apart in silence (issue #150).
  *
  * The schema is built here by the migrations, never by `synchronize`. Nothing in this file touches the
  * database the rest of the suites share.
@@ -98,9 +104,10 @@ describe('Migrations (integration)', () => {
     });
   }, HOOK_TIMEOUT);
 
-  // The two tests below share the database and run in declaration order (the suite is executed with
-  // --runInBand): the second one starts from the schema the first one built. Do not reorder them or
-  // turn them into `it.concurrent`.
+  // The three tests below share the database and run in declaration order (the suite is executed with
+  // --runInBand): each one starts from the schema the previous one left. Do not reorder them or turn
+  // them into `it.concurrent` — in particular, the index assertion is only meaningful once every
+  // migration has been applied.
 
   it(
     'applies every migration to an empty database',
@@ -128,6 +135,16 @@ describe('Migrations (integration)', () => {
 
       expect(reapplied).toHaveLength(1);
       await expect(dataSource.showMigrations()).resolves.toBe(false);
+    },
+    HOOK_TIMEOUT,
+  );
+
+  it(
+    'leaves exactly the expected indexes behind',
+    async () => {
+      const actual = await readIndexNamesByTable((sql) => dataSource.query(sql));
+
+      expect(actual).toEqual(EXPECTED_INDEXES);
     },
     HOOK_TIMEOUT,
   );

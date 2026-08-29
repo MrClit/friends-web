@@ -21,6 +21,10 @@ export type { PaymentType } from '@friends/shared-types';
 @Index('idx_transactions_event_date_created_active', ['eventId', 'date', 'createdAt'], {
   where: 'deleted_at IS NULL',
 })
+// Not redundant with the index above, despite event_id leading both: this one backs the ON DELETE
+// CASCADE from events, and the referential integrity check carries no deleted_at predicate, so the
+// partial index cannot serve it. Without this, deleting an event seq scans transactions.
+@Index('idx_transactions_event_id', ['eventId'])
 @Entity('transactions')
 export class Transaction {
   @PrimaryGeneratedColumn('uuid')
