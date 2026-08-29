@@ -68,7 +68,8 @@ of truth for which vars exist, which are required and what the defaults are. Boo
 
 The backend integration and e2e suites need a running Postgres *and* an `apps/backend/.env.test` copied from
 `.env.test.example` (gitignored). That file sets `TYPEORM_SYNC=true`, so those suites build the schema
-themselves and do not run migrations.
+themselves and do not run migrations — the one exception is `test/migrations.int-spec.ts`, which builds
+its own throwaway database from `src/migrations/`.
 
 Frontend env vars are `VITE_`-prefixed and validated at module load in `src/config/env.ts`
 (`VITE_API_URL` and `VITE_APP_NAME` are required; a missing or malformed one throws at startup).

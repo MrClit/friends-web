@@ -105,7 +105,9 @@ jobs:
       - name: Run unit tests
         run: pnpm --filter @friends/backend test:run
 
-      # TYPEORM_SYNC=true creates the schema, so no migrations are needed here.
+      # TYPEORM_SYNC=true creates the schema for these tests. The exception is
+      # migrations.int-spec.ts, which creates a throwaway database of its own and builds it from
+      # src/migrations/ — the pre-merge check that the migration SQL is valid and reversible.
       - name: Run integration tests
         run: pnpm --filter @friends/backend test:int
 
