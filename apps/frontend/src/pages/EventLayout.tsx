@@ -5,7 +5,7 @@ import { ApiError } from '@/api/client';
 import { EventDetailHeader, EventFormModal, EventSectionTabs } from '@/features/events';
 import { EventDetailSkeleton } from '@/features/events/components/EventDetailSkeleton';
 import { EventSectionSkeleton } from '@/features/events/components/EventSectionSkeleton';
-import { useEventDetail, type EventLayoutContext } from '@/features/events/hooks';
+import { useEventDetail, useIsEventSectionRoute, type EventLayoutContext } from '@/features/events/hooks';
 import { useConfirmDialog } from '@/hooks/common';
 import { ConfirmDialog, ErrorState } from '@/shared/components';
 import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
@@ -15,16 +15,35 @@ import { MainLayout } from './MainLayout';
 const EVENT_LAYOUT_NAMESPACES = ['eventDetail', 'events', 'common'] as const;
 
 /**
- * Shell of the event hub: it owns the event fetch, its loading/error/not-found
- * states, the header and the event-level modals. Sections render inside the
- * outlet and receive the loaded event through the outlet context.
+ * Shell of every view of an event: it owns the event fetch, its
+ * loading/error/not-found states, the header and the event-level modals.
+ * Children render inside the outlet and receive the loaded event through the
+ * outlet context.
+ *
+ * Sections (tabs) and detail views (the KPI drill-down) differ only in chrome:
+ * a detail view gets neither the section tabs nor the event actions, and its
+ * back button returns to the event instead of the event list.
  */
 export function EventLayout() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation(EVENT_LAYOUT_NAMESPACES);
   const isI18nReady = useI18nNamespacesReady(EVENT_LAYOUT_NAMESPACES);
-  const { event, kpis, isLoading, error, refetch, handleDelete, handleToggleArchive, handleBack, isMutatingEvent } =
-    useEventDetail(id);
+  const isSectionRoute = useIsEventSectionRoute();
+  const {
+    event,
+    kpis,
+    isLoading,
+    error,
+    refetch,
+    isLoadingKpis,
+    kpisError,
+    refetchKpis,
+    handleDelete,
+    handleToggleArchive,
+    handleBack,
+    handleBackToEvent,
+    isMutatingEvent,
+  } = useEventDetail(id);
 
   // UI state management
   const eventFormModalStore = useEventFormModalStore();
@@ -68,23 +87,29 @@ export function EventLayout() {
     );
   }
 
-  const outletContext: EventLayoutContext = { event, kpis };
+  const outletContext: EventLayoutContext = {
+    event,
+    kpis,
+    isLoadingKpis,
+    kpisError,
+    refetchKpis: () => void refetchKpis(),
+  };
 
   return (
     <MainLayout>
       <EventDetailHeader
         eventTitle={event.title}
         eventStatus={event.status}
-        onBack={handleBack}
-        onEdit={() => eventFormModalStore.openModal(event.id)}
-        onDelete={() => deleteDialog.confirm(handleDelete)}
-        onToggleArchive={handleToggleArchive}
+        onBack={isSectionRoute ? handleBack : handleBackToEvent}
+        onEdit={isSectionRoute ? () => eventFormModalStore.openModal(event.id) : undefined}
+        onDelete={isSectionRoute ? () => deleteDialog.confirm(handleDelete) : undefined}
+        onToggleArchive={isSectionRoute ? handleToggleArchive : undefined}
         isMutatingStatus={isMutatingEvent}
       />
 
-      <EventSectionTabs />
+      {isSectionRoute ? <EventSectionTabs /> : null}
 
-      {/* Local Suspense: without it, loading a section chunk would unmount the
+      {/* Local Suspense: without it, loading a child chunk would unmount the
           header and tabs behind the app-wide fallback. */}
       <Suspense fallback={<EventSectionSkeleton />}>
         <Outlet context={outletContext} />

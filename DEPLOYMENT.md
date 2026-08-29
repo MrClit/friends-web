@@ -166,8 +166,12 @@ Infrastructure checks. The release flow reads its pre-flight from
 - Database backup generated before risky releases
 
 > Migrations run **on backend startup** (`start:prod:migrate`), which happens after `main` is pushed
-> and Render redeploys — there is no pre-merge migration step. A migration that fails takes the API
-> down with it, so it has to be verified *before* merging, not applied earlier.
+> and Render redeploys — nothing applies them to the production database before the merge. A migration
+> that fails takes the API down with it, so it has to be verified *before* merging, not applied earlier.
+> CI does that verification on every PR: `test/migrations.int-spec.ts` applies every migration to an
+> empty throwaway database, reverts the most recent one and re-applies it. That proves the SQL is valid
+> and the `down()` works; it does not prove the migration is safe against production *data*, which is
+> still on the reviewer.
 
 Recommended backup command:
 

@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { EventDetailHeader } from '@/features/events';
 import { KPIBalanceBreakdown, KPIParticipantsList, KPIUserStatusSummary } from '../index';
-import type { Event } from '@/features/events/types';
 import type {
   KPIType,
   KPIParticipantItem,
@@ -15,7 +13,6 @@ import { KPIBoxDetail } from './KPIBoxDetail';
 import { KPIContributionStatusSummary } from './KPIContributionStatusSummary';
 
 interface KPIDetailContentProps {
-  event: Event;
   kpi: KPIType;
   items: KPIParticipantItem[];
   kpiValue: number;
@@ -27,7 +24,6 @@ interface KPIDetailContentProps {
   selectedUserStatusParticipantId?: string;
   isCurrentUserParticipant: boolean;
   onUserStatusParticipantChange: (participantId: string | undefined) => void;
-  onBack: () => void;
 }
 
 /**
@@ -36,7 +32,6 @@ interface KPIDetailContentProps {
  * All logic is handled by the container (KPIDetailView)
  */
 export function KPIDetailContent({
-  event,
   kpi,
   items,
   kpiValue,
@@ -48,13 +43,11 @@ export function KPIDetailContent({
   selectedUserStatusParticipantId,
   isCurrentUserParticipant,
   onUserStatusParticipantChange,
-  onBack,
 }: KPIDetailContentProps) {
   const { t } = useTranslation('kpiDetail');
 
   return (
     <div>
-      <EventDetailHeader eventTitle={event.title} eventStatus={event.status} onBack={onBack} />
       <KPIBoxDetail kpi={kpi} kpiValue={kpiValue} kpiConfig={kpiConfig} />
 
       {kpi === 'balance' && balanceBreakdownData ? (

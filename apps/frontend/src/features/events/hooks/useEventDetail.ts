@@ -11,7 +11,7 @@ export function useEventDetail(id: string | undefined) {
   const { data: event, isLoading, error, refetch } = useEvent(id);
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
-  const { data: kpis } = useEventKPIs(id);
+  const { data: kpis, isLoading: isLoadingKpis, error: kpisError, refetch: refetchKpis } = useEventKPIs(id);
 
   useEffect(() => {
     return () => {
@@ -45,15 +45,27 @@ export function useEventDetail(id: string | undefined) {
 
   const handleBack = () => navigate('/');
 
+  const handleBackToEvent = () => {
+    if (!event) {
+      return;
+    }
+
+    navigate(`/event/${event.id}`);
+  };
+
   return {
     event,
     kpis,
     isLoading,
     error,
     refetch,
+    isLoadingKpis,
+    kpisError,
+    refetchKpis,
     handleDelete,
     handleToggleArchive,
     handleBack,
+    handleBackToEvent,
     isMutatingEvent: updateEvent.isPending,
   };
 }
