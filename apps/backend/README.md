@@ -313,6 +313,11 @@ Notes:
 
 - `migration:run` and `migration:revert` remain available as compatibility aliases to `:local`.
 - In production keep `TYPEORM_SYNC=false` and apply schema changes only through versioned migrations.
+- Migrations are smoke-tested on every PR by `test/migrations.int-spec.ts`, part of the integration
+  suite: it applies all of them to an empty throwaway database, reverts the last one and re-applies it.
+  Run it alone with `pnpm test:int -- test/migrations.int-spec.ts`. It proves the SQL is valid and that
+  the newest `down()` runs; it proves nothing about production data, and its docblock lists the rest of
+  what it does not cover.
 
 ---
 
