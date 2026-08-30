@@ -1,0 +1,200 @@
+###############################################
+# CALENDAR API - EXAMPLE FILE
+###############################################
+# Copy this file to calendar.http and replace with your real values
+# calendar.http is gitignored for security
+#
+# Calendario de comidas y cenas de un evento: días, turnos y asistentes.
+# El participantId es el uuid del usuario o el id del invitado; el bote ('0') no participa.
+
+# Option 1: Define variables locally (recommended)
+@baseUrl = http://localhost:3000/api
+@token = YOUR_JWT_TOKEN_HERE
+@contentType = application/json
+@eventId = YOUR_EVENT_ID_HERE
+@participantId = YOUR_PARTICIPANT_ID_HERE
+
+# Option 2: Use .vscode/settings.json variables
+# Select environment in VS Code: Cmd+Shift+P → "REST Client: Switch Environment"
+
+###############################################
+# 1. GET CALENDAR - Días, turnos y asistencias
+###############################################
+# Una sola petición devuelve el calendario entero, anidado.
+# Los días vienen por fecha ascendente y los turnos en orden Comida → Cena.
+GET {{baseUrl}}/events/{{eventId}}/calendar
+Authorization: Bearer {{token}}
+
+###############################################
+# 2. ADD DAYS - Rango expandido más un día suelto
+###############################################
+# El rango es azúcar de la UI: el cliente lo expande y manda días individuales.
+# Idempotente: las fechas que el evento ya tiene se ignoran, no dan error.
+# @name addDays
+POST {{baseUrl}}/events/{{eventId}}/calendar/days
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "dates": ["2026-09-12", "2026-09-13", "2026-09-14", "2026-09-21"]
+}
+
+### Guardar el primer día creado y sus dos turnos
+@dayId = {{addDays.response.body.data.0.id}}
+@lunchId = {{addDays.response.body.data.0.meals.0.id}}
+@dinnerId = {{addDays.response.body.data.0.meals.1.id}}
+
+###############################################
+# 3. ADD DAYS - Con descripción para todos
+###############################################
+POST {{baseUrl}}/events/{{eventId}}/calendar/days
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "dates": ["2026-09-15"],
+  "description": "BAILE DE DISFRACES"
+}
+
+###############################################
+# 4. ADD DAYS - Fechas repetidas (se ignoran)
+###############################################
+# Devuelve solo los días nuevos: reenviar un rango solapado es uso normal.
+POST {{baseUrl}}/events/{{eventId}}/calendar/days
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "dates": ["2026-09-12", "2026-09-30"]
+}
+
+###############################################
+# 5. ADD DAYS - Fecha que no existe (400)
+###############################################
+POST {{baseUrl}}/events/{{eventId}}/calendar/days
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "dates": ["2026-02-31"]
+}
+
+###############################################
+# 6. UPDATE DAY - Poner descripción
+###############################################
+PATCH {{baseUrl}}/calendar-days/{{dayId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "description": "LLEGADA Y BIENVENIDA"
+}
+
+###############################################
+# 7. UPDATE DAY - Quitar descripción
+###############################################
+PATCH {{baseUrl}}/calendar-days/{{dayId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "description": null
+}
+
+###############################################
+# 8. UPDATE MEAL - Plan de la comida
+###############################################
+PATCH {{baseUrl}}/calendar-meals/{{lunchId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "description": "Paella en la casa"
+}
+
+###############################################
+# 9. UPDATE MEAL - Plan de la cena
+###############################################
+PATCH {{baseUrl}}/calendar-meals/{{dinnerId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "description": "Reserva en el restaurante del puerto"
+}
+
+###############################################
+# 10. SET ATTENDANCE - Una familia en la comida
+###############################################
+# Upsert de una celda de la parrilla. Adultos y niños van por separado
+# porque una fila puede representar a una familia entera.
+PUT {{baseUrl}}/calendar-meals/{{lunchId}}/attendances
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "participantId": "{{participantId}}",
+  "adults": 2,
+  "children": 3
+}
+
+###############################################
+# 11. SET ATTENDANCE - Corregir la misma celda
+###############################################
+PUT {{baseUrl}}/calendar-meals/{{lunchId}}/attendances
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "participantId": "{{participantId}}",
+  "adults": 4,
+  "children": 1
+}
+
+###############################################
+# 12. SET ATTENDANCE - Vaciar la celda
+###############################################
+# Con ambos a cero se borra la fila, y aun así responde con el estado
+# de la celda (ceros incluidos): una sola forma de respuesta que reconciliar.
+PUT {{baseUrl}}/calendar-meals/{{lunchId}}/attendances
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "participantId": "{{participantId}}",
+  "adults": 0,
+  "children": 0
+}
+
+###############################################
+# 13. SET ATTENDANCE - El bote (400)
+###############################################
+# El bote es un saco de gasto, no una persona: no come.
+PUT {{baseUrl}}/calendar-meals/{{dinnerId}}/attendances
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "participantId": "0",
+  "adults": 1,
+  "children": 0
+}
+
+###############################################
+# 14. SET ATTENDANCE - Alguien ajeno al evento (400)
+###############################################
+PUT {{baseUrl}}/calendar-meals/{{dinnerId}}/attendances
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "participantId": "no-participa-en-el-evento",
+  "adults": 1,
+  "children": 0
+}
+
+###############################################
+# 15. DELETE DAY - Se lleva turnos y asistencias
+###############################################
+DELETE {{baseUrl}}/calendar-days/{{dayId}}
+Authorization: Bearer {{token}}

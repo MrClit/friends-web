@@ -37,6 +37,9 @@ async function bootstrap() {
     .addTag('Transactions', 'Individual transaction operations')
     .addTag('Event Shopping Items', 'Shopping list endpoints under events')
     .addTag('Shopping Items', 'Individual shopping item operations')
+    .addTag('Event Calendar', 'Meal calendar endpoints under events')
+    .addTag('Calendar Days', 'Individual calendar day operations')
+    .addTag('Calendar Meals', 'Lunch and dinner operations, including attendance')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
