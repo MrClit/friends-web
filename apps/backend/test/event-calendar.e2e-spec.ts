@@ -161,7 +161,7 @@ describe('Event calendar API (e2e)', () => {
   });
 
   describe('POST /api/events/:eventId/calendar/days', () => {
-    const postDays = (body: unknown, actor: User = member) =>
+    const postDays = (body: object, actor: User = member) =>
       request(httpServer())
         .post(`/api/events/${event.id}/calendar/days`)
         .set('Authorization', buildAuthHeader(jwtService, actor))
@@ -337,7 +337,7 @@ describe('Event calendar API (e2e)', () => {
   });
 
   describe('PUT /api/calendar-meals/:mealId/attendances', () => {
-    const setAttendance = (mealId: string, body: unknown, actor: User = member) =>
+    const setAttendance = (mealId: string, body: object, actor: User = member) =>
       request(httpServer())
         .put(`/api/calendar-meals/${mealId}/attendances`)
         .set('Authorization', buildAuthHeader(jwtService, actor))
