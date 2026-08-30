@@ -12,6 +12,7 @@ import { getDatabaseConfig } from './config/database.config';
 import { EventsModule } from './modules/events/events.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ShoppingListModule } from './modules/shopping-list/shopping-list.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
@@ -65,6 +66,7 @@ import { RequestContextModule } from './common/request-context/request-context.m
     EventsModule,
     TransactionsModule,
     ShoppingListModule,
+    CalendarModule,
     UsersModule,
     AuthModule,
     AdminModule,

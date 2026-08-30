@@ -8,9 +8,20 @@ import { AppModule } from '../src/app.module';
 import { Event } from '../src/modules/events/entities/event.entity';
 import { EventParticipantsService } from '../src/modules/events/services/event-participants.service';
 import { Transaction } from '../src/modules/transactions/entities/transaction.entity';
+import { CalendarDay } from '../src/modules/calendar/entities/calendar-day.entity';
+import { CalendarMeal } from '../src/modules/calendar/entities/calendar-meal.entity';
+import { CalendarAttendance } from '../src/modules/calendar/entities/calendar-attendance.entity';
 import { User } from '../src/modules/users/user.entity';
+import { MealSlot } from '@friends/shared-types';
 import { applyAppTestConfig } from './utils/test-app-config';
-import { createEvent, createTransaction, createUser } from './utils/test-factories';
+import {
+  createCalendarAttendance,
+  createCalendarDay,
+  createEvent,
+  createTransaction,
+  createUser,
+  mealOf,
+} from './utils/test-factories';
 import { buildAuthHeader, getDataObjectFromBody } from './utils/test-http-helpers';
 
 const GUEST_ID = 'g-1';
@@ -21,6 +32,9 @@ describe('Event participant replacements (e2e)', () => {
   let userRepository: Repository<User>;
   let eventRepository: Repository<Event>;
   let transactionRepository: Repository<Transaction>;
+  let dayRepository: Repository<CalendarDay>;
+  let mealRepository: Repository<CalendarMeal>;
+  let attendanceRepository: Repository<CalendarAttendance>;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -35,9 +49,15 @@ describe('Event participant replacements (e2e)', () => {
     userRepository = app.get<Repository<User>>(getRepositoryToken(User));
     eventRepository = app.get<Repository<Event>>(getRepositoryToken(Event));
     transactionRepository = app.get<Repository<Transaction>>(getRepositoryToken(Transaction));
+    dayRepository = app.get<Repository<CalendarDay>>(getRepositoryToken(CalendarDay));
+    mealRepository = app.get<Repository<CalendarMeal>>(getRepositoryToken(CalendarMeal));
+    attendanceRepository = app.get<Repository<CalendarAttendance>>(getRepositoryToken(CalendarAttendance));
   });
 
   beforeEach(async () => {
+    await attendanceRepository.createQueryBuilder().delete().from(CalendarAttendance).execute();
+    await mealRepository.createQueryBuilder().delete().from(CalendarMeal).execute();
+    await dayRepository.createQueryBuilder().delete().from(CalendarDay).execute();
     await transactionRepository.createQueryBuilder().delete().from(Transaction).execute();
     await eventRepository.createQueryBuilder().delete().from(Event).execute();
     await userRepository.createQueryBuilder().delete().from(User).execute();
@@ -113,8 +133,45 @@ describe('Event participant replacements (e2e)', () => {
       eventId: otherEvent.id,
     });
 
-    return { owner, destination, eventId, guestTransactions, ownerTransaction, otherEventTransaction };
+    // A calendar day in each event, so the guest holds seats that must follow the same rules as its
+    // money: migrated on a replacement, and dropped when it simply stops coming.
+    const day = await createCalendarDay(dayRepository, { eventId, date: '2026-09-12' });
+    const guestAttendance = await createCalendarAttendance(attendanceRepository, {
+      mealId: mealOf(day, MealSlot.LUNCH).id,
+      participantId: GUEST_ID,
+      adults: 2,
+      children: 3,
+    });
+    const ownerAttendance = await createCalendarAttendance(attendanceRepository, {
+      mealId: mealOf(day, MealSlot.DINNER).id,
+      participantId: owner.id,
+      adults: 1,
+      children: 0,
+    });
+
+    const otherEventDay = await createCalendarDay(dayRepository, { eventId: otherEvent.id, date: '2026-09-12' });
+    const otherEventAttendance = await createCalendarAttendance(attendanceRepository, {
+      mealId: mealOf(otherEventDay, MealSlot.LUNCH).id,
+      participantId: GUEST_ID,
+      adults: 4,
+      children: 0,
+    });
+
+    return {
+      owner,
+      destination,
+      eventId,
+      guestTransactions,
+      ownerTransaction,
+      otherEventTransaction,
+      guestAttendance,
+      ownerAttendance,
+      otherEventAttendance,
+    };
   }
+
+  const attendanceParticipantOf = async (attendanceId: string): Promise<string | undefined> =>
+    (await attendanceRepository.findOne({ where: { id: attendanceId } }))?.participantId;
 
   const participantIdOf = async (transactionId: string): Promise<string | undefined> =>
     (await transactionRepository.findOne({ where: { id: transactionId } }))?.participantId;
@@ -156,6 +213,51 @@ describe('Event participant replacements (e2e)', () => {
     expect(participants).toContainEqual(
       expect.objectContaining({ type: 'user', id: destination.id, name: 'Destination' }),
     );
+  });
+
+  it('moves the calendar seats of the guest to the destination user, and only in this event', async () => {
+    const { owner, destination, eventId, guestAttendance, ownerAttendance, otherEventAttendance } =
+      await seedScenario();
+
+    await request(httpServer())
+      .patch(`/api/events/${eventId}`)
+      .set('Authorization', buildAuthHeader(jwtService, owner))
+      .send({
+        participants: [
+          { type: 'user', id: owner.id },
+          { type: 'user', id: destination.id },
+        ],
+        participantReplacements: [{ fromGuestId: GUEST_ID, toUserId: destination.id }],
+      })
+      .expect(200);
+
+    await expect(attendanceParticipantOf(guestAttendance.id)).resolves.toBe(destination.id);
+    await expect(attendanceParticipantOf(ownerAttendance.id)).resolves.toBe(owner.id);
+    await expect(attendanceParticipantOf(otherEventAttendance.id)).resolves.toBe(GUEST_ID);
+
+    // The seats move rather than being recreated, so the counts survive untouched.
+    const migrated = await attendanceRepository.findOneOrFail({ where: { id: guestAttendance.id } });
+    expect(migrated).toMatchObject({ adults: 2, children: 3 });
+  });
+
+  it('deletes the calendar seats of a participant simply dropped, while keeping its transactions', async () => {
+    const { owner, eventId, guestTransactions, guestAttendance, ownerAttendance, otherEventAttendance } =
+      await seedScenario();
+
+    await request(httpServer())
+      .patch(`/api/events/${eventId}`)
+      .set('Authorization', buildAuthHeader(jwtService, owner))
+      .send({ participants: [{ type: 'user', id: owner.id }] })
+      .expect(200);
+
+    // The asymmetry the issue asks for: money already moved is history, a future seat is not.
+    await expect(attendanceParticipantOf(guestAttendance.id)).resolves.toBeUndefined();
+    for (const transaction of guestTransactions) {
+      await expect(participantIdOf(transaction.id)).resolves.toBe(GUEST_ID);
+    }
+
+    await expect(attendanceParticipantOf(ownerAttendance.id)).resolves.toBe(owner.id);
+    await expect(attendanceParticipantOf(otherEventAttendance.id)).resolves.toBe(GUEST_ID);
   });
 
   it('rejects a replacement whose target user is missing from the updated participants and changes nothing', async () => {

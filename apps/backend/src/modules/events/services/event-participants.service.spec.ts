@@ -5,6 +5,8 @@ import { EntityManager, In } from 'typeorm';
 import { User } from '../../users/user.entity';
 import { Event, EventParticipant } from '../entities/event.entity';
 import { Transaction } from '../../transactions/entities/transaction.entity';
+import { CalendarMeal } from '../../calendar/entities/calendar-meal.entity';
+import { CalendarAttendance } from '../../calendar/entities/calendar-attendance.entity';
 import { ParticipantReplacementDto } from '../dto/participant-replacement.dto';
 import { EventParticipantsService } from './event-participants.service';
 
@@ -34,10 +36,47 @@ const makeQueryBuilder = (affected: number | undefined = 1): QueryBuilderDouble 
   return builder;
 };
 
-const makeManager = (builder: QueryBuilderDouble) => {
-  const getRepository = jest.fn(() => ({ createQueryBuilder: () => builder }));
+interface MealQueryBuilderDouble {
+  innerJoin: jest.Mock;
+  select: jest.Mock;
+  where: jest.Mock;
+  getRawMany: jest.Mock;
+}
 
-  return { manager: { getRepository } as unknown as EntityManager, getRepository };
+/** The builder that resolves an event's meal ids, so attendance writes can be scoped to them. */
+const makeMealQueryBuilder = (mealIds: string[]): MealQueryBuilderDouble => {
+  const builder: MealQueryBuilderDouble = {
+    innerJoin: jest.fn(() => builder),
+    select: jest.fn(() => builder),
+    where: jest.fn(() => builder),
+    getRawMany: jest.fn().mockResolvedValue(mealIds.map((id) => ({ id }))),
+  };
+
+  return builder;
+};
+
+const makeManager = (
+  builder: QueryBuilderDouble,
+  options: { mealIds?: string[]; attendanceAffected?: number } = {},
+) => {
+  const mealBuilder = makeMealQueryBuilder(options.mealIds ?? ['meal-1', 'meal-2']);
+  const attendanceRepository = {
+    update: jest.fn().mockResolvedValue({ affected: options.attendanceAffected ?? 1 }),
+    delete: jest.fn().mockResolvedValue({ affected: options.attendanceAffected ?? 1 }),
+  };
+
+  const getRepository = jest.fn((entity: unknown) => {
+    if (entity === CalendarMeal) return { createQueryBuilder: () => mealBuilder };
+    if (entity === CalendarAttendance) return attendanceRepository;
+    return { createQueryBuilder: () => builder };
+  });
+
+  return {
+    manager: { getRepository } as unknown as EntityManager,
+    getRepository,
+    mealBuilder,
+    attendanceRepository,
+  };
 };
 
 describe('EventParticipantsService', () => {
@@ -426,11 +465,96 @@ describe('EventParticipantsService', () => {
     });
 
     it('tolerates a driver that does not report the affected row count', async () => {
-      const { manager } = makeManager(makeQueryBuilder(undefined));
+      const { manager } = makeManager(makeQueryBuilder(undefined), { attendanceAffected: undefined });
 
       await expect(
         service.applyParticipantReplacements(manager, 'evt-1', [{ fromGuestId: 'g1', toUserId: 'u-new' }]),
       ).resolves.toBeUndefined();
+    });
+
+    it('moves the calendar attendances of the guest onto the user, scoped to the meals of the event', async () => {
+      const { manager, attendanceRepository, mealBuilder } = makeManager(makeQueryBuilder(), {
+        mealIds: ['meal-1', 'meal-2'],
+      });
+
+      await service.applyParticipantReplacements(manager, 'evt-1', [{ fromGuestId: 'g1', toUserId: 'u-new' }]);
+
+      expect(mealBuilder.where).toHaveBeenCalledWith('day.event_id = :eventId', { eventId: 'evt-1' });
+      expect(attendanceRepository.update).toHaveBeenCalledWith(
+        { mealId: In(['meal-1', 'meal-2']), participantId: 'g1' },
+        { participantId: 'u-new' },
+      );
+    });
+
+    it('skips the attendance update when the event has no calendar days', async () => {
+      const { manager, attendanceRepository } = makeManager(makeQueryBuilder(), { mealIds: [] });
+
+      await service.applyParticipantReplacements(manager, 'evt-1', [{ fromGuestId: 'g1', toUserId: 'u-new' }]);
+
+      expect(attendanceRepository.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('applyParticipantRemovals', () => {
+    it('does not touch the database when nobody was removed', async () => {
+      const { manager, getRepository } = makeManager(makeQueryBuilder());
+
+      await service.applyParticipantRemovals(manager, 'evt-1', []);
+
+      expect(getRepository).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when the event has no calendar days', async () => {
+      const { manager, attendanceRepository } = makeManager(makeQueryBuilder(), { mealIds: [] });
+
+      await service.applyParticipantRemovals(manager, 'evt-1', ['g1']);
+
+      expect(attendanceRepository.delete).not.toHaveBeenCalled();
+    });
+
+    it('deletes the attendances of every removed participant, scoped to the meals of the event', async () => {
+      const { manager, attendanceRepository } = makeManager(makeQueryBuilder(), { mealIds: ['meal-1'] });
+
+      await service.applyParticipantRemovals(manager, 'evt-1', ['g1', 'u-2']);
+
+      expect(attendanceRepository.delete).toHaveBeenCalledWith({
+        mealId: In(['meal-1']),
+        participantId: In(['g1', 'u-2']),
+      });
+    });
+
+    it('tolerates a driver that does not report the affected row count', async () => {
+      const { manager } = makeManager(makeQueryBuilder(), { attendanceAffected: undefined });
+
+      await expect(service.applyParticipantRemovals(manager, 'evt-1', ['g1'])).resolves.toBeUndefined();
+    });
+  });
+
+  describe('collectRemovedParticipantIds', () => {
+    const original: EventParticipant[] = [
+      { type: 'user', id: 'u-1' },
+      { type: 'guest', id: 'g1', name: 'Guest 1' },
+      { type: 'pot', id: '0' },
+    ];
+
+    it('returns nothing when the update does not touch participants', () => {
+      expect(service.collectRemovedParticipantIds(original, undefined)).toEqual([]);
+    });
+
+    it('returns nothing when everybody stays', () => {
+      expect(service.collectRemovedParticipantIds(original, original)).toEqual([]);
+    });
+
+    it('returns the ids that disappeared from the list', () => {
+      const next: EventParticipant[] = [{ type: 'user', id: 'u-1' }];
+
+      expect(service.collectRemovedParticipantIds(original, next)).toEqual(['g1']);
+    });
+
+    it('never reports the pot, which owns no attendances', () => {
+      const next: EventParticipant[] = [{ type: 'user', id: 'u-1' }];
+
+      expect(service.collectRemovedParticipantIds([{ type: 'pot', id: '0' }, ...original], next)).not.toContain('0');
     });
   });
 });
