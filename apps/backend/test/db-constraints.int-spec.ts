@@ -103,4 +103,29 @@ describe('Foreign key constraints (integration)', () => {
     // The count is what makes dropping a relation fail here rather than pass unnoticed.
     expect(foreignKeys).toHaveLength(3);
   });
+
+  // The calendar is a three-level chain, and every link cascades: deleting an event has to take its
+  // days, their sittings and every attendance on them with it. A link that stopped cascading would
+  // leave rows nothing can reach and nothing can delete.
+  it('cascades the calendar all the way down from the event', async () => {
+    const dayForeignKeys = await foreignKeysFor('event_calendar_days');
+    const eventFk = on(dayForeignKeys, 'event_id');
+    expect(eventFk?.name).toBe('fk_event_calendar_days_event_id');
+    expect(eventFk?.definition).toMatch(/REFERENCES "?events"?\("?id"?\) ON DELETE CASCADE/);
+    expect(dayForeignKeys).toHaveLength(1);
+
+    const mealForeignKeys = await foreignKeysFor('event_calendar_meals');
+    const dayFk = on(mealForeignKeys, 'day_id');
+    expect(dayFk?.name).toBe('fk_event_calendar_meals_day_id');
+    expect(dayFk?.definition).toMatch(/REFERENCES "?event_calendar_days"?\("?id"?\) ON DELETE CASCADE/);
+    expect(mealForeignKeys).toHaveLength(1);
+
+    // participant_id carries no foreign key on purpose: it holds either a user uuid or a guest id, and
+    // guest ids live only inside the event's JSONB participants, so there is no table to point at.
+    const attendanceForeignKeys = await foreignKeysFor('event_calendar_attendances');
+    const mealFk = on(attendanceForeignKeys, 'meal_id');
+    expect(mealFk?.name).toBe('fk_event_calendar_attendances_meal_id');
+    expect(mealFk?.definition).toMatch(/REFERENCES "?event_calendar_meals"?\("?id"?\) ON DELETE CASCADE/);
+    expect(attendanceForeignKeys).toHaveLength(1);
+  });
 });
