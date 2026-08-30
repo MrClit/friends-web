@@ -1,0 +1,59 @@
+{
+  "slots": {
+    "lunch": "Lunch",
+    "dinner": "Dinner"
+  },
+  "dayCount_one": "{{count}} day",
+  "dayCount_other": "{{count}} days",
+  "configureDays": "Configure days",
+  "configureDaysAria": "Configure the calendar days",
+  "empty": {
+    "title": "No days in the calendar yet",
+    "message": "Add the days of the event to start signing people up for each lunch and dinner.",
+    "action": "Add days"
+  },
+  "grid": {
+    "participant": "Participant",
+    "total": "Total",
+    "adultsShort": "A",
+    "childrenShort": "C",
+    "adultsLong": "Adults",
+    "childrenLong": "Children",
+    "legend": "A = Adults · C = Children",
+    "adultsAria": "Adults for {{participant}} at {{slot}} on {{date}}",
+    "childrenAria": "Children for {{participant}} at {{slot}} on {{date}}",
+    "noPlan": "No plan",
+    "summary": "{{adults}} Adults · {{children}} Children"
+  },
+  "daysModal": {
+    "title": "Configure days",
+    "close": "Close",
+    "addTitle": "Add days",
+    "rangeFrom": "From",
+    "rangeTo": "To",
+    "addRange": "Add range",
+    "singleDate": "Single day",
+    "addSingle": "Add day",
+    "invalidRange": "Check the dates: the start must be on or before the end.",
+    "tooManyDays": "A range cannot be longer than {{count}} days.",
+    "existingTitle": "Calendar days",
+    "noDays": "No days yet.",
+    "dayDescriptionLabel": "Day description",
+    "dayDescriptionPlaceholder": "e.g. Costume party",
+    "mealDescriptionLabel": "{{slot}} plan",
+    "mealDescriptionPlaceholder": "e.g. Paella, or dinner at the restaurant",
+    "deleteDay": "Delete day",
+    "deleteDayAria": "Delete the day {{date}}"
+  },
+  "deleteDayDialog": {
+    "title": "Delete this day?",
+    "message": "This deletes {{date}} and every attendance recorded on its lunch and dinner. This cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "add_days_error": "The days could not be added",
+  "update_day_error": "The day description could not be saved",
+  "delete_day_error": "The day could not be deleted",
+  "update_meal_error": "The plan could not be saved",
+  "attendance_error": "The attendance could not be saved"
+}

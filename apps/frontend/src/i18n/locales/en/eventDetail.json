@@ -17,7 +17,8 @@
   "tabs": {
     "ariaLabel": "Event sections",
     "money": "Money",
-    "shopping": "Shopping"
+    "shopping": "Shopping",
+    "calendar": "Calendar"
   },
   "addTransaction": "Add Transaction",
   "deleteTitle": "Delete event?",

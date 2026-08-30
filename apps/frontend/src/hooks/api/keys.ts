@@ -74,6 +74,20 @@ export const queryKeys = {
     byEvent: (eventId: string) => ['shopping-items', 'event', eventId] as const,
   },
 
+  calendar: {
+    /**
+     * Key for all calendar queries
+     */
+    all: ['calendar'] as const,
+
+    /**
+     * Key for the meal calendar of an event. Doubles as the mutation key of every calendar mutation,
+     * so an optimistic attendance write can tell whether it is the last one still in flight.
+     * @param eventId - Event ID
+     */
+    byEvent: (eventId: string) => ['calendar', 'event', eventId] as const,
+  },
+
   users: {
     all: ['users'] as const,
   },
