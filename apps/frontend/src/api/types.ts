@@ -4,7 +4,7 @@
  */
 
 // ============= Shared types (single source of truth) =============
-import { EventStatus, PaymentType } from '@friends/shared-types';
+import { EventStatus, PaymentType, MealSlot, MEAL_SLOTS } from '@friends/shared-types';
 import type {
   EventParticipant as EventParticipantDto,
   UserParticipant,
@@ -12,7 +12,7 @@ import type {
   PotParticipant,
 } from '@friends/shared-types';
 
-export { EventStatus, PaymentType };
+export { EventStatus, PaymentType, MealSlot, MEAL_SLOTS };
 export type { EventParticipantDto, UserParticipant, GuestParticipant, PotParticipant };
 
 // ============= Event Types =============
@@ -107,6 +107,78 @@ export interface CreateShoppingItemDto {
 export interface UpdateShoppingItemDto {
   name?: string;
   purchased?: boolean;
+}
+
+// ============= Calendar Types =============
+
+/**
+ * How many people one participant brings to one sitting.
+ *
+ * Rows are sparse: a cell nobody filled in has no row at all and reads as zero. The count is split
+ * because a row can stand for a whole family, and the split changes what the meal has to cater for.
+ */
+export interface CalendarAttendance {
+  id: string;
+  mealId: string;
+  /** A user's uuid or a guest's id. Never the pot, which does not eat. */
+  participantId: string;
+  adults: number;
+  children: number;
+}
+
+/** One sitting of one day. Every day is created with the full set of MEAL_SLOTS. */
+export interface CalendarMeal {
+  id: string;
+  dayId: string;
+  slot: MealSlot;
+  /** The plan for this sitting ('Paella'), as opposed to what the day is about. */
+  description: string | null;
+  attendances: CalendarAttendance[];
+}
+
+export interface CalendarDay {
+  id: string;
+  eventId: string;
+  /** Calendar day in YYYY-MM-DD, never an instant. */
+  date: string;
+  /** What the day is about ('BAILE DE DISFRACES'). */
+  description: string | null;
+  /** Already ordered by the API following MEAL_SLOTS, so Lunch comes before Dinner. */
+  meals: CalendarMeal[];
+}
+
+/**
+ * A range is expanded by the client into individual days. The API ignores dates the event already has,
+ * so an overlapping range is safe to send.
+ */
+export interface CreateCalendarDaysDto {
+  dates: string[];
+  description?: string;
+}
+
+/** Null clears the description, an absent property leaves it alone. */
+export interface UpdateCalendarDayDto {
+  description?: string | null;
+}
+
+export interface UpdateCalendarMealDto {
+  description?: string | null;
+}
+
+export interface SetAttendanceDto {
+  participantId: string;
+  adults: number;
+  children: number;
+}
+
+/**
+ * The state of one cell after a write. Returned whether the row was created, updated or deleted, so
+ * setting a cell back to zero answers with zeros rather than an empty body.
+ */
+export interface AttendanceCell {
+  participantId: string;
+  adults: number;
+  children: number;
 }
 
 // ============= Pagination Types =============

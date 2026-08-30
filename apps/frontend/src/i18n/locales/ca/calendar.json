@@ -1,0 +1,59 @@
+{
+  "slots": {
+    "lunch": "Dinar",
+    "dinner": "Sopar"
+  },
+  "dayCount_one": "{{count}} dia",
+  "dayCount_other": "{{count}} dies",
+  "configureDays": "Configurar dies",
+  "configureDaysAria": "Configurar els dies del calendari",
+  "empty": {
+    "title": "Encara no hi ha dies al calendari",
+    "message": "Afegeix els dies de l'esdeveniment per començar a apuntar qui ve a cada dinar i sopar.",
+    "action": "Afegir dies"
+  },
+  "grid": {
+    "participant": "Participant",
+    "total": "Total",
+    "adultsShort": "A",
+    "childrenShort": "N",
+    "adultsLong": "Adults",
+    "childrenLong": "Nens",
+    "legend": "A = Adults · N = Nens",
+    "adultsAria": "Adults de {{participant}} al {{slot}} del {{date}}",
+    "childrenAria": "Nens de {{participant}} al {{slot}} del {{date}}",
+    "noPlan": "Sense pla",
+    "summary": "{{adults}} Adults · {{children}} Nens"
+  },
+  "daysModal": {
+    "title": "Configurar dies",
+    "close": "Tancar",
+    "addTitle": "Afegir dies",
+    "rangeFrom": "Des de",
+    "rangeTo": "Fins a",
+    "addRange": "Afegir interval",
+    "singleDate": "Dia solt",
+    "addSingle": "Afegir dia",
+    "invalidRange": "Revisa les dates: la d'inici ha de ser anterior o igual a la de fi.",
+    "tooManyDays": "Un interval no pot tenir més de {{count}} dies.",
+    "existingTitle": "Dies del calendari",
+    "noDays": "Encara no hi ha dies.",
+    "dayDescriptionLabel": "Descripció del dia",
+    "dayDescriptionPlaceholder": "Ex. Ball de disfresses",
+    "mealDescriptionLabel": "Pla del {{slot}}",
+    "mealDescriptionPlaceholder": "Ex. Paella, o sopar al restaurant",
+    "deleteDay": "Esborrar dia",
+    "deleteDayAria": "Esborrar el dia {{date}}"
+  },
+  "deleteDayDialog": {
+    "title": "Vols esborrar aquest dia?",
+    "message": "S'esborrarà el {{date}} i totes les assistències apuntades als seus dinars i sopars. Aquesta acció no es pot desfer.",
+    "confirm": "Esborrar",
+    "cancel": "Cancel·lar"
+  },
+  "add_days_error": "No s'han pogut afegir els dies",
+  "update_day_error": "No s'ha pogut desar la descripció del dia",
+  "delete_day_error": "No s'ha pogut esborrar el dia",
+  "update_meal_error": "No s'ha pogut desar el pla",
+  "attendance_error": "No s'han pogut desar els assistents"
+}
