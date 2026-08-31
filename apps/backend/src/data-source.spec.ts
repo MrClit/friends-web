@@ -69,4 +69,23 @@ describe('migration DataSource', () => {
 
     expect(() => importDataSource()).toThrow(/Missing database configuration/);
   });
+
+  // `.env.production` holds the deployment's real credentials, so reading it from a laptop means
+  // connecting to the live database. A NODE_ENV left exported in a shell must not be enough to migrate
+  // production. This spec runs from source (.ts), which is exactly the CLI path being refused;
+  // production runs the compiled file and never reaches it.
+  describe('with NODE_ENV=production', () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'production';
+    });
+
+    it('refuses to run the TypeScript CLI against production', () => {
+      expect(() => importDataSource()).toThrow(/Refusing to run the TypeScript migration CLI/);
+    });
+
+    it('aborts before loading the file, so the credentials never reach the process', () => {
+      expect(() => importDataSource()).toThrow();
+      expect(loadEnvMock).not.toHaveBeenCalled();
+    });
+  });
 });
