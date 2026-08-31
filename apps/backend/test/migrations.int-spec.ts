@@ -1,6 +1,6 @@
 import { config as loadEnv } from 'dotenv';
-import { join } from 'node:path';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { envFilePath } from '../src/config/env-file';
 import { ENTITY_GLOB, MIGRATION_GLOB } from '../src/config/typeorm-paths';
 import { EXPECTED_INDEXES, readIndexNamesByTable } from './utils/expected-indexes';
 
@@ -39,8 +39,9 @@ import { EXPECTED_INDEXES, readIndexNamesByTable } from './utils/expected-indexe
 
 // This suite does not boot AppModule, which is what normally loads `.env.test`, and none of the jest
 // configs declare setupFiles — so the env has to be loaded here. No `override`: whatever CI already
-// exported wins.
-loadEnv({ path: join(__dirname, '..', `.env.${process.env.NODE_ENV ?? 'test'}`), quiet: true });
+// exported wins. The file is named by the same helper the application and the migration CLI use, with
+// `test` as the fallback because that is the only environment this suite belongs to.
+loadEnv({ path: envFilePath(process.env.NODE_ENV ?? 'test'), quiet: true });
 
 const DATABASE_NAME = process.env.DATABASE_NAME ?? 'friends_db_test';
 
