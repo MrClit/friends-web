@@ -5,6 +5,34 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-09-01
+
+The meal calendar lands: every event gets days, sittings and per-participant attendance counts, planned
+from a new Calendar section of the event hub. Includes a database migration,
+`1706200000000-CreateEventCalendarTables`, that creates three tables (`event_calendar_days`,
+`event_calendar_meals`, `event_calendar_attendances`); it is purely additive — it touches no existing
+table, column or row, and its `down()` drops the three again — and applies automatically on the
+backend's boot once this release deploys. **No new environment variables**, so there is nothing to
+change in the Render dashboard before deploying.
+
+### Added
+
+- Meal calendar API: days, meals and attendances, with the endpoints to configure an event's calendar
+  and to record per-participant attendance counts. Closes [#172].
+- Calendar section at `/event/:id/calendar` — attendance planning grid on desktop, collapsible day
+  cards on mobile, optimistic per-cell saves and the day-range/single-day setup modal. Closes [#173],
+  and with it the meal calendar feature as a whole. Closes [#136].
+
+### Fixed
+
+- `PUT` added to the CORS allowed methods. Without it the attendance endpoint's preflight failed, and a
+  failed preflight reaches the browser as a bare network error rather than an HTTP status, so it looked
+  like the server was down instead of misconfigured.
+- The migration DataSource loads `.env.${NODE_ENV}` the way the app does, so `pnpm migration:run` works
+  on a developer machine instead of dying with pg's SASL error. Closes [#149].
+- The TypeScript migration CLI refuses to run under `NODE_ENV=production`: a stray exported variable
+  can no longer point a laptop's `pnpm migration:run` at the production database. Closes [#177].
+
 ## [0.4.0] - 2026-08-29
 
 Default-behavior tweak for new transactions plus consolidation work: the KPI drill-down unified under
@@ -247,6 +275,12 @@ JWT secret validation. No product features and no database migrations.
 
 - Outdated GitHub Actions workflows: `backend-tests.yml` and `release-to-prod.yml`.
 
+[#136]: https://github.com/MrClit/friends-web/issues/136
+[#149]: https://github.com/MrClit/friends-web/issues/149
+[#172]: https://github.com/MrClit/friends-web/issues/172
+[#173]: https://github.com/MrClit/friends-web/issues/173
+[#177]: https://github.com/MrClit/friends-web/issues/177
+
 [#144]: https://github.com/MrClit/friends-web/issues/144
 [#154]: https://github.com/MrClit/friends-web/issues/154
 [#150]: https://github.com/MrClit/friends-web/issues/150
@@ -278,6 +312,7 @@ JWT secret validation. No product features and no database migrations.
 [#111]: https://github.com/MrClit/friends-web/issues/111
 [#112]: https://github.com/MrClit/friends-web/issues/112
 
+[0.5.0]: https://github.com/MrClit/friends-web/releases/tag/v0.5.0
 [0.4.0]: https://github.com/MrClit/friends-web/releases/tag/v0.4.0
 [0.3.0]: https://github.com/MrClit/friends-web/releases/tag/v0.3.0
 [0.2.0]: https://github.com/MrClit/friends-web/releases/tag/v0.2.0
