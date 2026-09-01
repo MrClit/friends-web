@@ -6,6 +6,7 @@ export const NAMESPACES = [
   'eventDetail',
   'transactions',
   'shopping',
+  'calendar',
   'kpiDetail',
   'adminUsers',
   'profile',

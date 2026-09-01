@@ -158,7 +158,15 @@ export class EventsService {
 
       const cleanUpdate = this.buildCleanEventUpdate(updateEventDto, normalizedParticipants);
 
-      if (participantReplacements.length > 0) {
+      // A replaced guest also disappears from the participants list, but its seats are migrated rather
+      // than dropped, so it must not be treated as a removal too. Excluded here instead of relying on
+      // the two operations running in the right order.
+      const replacedGuestIds = new Set(participantReplacements.map((replacement) => replacement.fromGuestId));
+      const removedParticipantIds = this.eventParticipantsService
+        .collectRemovedParticipantIds(event.participants ?? [], normalizedParticipants)
+        .filter((participantId) => !replacedGuestIds.has(participantId));
+
+      if (participantReplacements.length > 0 || removedParticipantIds.length > 0) {
         const savedEvent = await this.eventRepository.manager.transaction(async (manager) => {
           const transactionalEventRepository = manager.getRepository(Event);
           const eventToUpdate = await transactionalEventRepository.findOne({ where: { id } });
@@ -173,12 +181,15 @@ export class EventsService {
           const transactionSavedEvent = await transactionalEventRepository.save(updatedEvent);
 
           await this.eventParticipantsService.applyParticipantReplacements(manager, id, participantReplacements);
+          await this.eventParticipantsService.applyParticipantRemovals(manager, id, removedParticipantIds);
 
           return transactionSavedEvent;
         });
 
         await this.eventQueryService.calculateLastModified(savedEvent);
-        this.logger.log(`Event ${id} updated successfully with ${participantReplacements.length} replacements`);
+        this.logger.log(
+          `Event ${id} updated successfully with ${participantReplacements.length} replacements and ${removedParticipantIds.length} removals`,
+        );
         return savedEvent;
       }
 

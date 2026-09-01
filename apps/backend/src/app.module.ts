@@ -12,11 +12,13 @@ import { getDatabaseConfig } from './config/database.config';
 import { EventsModule } from './modules/events/events.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ShoppingListModule } from './modules/shopping-list/shopping-list.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { envValidationSchema } from './config/env.validation';
+import { envFilePath } from './config/env-file';
 import { CorrelationMiddleware } from './common/middleware/correlation.middleware';
 import { RequestContextModule } from './common/request-context/request-context.module';
 
@@ -48,7 +50,7 @@ import { RequestContextModule } from './common/request-context/request-context.m
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+      envFilePath: envFilePath(),
       cache: true,
       validationSchema: envValidationSchema,
       validationOptions: { abortEarly: false },
@@ -65,6 +67,7 @@ import { RequestContextModule } from './common/request-context/request-context.m
     EventsModule,
     TransactionsModule,
     ShoppingListModule,
+    CalendarModule,
     UsersModule,
     AuthModule,
     AdminModule,

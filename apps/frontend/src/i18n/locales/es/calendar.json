@@ -1,0 +1,59 @@
+{
+  "slots": {
+    "lunch": "Comida",
+    "dinner": "Cena"
+  },
+  "dayCount_one": "{{count}} día",
+  "dayCount_other": "{{count}} días",
+  "configureDays": "Configurar días",
+  "configureDaysAria": "Configurar los días del calendario",
+  "empty": {
+    "title": "Aún no hay días en el calendario",
+    "message": "Añade los días del evento para empezar a apuntar quién viene a cada comida y cena.",
+    "action": "Añadir días"
+  },
+  "grid": {
+    "participant": "Participante",
+    "total": "Total",
+    "adultsShort": "A",
+    "childrenShort": "N",
+    "adultsLong": "Adultos",
+    "childrenLong": "Niños",
+    "legend": "A = Adultos · N = Niños",
+    "adultsAria": "Adultos de {{participant}} en {{slot}} del {{date}}",
+    "childrenAria": "Niños de {{participant}} en {{slot}} del {{date}}",
+    "noPlan": "Sin plan",
+    "summary": "{{adults}} Adultos · {{children}} Niños"
+  },
+  "daysModal": {
+    "title": "Configurar días",
+    "close": "Cerrar",
+    "addTitle": "Añadir días",
+    "rangeFrom": "Desde",
+    "rangeTo": "Hasta",
+    "addRange": "Añadir rango",
+    "singleDate": "Día suelto",
+    "addSingle": "Añadir día",
+    "invalidRange": "Revisa las fechas: la de inicio tiene que ser anterior o igual a la de fin.",
+    "tooManyDays": "Un rango no puede tener más de {{count}} días.",
+    "existingTitle": "Días del calendario",
+    "noDays": "Todavía no hay días.",
+    "dayDescriptionLabel": "Descripción del día",
+    "dayDescriptionPlaceholder": "Ej. Baile de disfraces",
+    "mealDescriptionLabel": "Plan de {{slot}}",
+    "mealDescriptionPlaceholder": "Ej. Paella, o cena en el restaurante",
+    "deleteDay": "Borrar día",
+    "deleteDayAria": "Borrar el día {{date}}"
+  },
+  "deleteDayDialog": {
+    "title": "¿Borrar este día?",
+    "message": "Se borrará el {{date}} y todas las asistencias apuntadas en sus comidas y cenas. Esta acción no se puede deshacer.",
+    "confirm": "Borrar",
+    "cancel": "Cancelar"
+  },
+  "add_days_error": "No se han podido añadir los días",
+  "update_day_error": "No se ha podido guardar la descripción del día",
+  "delete_day_error": "No se ha podido borrar el día",
+  "update_meal_error": "No se ha podido guardar el plan",
+  "attendance_error": "No se han podido guardar los asistentes"
+}

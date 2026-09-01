@@ -5,6 +5,8 @@ import { Event, EventParticipant, UserParticipant, GuestParticipant } from '../e
 import { User } from '../../users/user.entity';
 import { ParticipantReplacementDto } from '../dto/participant-replacement.dto';
 import { Transaction } from '../../transactions/entities/transaction.entity';
+import { CalendarMeal } from '../../calendar/entities/calendar-meal.entity';
+import { CalendarAttendance } from '../../calendar/entities/calendar-attendance.entity';
 
 @Injectable()
 export class EventParticipantsService {
@@ -232,7 +234,7 @@ export class EventParticipantsService {
   }
 
   /**
-   * Bulk-update transaction participant_id for each guest→user replacement.
+   * Bulk-update transaction and calendar attendance participant_id for each guest→user replacement.
    * Must be called inside an active TypeORM EntityManager transaction.
    */
   async applyParticipantReplacements(
@@ -243,6 +245,8 @@ export class EventParticipantsService {
     if (participantReplacements.length === 0) return;
 
     const transactionRepository = manager.getRepository(Transaction);
+    const attendanceRepository = manager.getRepository(CalendarAttendance);
+    const mealIds = await this.findMealIdsOfEvent(manager, eventId);
 
     for (const replacement of participantReplacements) {
       const result = await transactionRepository
@@ -256,6 +260,77 @@ export class EventParticipantsService {
       this.logger.log(
         `Migrated ${result.affected ?? 0} transactions from guest ${replacement.fromGuestId} to user ${replacement.toUserId} in event ${eventId}`,
       );
+
+      // The guest's seats move with them. No unique violation is possible here: the destination user is
+      // rejected upfront if it already participates, so it cannot own a row on any of these meals.
+      if (mealIds.length > 0) {
+        const attendanceResult = await attendanceRepository.update(
+          { mealId: In(mealIds), participantId: replacement.fromGuestId },
+          { participantId: replacement.toUserId },
+        );
+
+        this.logger.log(
+          `Migrated ${attendanceResult.affected ?? 0} calendar attendances from guest ${replacement.fromGuestId} to user ${replacement.toUserId} in event ${eventId}`,
+        );
+      }
     }
+  }
+
+  /**
+   * Delete the calendar attendances of participants that are no longer in the event.
+   * Must be called inside an active TypeORM EntityManager transaction.
+   *
+   * Attendances are removed while transactions are kept, and the asymmetry is deliberate: a transaction
+   * records money that already moved, whereas a future seat held by someone who is no longer coming
+   * records nothing at all, and would keep inflating the totals of every meal.
+   */
+  async applyParticipantRemovals(
+    manager: EntityManager,
+    eventId: string,
+    removedParticipantIds: string[],
+  ): Promise<void> {
+    if (removedParticipantIds.length === 0) return;
+
+    const mealIds = await this.findMealIdsOfEvent(manager, eventId);
+    if (mealIds.length === 0) return;
+
+    const result = await manager
+      .getRepository(CalendarAttendance)
+      .delete({ mealId: In(mealIds), participantId: In(removedParticipantIds) });
+
+    this.logger.log(
+      `Deleted ${result.affected ?? 0} calendar attendances of ${removedParticipantIds.length} removed participants in event ${eventId}`,
+    );
+  }
+
+  /**
+   * Which participant ids the update drops. Comparing the two arrays is the only way to know: the
+   * participants column is replaced wholesale on every update, there is no per-participant endpoint.
+   */
+  collectRemovedParticipantIds(
+    originalParticipants: EventParticipant[],
+    nextParticipants: EventParticipant[] | undefined,
+  ): string[] {
+    if (!nextParticipants) return [];
+
+    const remainingIds = new Set(nextParticipants.map((p) => p.id));
+
+    return originalParticipants.filter((p) => p.type !== 'pot' && !remainingIds.has(p.id)).map((p) => p.id);
+  }
+
+  /**
+   * The meals of an event, reached through its days. Attendances hang off meals, so scoping any of the
+   * bulk operations above to one event has to go through this list.
+   */
+  private async findMealIdsOfEvent(manager: EntityManager, eventId: string): Promise<string[]> {
+    const rows = await manager
+      .getRepository(CalendarMeal)
+      .createQueryBuilder('meal')
+      .innerJoin('meal.day', 'day')
+      .select('meal.id', 'id')
+      .where('day.event_id = :eventId', { eventId })
+      .getRawMany<{ id: string }>();
+
+    return rows.map((row) => row.id);
   }
 }

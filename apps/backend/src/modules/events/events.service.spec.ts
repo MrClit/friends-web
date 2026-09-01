@@ -44,6 +44,8 @@ describe('EventsService', () => {
     normalizeParticipants: jest.Mock;
     validateParticipantReplacements: jest.Mock;
     applyParticipantReplacements: jest.Mock;
+    applyParticipantRemovals: jest.Mock;
+    collectRemovedParticipantIds: jest.Mock;
   };
   let mockEventKPIsService: { getKPIs: jest.Mock };
 
@@ -122,6 +124,8 @@ describe('EventsService', () => {
       normalizeParticipants: jest.fn().mockImplementation((raw: unknown) => raw as EventParticipant[]),
       validateParticipantReplacements: jest.fn().mockReturnValue([]),
       applyParticipantReplacements: jest.fn().mockResolvedValue(undefined),
+      applyParticipantRemovals: jest.fn().mockResolvedValue(undefined),
+      collectRemovedParticipantIds: jest.fn().mockReturnValue([]),
     };
 
     mockEventKPIsService = {
@@ -337,6 +341,59 @@ describe('EventsService', () => {
         [{ fromGuestId: 'g1', toUserId: 'new-user-id' }],
       );
       expect(result).toEqual(updatedEvent);
+    });
+
+    it('deletes the calendar attendances of a participant dropped from the event', async () => {
+      const updateDto: UpdateEventDto = {
+        participants: [{ type: 'user', id: memberActor.id }],
+      };
+
+      const updatedEvent = { ...mockEvent, participants: updateDto.participants } as Event;
+
+      mockTransactionalEventRepository.findOne.mockResolvedValue(mockEvent);
+      mockTransactionalEventRepository.merge.mockReturnValue(updatedEvent);
+      mockTransactionalEventRepository.save.mockResolvedValue(updatedEvent);
+      mockEventParticipantsService.collectRemovedParticipantIds.mockReturnValue(['g1']);
+
+      const result = await service.update(mockEvent.id, updateDto, adminActor);
+
+      // Dropping a participant is enough to open the transaction, with no replacement involved.
+      expect(mockRepository.manager.transaction).toHaveBeenCalledTimes(1);
+      expect(mockEventParticipantsService.applyParticipantRemovals).toHaveBeenCalledWith(
+        expect.anything(),
+        mockEvent.id,
+        ['g1'],
+      );
+      expect(result).toEqual(updatedEvent);
+    });
+
+    it('does not treat a replaced guest as a removal, so its attendances are migrated and not deleted', async () => {
+      const updateDto: UpdateEventDto = {
+        participants: [
+          { type: 'user', id: memberActor.id },
+          { type: 'user', id: 'new-user-id' },
+        ],
+        participantReplacements: [{ fromGuestId: 'g1', toUserId: 'new-user-id' }],
+      };
+
+      const updatedEvent = { ...mockEvent, participants: updateDto.participants } as Event;
+
+      mockTransactionalEventRepository.findOne.mockResolvedValue(mockEvent);
+      mockTransactionalEventRepository.merge.mockReturnValue(updatedEvent);
+      mockTransactionalEventRepository.save.mockResolvedValue(updatedEvent);
+      mockEventParticipantsService.validateParticipantReplacements.mockReturnValue([
+        { fromGuestId: 'g1', toUserId: 'new-user-id' },
+      ]);
+      // The guest does leave the participants list, so the raw diff reports it.
+      mockEventParticipantsService.collectRemovedParticipantIds.mockReturnValue(['g1']);
+
+      await service.update(mockEvent.id, updateDto, adminActor);
+
+      expect(mockEventParticipantsService.applyParticipantRemovals).toHaveBeenCalledWith(
+        expect.anything(),
+        mockEvent.id,
+        [],
+      );
     });
 
     it('throws BadRequestException when replacement target user already participates', async () => {

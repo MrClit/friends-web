@@ -16,10 +16,16 @@ async function bootstrap() {
   const corsOrigin = configService.get<string>('CORS_ORIGIN') || 'http://localhost:5173';
 
   // CORS Configuration
+  //
+  // This list has to name every verb the controllers expose. Anything not on it fails at the preflight,
+  // which reaches the browser as a bare network error rather than an HTTP status, so it looks like the
+  // server is down instead of like a misconfiguration. Nothing catches a mismatch for us either: CORS
+  // lives here and not in configureApp(), so the e2e suite never exercises it, and supertest issues no
+  // preflight anyway.
   app.enableCors({
     origin: corsOrigin,
     credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
@@ -37,6 +43,9 @@ async function bootstrap() {
     .addTag('Transactions', 'Individual transaction operations')
     .addTag('Event Shopping Items', 'Shopping list endpoints under events')
     .addTag('Shopping Items', 'Individual shopping item operations')
+    .addTag('Event Calendar', 'Meal calendar endpoints under events')
+    .addTag('Calendar Days', 'Individual calendar day operations')
+    .addTag('Calendar Meals', 'Lunch and dinner operations, including attendance')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

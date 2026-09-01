@@ -17,6 +17,7 @@ cp admin-users.http.example admin-users.http
 cp events.http.example events.http
 cp transactions.http.example transactions.http
 cp users.http.example users.http
+cp calendar.http.example calendar.http
 ```
 
 **2. Get Your JWT Token:**
@@ -99,5 +100,6 @@ git commit -m "docs(backend): add new auth endpoint example"
 - `*.http` - Your local files with real tokens (gitignored)
 - `*.http.example` - Template files without sensitive data (committed)
 - `admin-users.http.example` - Admin user management endpoints (`/api/admin/users`)
+- `calendar.http.example` - Meal calendar: days, sittings and attendance (`/api/events/:id/calendar`, `/api/calendar-days`, `/api/calendar-meals`)
 - `_common.http` - Shared variables and health check (safe to commit)
 - `README.md` - This file (committed)

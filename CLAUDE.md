@@ -93,7 +93,7 @@ src/i18n/locales/         es/ (default), en/, ca/
 src/config/env.ts         Validated env vars via VITE_ prefix
 ```
 
-Features: `events`, `transactions`, `kpi`, `auth`, `admin-users`, `profile`
+Features: `events`, `transactions`, `kpi`, `shopping`, `calendar`, `auth`, `admin-users`, `profile`
 
 ### State management layers
 
@@ -131,7 +131,9 @@ redirect has to land inside the hash router. Every route below is lazy-loaded in
 
 - `/login`, `/auth/callback` — OAuth flow
 - `/` — Home (event list, protected)
-- `/event/:id` — Event detail (protected)
+- `/event/:id` — Event hub, money section (protected)
+- `/event/:id/shopping` — Shopping list section (protected)
+- `/event/:id/calendar` — Meal calendar and attendance planning (protected)
 - `/event/:id/kpi/:kpi` — KPI drill-down (protected)
 - `/profile` — User profile (protected)
 - `/settings` → redirects to `/profile` (protected alias)
@@ -166,7 +168,7 @@ src/config/                 database.config.ts, app.config.ts, env.validation.ts
 src/migrations/             TypeORM migration files
 ```
 
-Modules: `auth`, `events`, `transactions`, `users`, `admin`, `event-access`
+Modules: `auth`, `events`, `transactions`, `shopping-list`, `calendar`, `users`, `admin`, `event-access`
 
 A module that grows past one service splits into `{module}/services/` (see `events/services/`,
 `transactions/services/`) rather than fattening the root service.

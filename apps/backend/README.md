@@ -312,6 +312,9 @@ pnpm start:prod:migrate
 Notes:
 
 - `migration:run` and `migration:revert` remain available as compatibility aliases to `:local`.
+- The local commands read `.env.${NODE_ENV}` — `.env.development` unless you set it — which is the same
+  file the app boots with, so they always target the database the dev server is using. To point them at
+  another environment, prefix the variable: `NODE_ENV=test pnpm migration:run`.
 - In production keep `TYPEORM_SYNC=false` and apply schema changes only through versioned migrations.
 - Migrations are smoke-tested on every PR by `test/migrations.int-spec.ts`, part of the integration
   suite: it applies all of them to an empty throwaway database, reverts the last one and re-applies it.
