@@ -111,7 +111,9 @@ function ShoppingItemRowBase({ item, onToggle, onRename, onRequestDelete }: Shop
           onClick={() => setIsEditing(true)}
           className={cn(
             'flex-1 min-w-0',
-            'px-2 py-1 text-left text-sm break-words',
+            // Tapping swaps this button for a same-sized input. The input is bumped to 16px on touch to
+            // keep iOS from zooming, so the button follows or the name jumps as the row enters editing.
+            'px-2 py-1 text-left text-sm touch:text-base break-words',
             'rounded-lg cursor-pointer',
             'hover:bg-emerald-50 dark:hover:bg-emerald-900',
             'focus:outline-none focus:ring-2 focus:ring-emerald-500',

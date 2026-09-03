@@ -16,8 +16,12 @@ interface AddDaysFormProps {
 const fieldClasses = cn(
   'w-full h-10 px-3',
   // A date input on iOS claims more width than it is given, and more still now that touch devices render
-  // it at 16px. Two of these share a row from `sm` up, so pin the box to its container.
-  'min-w-0 max-w-full box-border ios-date-input-fix',
+  // it at 16px. Two of these share a row from `sm` up, so pin the box to its container. The class carries
+  // the full width guard (width, max-width, min-width, box-sizing) and is unlayered, so repeating any of
+  // it as a utility here would be dead weight — the utility could never win. Capping the field is only
+  // half of it: each wrapper below carries `min-w-0` too, or the flex item's auto minimum lets the row
+  // stretch anyway. TransactionForm does the same on both sides.
+  'ios-date-input-fix',
   'text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100',
   'border border-slate-300 dark:border-slate-700 rounded-lg',
   'focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
@@ -85,7 +89,7 @@ export function AddDaysForm({ disabled, onAddDays }: AddDaysFormProps) {
       <h3 className="mb-2 text-sm font-semibold text-slate-800 dark:text-slate-100">{t('daysModal.addTitle')}</h3>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <label htmlFor="calendar-range-from" className={labelClasses}>
             {t('daysModal.rangeFrom')}
           </label>
@@ -97,7 +101,7 @@ export function AddDaysForm({ disabled, onAddDays }: AddDaysFormProps) {
             className={fieldClasses}
           />
         </div>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <label htmlFor="calendar-range-to" className={labelClasses}>
             {t('daysModal.rangeTo')}
           </label>
@@ -121,7 +125,7 @@ export function AddDaysForm({ disabled, onAddDays }: AddDaysFormProps) {
       ) : null}
 
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <label htmlFor="calendar-single-date" className={labelClasses}>
             {t('daysModal.singleDate')}
           </label>

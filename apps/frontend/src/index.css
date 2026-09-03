@@ -9,6 +9,13 @@ html {
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Touch devices, which is where the iOS 16px field rule below applies. Anything that has to grow in
+ * step with a field — the plain text an edit-in-place widget swaps a field for, a symbol sitting
+ * inside a field's box — carries `touch:text-base` so the two can never drift apart.
+ */
+@custom-variant touch (@media (hover: none) and (pointer: coarse));
+
 body {
   font-family: 'Inter', sans-serif;
   @apply font-sans;
@@ -52,6 +59,8 @@ body {
  * This block must stay outside every @layer: Tailwind utilities live in @layer utilities, and an
  * unlayered rule wins over them without needing !important. Move it into a layer and text-sm takes the
  * field back, silently.
+ *
+ * The condition is repeated by the `touch` variant above; the two have to stay in step.
  */
 @media (hover: none) and (pointer: coarse) {
   input:not([type='checkbox']):not([type='radio']):not([type='file']),

@@ -131,7 +131,9 @@ export const ParticipantRow = memo(function ParticipantRow({
               </div>
             ) : (
               <div className="min-w-0">
-                <p className="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">
+                {/* Renaming swaps this for an input, which is 16px on touch so iOS does not zoom in.
+                    Without the same bump here the name grows the moment the row enters editing. */}
+                <p className="truncate text-sm touch:text-base font-bold leading-tight text-slate-900 dark:text-white">
                   {participantName}
                 </p>
                 {participantEmail && (
@@ -255,7 +257,8 @@ export const ParticipantRow = memo(function ParticipantRow({
               />
               <span
                 aria-hidden
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400 dark:text-emerald-300/70"
+                // Sits inside the field's box, so it tracks the field's size rather than its own.
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm touch:text-base font-bold text-slate-400 dark:text-emerald-300/70"
               >
                 €
               </span>
