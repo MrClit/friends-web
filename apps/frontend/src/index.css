@@ -43,6 +43,24 @@ body {
   scrollbar-color: rgba(4, 120, 87, 0.45) transparent; /* emerald-700 at 45% */
 }
 
+/*
+ * iOS Safari zooms the page in whenever a focused field renders below 16px, and never zooms back out on
+ * blur — the app is left magnified until the user pinches. Fields are text-sm (14px) by design, so touch
+ * devices get 16px instead. Gated on the pointer rather than on a width: a phone in landscape is wider
+ * than the md breakpoint and Safari zooms there just the same.
+ *
+ * This block must stay outside every @layer: Tailwind utilities live in @layer utilities, and an
+ * unlayered rule wins over them without needing !important. Move it into a layer and text-sm takes the
+ * field back, silently.
+ */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+}
+
 /* iOS Safari can render date inputs with intrinsic width larger than containers. */
 .ios-date-input-fix {
   display: block;

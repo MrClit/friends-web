@@ -15,6 +15,9 @@ interface AddDaysFormProps {
 
 const fieldClasses = cn(
   'w-full h-10 px-3',
+  // A date input on iOS claims more width than it is given, and more still now that touch devices render
+  // it at 16px. Two of these share a row from `sm` up, so pin the box to its container.
+  'min-w-0 max-w-full box-border ios-date-input-fix',
   'text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100',
   'border border-slate-300 dark:border-slate-700 rounded-lg',
   'focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
