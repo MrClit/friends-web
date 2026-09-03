@@ -9,6 +9,13 @@ html {
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Touch devices, which is where the iOS 16px field rule below applies. Anything that has to grow in
+ * step with a field — the plain text an edit-in-place widget swaps a field for, a symbol sitting
+ * inside a field's box — carries `touch:text-base` so the two can never drift apart.
+ */
+@custom-variant touch (@media (hover: none) and (pointer: coarse));
+
 body {
   font-family: 'Inter', sans-serif;
   @apply font-sans;
@@ -41,6 +48,26 @@ body {
 }
 .dark .custom-scrollbar {
   scrollbar-color: rgba(4, 120, 87, 0.45) transparent; /* emerald-700 at 45% */
+}
+
+/*
+ * iOS Safari zooms the page in whenever a focused field renders below 16px, and never zooms back out on
+ * blur — the app is left magnified until the user pinches. Fields are text-sm (14px) by design, so touch
+ * devices get 16px instead. Gated on the pointer rather than on a width: a phone in landscape is wider
+ * than the md breakpoint and Safari zooms there just the same.
+ *
+ * This block must stay outside every @layer: Tailwind utilities live in @layer utilities, and an
+ * unlayered rule wins over them without needing !important. Move it into a layer and text-sm takes the
+ * field back, silently.
+ *
+ * The condition is repeated by the `touch` variant above; the two have to stay in step.
+ */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  select,
+  textarea {
+    font-size: 1rem;
+  }
 }
 
 /* iOS Safari can render date inputs with intrinsic width larger than containers. */

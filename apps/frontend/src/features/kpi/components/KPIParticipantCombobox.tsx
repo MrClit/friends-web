@@ -211,7 +211,7 @@ export function KPIParticipantCombobox({
               ref={searchInputRef}
               type="text"
               className={cn(
-                'w-full rounded-xl border px-3 py-2 text-base outline-none transition-colors sm:text-sm',
+                'w-full rounded-xl border px-3 py-2 text-sm outline-none transition-colors',
                 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400',
                 'focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30',
                 'dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500',
