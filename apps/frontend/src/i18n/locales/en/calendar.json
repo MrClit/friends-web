@@ -25,6 +25,10 @@
     "noPlan": "No plan",
     "summary": "{{adults}} Adults · {{children}} Children"
   },
+  "cards": {
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all"
+  },
   "daysModal": {
     "title": "Configure days",
     "close": "Close",

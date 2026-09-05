@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdCalendarMonth } from 'react-icons/md';
+import { MdCalendarMonth, MdUnfoldLess, MdUnfoldMore } from 'react-icons/md';
 import type { Event } from '@/features/events/types';
 import { ApiError } from '@/api/client';
 import {
@@ -33,6 +33,10 @@ export function CalendarPlanning({ event }: CalendarPlanningProps) {
   const { t } = useTranslation(['calendar', 'common']);
   const [isConfiguring, setIsConfiguring] = useState(false);
 
+  // The cards start collapsed, so this starts empty. It lives here rather than in DayCardList because the
+  // control that opens and closes every day belongs in this header, beside Configure days.
+  const [openDayIds, setOpenDayIds] = useState<string[]>([]);
+
   const { data, isLoading, error, refetch } = useEventCalendar(event.id);
   const addDays = useAddCalendarDays(event.id);
   const updateDay = useUpdateCalendarDay(event.id);
@@ -55,6 +59,13 @@ export function CalendarPlanning({ event }: CalendarPlanningProps) {
       setAttendance.mutate({ mealId, cell: { participantId, ...next } });
     },
     [setAttendance],
+  );
+
+  const allDaysOpen = days.length > 0 && days.every((day) => openDayIds.includes(day.id));
+
+  const handleToggleAllDays = useCallback(
+    () => setOpenDayIds(allDaysOpen ? [] : days.map((day) => day.id)),
+    [allDaysOpen, days],
   );
 
   const handleAddDays = useCallback((dates: string[]) => addDays.mutate({ dates }), [addDays]);
@@ -106,24 +117,55 @@ export function CalendarPlanning({ event }: CalendarPlanningProps) {
           ) : null}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsConfiguring(true)}
-          aria-label={t('configureDaysAria')}
-          className={cn(
-            'flex items-center gap-2 shrink-0',
-            'h-10 px-3',
-            'text-sm font-medium',
-            'bg-white dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300',
-            'border border-emerald-300 dark:border-emerald-800 rounded-xl shadow-sm',
-            'cursor-pointer transition-colors',
-            'hover:bg-emerald-50 dark:hover:bg-emerald-900',
-            'focus:outline-none focus:ring-2 focus:ring-emerald-500',
-          )}
-        >
-          <MdCalendarMonth className="text-lg" aria-hidden="true" />
-          {t('configureDays')}
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          {/* Expanding every card only means something where there are cards, so it rides with the mobile
+              tree. Icon only, with the label as its accessible name: the two arrows are the Material
+              idiom for expand-all, and each day header already carries its own chevron. No aria-expanded
+              — that belongs to a control owning a single panel. The ring is focus-visible so it answers
+              the keyboard and not a fingertip. */}
+          {days.length > 0 ? (
+            <button
+              type="button"
+              onClick={handleToggleAllDays}
+              aria-label={t(allDaysOpen ? 'cards.collapseAll' : 'cards.expandAll')}
+              title={t(allDaysOpen ? 'cards.collapseAll' : 'cards.expandAll')}
+              className={cn(
+                'md:hidden flex items-center justify-center shrink-0',
+                'h-10 w-10',
+                'text-emerald-700 dark:text-emerald-300',
+                'rounded-xl',
+                'cursor-pointer transition-colors',
+                'hover:bg-emerald-50 dark:hover:bg-emerald-900',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500',
+              )}
+            >
+              {allDaysOpen ? (
+                <MdUnfoldLess className="text-xl" aria-hidden="true" />
+              ) : (
+                <MdUnfoldMore className="text-xl" aria-hidden="true" />
+              )}
+            </button>
+          ) : null}
+
+          <button
+            type="button"
+            onClick={() => setIsConfiguring(true)}
+            aria-label={t('configureDaysAria')}
+            className={cn(
+              'flex items-center gap-2 shrink-0',
+              'h-10 px-3',
+              'text-sm font-medium',
+              'bg-white dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300',
+              'border border-emerald-300 dark:border-emerald-800 rounded-xl shadow-sm',
+              'cursor-pointer transition-colors',
+              'hover:bg-emerald-50 dark:hover:bg-emerald-900',
+              'focus:outline-none focus:ring-2 focus:ring-emerald-500',
+            )}
+          >
+            <MdCalendarMonth className="text-lg" aria-hidden="true" />
+            {t('configureDays')}
+          </button>
+        </div>
       </div>
 
       {days.length === 0 ? (
@@ -152,7 +194,14 @@ export function CalendarPlanning({ event }: CalendarPlanningProps) {
             totals={totals}
             onSetAttendance={handleSetAttendance}
           />
-          <DayCardList days={days} participants={participants} totals={totals} onSetAttendance={handleSetAttendance} />
+          <DayCardList
+            days={days}
+            participants={participants}
+            totals={totals}
+            openDays={openDayIds}
+            onOpenDaysChange={setOpenDayIds}
+            onSetAttendance={handleSetAttendance}
+          />
         </>
       )}
 
