@@ -25,6 +25,10 @@
     "noPlan": "Sin plan",
     "summary": "{{adults}} Adultos · {{children}} Niños"
   },
+  "cards": {
+    "expandAll": "Abrir todos",
+    "collapseAll": "Plegar todos"
+  },
   "daysModal": {
     "title": "Configurar días",
     "close": "Cerrar",

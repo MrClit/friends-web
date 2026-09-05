@@ -150,6 +150,41 @@ describe('CalendarPlanning', () => {
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
 
+  it('opens and collapses every mobile card from the header control', () => {
+    const twoDays: CalendarDay[] = [
+      ...makeCalendar(),
+      {
+        id: 'day-2',
+        eventId: 'event-1',
+        date: '2026-09-13',
+        description: null,
+        meals: [{ id: 'lunch-2', dayId: 'day-2', slot: MealSlot.LUNCH, description: null, attendances: [] }],
+      },
+    ];
+    givenCalendar(twoDays);
+
+    render(<CalendarPlanning event={mockEvent} />);
+
+    // Only the day headers carry aria-expanded: the toggle drives several panels, so it has none.
+    expect(screen.getAllByRole('button', { expanded: false })).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole('button', { name: 'cards.expandAll' }));
+
+    expect(screen.getAllByRole('button', { expanded: true })).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole('button', { name: 'cards.collapseAll' }));
+
+    expect(screen.getAllByRole('button', { expanded: false })).toHaveLength(2);
+  });
+
+  it('leaves the toggle out when there is no day to open', () => {
+    givenCalendar([]);
+
+    render(<CalendarPlanning event={mockEvent} />);
+
+    expect(screen.queryByRole('button', { name: 'cards.expandAll' })).not.toBeInTheDocument();
+  });
+
   it('shows the day count', () => {
     givenCalendar(makeCalendar());
 
