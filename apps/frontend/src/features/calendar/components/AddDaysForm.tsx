@@ -44,13 +44,15 @@ const buttonClasses = cn(
   'disabled:opacity-40 disabled:cursor-not-allowed',
 );
 
+// The ring is focus-visible so it answers the keyboard and not a tap: a click leaves the button focused,
+// and a plain `focus:` ring would stay drawn around the heading after every fold.
 const toggleClasses = cn(
   'flex items-center gap-1 w-full',
   'py-1',
   'text-sm font-semibold text-slate-800 dark:text-slate-100',
   'rounded cursor-pointer transition-colors',
   'hover:text-emerald-700 dark:hover:text-emerald-300',
-  'focus:outline-none focus:ring-2 focus:ring-emerald-500',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500',
 );
 
 const labelClasses = 'block mb-1 text-xs font-medium text-slate-600 dark:text-slate-300';
