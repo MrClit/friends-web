@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MealSlot } from '@friends/shared-types';
 import type { CalendarDay } from '@/api/types';
 import type { Event } from '@/features/events/types';
+import { ApiError } from '@/api/client';
 import { CalendarPlanning } from './CalendarPlanning';
 
 vi.mock('@/config/env', () => ({
@@ -137,7 +138,7 @@ describe('CalendarPlanning', () => {
     });
   });
 
-  it('retries a plain failure but not a 404', () => {
+  it('retries a plain failure', () => {
     useEventCalendarMock.mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -147,7 +148,21 @@ describe('CalendarPlanning', () => {
 
     render(<CalendarPlanning event={mockEvent} />);
 
-    expect(screen.getByRole('button')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'retry' })).toBeInTheDocument();
+  });
+
+  it('shows the no-access message without retry when the actor is not a participant', () => {
+    useEventCalendarMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new ApiError(403, 'Forbidden', 'Forbidden'),
+      refetch: vi.fn(),
+    });
+
+    render(<CalendarPlanning event={mockEvent} />);
+
+    expect(screen.getByText('notFoundOrNoAccess')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
   });
 
   it('opens and collapses every mobile card from the header control', () => {

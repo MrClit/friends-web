@@ -67,8 +67,11 @@ vi.mock('@/features/events/components/EventSectionSkeleton', () => ({
 
 vi.mock('@/shared/components', () => ({
   ConfirmDialog: () => null,
-  ErrorState: ({ onRetry }: { onRetry?: () => void }) => (
-    <div data-testid="error-state">{onRetry && <button onClick={onRetry}>retry</button>}</div>
+  ErrorState: ({ message, onRetry }: { message?: string; onRetry?: () => void }) => (
+    <div data-testid="error-state">
+      {message}
+      {onRetry && <button onClick={onRetry}>retry</button>}
+    </div>
   ),
 }));
 
@@ -144,15 +147,23 @@ describe('EventLayout', () => {
     expect(screen.getByText('invalidId')).toBeInTheDocument();
   });
 
-  it('shows ErrorState without retry button for 404 ApiError', () => {
-    const error = new ApiError(404, 'Not Found', 'Event not found');
+  it.each([403, 404])('shows the not-found-or-no-access message without retry for a %i', (status) => {
+    const error = new ApiError(status, 'Error', 'Error');
     mockUseEventDetail.mockReturnValue(defaultHookReturn({ error }));
     renderLayout();
-    expect(screen.getByTestId('error-state')).toBeInTheDocument();
+    expect(screen.getByTestId('error-state')).toHaveTextContent('notFoundOrNoAccess');
     expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
   });
 
-  it('shows ErrorState with retry button for non-404 ApiError', () => {
+  it('shows the invalid link message without retry for a 400 (malformed id in the URL)', () => {
+    const error = new ApiError(400, 'Bad Request', 'Validation failed (uuid is expected)');
+    mockUseEventDetail.mockReturnValue(defaultHookReturn({ error }));
+    renderLayout('/event/not-a-uuid');
+    expect(screen.getByTestId('error-state')).toHaveTextContent('invalidLink');
+    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
+  });
+
+  it('shows ErrorState with retry button for a transient ApiError', () => {
     const error = new ApiError(500, 'Internal Server Error', 'Server error');
     mockUseEventDetail.mockReturnValue(defaultHookReturn({ error }));
     renderLayout();

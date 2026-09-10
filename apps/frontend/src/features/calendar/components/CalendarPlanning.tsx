@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCalendarMonth, MdUnfoldLess, MdUnfoldMore } from 'react-icons/md';
 import type { Event } from '@/features/events/types';
-import { ApiError } from '@/api/client';
 import {
   useEventCalendar,
   useAddCalendarDays,
@@ -12,6 +11,7 @@ import {
   useSetAttendance,
 } from '@/hooks/api/useCalendar';
 import { ErrorState } from '@/shared/components';
+import { describeLoadError } from '@/shared/utils/apiError';
 import { cn } from '@/shared/utils/cn';
 import { AttendanceGrid } from './AttendanceGrid';
 import { DayCardList } from './DayCardList';
@@ -89,14 +89,9 @@ export function CalendarPlanning({ event }: CalendarPlanningProps) {
   }
 
   if (error) {
-    const isNotFoundOrNoAccess = error instanceof ApiError && error.status === 404;
+    const { message, isRetryable } = describeLoadError(error, t);
 
-    return (
-      <ErrorState
-        message={isNotFoundOrNoAccess ? t('notFoundOrNoAccess', { ns: 'common' }) : undefined}
-        onRetry={isNotFoundOrNoAccess ? undefined : () => void refetch()}
-      />
-    );
+    return <ErrorState message={message} onRetry={isRetryable ? () => void refetch() : undefined} />;
   }
 
   const isBusy = addDays.isPending || updateDay.isPending || updateMeal.isPending || deleteDay.isPending;

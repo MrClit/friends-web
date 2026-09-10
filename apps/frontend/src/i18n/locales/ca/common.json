@@ -7,6 +7,7 @@
   "network_error": "Error de connexió. Torna-ho a provar",
   "errorLoading": "No s'han pogut carregar les dades. Si us plau, torna-ho a provar.",
   "notFoundOrNoAccess": "No s'ha trobat el recurs o no hi tens accés.",
+  "invalidLink": "L'enllaç no és vàlid.",
   "retry": "Reintentar",
   "back": "Tornar",
   "edit": "Editar",

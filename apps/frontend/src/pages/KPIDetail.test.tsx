@@ -32,8 +32,11 @@ vi.mock('@/features/events/components/EventSectionSkeleton', () => ({
 }));
 
 vi.mock('@/shared/components', () => ({
-  ErrorState: ({ onRetry }: { onRetry?: () => void }) => (
-    <div data-testid="error-state">{onRetry && <button onClick={onRetry}>retry</button>}</div>
+  ErrorState: ({ message, onRetry }: { message?: string; onRetry?: () => void }) => (
+    <div data-testid="error-state">
+      {message}
+      {onRetry && <button onClick={onRetry}>retry</button>}
+    </div>
   ),
 }));
 
@@ -84,16 +87,25 @@ describe('KPIDetail', () => {
     expect(screen.queryByTestId('kpi-detail-view')).not.toBeInTheDocument();
   });
 
-  it('shows ErrorState without retry button for a 404 on the KPIs', () => {
-    const kpisError = new ApiError(404, 'Not Found', 'Event not found');
+  it.each([403, 404])('shows the not-found-or-no-access message without retry for a %i on the KPIs', (status) => {
+    const kpisError = new ApiError(status, 'Error', 'Error');
     mockUseEventLayoutContext.mockReturnValue(defaultContext({ kpis: undefined, kpisError }));
     renderPage();
 
-    expect(screen.getByTestId('error-state')).toBeInTheDocument();
+    expect(screen.getByTestId('error-state')).toHaveTextContent('notFoundOrNoAccess');
     expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
   });
 
-  it('retries the KPIs from ErrorState on a non-404 error', () => {
+  it('shows the invalid link message without retry for a 400 on the KPIs', () => {
+    const kpisError = new ApiError(400, 'Bad Request', 'Validation failed (uuid is expected)');
+    mockUseEventLayoutContext.mockReturnValue(defaultContext({ kpis: undefined, kpisError }));
+    renderPage('/event/not-a-uuid/kpi/balance');
+
+    expect(screen.getByTestId('error-state')).toHaveTextContent('invalidLink');
+    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
+  });
+
+  it('retries the KPIs from ErrorState on a transient error', () => {
     const context = defaultContext({
       kpis: undefined,
       kpisError: new ApiError(500, 'Internal Server Error', 'Server error'),

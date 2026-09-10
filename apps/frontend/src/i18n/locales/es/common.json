@@ -7,6 +7,7 @@
   "network_error": "Error de conexión. Intenta de nuevo",
   "errorLoading": "No se pudo cargar los datos. Por favor, intenta de nuevo.",
   "notFoundOrNoAccess": "No se encontró el recurso o no tienes acceso.",
+  "invalidLink": "El enlace no es válido.",
   "retry": "Reintentar",
   "back": "Volver",
   "edit": "Editar",

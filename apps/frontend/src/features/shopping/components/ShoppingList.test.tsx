@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { ShoppingItem } from '@/api/types';
 import type { Event } from '@/features/events/types';
+import { ApiError } from '@/api/client';
 import { ShoppingList } from './ShoppingList';
 
 vi.mock('@/config/env', () => ({
@@ -75,6 +76,20 @@ describe('ShoppingList', () => {
     render(<ShoppingList event={mockEvent} />);
 
     expect(screen.getByText('empty')).toBeInTheDocument();
+  });
+
+  it('shows the no-access message without retry when the actor is not a participant', () => {
+    useShoppingItemsMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new ApiError(403, 'Forbidden', 'Forbidden'),
+      refetch: vi.fn(),
+    });
+
+    render(<ShoppingList event={mockEvent} />);
+
+    expect(screen.getByText('notFoundOrNoAccess')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
   });
 
   it('keeps the pending items out of the purchased group', () => {
