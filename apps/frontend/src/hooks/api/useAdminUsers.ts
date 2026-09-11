@@ -7,7 +7,6 @@ export function useAdminUsers() {
     queryKey: queryKeys.adminUsers.all,
     queryFn: adminUsersApi.getAll,
     staleTime: 2 * 60 * 1000,
-    retry: 1,
   });
 }
 

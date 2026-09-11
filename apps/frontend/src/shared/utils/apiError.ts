@@ -8,6 +8,21 @@ export function getApiErrorMessage(error: unknown, t: TFunction): string {
   return mapped || t('errors.default', { ns: 'common' });
 }
 
+const MAX_QUERY_RETRIES = 3;
+const NON_RETRYABLE_STATUSES = new Set([400, 401, 403, 404]);
+
+/**
+ * Default `retry` for queries, the single owner of the automatic retry rule. A 400 (malformed id),
+ * 403 (actor is not a participant) or 404 fails because of the link or the actor, and a 401 has
+ * already been refreshed and replayed by the API client, so repeating the request cannot succeed.
+ * Anything else (server errors, a 429, a network failure with status 0, unknown errors) may be
+ * transient and gets up to 3 retries.
+ */
+export function shouldRetryQuery(failureCount: number, error: unknown): boolean {
+  if (error instanceof ApiError && NON_RETRYABLE_STATUSES.has(error.status)) return false;
+  return failureCount < MAX_QUERY_RETRIES;
+}
+
 export interface LoadErrorPresentation {
   /** Translated message for ErrorState; undefined lets it fall back to the generic one. */
   message: string | undefined;
