@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import { shouldRetryQuery } from '@/shared/utils/apiError';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -7,7 +8,7 @@ export const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime in v4)
       refetchOnWindowFocus: false, // Disabled to avoid unnecessary refetches on window focus
       refetchOnReconnect: false, // Disabled to avoid unnecessary refetches on reconnect
-      retry: 3,
+      retry: shouldRetryQuery, // Up to 3 retries, none on a 400/401/403/404 that repeating cannot fix
     },
     mutations: {
       retry: 1,

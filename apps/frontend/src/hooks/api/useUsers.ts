@@ -14,7 +14,6 @@ export function useUsers() {
     queryKey: queryKeys.users.all,
     queryFn: usersApi.getAll,
     staleTime: 10 * 60 * 1000, // 10 minutes
-    retry: 2,
   });
 }
 
