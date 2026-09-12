@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { useUsers } from '@/hooks/api/useUsers';
 import type { User } from '@/features/auth/types';
+import { randomUUID } from '@/shared/utils';
 import type { EventParticipant } from '../types';
 
 interface UseParticipantsComboboxProps {
@@ -66,7 +67,7 @@ export function useParticipantsCombobox({
 
   const handleSelectNewGuest = useCallback(() => {
     if (!inputValue.trim()) return;
-    onSelect({ id: crypto.randomUUID(), type: 'guest', name: inputValue.trim() });
+    onSelect({ id: randomUUID(), type: 'guest', name: inputValue.trim() });
     onInputChange('');
     close();
   }, [inputValue, onSelect, onInputChange, close]);
