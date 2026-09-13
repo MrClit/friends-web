@@ -28,7 +28,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: { sub: string; email: string; role: string }): Promise<User> {
-    const user = await this.usersService.findByEmail(payload.email);
+    // `sub` is the stable identifier the token asserts; email is mutable and must not be trusted for lookup.
+    // No caching here on purpose: the per-request lookup is what makes a deleted user's tokens die immediately.
+    const user = await this.usersService.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException();
     }
