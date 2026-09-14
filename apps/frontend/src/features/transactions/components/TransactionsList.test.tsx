@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TransactionsList } from './TransactionsList';
 import type { Transaction } from '../types';
 import type { Event } from '../../events/types';
+import { ApiError } from '@/api/client';
 
 vi.mock('@/config/env', () => ({
   ENV: { API_URL: 'http://test.api' },
@@ -119,5 +120,40 @@ describe('TransactionsList day grouping', () => {
     render(<TransactionsList event={event} />);
 
     expect(screen.getByText('transactionsList.noTransactions')).toBeInTheDocument();
+  });
+});
+
+describe('TransactionsList load errors', () => {
+  beforeEach(() => {
+    mockUseTransactionsPaginated.mockReset();
+  });
+
+  function mockLoadError(error: unknown) {
+    mockUseTransactionsPaginated.mockReturnValue({
+      data: undefined,
+      fetchNextPage: vi.fn(),
+      hasNextPage: false,
+      isFetchingNextPage: false,
+      isLoading: false,
+      error,
+      refetch: vi.fn(),
+    });
+  }
+
+  it('shows the no-access message without retry when the actor is not a participant', () => {
+    mockLoadError(new ApiError(403, 'Forbidden', 'Forbidden'));
+
+    render(<TransactionsList event={event} />);
+
+    expect(screen.getByText('notFoundOrNoAccess')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
+  });
+
+  it('offers a retry on a server error', () => {
+    mockLoadError(new ApiError(500, 'Internal Server Error', 'Server error'));
+
+    render(<TransactionsList event={event} />);
+
+    expect(screen.getByRole('button', { name: 'retry' })).toBeInTheDocument();
   });
 });

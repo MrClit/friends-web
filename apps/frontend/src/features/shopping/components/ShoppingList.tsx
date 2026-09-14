@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { MdShare } from 'react-icons/md';
 import type { ShoppingItem } from '@/api/types';
 import type { Event } from '@/features/events/types';
-import { ApiError } from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
 import {
   useShoppingItems,
@@ -13,6 +12,7 @@ import {
   useDeleteShoppingItem,
 } from '@/hooks/api/useShoppingItems';
 import { ConfirmDialog, ErrorState } from '@/shared/components';
+import { describeLoadError } from '@/shared/utils/apiError';
 import { cn } from '@/shared/utils/cn';
 import { ShoppingAddForm } from './ShoppingAddForm';
 import { ShoppingItemRow } from './ShoppingItemRow';
@@ -84,14 +84,9 @@ export function ShoppingList({ event }: ShoppingListProps) {
   }
 
   if (error) {
-    const isNotFoundOrNoAccess = error instanceof ApiError && error.status === 404;
+    const { message, isRetryable } = describeLoadError(error, t);
 
-    return (
-      <ErrorState
-        message={isNotFoundOrNoAccess ? t('notFoundOrNoAccess', { ns: 'common' }) : undefined}
-        onRetry={isNotFoundOrNoAccess ? undefined : () => void refetch()}
-      />
-    );
+    return <ErrorState message={message} onRetry={isRetryable ? () => void refetch() : undefined} />;
   }
 
   return (

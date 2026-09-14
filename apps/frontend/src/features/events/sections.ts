@@ -29,19 +29,19 @@ export const EVENT_SECTIONS: readonly EventSectionConfig[] = [
     activeClasses: 'text-emerald-700 border-emerald-600 dark:text-emerald-300 dark:border-emerald-400',
   },
   {
-    key: 'shopping',
-    path: 'shopping',
-    end: false,
-    labelKey: 'tabs.shopping',
-    icon: MdShoppingCart,
-    activeClasses: 'text-emerald-700 border-emerald-600 dark:text-emerald-300 dark:border-emerald-400',
-  },
-  {
     key: 'calendar',
     path: 'calendar',
     end: false,
     labelKey: 'tabs.calendar',
     icon: MdCalendarMonth,
+    activeClasses: 'text-emerald-700 border-emerald-600 dark:text-emerald-300 dark:border-emerald-400',
+  },
+  {
+    key: 'shopping',
+    path: 'shopping',
+    end: false,
+    labelKey: 'tabs.shopping',
+    icon: MdShoppingCart,
     activeClasses: 'text-emerald-700 border-emerald-600 dark:text-emerald-300 dark:border-emerald-400',
   },
 ];

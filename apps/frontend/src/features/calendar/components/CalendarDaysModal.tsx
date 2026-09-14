@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDelete } from 'react-icons/md';
 import type { CalendarDay } from '@/api/types';
@@ -30,8 +30,15 @@ const textFieldClasses = cn(
  * Everything that shapes the calendar rather than fills it in: which days exist, what each day is
  * about, and what the plan is for each sitting.
  *
- * It is a modal and not a page on purpose — this is done once at the start of an event, while the
+ * It is a modal and not a page on purpose — this is set up once at the start of an event, while the
  * planning grid behind it is what people come back to.
+ *
+ * Two tasks of very different frequency share it. Adding days happens once; editing what a day or a
+ * sitting is about happens over and over. So the list of existing days comes first and the add form
+ * sits folded below it. The dialog's autofocus is redirected to the dialog itself for the same reason:
+ * left alone, Radix would focus the first focusable control, and a focused date input makes the browser
+ * unfold its native picker over the whole modal. The focus has to land inside the dialog, not merely be
+ * prevented — otherwise it stays on the button that opened it, outside the focus trap.
  *
  * Descriptions commit on blur, like the cells of the grid, so typing a plan is not one request per key.
  *
@@ -51,6 +58,7 @@ export function CalendarDaysModal({
 }: CalendarDaysModalProps) {
   const { t } = useTranslation('calendar');
   const [dayToDelete, setDayToDelete] = useState<CalendarDay | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const handleConfirmDelete = () => {
     if (dayToDelete) onDeleteDay(dayToDelete.id);
@@ -60,15 +68,18 @@ export function CalendarDaysModal({
   return (
     <>
       <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent className="p-5 max-h-[85vh] overflow-y-auto">
+        <DialogContent
+          ref={contentRef}
+          className="p-5 max-h-[85vh] overflow-y-auto"
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            contentRef.current?.focus();
+          }}
+        >
           <DialogTitle>{t('daysModal.title')}</DialogTitle>
           <DialogDescription className="sr-only">{t('empty.message')}</DialogDescription>
 
-          <div className="mt-4">
-            <AddDaysForm disabled={isBusy} onAddDays={onAddDays} />
-          </div>
-
-          <section className="mt-6">
+          <section className="mt-4">
             <h3 className="mb-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
               {t('daysModal.existingTitle')}
             </h3>
@@ -141,6 +152,10 @@ export function CalendarDaysModal({
               </ul>
             )}
           </section>
+
+          <div className="mt-6">
+            <AddDaysForm disabled={isBusy} defaultOpen={days.length === 0} onAddDays={onAddDays} />
+          </div>
 
           <div className="mt-5 flex justify-end">
             <DialogCloseButton onClick={onClose}>{t('daysModal.close')}</DialogCloseButton>

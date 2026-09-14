@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MealSlot } from '@friends/shared-types';
 import type { CalendarDay } from '@/api/types';
 import type { Event } from '@/features/events/types';
+import { ApiError } from '@/api/client';
 import { CalendarPlanning } from './CalendarPlanning';
 
 vi.mock('@/config/env', () => ({
@@ -137,7 +138,7 @@ describe('CalendarPlanning', () => {
     });
   });
 
-  it('retries a plain failure but not a 404', () => {
+  it('retries a plain failure', () => {
     useEventCalendarMock.mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -147,7 +148,56 @@ describe('CalendarPlanning', () => {
 
     render(<CalendarPlanning event={mockEvent} />);
 
-    expect(screen.getByRole('button')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'retry' })).toBeInTheDocument();
+  });
+
+  it('shows the no-access message without retry when the actor is not a participant', () => {
+    useEventCalendarMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new ApiError(403, 'Forbidden', 'Forbidden'),
+      refetch: vi.fn(),
+    });
+
+    render(<CalendarPlanning event={mockEvent} />);
+
+    expect(screen.getByText('notFoundOrNoAccess')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
+  });
+
+  it('opens and collapses every mobile card from the header control', () => {
+    const twoDays: CalendarDay[] = [
+      ...makeCalendar(),
+      {
+        id: 'day-2',
+        eventId: 'event-1',
+        date: '2026-09-13',
+        description: null,
+        meals: [{ id: 'lunch-2', dayId: 'day-2', slot: MealSlot.LUNCH, description: null, attendances: [] }],
+      },
+    ];
+    givenCalendar(twoDays);
+
+    render(<CalendarPlanning event={mockEvent} />);
+
+    // Only the day headers carry aria-expanded: the toggle drives several panels, so it has none.
+    expect(screen.getAllByRole('button', { expanded: false })).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole('button', { name: 'cards.expandAll' }));
+
+    expect(screen.getAllByRole('button', { expanded: true })).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole('button', { name: 'cards.collapseAll' }));
+
+    expect(screen.getAllByRole('button', { expanded: false })).toHaveLength(2);
+  });
+
+  it('leaves the toggle out when there is no day to open', () => {
+    givenCalendar([]);
+
+    render(<CalendarPlanning event={mockEvent} />);
+
+    expect(screen.queryByRole('button', { name: 'cards.expandAll' })).not.toBeInTheDocument();
   });
 
   it('shows the day count', () => {

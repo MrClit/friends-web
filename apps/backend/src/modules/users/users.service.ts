@@ -20,6 +20,11 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
+  /** Resolves a user by primary key; `null` when missing or soft-deleted. */
+  findById(userId: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { id: userId } });
+  }
+
   async findByIdOrThrow(userId: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {

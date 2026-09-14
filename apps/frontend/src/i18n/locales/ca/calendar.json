@@ -25,6 +25,10 @@
     "noPlan": "Sense pla",
     "summary": "{{adults}} Adults · {{children}} Nens"
   },
+  "cards": {
+    "expandAll": "Obre'ls tots",
+    "collapseAll": "Plega'ls tots"
+  },
   "daysModal": {
     "title": "Configurar dies",
     "close": "Tancar",

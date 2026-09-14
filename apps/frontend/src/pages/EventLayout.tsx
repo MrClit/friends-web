@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
-import { ApiError } from '@/api/client';
 import { EventDetailHeader, EventFormModal, EventSectionTabs } from '@/features/events';
 import { EventDetailSkeleton } from '@/features/events/components/EventDetailSkeleton';
 import { EventSectionSkeleton } from '@/features/events/components/EventSectionSkeleton';
@@ -9,6 +8,7 @@ import { useEventDetail, useIsEventSectionRoute, type EventLayoutContext } from 
 import { useConfirmDialog } from '@/hooks/common';
 import { ConfirmDialog, ErrorState } from '@/shared/components';
 import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
+import { describeLoadError } from '@/shared/utils/apiError';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 import { MainLayout } from './MainLayout';
 
@@ -67,14 +67,11 @@ export function EventLayout() {
   }
 
   if (error) {
-    const isNotFoundOrNoAccess = error instanceof ApiError && error.status === 404;
+    const { message, isRetryable } = describeLoadError(error, t);
 
     return (
       <MainLayout>
-        <ErrorState
-          message={isNotFoundOrNoAccess ? t('notFoundOrNoAccess', { ns: 'common' }) : undefined}
-          onRetry={isNotFoundOrNoAccess ? undefined : () => void refetch()}
-        />
+        <ErrorState message={message} onRetry={isRetryable ? () => void refetch() : undefined} />
       </MainLayout>
     );
   }

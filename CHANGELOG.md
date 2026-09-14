@@ -5,6 +5,50 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-09-13
+
+Polish on the calendar shipped in 0.5.0 — the mobile view starts collapsed and the day cards now say what
+is being eaten — plus a batch of fixes for things that were visibly wrong on phones (iOS zooming in on every
+field, toasts breaking outside a secure context) and a backend fix to how a JWT is resolved to its user.
+**No database migration and no new environment variables**: nothing to change in the Render dashboard
+before deploying.
+
+### Added
+
+- On mobile, the calendar's day cards start collapsed and each collapsed header summarises the plan for
+  every sitting (name, description and the adults/children headcount), so the screen answers "what are we
+  eating" without opening a day. Closes [#183].
+
+### Changed
+
+- The event hub sections are ordered money, calendar, shopping — the order participants actually read
+  them in. URLs, icons and labels are unchanged. Closes [#185].
+- The "Configure days" modal leads with the list of existing days and folds the "Add days" form away, and
+  it no longer autofocuses the first date input — which popped the native date picker open on every
+  visit, even for someone who only came to edit a description. Focus stays inside the dialog. Closes
+  [#184].
+
+### Fixed
+
+- The JWT strategy resolves the user by the stable `sub` claim instead of the mutable email claim. A
+  missing or soft-deleted user still yields a 401, and the lookup stays per-request so a deleted user's
+  tokens die immediately. Closes [#186].
+- Form fields render at 16px on touch devices, gated on `(hover: none) and (pointer: coarse)` rather than
+  on a breakpoint, so iOS Safari stops zooming the page in when a field is focused. The viewport meta is
+  untouched: pinch-zoom keeps working (WCAG 2.2 SC 1.4.4). Closes [#182].
+- Toast ids are unique — two toasts fired in the same millisecond used to share a `Date.now()` id, which
+  duplicated React keys and made dismissing one dismiss both. Every random id now goes through a shared
+  `randomUUID()` helper with a `crypto.getRandomValues()` fallback, so opening the app over plain HTTP on
+  a LAN (where `crypto.randomUUID` does not exist) no longer throws on every toast, on adding a guest or
+  on mounting the participants combobox. Closes [#158].
+- TanStack Query no longer retries a `400`, `401`, `403` or `404` automatically: those cannot succeed on a
+  second attempt, and the client has already refreshed and replayed a `401` before the query ever sees
+  it. `5xx`, `429` and network errors keep the three retries. `shouldRetryQuery` in `shared/utils/apiError.ts`
+  is the single owner of the rule. Closes [#195].
+- Loading an event with a malformed id (`400`) or without access (`403`) no longer shows a Retry button
+  that could never work; `describeLoadError` is the single owner of the message-and-retryable rule, used
+  by the event layout, KPI detail, shopping list, transactions list and calendar views. Closes [#166].
+
 ## [0.5.0] - 2026-09-01
 
 The meal calendar lands: every event gets days, sittings and per-participant attendance counts, planned
@@ -110,7 +154,7 @@ variables**; nothing to change in the Render dashboard or the OAuth consoles bef
   Application-layer only, no migration. Closes [#100].
 - **`Transaction.date` is a plain `'YYYY-MM-DD'` string on every read path.** It was typed `Date`
   while TypeORM hydrates a Postgres `date` as a string, and the raw-SQL paginated route built a
-  `Date` at the server's local midnight — which east of UTC serialized to the *previous* day. The
+  `Date` at the server's local midnight — which east of UTC serialized to the _previous_ day. The
   paginated query now formats with `TO_CHAR(rt.date, 'YYYY-MM-DD')`. On the input side,
   `CreateTransactionDto.date` moves from `@IsDateString()` to a strict `YYYY-MM-DD` match, the only
   input contract change; the frontend already sent that format. Closes [#129].
@@ -275,17 +319,23 @@ JWT secret validation. No product features and no database migrations.
 
 - Outdated GitHub Actions workflows: `backend-tests.yml` and `release-to-prod.yml`.
 
+[#158]: https://github.com/MrClit/friends-web/issues/158
+[#166]: https://github.com/MrClit/friends-web/issues/166
+[#182]: https://github.com/MrClit/friends-web/issues/182
+[#183]: https://github.com/MrClit/friends-web/issues/183
+[#184]: https://github.com/MrClit/friends-web/issues/184
+[#185]: https://github.com/MrClit/friends-web/issues/185
+[#186]: https://github.com/MrClit/friends-web/issues/186
+[#195]: https://github.com/MrClit/friends-web/issues/195
 [#136]: https://github.com/MrClit/friends-web/issues/136
 [#149]: https://github.com/MrClit/friends-web/issues/149
 [#172]: https://github.com/MrClit/friends-web/issues/172
 [#173]: https://github.com/MrClit/friends-web/issues/173
 [#177]: https://github.com/MrClit/friends-web/issues/177
-
 [#144]: https://github.com/MrClit/friends-web/issues/144
 [#154]: https://github.com/MrClit/friends-web/issues/154
 [#150]: https://github.com/MrClit/friends-web/issues/150
 [#151]: https://github.com/MrClit/friends-web/issues/151
-
 [#97]: https://github.com/MrClit/friends-web/issues/97
 [#98]: https://github.com/MrClit/friends-web/issues/98
 [#28]: https://github.com/MrClit/friends-web/issues/28
@@ -296,7 +346,6 @@ JWT secret validation. No product features and no database migrations.
 [#156]: https://github.com/MrClit/friends-web/issues/156
 [#157]: https://github.com/MrClit/friends-web/issues/157
 [#160]: https://github.com/MrClit/friends-web/issues/160
-
 [#100]: https://github.com/MrClit/friends-web/issues/100
 [#103]: https://github.com/MrClit/friends-web/issues/103
 [#104]: https://github.com/MrClit/friends-web/issues/104
@@ -307,11 +356,10 @@ JWT secret validation. No product features and no database migrations.
 [#124]: https://github.com/MrClit/friends-web/issues/124
 [#125]: https://github.com/MrClit/friends-web/issues/125
 [#129]: https://github.com/MrClit/friends-web/issues/129
-
 [#92]: https://github.com/MrClit/friends-web/issues/92
 [#111]: https://github.com/MrClit/friends-web/issues/111
 [#112]: https://github.com/MrClit/friends-web/issues/112
-
+[0.6.0]: https://github.com/MrClit/friends-web/releases/tag/v0.6.0
 [0.5.0]: https://github.com/MrClit/friends-web/releases/tag/v0.5.0
 [0.4.0]: https://github.com/MrClit/friends-web/releases/tag/v0.4.0
 [0.3.0]: https://github.com/MrClit/friends-web/releases/tag/v0.3.0

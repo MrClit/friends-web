@@ -1,11 +1,11 @@
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ApiError } from '@/api/client';
 import { EventSectionSkeleton } from '@/features/events/components/EventSectionSkeleton';
 import { useEventLayoutContext } from '@/features/events/hooks';
 import { KPIDetailView } from '@/features/kpi';
 import { ErrorState } from '@/shared/components';
 import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
+import { describeLoadError } from '@/shared/utils/apiError';
 
 const KPI_DETAIL_NAMESPACES = ['kpiDetail', 'common', 'transactions', 'events'] as const;
 
@@ -25,14 +25,9 @@ export function KPIDetail() {
   }
 
   if (kpisError) {
-    const isNotFoundOrNoAccess = kpisError instanceof ApiError && kpisError.status === 404;
+    const { message, isRetryable } = describeLoadError(kpisError, t);
 
-    return (
-      <ErrorState
-        message={isNotFoundOrNoAccess ? t('notFoundOrNoAccess', { ns: 'common' }) : undefined}
-        onRetry={isNotFoundOrNoAccess ? undefined : refetchKpis}
-      />
-    );
+    return <ErrorState message={message} onRetry={isRetryable ? refetchKpis : undefined} />;
   }
 
   if (!kpi || !kpis) {

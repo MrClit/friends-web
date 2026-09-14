@@ -72,6 +72,8 @@ describe('EventSectionTabs', () => {
 
     expect(screen.getByRole('navigation', { name: 'tabs.ariaLabel' })).toBeInTheDocument();
     expect(screen.getAllByRole('link')).toHaveLength(EVENT_SECTIONS.length);
+    // The bar renders the registry in order, so this pins the intended reading order.
+    expect(EVENT_SECTIONS.map((section) => section.key)).toEqual(['money', 'calendar', 'shopping']);
   });
 
   it('renders one link per section inside a labelled nav', () => {

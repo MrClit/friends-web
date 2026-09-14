@@ -131,7 +131,9 @@ export const ParticipantRow = memo(function ParticipantRow({
               </div>
             ) : (
               <div className="min-w-0">
-                <p className="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">
+                {/* Renaming swaps this for an input, which is 16px on touch so iOS does not zoom in.
+                    Without the same bump here the name grows the moment the row enters editing. */}
+                <p className="truncate text-sm touch:text-base font-bold leading-tight text-slate-900 dark:text-white">
                   {participantName}
                 </p>
                 {participantEmail && (
@@ -221,7 +223,7 @@ export const ParticipantRow = memo(function ParticipantRow({
             >
               {t('participantsInput.targetLabel')}
             </label>
-            <div className="relative w-28">
+            <div className="relative w-32">
               <input
                 id={`target-${participantIndex}`}
                 type="number"
@@ -248,12 +250,15 @@ export const ParticipantRow = memo(function ParticipantRow({
                   'w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-2 pl-3 pr-8 text-sm font-medium text-slate-900',
                   'outline-none transition-colors placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-emerald-500',
                   'dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-white dark:placeholder:text-emerald-700',
+                  // The spinners sit exactly where the € glyph is, and the amount is typed anyway.
+                  '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
                 )}
                 aria-label={t('participantsInput.targetAria')}
               />
               <span
                 aria-hidden
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400 dark:text-emerald-300/70"
+                // Sits inside the field's box, so it tracks the field's size rather than its own.
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm touch:text-base font-bold text-slate-400 dark:text-emerald-300/70"
               >
                 €
               </span>

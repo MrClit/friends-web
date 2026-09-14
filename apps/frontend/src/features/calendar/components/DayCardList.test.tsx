@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MealSlot } from '@friends/shared-types';
@@ -54,76 +55,85 @@ const makeDays = (): CalendarDay[] => [
   },
 ];
 
-const renderList = (days = makeDays()) =>
-  render(
+/**
+ * Which days are open is a prop now — CalendarPlanning owns it, since the toggle-all lives in its
+ * header. This stands in for that owner so the cards can still be driven on their own.
+ */
+function ControlledList({ days }: { days: CalendarDay[] }) {
+  const [openDays, setOpenDays] = useState<string[]>([]);
+
+  return (
     <DayCardList
       days={days}
       participants={participants}
       totals={calendarTotals(days)}
+      openDays={openDays}
+      onOpenDaysChange={setOpenDays}
       onSetAttendance={onSetAttendance}
-    />,
+    />
   );
+}
 
-const dayTriggers = () => screen.getAllByRole('button', { expanded: true });
+const renderList = (days = makeDays()) => render(<ControlledList days={days} />);
+
+const closedDays = () => screen.queryAllByRole('button', { expanded: false });
+const openDays = () => screen.queryAllByRole('button', { expanded: true });
 
 describe('DayCardList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('opens every day by default, so nothing regresses for somebody filling the calendar in', () => {
+  it('starts every day collapsed, so the whole event fits on one phone screen', () => {
     renderList();
 
-    expect(dayTriggers()).toHaveLength(2);
+    expect(closedDays()).toHaveLength(2);
+    expect(openDays()).toHaveLength(0);
   });
 
-  it('collapses a day without touching the others', () => {
+  it('tells what is being eaten and by how many while the day is collapsed', () => {
     renderList();
-
-    fireEvent.click(dayTriggers()[0]);
-
-    expect(screen.getAllByRole('button', { expanded: false })).toHaveLength(1);
-    expect(screen.getAllByRole('button', { expanded: true })).toHaveLength(1);
-  });
-
-  it('keeps the headcounts readable while the day is collapsed', () => {
-    renderList();
-
-    fireEvent.click(dayTriggers()[0]);
 
     // The summary lives in the header precisely so it survives collapsing: it is the answer somebody
-    // scrolls this list to find.
+    // opens this list to find, and collapsing by default is only acceptable because it is there.
+    expect(screen.getByText('Paella')).toBeInTheDocument();
+    expect(screen.getAllByText('grid.noPlan').length).toBeGreaterThan(0);
     expect(screen.getByText('grid.summary:2:3')).toBeInTheDocument();
   });
 
-  it('takes the inputs of a collapsed day out of the page', () => {
-    renderList();
-    // Two sittings on the first day and one on the second, two participants each.
-    expect(screen.getAllByLabelText('grid.adultsAria')).toHaveLength(6);
-
-    fireEvent.click(dayTriggers()[0]);
-
-    // Radix unmounts a closed panel rather than hiding it, so those four inputs are gone from the
-    // accessibility tree and from the tab order too — which is the behaviour we want on a phone.
-    // Nothing is lost by it: collapsing means clicking the header, and that blurs whatever cell was
-    // focused, which is what commits its draft.
-    expect(screen.getAllByLabelText('grid.adultsAria')).toHaveLength(2);
-  });
-
-  it('reopens a day that was collapsed', () => {
+  it('keeps the inputs of a collapsed day out of the page', () => {
     renderList();
 
-    const trigger = dayTriggers()[0];
-    fireEvent.click(trigger);
-    fireEvent.click(trigger);
-
-    expect(dayTriggers()).toHaveLength(2);
+    // Radix unmounts a closed panel rather than hiding it, so those inputs are out of the accessibility
+    // tree and out of the tab order too — which is the behaviour we want on a phone.
+    expect(screen.queryAllByLabelText('grid.adultsAria')).toHaveLength(0);
   });
 
-  it('opens a day added after the user collapsed another one', () => {
+  it('expands a day without touching the others', () => {
+    renderList();
+
+    fireEvent.click(closedDays()[0]);
+
+    expect(openDays()).toHaveLength(1);
+    expect(closedDays()).toHaveLength(1);
+    // Two sittings on the first day, two participants each.
+    expect(screen.getAllByLabelText('grid.adultsAria')).toHaveLength(4);
+  });
+
+  it('collapses a day that was expanded', () => {
+    renderList();
+
+    fireEvent.click(closedDays()[0]);
+    fireEvent.click(openDays()[0]);
+
+    expect(closedDays()).toHaveLength(2);
+    expect(screen.queryAllByLabelText('grid.adultsAria')).toHaveLength(0);
+  });
+
+  it('collapses a day added after the user expanded another one', () => {
     const { rerender } = renderList();
 
-    fireEvent.click(dayTriggers()[0]);
+    fireEvent.click(closedDays()[0]);
 
     const withExtraDay: CalendarDay[] = [
       ...makeDays(),
@@ -136,17 +146,10 @@ describe('DayCardList', () => {
       },
     ];
 
-    rerender(
-      <DayCardList
-        days={withExtraDay}
-        participants={participants}
-        totals={calendarTotals(withExtraDay)}
-        onSetAttendance={onSetAttendance}
-      />,
-    );
+    rerender(<ControlledList days={withExtraDay} />);
 
-    // Tracking what is closed rather than what is open is what makes a brand new day arrive expanded.
-    expect(screen.getAllByRole('button', { expanded: true })).toHaveLength(2);
-    expect(screen.getAllByRole('button', { expanded: false })).toHaveLength(1);
+    // Tracking what is open rather than what is closed is what makes a brand new day arrive collapsed.
+    expect(openDays()).toHaveLength(1);
+    expect(closedDays()).toHaveLength(2);
   });
 });

@@ -137,7 +137,7 @@ export function TransactionParticipantCombobox({
           <input
             ref={searchInputRef}
             type="text"
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-emerald-800 bg-white dark:bg-emerald-950 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 text-base sm:text-sm"
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-emerald-800 bg-white dark:bg-emerald-950 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-emerald-700 text-sm"
             aria-label={t('transactionForm.searchParticipantPlaceholder')}
             placeholder={t('transactionForm.searchParticipantPlaceholder')}
             value={searchValue}

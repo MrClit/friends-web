@@ -5,11 +5,11 @@ import { TransactionItem } from './TransactionItem';
 import { useMemo, useCallback } from 'react';
 import { formatDateLong } from '@/shared/utils/format';
 import { useTranslation } from 'react-i18next';
-import { ApiError } from '@/api/client';
 import { useTransactionsPaginated } from '@/hooks/api/useTransactions';
 import { useInfiniteScroll } from '@/hooks/common';
 import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
 import { ErrorState } from '@/shared/components';
+import { describeLoadError } from '@/shared/utils/apiError';
 import { getParticipantName } from '@/features/events/utils/participants';
 
 interface TransactionsListProps {
@@ -77,14 +77,9 @@ export function TransactionsList({ event }: TransactionsListProps) {
   }
 
   if (error) {
-    const isNotFoundOrNoAccess = error instanceof ApiError && error.status === 404;
+    const { message, isRetryable } = describeLoadError(error, t);
 
-    return (
-      <ErrorState
-        message={isNotFoundOrNoAccess ? t('notFoundOrNoAccess', { ns: 'common' }) : undefined}
-        onRetry={isNotFoundOrNoAccess ? undefined : () => void refetch()}
-      />
-    );
+    return <ErrorState message={message} onRetry={isRetryable ? () => void refetch() : undefined} />;
   }
 
   return (

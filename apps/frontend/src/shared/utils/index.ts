@@ -3,3 +3,4 @@ export * from './cn';
 export * from './humanize';
 export * from './stringAvatar';
 export * from './apiError';
+export * from './randomUUID';
