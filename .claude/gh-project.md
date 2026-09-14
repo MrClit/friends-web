@@ -101,6 +101,13 @@ deben coincidir. Consúltalos (`git tag -l`, `gh release list`) en vez de fiarte
 `main` exige PR y checks en verde: no hay atajo por push directo. La única vía es la coreografía por
 PR de la skill `release`.
 
+El **cuerpo del PR `develop → main`** lleva las notas de la nueva entrada del `CHANGELOG.md`, con sus
+`Closes #N` **a propósito**: así cada issue queda vinculada al PR de release y desde la issue se ve en
+qué versión salió. Para que esa vinculación no devuelva las issues a In Progress, el workflow del
+tablero **«Pull request linked to issue» está desactivado**; no lo reactives. Como `main` sí es la rama
+por defecto, `Closes #N` ahí **autocierra**: una entrada que referencie una issue todavía abierta
+(entrega parcial) debe usar `Refs #N` en vez de `Closes #N`.
+
 ### Pre-vuelo del release
 
 - [ ] `pnpm lint && pnpm test && pnpm build` en verde en local sobre `develop`
