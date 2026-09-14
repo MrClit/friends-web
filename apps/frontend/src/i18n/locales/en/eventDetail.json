@@ -20,6 +20,29 @@
     "shopping": "Shopping",
     "calendar": "Calendar"
   },
+  "targets": {
+    "summaryTotal": "Total target · {{amount}}",
+    "summaryNone": "No targets",
+    "open": "Targets",
+    "openAria": "Edit contribution targets",
+    "modal": {
+      "title": "Contribution targets",
+      "description": "How much each participant is expected to contribute.",
+      "targetAria": "Target for {{name}}",
+      "targetPlaceholder": "0",
+      "calculate": "Calculate targets",
+      "calculateAria": "Calculate contribution targets proportionally to total expenses",
+      "totalLabel": "Targets total",
+      "expensesLabel": "Expenses",
+      "empty": "This event has no participants yet. Add them from “Edit Event”.",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "discardTitle": "Discard changes?",
+      "discardMessage": "You have unsaved changes to the targets. Are you sure you want to close?",
+      "discard": "Discard"
+    }
+  },
   "addTransaction": "Add Transaction",
   "deleteTitle": "Delete event?",
   "deleteMessage": "This action cannot be undone. Are you sure you want to delete this event?",

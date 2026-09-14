@@ -6,3 +6,4 @@ export { useIsEventSectionRoute } from './useIsEventSectionRoute';
 export { useEventFormModal } from './useEventFormModal';
 export { useParticipantsList } from './useParticipantsList';
 export { useParticipantsCombobox } from './useParticipantsCombobox';
+export { useContributionTargetsModal } from './useContributionTargetsModal';

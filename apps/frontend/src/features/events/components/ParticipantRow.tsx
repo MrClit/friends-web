@@ -9,7 +9,6 @@ import { getParticipantAvatar, getParticipantName } from '../utils/participants'
 
 interface ParticipantRowProps {
   participant: EventParticipant;
-  participantIndex: number;
   isFirst: boolean;
   existingParticipants: EventParticipant[];
   isRenamingGuest: boolean;
@@ -25,12 +24,10 @@ interface ParticipantRowProps {
   onCancelRename: () => void;
   onRenameNameChange: (name: string) => void;
   onCommitRename: () => void;
-  onTargetChange: (target: number | undefined) => void;
 }
 
 export const ParticipantRow = memo(function ParticipantRow({
   participant,
-  participantIndex,
   isFirst,
   existingParticipants,
   isRenamingGuest,
@@ -46,14 +43,11 @@ export const ParticipantRow = memo(function ParticipantRow({
   onCancelRename,
   onRenameNameChange,
   onCommitRename,
-  onTargetChange,
 }: ParticipantRowProps) {
   const { t } = useTranslation('events');
   const isGuest = participant.type === 'guest';
-  const isPot = participant.type === 'pot';
   const participantName = getParticipantName(participant, t);
   const participantEmail = participant.type === 'user' ? participant.email : undefined;
-  const currentTarget = participant.type !== 'pot' ? (participant.contributionTarget ?? 0) : 0;
 
   return (
     <div>
@@ -210,58 +204,6 @@ export const ParticipantRow = memo(function ParticipantRow({
               >
                 {t('participantsInput.cancelReplace')}
               </button>
-            </div>
-          </div>
-        )}
-
-        {/* Contribution target input for non-pot participants */}
-        {!isPot && (
-          <div className="flex items-center gap-2 pl-13">
-            <label
-              htmlFor={`target-${participantIndex}`}
-              className="text-xs font-semibold text-slate-600 dark:text-slate-400"
-            >
-              {t('participantsInput.targetLabel')}
-            </label>
-            <div className="relative w-32">
-              <input
-                id={`target-${participantIndex}`}
-                type="number"
-                min="0"
-                step="0.01"
-                value={currentTarget === 0 ? '' : currentTarget}
-                onChange={(e) => {
-                  const val = e.target.value.trim();
-                  if (val === '') {
-                    onTargetChange(undefined);
-                    return;
-                  }
-
-                  const parsedValue = Math.round(Number(val) * 100) / 100;
-                  if (!Number.isFinite(parsedValue)) {
-                    onTargetChange(undefined);
-                    return;
-                  }
-
-                  onTargetChange(parsedValue < 0 ? 0 : parsedValue);
-                }}
-                placeholder={t('participantsInput.targetPlaceholder')}
-                className={cn(
-                  'w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-2 pl-3 pr-8 text-sm font-medium text-slate-900',
-                  'outline-none transition-colors placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-emerald-500',
-                  'dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-white dark:placeholder:text-emerald-700',
-                  // The spinners sit exactly where the € glyph is, and the amount is typed anyway.
-                  '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                )}
-                aria-label={t('participantsInput.targetAria')}
-              />
-              <span
-                aria-hidden
-                // Sits inside the field's box, so it tracks the field's size rather than its own.
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm touch:text-base font-bold text-slate-400 dark:text-emerald-300/70"
-              >
-                €
-              </span>
             </div>
           </div>
         )}

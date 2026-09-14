@@ -47,11 +47,6 @@
     "cancelReplace": "Cancel",
     "potName": "Shared pot",
     "noUsers": "No users found",
-    "targetLabel": "Target",
-    "targetPlaceholder": "0",
-    "targetAria": "Contribution target amount",
-    "calculateTargets": "Calculate targets",
-    "calculateTargetsAria": "Calculate contribution targets proportionally to total expenses",
     "createNew": "Add as guest"
   },
   "eventContextMenu": {
