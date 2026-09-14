@@ -15,7 +15,6 @@ export interface EventFormState {
   ) => void;
   icon?: string;
   setIcon?: (key: string) => void;
-  totalExpenses?: number;
 }
 
 interface EventFormProps {
@@ -35,7 +34,6 @@ export function EventForm({ fields, onSubmit }: EventFormProps) {
     setParticipantReplacements,
     icon,
     setIcon,
-    totalExpenses,
   } = fields;
 
   return (
@@ -73,7 +71,6 @@ export function EventForm({ fields, onSubmit }: EventFormProps) {
         participants={participants}
         setParticipants={setParticipants}
         setParticipantReplacements={setParticipantReplacements}
-        totalExpenses={totalExpenses}
       />
       {/* Submit button moved to modal footer via <button form="event-form" type="submit"> to match design */}
     </form>

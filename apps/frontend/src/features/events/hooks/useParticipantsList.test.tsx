@@ -53,8 +53,10 @@ describe('useParticipantsList', () => {
     expect(result.current.participantReplacements).toEqual([{ fromGuestId: 'g1', toUserId: 'u2' }]);
   });
 
-  it('removes target field when set to zero or undefined', () => {
-    const initialParticipants: EventParticipant[] = [{ type: 'user', id: 'u1', name: 'Alice', contributionTarget: 10 }];
+  it('keeps contributionTarget when renaming a guest', () => {
+    const initialParticipants: EventParticipant[] = [
+      { type: 'guest', id: 'g1', name: 'Guest One', contributionTarget: 25 },
+    ];
 
     const { result } = renderHook(() => {
       const [participants, setParticipants] = useState<EventParticipant[]>(initialParticipants);
@@ -73,25 +75,20 @@ describe('useParticipantsList', () => {
     });
 
     act(() => {
-      result.current.handleUpdateParticipantTarget(0, 0);
+      result.current.handleStartRenameGuest('g1', 'Guest One');
     });
-
-    expect('contributionTarget' in result.current.participants[0]).toBe(false);
-
     act(() => {
-      result.current.handleUpdateParticipantTarget(0, 15);
+      result.current.handleRenameGuestNameChange('Renamed');
     });
-
-    expect(
-      'contributionTarget' in result.current.participants[0]
-        ? result.current.participants[0].contributionTarget
-        : undefined,
-    ).toBe(15);
-
     act(() => {
-      result.current.handleUpdateParticipantTarget(0, undefined);
+      result.current.handleCommitRenameGuest();
     });
 
-    expect('contributionTarget' in result.current.participants[0]).toBe(false);
+    expect(result.current.participants[0]).toEqual({
+      type: 'guest',
+      id: 'g1',
+      name: 'Renamed',
+      contributionTarget: 25,
+    });
   });
 });

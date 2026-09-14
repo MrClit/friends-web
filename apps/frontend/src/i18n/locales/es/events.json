@@ -47,11 +47,6 @@
     "cancelReplace": "Cancelar",
     "potName": "Fondo común",
     "noUsers": "No se encontraron usuarios",
-    "targetLabel": "Objetivo",
-    "targetPlaceholder": "0",
-    "targetAria": "Importe del objetivo de contribución",
-    "calculateTargets": "Calcular objetivos",
-    "calculateTargetsAria": "Calcular objetivos de contribución proporcionalmente a los gastos",
     "createNew": "Añadir como invitado"
   },
   "eventContextMenu": {

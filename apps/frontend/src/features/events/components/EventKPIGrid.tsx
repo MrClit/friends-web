@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MdAccountBalanceWallet, MdVolunteerActivism, MdShoppingBag, MdPerson } from 'react-icons/md';
 import type { EventParticipant } from '@/features/events/types';
+import { sumContributionTargets } from '@/features/events/utils/contributionTargets';
 import { formatAmount } from '@/shared/utils/format';
 import { KPIBox } from './KPIBox';
 
@@ -45,13 +46,7 @@ export function EventKPIGrid(props: EventKPIGridProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('eventDetail');
 
-  const targetTotal = participants.reduce((sum, participant) => {
-    if (participant.type === 'user' || participant.type === 'guest') {
-      return sum + (participant.contributionTarget ?? 0);
-    }
-
-    return sum;
-  }, 0);
+  const targetTotal = sumContributionTargets(participants);
 
   const contributionStatusPercent = targetTotal > 0 ? (totalContributions / targetTotal) * 100 : Number.NaN;
   const pendingAdjustment =

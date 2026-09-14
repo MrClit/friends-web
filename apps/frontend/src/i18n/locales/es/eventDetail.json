@@ -20,6 +20,29 @@
     "shopping": "Compra",
     "calendar": "Calendario"
   },
+  "targets": {
+    "summaryTotal": "Objetivo total · {{amount}}",
+    "summaryNone": "Sin objetivos",
+    "open": "Objetivos",
+    "openAria": "Editar objetivos de contribución",
+    "modal": {
+      "title": "Objetivos de contribución",
+      "description": "Cuánto se espera que aporte cada participante.",
+      "targetAria": "Objetivo de {{name}}",
+      "targetPlaceholder": "0",
+      "calculate": "Calcular objetivos",
+      "calculateAria": "Calcular objetivos de contribución proporcionalmente a los gastos",
+      "totalLabel": "Total objetivos",
+      "expensesLabel": "Gastos",
+      "empty": "Este evento aún no tiene participantes. Añádelos desde «Editar Evento».",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "discardTitle": "¿Descartar cambios?",
+      "discardMessage": "Tienes cambios sin guardar en los objetivos. ¿Seguro que quieres cerrar?",
+      "discard": "Descartar"
+    }
+  },
   "addTransaction": "Añadir Transacción",
   "deleteTitle": "¿Borrar evento?",
   "deleteMessage": "Esta acción no se puede deshacer. ¿Seguro que quieres borrar este evento?",

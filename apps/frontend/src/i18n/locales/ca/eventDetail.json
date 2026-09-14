@@ -20,6 +20,29 @@
     "shopping": "Compra",
     "calendar": "Calendari"
   },
+  "targets": {
+    "summaryTotal": "Objectiu total · {{amount}}",
+    "summaryNone": "Sense objectius",
+    "open": "Objectius",
+    "openAria": "Editar els objectius de contribució",
+    "modal": {
+      "title": "Objectius de contribució",
+      "description": "Quant s'espera que aporti cada participant.",
+      "targetAria": "Objectiu de {{name}}",
+      "targetPlaceholder": "0",
+      "calculate": "Calcula objectius",
+      "calculateAria": "Calcula els objectius de contribució proporcionalment a les despeses totals",
+      "totalLabel": "Total objectius",
+      "expensesLabel": "Despeses",
+      "empty": "Aquest esdeveniment encara no té participants. Afegeix-los des de «Edita l'esdeveniment».",
+      "save": "Desar",
+      "saving": "Desant...",
+      "cancel": "Cancel·lar",
+      "discardTitle": "Descartar canvis?",
+      "discardMessage": "Tens canvis sense desar als objectius. Segur que vols tancar?",
+      "discard": "Descartar"
+    }
+  },
   "addTransaction": "Afegir Transacció",
   "deleteTitle": "Vols esborrar l'esdeveniment?",
   "deleteMessage": "Aquesta acció no es pot desfer. Segur que vols esborrar aquest esdeveniment?",
