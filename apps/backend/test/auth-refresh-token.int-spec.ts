@@ -81,12 +81,48 @@ describe('RefreshTokenService (integration)', () => {
     await expect(refreshTokenService.rotateRefreshToken(rawToken)).rejects.toThrow(UnauthorizedException);
   });
 
-  it('rotateRefreshToken: using a revoked token triggers family revocation (breach detection)', async () => {
+  it('rotateRefreshToken: reusing a just-rotated token (concurrent tabs) issues a sibling instead of revoking the family', async () => {
+    const user = await createUser(userRepository, { email: 'tabs@test.com', name: 'Tabs User' });
+    const { rawToken: token0, family } = await refreshTokenService.issueRefreshToken(user.id);
+
+    // Tab A rotates T0 → T1; tab B, which had read T0 before A wrote T1, sends T0 right after.
+    const { rawToken: token1 } = await refreshTokenService.rotateRefreshToken(token0);
+    const rotatedAtAfterFirst = (await refreshTokenRepository.findOne({ where: { tokenHash: hashToken(token0) } }))!
+      .rotatedAt;
+    const { rawToken: token2 } = await refreshTokenService.rotateRefreshToken(token0);
+
+    expect(token2).not.toBe(token1);
+
+    const siblings = await refreshTokenRepository.find({ where: { family, isRevoked: false } });
+    expect(siblings.map((t) => t.tokenHash).sort()).toEqual([hashToken(token1), hashToken(token2)].sort());
+    expect(siblings.every((t) => t.rotationCount === 1)).toBe(true);
+
+    // The grace reuse must not slide the window: T0 keeps the rotatedAt of the first rotation.
+    const t0Record = await refreshTokenRepository.findOne({ where: { tokenHash: hashToken(token0) } });
+    expect(t0Record!.isRevoked).toBe(true);
+    expect(t0Record!.rotatedAt).toEqual(rotatedAtAfterFirst);
+  });
+
+  it('rotateRefreshToken: a token revoked by logout gets no grace window', async () => {
+    const user = await createUser(userRepository, { email: 'logout@test.com', name: 'Logout User' });
+    const { rawToken, family } = await refreshTokenService.issueRefreshToken(user.id);
+
+    await refreshTokenService.revokeByRawToken(rawToken);
+
+    await expect(refreshTokenService.rotateRefreshToken(rawToken)).rejects.toThrow(UnauthorizedException);
+    const familyTokens = await refreshTokenRepository.find({ where: { family } });
+    expect(familyTokens.every((t) => t.isRevoked)).toBe(true);
+  });
+
+  it('rotateRefreshToken: using a revoked token outside the grace window triggers family revocation (breach detection)', async () => {
     const user = await createUser(userRepository, { email: 'breach@test.com', name: 'Breach User' });
     const { rawToken: token0, family } = await refreshTokenService.issueRefreshToken(user.id);
 
     // Legitimate rotation: T0 → T1
     const { rawToken: token1 } = await refreshTokenService.rotateRefreshToken(token0);
+
+    // Push the rotation outside the grace window (default 10s)
+    await refreshTokenRepository.update({ tokenHash: hashToken(token0) }, { rotatedAt: new Date(Date.now() - 60_000) });
 
     // Attacker replays T0 (already revoked) — breach detection kicks in
     await expect(refreshTokenService.rotateRefreshToken(token0)).rejects.toThrow(UnauthorizedException);

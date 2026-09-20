@@ -24,7 +24,7 @@ El módulo `auth` gestiona la autenticación y autorización de usuarios en la A
 - **services/**:
   - **oauth-provider.service.ts**: Lógica común de validación/login OAuth para proveedores.
   - **avatar.service.ts**: Gestión de avatares en Cloudinary.
-  - **refresh-token.service.ts**: Emisión, rotación y revocación de refresh tokens (hash SHA-256, familias, detección de brechas).
+  - **refresh-token.service.ts**: Emisión, rotación y revocación de refresh tokens (hash SHA-256, familias, detección de brechas con ventana de gracia para pestañas concurrentes).
   - **auth-exchange-code.service.ts**: Códigos de intercambio de un solo uso (TTL corto) para el callback OAuth.
 - **strategies/**:
   - **index.ts**: Registro centralizado de estrategias (`AUTH_STRATEGIES`).

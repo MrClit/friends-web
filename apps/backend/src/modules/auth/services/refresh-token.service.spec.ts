@@ -59,6 +59,7 @@ describe('RefreshTokenService', () => {
       userId: 'user-1',
       family: 'family-1',
       isRevoked: false,
+      rotatedAt: null,
       rotationCount: 0,
       expiresAt: new Date(Date.now() + 60_000),
     });
@@ -67,7 +68,9 @@ describe('RefreshTokenService', () => {
 
     expect(result.userId).toBe('user-1');
     expect(result.rawToken).toEqual(expect.any(String));
-    expect(repository.save).toHaveBeenCalled();
+    expect(repository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ tokenHash: 'hash', isRevoked: true, rotatedAt: expect.any(Date) as Date }),
+    );
   });
 
   it('rotateRefreshToken increments rotationCount on each rotation', async () => {
@@ -106,12 +109,13 @@ describe('RefreshTokenService', () => {
     expect(revokeFamilySpy).toHaveBeenCalledWith('family-1');
   });
 
-  it('rotateRefreshToken with revoked token revokes family and throws unauthorized', async () => {
+  it('rotateRefreshToken with a token rotated outside the grace window revokes family and throws unauthorized', async () => {
     repository.findOne.mockResolvedValue({
       tokenHash: 'hash',
       userId: 'user-1',
       family: 'family-1',
       isRevoked: true,
+      rotatedAt: new Date(Date.now() - 60_000),
       rotationCount: 0,
       expiresAt: new Date(Date.now() + 60_000),
     });
@@ -120,6 +124,78 @@ describe('RefreshTokenService', () => {
 
     await expect(service.rotateRefreshToken('raw-token')).rejects.toBeInstanceOf(UnauthorizedException);
     expect(revokeFamilySpy).toHaveBeenCalledWith('family-1');
+  });
+
+  describe('rotation grace window', () => {
+    const revokedTwoSecondsAgo = () => ({
+      tokenHash: 'hash',
+      userId: 'user-1',
+      family: 'family-1',
+      isRevoked: true,
+      rotatedAt: new Date(Date.now() - 2_000),
+      rotationCount: 3,
+      expiresAt: new Date(Date.now() + 60_000),
+    });
+
+    beforeEach(() => {
+      configService.get.mockImplementation((key: string) => {
+        if (key === 'REFRESH_TOKEN_ROTATION_GRACE_SECONDS') return '10';
+        if (key === 'REFRESH_TOKEN_MAX_ROTATIONS') return '100';
+        return '30';
+      });
+    });
+
+    it('issues a sibling token for a token rotated inside the window, without touching the stored row', async () => {
+      repository.findOne.mockResolvedValue(revokedTwoSecondsAgo());
+      const revokeFamilySpy = jest.spyOn(service, 'revokeFamilyTokens').mockResolvedValue(undefined);
+
+      const result = await service.rotateRefreshToken('raw-token');
+
+      expect(result.userId).toBe('user-1');
+      expect(result.rawToken).toEqual(expect.any(String));
+      expect(revokeFamilySpy).not.toHaveBeenCalled();
+      expect(repository.create).toHaveBeenCalledWith(expect.objectContaining({ family: 'family-1', rotationCount: 4 }));
+      // The only save is the sibling; the rotated row keeps its original rotatedAt.
+      expect(repository.save).toHaveBeenCalledTimes(1);
+      expect(repository.save).not.toHaveBeenCalledWith(expect.objectContaining({ tokenHash: 'hash' }));
+    });
+
+    it('gives no grace to a token revoked without a rotation (logout or family revocation)', async () => {
+      repository.findOne.mockResolvedValue({ ...revokedTwoSecondsAgo(), rotatedAt: null });
+      const revokeFamilySpy = jest.spyOn(service, 'revokeFamilyTokens').mockResolvedValue(undefined);
+
+      await expect(service.rotateRefreshToken('raw-token')).rejects.toBeInstanceOf(UnauthorizedException);
+      expect(revokeFamilySpy).toHaveBeenCalledWith('family-1');
+    });
+
+    it('is disabled when REFRESH_TOKEN_ROTATION_GRACE_SECONDS is 0', async () => {
+      configService.get.mockImplementation((key: string) =>
+        key === 'REFRESH_TOKEN_ROTATION_GRACE_SECONDS' ? '0' : '30',
+      );
+      repository.findOne.mockResolvedValue(revokedTwoSecondsAgo());
+      const revokeFamilySpy = jest.spyOn(service, 'revokeFamilyTokens').mockResolvedValue(undefined);
+
+      await expect(service.rotateRefreshToken('raw-token')).rejects.toBeInstanceOf(UnauthorizedException);
+      expect(revokeFamilySpy).toHaveBeenCalledWith('family-1');
+    });
+
+    it('falls back to the default window when the configured value is not a number', async () => {
+      configService.get.mockImplementation((key: string) =>
+        key === 'REFRESH_TOKEN_ROTATION_GRACE_SECONDS' ? 'oops' : '30',
+      );
+      repository.findOne.mockResolvedValue(revokedTwoSecondsAgo());
+
+      await expect(service.rotateRefreshToken('raw-token')).resolves.toEqual(
+        expect.objectContaining({ userId: 'user-1' }),
+      );
+    });
+
+    it('still rejects an expired token inside the window', async () => {
+      repository.findOne.mockResolvedValue({ ...revokedTwoSecondsAgo(), expiresAt: new Date(Date.now() - 60_000) });
+
+      await expect(service.rotateRefreshToken('raw-token')).rejects.toBeInstanceOf(UnauthorizedException);
+      expect(repository.save).not.toHaveBeenCalled();
+    });
   });
 
   it('rotateRefreshToken with expired token throws unauthorized', async () => {

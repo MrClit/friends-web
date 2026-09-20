@@ -210,7 +210,8 @@ transaction are flat (`/api/transactions/:id`). Admin user management is `/api/a
 OAuth callback → the backend mints a **one-time exchange code** (`AuthExchangeCode` entity, TTL from
 `AUTH_EXCHANGE_CODE_TTL_SECONDS`) and redirects to `FRONTEND_URL` with it → the frontend `POST /api/auth/exchange`
 trades it for an access token + refresh token. Tokens never travel in the redirect URL. Refresh tokens are
-persisted (`RefreshToken` entity), rotated on use and capped by `REFRESH_TOKEN_MAX_ROTATIONS`.
+persisted (`RefreshToken` entity), rotated on use and capped by `REFRESH_TOKEN_MAX_ROTATIONS`; a token rotated
+within the last `REFRESH_TOKEN_ROTATION_GRACE_SECONDS` may be reused by a concurrent tab without tripping breach detection.
 Google and Microsoft strategies share `strategies/base/oauth-validation.base.ts`; avatars go to Cloudinary
 via `services/avatar.service.ts`.
 

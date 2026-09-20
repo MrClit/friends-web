@@ -117,6 +117,7 @@ JWT_SECRET=<strong-secret>          # minimum 32 characters, or the backend refu
 JWT_EXPIRATION=15m
 REFRESH_TOKEN_EXPIRATION_DAYS=30
 REFRESH_TOKEN_MAX_ROTATIONS=100
+REFRESH_TOKEN_ROTATION_GRACE_SECONDS=10   # concurrent-tab reuse window; 0 disables it
 ```
 
 ### OAuth providers
