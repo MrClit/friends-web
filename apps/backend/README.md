@@ -171,6 +171,7 @@ CORS_ORIGIN=http://localhost:5173
 JWT_SECRET=replace-with-a-secure-random-string-min-32-chars
 JWT_EXPIRATION=15m
 REFRESH_TOKEN_EXPIRATION_DAYS=30
+REFRESH_TOKEN_ROTATION_GRACE_SECONDS=10
 
 # Google OAuth2
 GOOGLE_CLIENT_ID=replace-with-google-client-id
