@@ -62,9 +62,13 @@ this; a watching dev server does not).
 
 ### Environment
 
-Backend loads `.env.${NODE_ENV}` (`.env.development`, `.env.test`, `.env.production`) and validates it with
-the Joi schema in `src/config/env.validation.ts` — that schema, not the `.env.example` files, is the source
-of truth for which vars exist, which are required and what the defaults are. Boot fails loudly on a bad env.
+Backend loads `.env.${NODE_ENV}` (`.env.development`, `.env.test`) and validates it with the Joi schema in
+`src/config/env.validation.ts` — that schema, not the `.env.example` files, is the source of truth for which
+vars exist, which are required and what the defaults are. Boot fails loudly on a bad env. Production reads
+no file (Render exports the variables) and **refuses to boot or migrate if an `apps/backend/.env.production`
+exists on disk** — see `src/config/env-file.ts`. `pnpm check:env` (run by `pnpm lint`) fails if any backend
+`.env*` other than `*.example` is tracked or stops being ignored: the frontend commits its env files, the
+backend never does.
 
 The backend integration and e2e suites need a running Postgres *and* an `apps/backend/.env.test` copied from
 `.env.test.example` (gitignored). That file sets `TYPEORM_SYNC=true`, so those suites build the schema

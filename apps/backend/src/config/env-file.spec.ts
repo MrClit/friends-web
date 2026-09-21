@@ -1,5 +1,7 @@
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import * as path from 'node:path';
-import { assertDatabaseEnv, envFilePath } from './env-file';
+import { assertDatabaseEnv, envFilePath, resolveEnvFile } from './env-file';
 
 /**
  * The migration CLI used to read a plain `.env`, a file this repo does not have, so every local
@@ -39,6 +41,54 @@ describe('envFilePath', () => {
   // are each invoked from a different place.
   it('is absolute, so the working directory cannot change it', () => {
     expect(path.isAbsolute(envFilePath('development'))).toBe(true);
+  });
+});
+
+/**
+ * Production has no environment file — Render exports the variables — so an `.env.production` on disk is
+ * a developer's copy of the real credentials. The compiled entry points (`node dist/main`,
+ * `start:prod:migrate`) are not covered by data-source.ts's TypeScript-only guard, and they would read
+ * that file and connect to the live database (issue #179). The file is passed in explicitly, in a temp
+ * directory, so these tests do not depend on what the developer's machine happens to have.
+ */
+describe('resolveEnvFile', () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(path.join(tmpdir(), 'env-file-'));
+  });
+
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('refuses a production file that exists, naming it', () => {
+    const file = path.join(dir, '.env.production');
+    writeFileSync(file, 'DATABASE_HOST=live');
+
+    expect(() => resolveEnvFile('production', file)).toThrow(/Refusing to start with NODE_ENV=production/);
+    expect(() => resolveEnvFile('production', file)).toThrow(file);
+  });
+
+  // The Render path: NODE_ENV=production and nothing on disk. The path is still returned so the
+  // loaders keep behaving as before (dotenv and ConfigModule both tolerate a missing file).
+  it('returns the path in production when the file does not exist', () => {
+    const file = path.join(dir, '.env.production');
+
+    expect(resolveEnvFile('production', file)).toBe(file);
+  });
+
+  // Only the production file is a copy of live credentials; the others are meant to be on disk.
+  it('returns an existing file for any other environment', () => {
+    const file = path.join(dir, '.env.development');
+    writeFileSync(file, 'DATABASE_HOST=localhost');
+
+    expect(resolveEnvFile('development', file)).toBe(file);
+  });
+
+  // The unit suite runs under NODE_ENV=test, so the default resolves to the same file the app would load.
+  it('defaults to the file for the current environment', () => {
+    expect(resolveEnvFile()).toBe(envFilePath());
   });
 });
 
@@ -86,5 +136,14 @@ describe('assertDatabaseEnv', () => {
     process.env.DATABASE_PASSWORD = '';
 
     expect(() => assertDatabaseEnv()).toThrow(/DATABASE_PASSWORD/);
+  });
+
+  // Telling someone to "copy .env.example to .env.production" would have them create the very file
+  // resolveEnvFile refuses. In production the variables come from the platform, and the hint says so.
+  it('does not suggest creating the file in production', () => {
+    process.env.NODE_ENV = 'production';
+
+    expect(() => assertDatabaseEnv()).toThrow(/export them, do not create \.env\.production/);
+    expect(() => assertDatabaseEnv()).not.toThrow(/Copy \.env\.example/);
   });
 });

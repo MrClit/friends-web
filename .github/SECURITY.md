@@ -17,9 +17,11 @@ Reference inventory source: `apps/backend/.env.example`.
 
 ## 2. Where Secrets Are Stored
 
-- Local development: `apps/backend/.env.development` (never committed).
+- Local development: `apps/backend/.env.development` (never committed; `pnpm check:env` fails if any
+  backend `.env*` other than `*.example` is tracked).
 - CI/CD: GitHub Actions repository secrets.
-- Production runtime: hosting provider environment variables (Render).
+- Production runtime: hosting provider environment variables (Render) only. A local
+  `apps/backend/.env.production` makes the backend refuse to boot with `NODE_ENV=production`.
 - OAuth provider values: Google and Microsoft app consoles.
 
 ## 3. Secret Generation Rules

@@ -18,9 +18,12 @@ apps/*/coverage
 # outputs are missing, so a build can silently produce nothing.
 *.tsbuildinfo
 
-# Environment variables - Local overrides
-# Commitear: .env, .env.development, .env.production, .env.test
-# NO commitear: .env.local, .env.*.local
+# Environment variables. The two apps follow opposite rules:
+# - Frontend (apps/frontend): .env, .env.development, .env.test, .env.production ARE committed —
+#   every VITE_* value ships in the bundle, there is nothing secret in them.
+# - Backend (apps/backend): every .env* except *.example holds secrets and is NEVER committed.
+#   apps/backend/.gitignore ignores them and `pnpm check:env` (part of `pnpm lint`) enforces it.
+# *.local files are per-developer overrides in both apps and are never committed.
 .env.local
 .env.*.local
 .env.development.local

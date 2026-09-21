@@ -80,7 +80,10 @@ pnpm --filter @friends/backend start:prod:migrate
 
 ## 6. Required Backend Environment Variables (Production)
 
-These values are validated in `apps/backend/src/config/env.validation.ts`.
+These values are validated in `apps/backend/src/config/env.validation.ts`. They are set in the Render
+environment panel only: production reads no environment file, and the backend refuses to start (or to
+migrate) with `NODE_ENV=production` while an `apps/backend/.env.production` exists on disk — such a file
+can only be a developer's copy of the live credentials.
 
 ### Runtime
 
