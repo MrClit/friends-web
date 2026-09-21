@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
@@ -22,6 +23,33 @@ export const envFilePath = (nodeEnv: string = process.env.NODE_ENV || 'developme
   join(__dirname, '..', '..', `.env.${nodeEnv}`);
 
 /**
+ * The environment file to load, refusing a production file that only a developer's machine would have.
+ *
+ * Production has no environment file: Render exports the variables itself. An `.env.production` on
+ * disk is therefore a local copy of the real credentials, and any entry point that read it under
+ * `NODE_ENV=production` — `node dist/main`, `start:prod:migrate`, the compiled DataSource — would be
+ * talking to the live database from a laptop. The compiled paths are exactly the ones data-source.ts's
+ * own guard lets through (it only refuses the TypeScript CLI), so the check has to live here, in front
+ * of every loader. `NODE_ENV` alone cannot be the criterion, since Render boots with it too: what
+ * separates Render from a laptop is whether the file exists (issue #179).
+ */
+export const resolveEnvFile = (
+  nodeEnv: string = process.env.NODE_ENV || 'development',
+  file: string = envFilePath(nodeEnv),
+): string => {
+  if (nodeEnv === 'production' && existsSync(file)) {
+    throw new Error(
+      `Refusing to start with NODE_ENV=production while ${file} exists.\n` +
+        'Production reads its variables from the platform (Render) and ships no .env.production; a ' +
+        'local copy holds the real credentials, so this would connect to the live database. Unset ' +
+        'NODE_ENV to run against your local database.',
+    );
+  }
+
+  return file;
+};
+
+/**
  * Fails with the cause instead of the symptom when the database configuration is incomplete.
  *
  * Reads `process.env`, so it is satisfied either by the environment file or by variables the platform
@@ -33,9 +61,13 @@ export const assertDatabaseEnv = (envFile: string = envFilePath()): void => {
 
   if (missing.length === 0) return;
 
-  throw new Error(
-    `Missing database configuration: ${missing.join(', ')}.\n` +
-      `Read from ${envFile} (NODE_ENV=${process.env.NODE_ENV || 'development'}).\n` +
-      `Copy .env.example to that file, or export the variables before running this command.`,
-  );
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  // In production the fix is never to create the file: that is the copy resolveEnvFile refuses.
+  const hint =
+    nodeEnv === 'production'
+      ? 'Production reads its variables from the platform; export them, do not create .env.production.'
+      : `Read from ${envFile} (NODE_ENV=${nodeEnv}).\n` +
+        'Copy .env.example to that file, or export the variables before running this command.';
+
+  throw new Error(`Missing database configuration: ${missing.join(', ')}.\n${hint}`);
 };

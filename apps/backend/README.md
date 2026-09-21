@@ -127,23 +127,23 @@ This project uses different `.env` files depending on the environment.
 ```
 .env.development    # Development variables (local)
 .env.test           # Automated test variables (local)
-.env.production     # Production variables (server)
 .env.example        # Template with all variables
 .env.test.example   # Template for test environment
 ```
 
+There is no `.env.production`: production reads its variables from the Render environment panel.
+
 ### How It Works
 
-The loaded file is determined automatically by the `NODE_ENV` variable:
-
-```typescript
-// In app.module.ts
-envFilePath: `.env.${process.env.NODE_ENV || 'development'}`;
-```
+The loaded file is `.env.${NODE_ENV}`, resolved by `src/config/env-file.ts` (shared by
+`app.module.ts` and the migration CLI's `data-source.ts`):
 
 - If `NODE_ENV=development` → loads `.env.development`
-- If `NODE_ENV=production` → loads `.env.production`
+- If `NODE_ENV=test` → loads `.env.test`
 - By default (no NODE_ENV) → loads `.env.development`
+- If `NODE_ENV=production` → loads nothing on Render. If an `.env.production` exists on disk, the
+  backend **refuses to start**: that file can only be a copy of the live credentials, and running
+  `start:prod` or `start:prod:migrate` with it would connect a laptop to the production database.
 
 ### Available Variables
 
@@ -206,9 +206,11 @@ cp .env.example .env.development
 
 **⚠️ NEVER commit to Git:**
 
-- ❌ `.env.development` (local passwords)
-- ❌ `.env.production` (production passwords)
+- ❌ `.env.development` (local passwords, real OAuth and Cloudinary secrets)
+- ❌ `.env.production` (production passwords — and it should not exist locally at all, see above)
 - ❌ `.env` (generic file)
+
+`pnpm check:env` (part of `pnpm lint`, so also CI) fails if any of them is tracked or stops being ignored.
 
 **✅ OK to commit to Git:**
 
