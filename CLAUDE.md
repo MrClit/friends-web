@@ -57,8 +57,8 @@ pnpm --filter @friends/backend migration:run
 `check:backend` and still fail to compile.
 
 **`@friends/shared-types` is consumed from `dist/`.** Both apps import the built output, so a change there
-needs `pnpm --filter @friends/shared-types build` before the consumers see it (the backend `prebuild` does
-this; a watching dev server does not).
+needs `pnpm --filter @friends/shared-types build` before the consumers see it (root `pnpm lint`, `pnpm test`
+and `pnpm build` do this themselves; a watching dev server does not).
 
 ### Environment
 
