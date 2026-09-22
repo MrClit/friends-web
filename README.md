@@ -114,7 +114,7 @@ pnpm --filter @friends/frontend add lodash
 pnpm --filter @friends/backend add @nestjs/core
 
 # Add dev dependency to root
-pnpm add -D -w husky
+pnpm add -D -w <package>
 ```
 
 ### Available Scripts
@@ -144,6 +144,29 @@ pnpm format:check     # Check Prettier formatting
 pnpm clean            # Remove all node_modules and build artifacts
 ```
 
+### Git Hooks
+
+`pnpm install` installs a **`pre-push`** hook (husky). Every `git push` runs the same command this
+project requires before opening a PR:
+
+```bash
+pnpm lint && pnpm test && pnpm build
+```
+
+That is ESLint, Prettier, the workspace checks (`check:skills`, `check:env`), the frontend and
+backend unit suites, and — only through `build` — type-checking, which neither `lint` nor `test`
+does. It takes about **30 s** on a warm cache and writes nothing that git tracks. The backend
+integration and e2e suites are not included: they need Postgres and an `apps/backend/.env.test`.
+
+The hook is a safety net, not a substitute for running the command yourself: a failure found at push
+time has already cost you a commit. And it is not optional — `--no-verify` and `HUSKY=0` are the same
+bypass under two names, and neither is allowed.
+
+Hooks are installed by the root `prepare` script (`node .husky/install.mjs`), which exits early when
+`NODE_ENV=production` or `CI=true`, so production installs and CI runners never get them. They live
+per working tree: a fresh clone or a new `git worktree` has no hook until `pnpm install` has run
+there.
+
 ---
 
 ## 📂 Project Structure
@@ -166,9 +189,14 @@ friends-web/
 │       └── package.json
 ├── docs/                   # Pending designs and valid runbooks only (no shipped-work plans)
 ├── scripts/
-│   └── check-skills-symlinks.mjs # Skill symlink wiring check (pnpm check:skills)
+│   ├── check-skills-symlinks.mjs # Skill symlink wiring check (pnpm check:skills)
+│   └── check-env-files.mjs       # Backend .env exposure check (pnpm check:env)
+├── .husky/
+│   ├── install.mjs             # Hook installer, run by `prepare` (skips in CI and production)
+│   └── pre-push                # Runs lint + test + build before every push
 ├── .github/
 │   └── workflows/
+│       ├── ci.yml              # Lint, tests and build on every PR
 │       └── deploy.yml          # Auto-deploy frontend on push to main
 ├── package.json            # Root package (friends-monorepo)
 ├── pnpm-workspace.yaml     # pnpm workspaces config
@@ -179,13 +207,15 @@ friends-web/
 
 ## 🔄 CI/CD
 
-| Workflow       | Trigger        | Description                                            |
-| -------------- | -------------- | ------------------------------------------------------ |
-| **deploy.yml** | Push to `main` | Lints, tests, builds frontend, deploys to GitHub Pages |
+| Workflow       | Trigger                       | Description                                                                      |
+| -------------- | ----------------------------- | -------------------------------------------------------------------------------- |
+| **ci.yml**     | PR to `develop`/`main`        | Lint, frontend tests and build; backend unit, integration and e2e against Postgres |
+| **deploy.yml** | Push to `main`                | Lints, tests, builds frontend, deploys to GitHub Pages                             |
 
-CI only validates the frontend. The full check across all three workspaces is `pnpm lint && pnpm test
-&& pnpm build`, run locally before opening a PR — deliberately stricter than CI, since it is what
-keeps the backend from breaking. Production promotion is a pull request from `develop` into `main`,
+The same full check runs locally: `pnpm lint && pnpm test && pnpm build`, before opening a PR and
+again mechanically on every push through the [`pre-push` hook](#git-hooks). What the hook cannot
+cover is the backend integration and e2e suites, which need a running Postgres — those are CI's
+alone. Production promotion is a pull request from `develop` into `main`,
 merged with a merge commit — `main` is protected and rejects direct pushes. The full sequence (version
 bump, `CHANGELOG.md`, tag and GitHub Release) lives in the `release` skill, with this repo's
 coordinates in [`.claude/gh-project.md`](.claude/gh-project.md).
