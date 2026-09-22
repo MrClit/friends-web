@@ -22,13 +22,15 @@
     "test:coverage": "pnpm -r test:coverage",
     "format": "prettier --write \"apps/**/*.{ts,tsx,js,jsx,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"apps/**/*.{ts,tsx,js,jsx,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,json,md}\"",
-    "clean": "pnpm -r clean && rm -rf node_modules"
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "prepare": "node .husky/install.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.8.0",
+    "husky": "^9.1.7",
     "prettier": "^3.9.6",
     "typescript-eslint": "^8.65.0"
   },

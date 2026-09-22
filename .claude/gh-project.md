@@ -88,6 +88,11 @@ Ambos checks son **requeridos** en `develop` y `main`; `main` exige además PR.
 
 Nunca `--no-verify`.
 
+Un hook `pre-push` (husky) corre esa misma orden en cada push, unos 30 s. Es red de seguridad, no
+sustituto: ejecutarla a mano antes de abrir el PR sigue siendo el flujo, porque es su salida la que
+va al resumen del PR. `HUSKY=0` es `--no-verify` con otro nombre y está igual de prohibido. Detalles
+en el README, sección *Git Hooks*.
+
 ## Release a producción
 
 Versionado en el **`package.json` raíz** únicamente (una sola versión para todo el producto). Los
