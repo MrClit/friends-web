@@ -49,7 +49,7 @@ for (const file of backendEnvFiles) {
 if (problems.length) {
   console.error('\nBackend environment files are exposed:\n');
   for (const p of problems) console.error(`  - ${p}`);
-  console.error('\nSee the "Environment" section of CLAUDE.md.\n');
+  console.error('\nSee the "Environment" section of .claude/rules/backend.md.\n');
   process.exit(1);
 }
 

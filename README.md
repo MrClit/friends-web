@@ -237,8 +237,8 @@ Operational documentation:
 
 **[docs/](docs/)** holds only living documents: designs still pending execution and runbooks still
 valid. Plans for work already shipped are deleted — the code is the truth and the issue plus its PR
-are the record. Architecture and conventions live in [CLAUDE.md](CLAUDE.md); the API contract is the
-Swagger UI at `/api/docs`.
+are the record. Architecture and conventions live in [CLAUDE.md](CLAUDE.md) and, per side of the monorepo,
+in [.claude/rules/](.claude/rules/); the API contract is the Swagger UI at `/api/docs`.
 
 ---
 
