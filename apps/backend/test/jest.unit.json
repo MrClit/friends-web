@@ -5,7 +5,7 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
-  "collectCoverageFrom": ["<rootDir>/src/**/*.(t|j)s"],
+  "collectCoverageFrom": ["<rootDir>/src/**/*.(t|j)s", "!<rootDir>/src/migrations/**"],
   "coverageDirectory": "<rootDir>/coverage/unit",
   "coverageThreshold": {
     "global": {
