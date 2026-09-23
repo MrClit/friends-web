@@ -138,4 +138,4 @@ src/hooks/common/useModalState.ts    ✅
 
 - [Common Hooks README](./common/README.md)
 - [Domain Hooks README](./domain/README.md)
-- [State management layers](../../../../CLAUDE.md) - see "Frontend Architecture"
+- [State management layers](../../../../.claude/rules/frontend.md) - see "Frontend Architecture"
