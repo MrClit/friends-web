@@ -1,16 +1,5 @@
 import type { EventParticipant } from '../types';
 
-/** Sum of the contribution targets of every user and guest participant. The pot has no target. */
-export function sumContributionTargets(participants: EventParticipant[]): number {
-  return participants.reduce((sum, participant) => {
-    if (participant.type === 'user' || participant.type === 'guest') {
-      return sum + (participant.contributionTarget ?? 0);
-    }
-
-    return sum;
-  }, 0);
-}
-
 /**
  * Returns the participant with the given target applied.
  * A missing, zero or non-finite target removes the key: "no target" is the absence of the property,

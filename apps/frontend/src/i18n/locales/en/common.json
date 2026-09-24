@@ -15,6 +15,7 @@
   "actions": "Actions",
   "goToHome": "Friends - Go to home page",
   "participant": "Participant",
+  "potName": "Shared pot",
   "skipToContent": "Skip to main content",
   "errors": {
     "400": "The request data is not valid.",

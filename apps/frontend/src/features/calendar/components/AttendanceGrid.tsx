@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { CalendarDay, EventParticipantDto } from '@/api/types';
-import { getParticipantName } from '@/features/events/utils/participants';
+import { getParticipantName } from '@/shared/utils/participants';
 import { formatDateShort } from '@/shared/utils/format';
 import { cn } from '@/shared/utils/cn';
 import { AttendanceCell } from './AttendanceCell';

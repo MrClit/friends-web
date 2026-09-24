@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Event } from '@/features/events/types';
+import type { Event } from '@/api/types';
 import type { Transaction } from '@/features/transactions/types';
 
 type State = {

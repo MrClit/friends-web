@@ -3,7 +3,6 @@ import type { EventParticipant } from '../types';
 import {
   haveSameContributionTargets,
   parseContributionTargetInput,
-  sumContributionTargets,
   withContributionTarget,
 } from './contributionTargets';
 
@@ -19,20 +18,6 @@ const guest = (id: string, target?: number): EventParticipant => ({
   ...(target !== undefined && { contributionTarget: target }),
 });
 const pot: EventParticipant = { type: 'pot', id: '0' };
-
-describe('sumContributionTargets', () => {
-  it('sums user and guest targets and ignores the pot', () => {
-    expect(sumContributionTargets([user('a', 10.5), guest('g', 20), pot])).toBe(30.5);
-  });
-
-  it('treats a missing target as zero', () => {
-    expect(sumContributionTargets([user('a'), guest('g', 5)])).toBe(5);
-  });
-
-  it('returns zero for an empty list', () => {
-    expect(sumContributionTargets([])).toBe(0);
-  });
-});
 
 describe('withContributionTarget', () => {
   it('sets a non-zero target', () => {

@@ -5,11 +5,8 @@ import { useModalForm } from '@/hooks/common';
 import { getApiErrorMessage } from '@/shared/utils';
 import type { EventParticipant } from '../types';
 import { calculateSuggestedTargets } from '../utils/calculateSuggestedTargets';
-import {
-  haveSameContributionTargets,
-  sumContributionTargets,
-  withContributionTarget,
-} from '../utils/contributionTargets';
+import { sumContributionTargets } from '@/shared/utils/contributionTargets';
+import { haveSameContributionTargets, withContributionTarget } from '../utils/contributionTargets';
 
 interface UseContributionTargetsModalParams {
   open: boolean;

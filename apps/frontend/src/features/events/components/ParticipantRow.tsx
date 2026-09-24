@@ -5,7 +5,7 @@ import { cn } from '@/shared/utils/cn';
 import { Avatar } from '@/shared/components/Avatar';
 import { ParticipantsCombobox } from './ParticipantsCombobox';
 import type { EventParticipant } from '../types';
-import { getParticipantAvatar, getParticipantName } from '../utils/participants';
+import { getParticipantAvatar, getParticipantName } from '@/shared/utils/participants';
 
 interface ParticipantRowProps {
   participant: EventParticipant;

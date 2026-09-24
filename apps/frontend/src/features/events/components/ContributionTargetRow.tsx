@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/shared/components/Avatar';
 import { cn } from '@/shared/utils/cn';
 import type { GuestParticipant, UserParticipant } from '@/api/types';
-import { getParticipantAvatar, getParticipantName } from '../utils/participants';
+import { getParticipantAvatar, getParticipantName } from '@/shared/utils/participants';
 import { parseContributionTargetInput } from '../utils/contributionTargets';
 
 interface ContributionTargetRowProps {

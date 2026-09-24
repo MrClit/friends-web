@@ -2,8 +2,8 @@ import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
 import { FaChevronDown } from 'react-icons/fa';
-import type { EventParticipant } from '@/features/events/types';
-import { getParticipantAvatar, getParticipantName } from '@/features/events/utils/participants';
+import type { EventParticipantDto } from '@/api/types';
+import { getParticipantAvatar, getParticipantName } from '@/shared/utils/participants';
 import { Avatar } from '@/shared/components/Avatar';
 import { ComboboxOptionItem } from '@/shared/components/ComboboxOptionItem';
 import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
@@ -12,7 +12,7 @@ import type { PaymentType } from '../types';
 import { useTransactionParticipantCombobox } from '../hooks/useTransactionParticipantCombobox';
 
 interface TransactionParticipantComboboxProps {
-  participants: EventParticipant[];
+  participants: EventParticipantDto[];
   paymentType: PaymentType;
   value: string;
   onChange: (participantId: string) => void;

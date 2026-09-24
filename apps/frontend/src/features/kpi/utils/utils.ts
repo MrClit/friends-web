@@ -1,6 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { EventKPIBalanceBreakdown, EventKPIs } from '@/api/types';
-import type { Event } from '@/features/events/types';
+import type { Event, EventKPIBalanceBreakdown, EventKPIs } from '@/api/types';
 import { formatAmount } from '@/shared/utils/format';
 import type {
   KPIBalanceBreakdownViewModel,
@@ -12,7 +11,7 @@ import type {
   KPIUserStatusSummaryData,
 } from '@/features/kpi/types';
 import { getKPIConfig } from '@/features/kpi/constants';
-import { getParticipantName } from '@/features/events/utils/participants';
+import { getParticipantName } from '@/shared/utils/participants';
 
 export function formatPercent(value?: number): string {
   if (value === undefined || !Number.isFinite(value)) {

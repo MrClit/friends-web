@@ -10,7 +10,7 @@ import { useInfiniteScroll } from '@/hooks/common';
 import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
 import { ErrorState } from '@/shared/components';
 import { describeLoadError } from '@/shared/utils/apiError';
-import { getParticipantName } from '@/features/events/utils/participants';
+import { getParticipantName } from '@/shared/utils/participants';
 
 interface TransactionsListProps {
   event: Event;
