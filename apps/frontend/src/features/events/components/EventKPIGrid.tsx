@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MdAccountBalanceWallet, MdVolunteerActivism, MdShoppingBag, MdPerson } from 'react-icons/md';
 import type { EventParticipant } from '@/features/events/types';
-import { sumContributionTargets } from '@/features/events/utils/contributionTargets';
+import { sumContributionTargets } from '@/shared/utils/contributionTargets';
 import { formatAmount } from '@/shared/utils/format';
 import { KPIBox } from './KPIBox';
 

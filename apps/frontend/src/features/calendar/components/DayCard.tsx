@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
 import { MdDinnerDining, MdLunchDining, MdRestaurant } from 'react-icons/md';
 import type { CalendarDay, CalendarMeal, EventParticipantDto } from '@/api/types';
-import { getParticipantName } from '@/features/events/utils/participants';
+import { getParticipantName } from '@/shared/utils/participants';
 import { AccordionItem, AccordionTrigger, AccordionContent } from '@/shared/components/ui';
 import { formatDateLong } from '@/shared/utils/format';
 import { AttendanceCell } from './AttendanceCell';

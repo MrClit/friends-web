@@ -1,10 +1,10 @@
 import type { TFunction } from 'i18next';
-import type { EventParticipant } from '../types';
+import type { EventParticipantDto } from '@/api/types';
 
 /**
  * Get avatar from participant, safely handling different participant types
  */
-export function getParticipantAvatar(participant: EventParticipant): string | null | undefined {
+export function getParticipantAvatar(participant: EventParticipantDto): string | null | undefined {
   if (participant.type === 'user' && 'avatar' in participant) {
     return participant.avatar ?? null;
   }
@@ -14,7 +14,7 @@ export function getParticipantAvatar(participant: EventParticipant): string | nu
 /**
  * Get name from participant, handling different participant types
  */
-export function getParticipantName(participant: EventParticipant, t: TFunction): string {
+export function getParticipantName(participant: EventParticipantDto, t: TFunction): string {
   if (participant.type === 'guest') {
     return participant.name;
   }
@@ -22,7 +22,7 @@ export function getParticipantName(participant: EventParticipant, t: TFunction):
     return participant.name || '?';
   }
   if (participant.type === 'pot') {
-    return t('participantsInput.potName', { ns: 'events' });
+    return t('potName', { ns: 'common' });
   }
   return '?';
 }

@@ -6,7 +6,7 @@ import { EventKPIGrid } from '@/features/events';
 import { ContributionTargetsModal } from '@/features/events/components/ContributionTargetsModal';
 import { EventSectionSkeleton } from '@/features/events/components/EventSectionSkeleton';
 import { useEventLayoutContext } from '@/features/events/hooks';
-import { sumContributionTargets } from '@/features/events/utils/contributionTargets';
+import { sumContributionTargets } from '@/shared/utils/contributionTargets';
 import { TransactionModal } from '@/features/transactions/components/TransactionModal';
 import { TransactionsList } from '@/features/transactions/components/TransactionsList';
 import { ActionButton, FAB_POSITION_CLASSES } from '@/shared/components/ActionButton';

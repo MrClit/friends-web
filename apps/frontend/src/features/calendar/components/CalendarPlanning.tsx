@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCalendarMonth, MdUnfoldLess, MdUnfoldMore } from 'react-icons/md';
-import type { Event } from '@/features/events/types';
+import type { Event } from '@/api/types';
 import {
   useEventCalendar,
   useAddCalendarDays,

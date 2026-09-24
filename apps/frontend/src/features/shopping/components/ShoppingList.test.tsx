@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { ShoppingItem } from '@/api/types';
-import type { Event } from '@/features/events/types';
+import type { Event, ShoppingItem } from '@/api/types';
 import { ApiError } from '@/api/client';
 import { ShoppingList } from './ShoppingList';
 

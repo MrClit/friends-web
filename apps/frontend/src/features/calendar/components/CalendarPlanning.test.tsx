@@ -1,8 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MealSlot } from '@friends/shared-types';
-import type { CalendarDay } from '@/api/types';
-import type { Event } from '@/features/events/types';
+import type { CalendarDay, Event } from '@/api/types';
 import { ApiError } from '@/api/client';
 import { CalendarPlanning } from './CalendarPlanning';
 

@@ -15,6 +15,7 @@
   "actions": "Accions",
   "goToHome": "Friends - Anar a la pàgina principal",
   "participant": "Participant",
+  "potName": "Fons comú",
   "skipToContent": "Anar al contingut principal",
   "errors": {
     "400": "Les dades de la sol·licitud no són vàlides.",

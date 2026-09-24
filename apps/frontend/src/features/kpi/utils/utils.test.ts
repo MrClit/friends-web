@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { EventKPIBalanceBreakdown, EventKPIs } from '@/api/types';
-import type { Event } from '@/features/events/types';
+import type { Event, EventKPIBalanceBreakdown, EventKPIs } from '@/api/types';
 import { formatAmount } from '@/shared/utils/format';
 import { getKPIConfig } from '@/features/kpi/constants';
 import {

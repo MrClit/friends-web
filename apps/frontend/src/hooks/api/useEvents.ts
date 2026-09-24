@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { eventsApi } from '@/api/events.api';
 import { queryKeys } from './keys';
-import type { UpdateEventInput } from '@/features/events/types';
-import type { EventStatus } from '@/api/types';
+import type { EventStatus, UpdateEventDto } from '@/api/types';
 import { useDeletingStore } from '@/shared/store/useDeletingStore';
 import { useToast } from '@/shared/hooks/useToast';
 
@@ -69,7 +68,7 @@ export function useUpdateEvent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateEventInput }) => eventsApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateEventDto }) => eventsApi.update(id, data),
     onSuccess: (_, { id }) => {
       success('update_success', undefined, undefined, { ns: 'events' });
       // Invalidate both list and specific event detail

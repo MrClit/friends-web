@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdShare } from 'react-icons/md';
-import type { ShoppingItem } from '@/api/types';
-import type { Event } from '@/features/events/types';
+import type { Event, ShoppingItem } from '@/api/types';
 import { useAuth } from '@/features/auth/useAuth';
 import {
   useShoppingItems,

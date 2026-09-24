@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { EventKPIs } from '@/api/types';
+import type { Event, EventKPIs } from '@/api/types';
 import { useAuth } from '@/features/auth/useAuth';
-import type { Event } from '@/features/events/types';
-import { sumContributionTargets } from '@/features/events/utils/contributionTargets';
+import { sumContributionTargets } from '@/shared/utils/contributionTargets';
 import type {
   KPIType,
   KPIParticipantItem,
