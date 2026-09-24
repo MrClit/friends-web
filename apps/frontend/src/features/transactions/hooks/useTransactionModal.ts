@@ -5,7 +5,7 @@ import { useModalForm } from '@/hooks/common';
 import { formatDateToInputValue, parseDateForFormatting, getApiErrorMessage } from '@/shared/utils';
 import { DEFAULT_PAYMENT_TYPE } from '../constants';
 import type { Transaction, PaymentType } from '../types';
-import type { Event } from '@/features/events/types';
+import type { Event } from '@/api/types';
 
 function getTodayLocalDate(): string {
   return formatDateToInputValue(new Date());

@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import type { Event } from '@/features/events/types';
+import type { Event } from '@/api/types';
 import type { Transaction } from '../types';
 import { useTransactionModal } from './useTransactionModal';
 

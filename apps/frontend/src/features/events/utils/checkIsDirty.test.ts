@@ -31,12 +31,25 @@ describe('checkIsDirty', () => {
     expect(isDirty).toBe(false);
   });
 
-  it('returns true for a new form when a target is provided', () => {
-    const participants: EventParticipant[] = [{ type: 'user', id: 'u1', name: 'Alice', contributionTarget: 20 }];
+  it('returns false while the modal is closed', () => {
+    const isDirty = checkIsDirty({
+      event: undefined,
+      title: 'Something',
+      description: '',
+      participants: [],
+      icon: 'flight',
+      open: false,
+    });
+
+    expect(isDirty).toBe(false);
+  });
+
+  it('returns true for a new form once a title is typed', () => {
+    const participants: EventParticipant[] = [{ type: 'user', id: 'u1', name: 'Alice' }];
 
     const isDirty = checkIsDirty({
       event: undefined,
-      title: '',
+      title: 'Trip',
       description: '',
       participants,
       icon: 'flight',
@@ -47,8 +60,51 @@ describe('checkIsDirty', () => {
     expect(isDirty).toBe(true);
   });
 
-  it('returns true when a user target changes in edit mode', () => {
-    const participants: EventParticipant[] = [{ type: 'user', id: 'u1', name: 'Alice', contributionTarget: 25 }];
+  it('returns false in edit mode when only contribution targets differ', () => {
+    // Targets are edited from the Money section; a target-only difference must never trigger the
+    // discard prompt of the event form.
+    const eventWithTarget: Event = {
+      ...baseEvent,
+      participants: [{ type: 'user', id: 'u1', name: 'Alice', contributionTarget: 25 }],
+    };
+    const participants: EventParticipant[] = [{ type: 'user', id: 'u1', name: 'Alice' }];
+
+    const isDirty = checkIsDirty({
+      event: eventWithTarget,
+      title: 'Trip',
+      description: 'Weekend trip',
+      participants,
+      icon: 'flight',
+      open: true,
+    });
+
+    expect(isDirty).toBe(false);
+  });
+
+  it('returns true when a guest is renamed in edit mode', () => {
+    const eventWithGuest: Event = {
+      ...baseEvent,
+      participants: [{ type: 'guest', id: 'g1', name: 'Guest One' }],
+    };
+    const participants: EventParticipant[] = [{ type: 'guest', id: 'g1', name: 'Guest Two' }];
+
+    const isDirty = checkIsDirty({
+      event: eventWithGuest,
+      title: 'Trip',
+      description: 'Weekend trip',
+      participants,
+      icon: 'flight',
+      open: true,
+    });
+
+    expect(isDirty).toBe(true);
+  });
+
+  it('returns true when a participant is added in edit mode', () => {
+    const participants: EventParticipant[] = [
+      { type: 'user', id: 'u1', name: 'Alice' },
+      { type: 'guest', id: 'g1', name: 'Guest One' },
+    ];
 
     const isDirty = checkIsDirty({
       event: baseEvent,
@@ -62,34 +118,11 @@ describe('checkIsDirty', () => {
     expect(isDirty).toBe(true);
   });
 
-  it('treats undefined and zero target as equivalent defaults', () => {
-    const eventWithZeroTarget: Event = {
-      ...baseEvent,
-      participants: [{ type: 'user', id: 'u1', name: 'Alice', contributionTarget: 0 }],
-    };
-    const participants: EventParticipant[] = [{ type: 'user', id: 'u1', name: 'Alice' }];
+  it('returns true when a participant is replaced in edit mode', () => {
+    const participants: EventParticipant[] = [{ type: 'user', id: 'u2', name: 'Bob' }];
 
     const isDirty = checkIsDirty({
-      event: eventWithZeroTarget,
-      title: 'Trip',
-      description: 'Weekend trip',
-      participants,
-      icon: 'flight',
-      open: true,
-    });
-
-    expect(isDirty).toBe(false);
-  });
-
-  it('returns true when a guest target changes in edit mode', () => {
-    const eventWithGuest: Event = {
-      ...baseEvent,
-      participants: [{ type: 'guest', id: 'g1', name: 'Guest One', contributionTarget: 10 }],
-    };
-    const participants: EventParticipant[] = [{ type: 'guest', id: 'g1', name: 'Guest One', contributionTarget: 30 }];
-
-    const isDirty = checkIsDirty({
-      event: eventWithGuest,
+      event: baseEvent,
       title: 'Trip',
       description: 'Weekend trip',
       participants,

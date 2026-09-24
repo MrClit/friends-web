@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { EventKPIs } from '@/api/types';
+import type { Event, EventKPIs } from '@/api/types';
 import { useAuth } from '@/features/auth/useAuth';
-import type { Event } from '@/features/events/types';
+import { sumContributionTargets } from '@/shared/utils/contributionTargets';
 import type {
   KPIType,
   KPIParticipantItem,
@@ -83,13 +83,7 @@ export function KPIDetailView({ event, kpis, kpi: rawKpi }: KPIDetailViewProps) 
     return <div className="text-center mt-10">{t('notFound', { ns: 'kpiDetail' })}</div>;
   }
 
-  const targetTotal = event.participants.reduce((sum, participant) => {
-    if (participant.type === 'user' || participant.type === 'guest') {
-      return sum + (participant.contributionTarget ?? 0);
-    }
-
-    return sum;
-  }, 0);
+  const targetTotal = sumContributionTargets(event.participants);
 
   const compliancePercent = targetTotal > 0 ? (kpis.totalContributions / targetTotal) * 100 : undefined;
   const adjustmentPending =

@@ -88,6 +88,11 @@ Ambos checks son **requeridos** en `develop` y `main`; `main` exige además PR.
 
 Nunca `--no-verify`.
 
+Un hook `pre-push` (husky) corre esa misma orden en cada push, unos 30 s. Es red de seguridad, no
+sustituto: ejecutarla a mano antes de abrir el PR sigue siendo el flujo, porque es su salida la que
+va al resumen del PR. `HUSKY=0` es `--no-verify` con otro nombre y está igual de prohibido. Detalles
+en el README, sección *Git Hooks*.
+
 ## Release a producción
 
 Versionado en el **`package.json` raíz** únicamente (una sola versión para todo el producto). Los
@@ -100,6 +105,13 @@ deben coincidir. Consúltalos (`git tag -l`, `gh release list`) en vez de fiarte
 
 `main` exige PR y checks en verde: no hay atajo por push directo. La única vía es la coreografía por
 PR de la skill `release`.
+
+El **cuerpo del PR `develop → main`** lleva las notas de la nueva entrada del `CHANGELOG.md`, con sus
+`Closes #N` **a propósito**: así cada issue queda vinculada al PR de release y desde la issue se ve en
+qué versión salió. Para que esa vinculación no devuelva las issues a In Progress, el workflow del
+tablero **«Pull request linked to issue» está desactivado**; no lo reactives. Como `main` sí es la rama
+por defecto, `Closes #N` ahí **autocierra**: una entrada que referencie una issue todavía abierta
+(entrega parcial) debe usar `Refs #N` en vez de `Closes #N`.
 
 ### Pre-vuelo del release
 

@@ -6,7 +6,7 @@ import { EventCard } from './EventCard';
 import { CreateEventCard } from './CreateEventCard';
 import { useNavigate } from 'react-router-dom';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
-import { getParticipantAvatar, getParticipantName } from '../utils/participants';
+import { getParticipantAvatar, getParticipantName } from '@/shared/utils/participants';
 import { ErrorState } from '@/shared/components/ErrorState';
 import type { EventStatus } from '@/api/types';
 import { cn } from '@/shared/utils/cn';

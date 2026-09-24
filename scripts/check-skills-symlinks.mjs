@@ -101,7 +101,7 @@ for (const name of loaded) {
 if (problems.length) {
   console.error('\nSkill wiring is broken:\n');
   for (const p of problems) console.error(`  - ${p}`);
-  console.error('\nSee the "Skills" section of CLAUDE.md.\n');
+  console.error('\nSee .claude/rules/skills-wiring.md.\n');
   process.exit(1);
 }
 

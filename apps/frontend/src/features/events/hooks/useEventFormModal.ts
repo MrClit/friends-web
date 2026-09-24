@@ -63,11 +63,21 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
       return [];
     }
 
+    // A replacement asks the backend to migrate the guest's transactions to the user, so it only makes
+    // sense against what is persisted: the guest must already exist in the saved event and the user must
+    // not (the backend rejects both otherwise). Replacements involving participants that only lived in this
+    // edit session are dropped; the user is simply sent as a new participant.
+    const persistedGuestIds = new Set(event.participants.filter((p) => p.type === 'guest').map((p) => p.id));
+    const persistedUserIds = new Set(event.participants.filter((p) => p.type === 'user').map((p) => p.id));
     const guestIds = new Set(cleanParticipants.filter((p) => p.type === 'guest').map((p) => p.id));
     const userIds = new Set(cleanParticipants.filter((p) => p.type === 'user').map((p) => p.id));
 
     return participantReplacements.filter(
-      (replacement) => !guestIds.has(replacement.fromGuestId) && userIds.has(replacement.toUserId),
+      (replacement) =>
+        persistedGuestIds.has(replacement.fromGuestId) &&
+        !persistedUserIds.has(replacement.toUserId) &&
+        !guestIds.has(replacement.fromGuestId) &&
+        userIds.has(replacement.toUserId),
     );
   }, [cleanParticipants, event, participantReplacements]);
 

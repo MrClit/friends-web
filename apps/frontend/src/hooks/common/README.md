@@ -122,7 +122,7 @@ pnpm test:coverage useModalState useConfirmDialog
 
 ## Architecture
 
-These hooks follow the state management layers described in `CLAUDE.md`:
+These hooks follow the state management layers described in `.claude/rules/frontend.md`:
 
 - ✅ **Modal state**: Always use `useModalState` or `useConfirmDialog`
 - ✅ **Business logic**: Separate in custom hooks (e.g., `useEventDetail`)

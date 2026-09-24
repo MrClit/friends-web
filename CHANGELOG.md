@@ -5,6 +5,43 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-09-24
+
+Contribution targets move to where the money is, a fix for a save that failed when a guest was swapped for
+a user, and a refresh-token grace window so several open tabs stop logging each other out. **One database
+migration** (a nullable `rotated_at` column on `refresh_tokens`, applied on boot) and **one new optional
+environment variable** with a safe default: nothing has to change in the Render dashboard before deploying.
+
+### Added
+
+- A refresh token rotated less than `REFRESH_TOKEN_ROTATION_GRACE_SECONDS` ago (default `10`, `0` disables)
+  can be presented once more by a concurrent tab instead of being treated as reuse and revoking the whole
+  session. Tokens rotated before this deploy keep a `NULL` `rotated_at` and get no grace window. Closes
+  [#112].
+
+### Changed
+
+- Contribution targets are edited from the event's Money section instead of the event modal. Closes
+  [#192].
+- Participant utils and types moved from `features/events` to `shared`. Closes [#188].
+- Migrations are excluded from the backend's unit coverage, which no longer drags the total down. Closes
+  [#168].
+- Tooling: a husky `pre-push` hook runs lint, tests and build (skipped on Render and CI), `shared-types`
+  is built before the root lint and test, and side-specific `CLAUDE.md` sections moved to path-scoped
+  rules. Closes [#59], [#146], [#205].
+
+### Fixed
+
+- Replacing a guest that was just added (and not yet saved) with a user no longer makes saving the event
+  fail with a `400`. Closes [#204].
+
+### Security
+
+- The backend refuses to start or migrate under `NODE_ENV=production` while an `apps/backend/.env.production`
+  exists on disk — on a laptop that file can only be a copy of the live credentials. Render ships no such
+  file and is unaffected. A new `check:env` step in `pnpm lint` fails if any backend `.env*` other than the
+  examples is tracked or stops being ignored. Closes [#179].
+
 ## [0.6.0] - 2026-09-13
 
 Polish on the calendar shipped in 0.5.0 — the mobile view starts collapsed and the day cards now say what
@@ -319,6 +356,15 @@ JWT secret validation. No product features and no database migrations.
 
 - Outdated GitHub Actions workflows: `backend-tests.yml` and `release-to-prod.yml`.
 
+[#59]: https://github.com/MrClit/friends-web/issues/59
+[#112]: https://github.com/MrClit/friends-web/issues/112
+[#146]: https://github.com/MrClit/friends-web/issues/146
+[#168]: https://github.com/MrClit/friends-web/issues/168
+[#179]: https://github.com/MrClit/friends-web/issues/179
+[#188]: https://github.com/MrClit/friends-web/issues/188
+[#192]: https://github.com/MrClit/friends-web/issues/192
+[#204]: https://github.com/MrClit/friends-web/issues/204
+[#205]: https://github.com/MrClit/friends-web/issues/205
 [#158]: https://github.com/MrClit/friends-web/issues/158
 [#166]: https://github.com/MrClit/friends-web/issues/166
 [#182]: https://github.com/MrClit/friends-web/issues/182

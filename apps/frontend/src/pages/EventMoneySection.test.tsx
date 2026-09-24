@@ -11,9 +11,15 @@ vi.mock('react-i18next', async () => {
 
   return {
     ...actual,
-    useTranslation: () => ({ t: (key: string) => key }),
+    useTranslation: () => ({
+      t: (key: string, options?: { amount?: string }) => (options?.amount ? `${key}:${options.amount}` : key),
+    }),
   };
 });
+
+vi.mock('@/shared/utils/format', () => ({
+  formatAmount: (amount: number) => `${amount} €`,
+}));
 
 const mockEvent = {
   id: 'event-123',
@@ -23,6 +29,12 @@ const mockEvent = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
+
+const participantsWithTargets = [
+  { type: 'user' as const, id: 'user-1', name: 'Alice', contributionTarget: 30 },
+  { type: 'guest' as const, id: 'guest-1', name: 'Guest', contributionTarget: 20.5 },
+  { type: 'pot' as const, id: '0' as const },
+];
 
 const mockUseEventLayoutContext = vi.fn();
 const openModalMock = vi.fn();
@@ -62,6 +74,32 @@ vi.mock('@/features/transactions/components/TransactionsList', () => ({
 
 vi.mock('@/features/transactions/components/TransactionModal', () => ({
   TransactionModal: () => null,
+}));
+
+vi.mock('@/features/events/components/ContributionTargetsModal', () => ({
+  ContributionTargetsModal: ({
+    open,
+    eventId,
+    participants,
+    totalExpenses,
+    onClose,
+  }: {
+    open: boolean;
+    eventId: string;
+    participants: unknown[];
+    totalExpenses: number;
+    onClose: () => void;
+  }) => (
+    <div
+      data-testid="contribution-targets-modal"
+      data-open={open}
+      data-event-id={eventId}
+      data-participants={participants.length}
+      data-total-expenses={totalExpenses}
+    >
+      <button onClick={onClose}>close-targets</button>
+    </div>
+  ),
 }));
 
 vi.mock('@/shared/components/ActionButton', () => ({
@@ -106,5 +144,50 @@ describe('EventMoneySection', () => {
     fireEvent.click(screen.getByRole('button', { name: 'addTransaction' }));
 
     expect(openModalMock).toHaveBeenCalledWith(mockEvent);
+  });
+
+  describe('contribution targets subheader', () => {
+    it('says there are no targets when no participant has one', () => {
+      render(<EventMoneySection />);
+
+      expect(screen.getByText('targets.summaryNone')).toBeInTheDocument();
+    });
+
+    it('shows the total target of the event', () => {
+      mockUseEventLayoutContext.mockReturnValue({
+        event: { ...mockEvent, participants: participantsWithTargets },
+        kpis: { potBalance: 0 },
+      });
+      render(<EventMoneySection />);
+
+      expect(screen.getByText('targets.summaryTotal:50.5 €')).toBeInTheDocument();
+    });
+
+    it('opens the targets modal with the event data and closes it back', () => {
+      mockUseEventLayoutContext.mockReturnValue({
+        event: { ...mockEvent, participants: participantsWithTargets },
+        kpis: { potBalance: 0, totalExpenses: 120 },
+      });
+      render(<EventMoneySection />);
+
+      const modal = screen.getByTestId('contribution-targets-modal');
+      expect(modal).toHaveAttribute('data-open', 'false');
+      expect(modal).toHaveAttribute('data-event-id', 'event-123');
+      expect(modal).toHaveAttribute('data-participants', '3');
+      expect(modal).toHaveAttribute('data-total-expenses', '120');
+
+      fireEvent.click(screen.getByRole('button', { name: 'targets.openAria' }));
+      expect(modal).toHaveAttribute('data-open', 'true');
+
+      fireEvent.click(screen.getByRole('button', { name: 'close-targets' }));
+      expect(modal).toHaveAttribute('data-open', 'false');
+    });
+
+    it('passes zero expenses to the modal while the KPIs have not loaded', () => {
+      mockUseEventLayoutContext.mockReturnValue({ event: mockEvent, kpis: undefined });
+      render(<EventMoneySection />);
+
+      expect(screen.getByTestId('contribution-targets-modal')).toHaveAttribute('data-total-expenses', '0');
+    });
   });
 });

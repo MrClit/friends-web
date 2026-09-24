@@ -4,6 +4,8 @@ export { EventFormModal } from './EventFormModal';
 export { EventForm } from './EventForm';
 export { ParticipantsList } from './ParticipantsList';
 export { ParticipantsCombobox } from './ParticipantsCombobox';
+export { ContributionTargetsModal } from './ContributionTargetsModal';
+export { ContributionTargetRow } from './ContributionTargetRow';
 export { KPIBox } from './KPIBox';
 export { EventDetailHeader } from './EventDetailHeader';
 export { EventKPIGrid } from './EventKPIGrid';

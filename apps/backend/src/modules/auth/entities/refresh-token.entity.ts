@@ -32,6 +32,11 @@ export class RefreshToken {
   @Column({ name: 'is_revoked', type: 'boolean', default: false })
   isRevoked!: boolean;
 
+  // Set only when the token is consumed by a rotation — never by a logout or a family revocation. It is
+  // what bounds the grace window in RefreshTokenService.rotateRefreshToken.
+  @Column({ name: 'rotated_at', type: 'timestamptz', nullable: true })
+  rotatedAt!: Date | null;
+
   @Column({ name: 'rotation_count', type: 'int', default: 0 })
   rotationCount!: number;
 

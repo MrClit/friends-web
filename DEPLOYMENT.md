@@ -80,7 +80,10 @@ pnpm --filter @friends/backend start:prod:migrate
 
 ## 6. Required Backend Environment Variables (Production)
 
-These values are validated in `apps/backend/src/config/env.validation.ts`.
+These values are validated in `apps/backend/src/config/env.validation.ts`. They are set in the Render
+environment panel only: production reads no environment file, and the backend refuses to start (or to
+migrate) with `NODE_ENV=production` while an `apps/backend/.env.production` exists on disk — such a file
+can only be a developer's copy of the live credentials.
 
 ### Runtime
 
@@ -117,6 +120,7 @@ JWT_SECRET=<strong-secret>          # minimum 32 characters, or the backend refu
 JWT_EXPIRATION=15m
 REFRESH_TOKEN_EXPIRATION_DAYS=30
 REFRESH_TOKEN_MAX_ROTATIONS=100
+REFRESH_TOKEN_ROTATION_GRACE_SECONDS=10   # concurrent-tab reuse window; 0 disables it
 ```
 
 ### OAuth providers

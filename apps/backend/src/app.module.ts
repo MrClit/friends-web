@@ -18,7 +18,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { envValidationSchema } from './config/env.validation';
-import { envFilePath } from './config/env-file';
+import { resolveEnvFile } from './config/env-file';
 import { CorrelationMiddleware } from './common/middleware/correlation.middleware';
 import { RequestContextModule } from './common/request-context/request-context.module';
 
@@ -50,7 +50,8 @@ import { RequestContextModule } from './common/request-context/request-context.m
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: envFilePath(),
+      // Throws under NODE_ENV=production if an .env.production exists on disk: see config/env-file.ts.
+      envFilePath: resolveEnvFile(),
       cache: true,
       validationSchema: envValidationSchema,
       validationOptions: { abortEarly: false },
