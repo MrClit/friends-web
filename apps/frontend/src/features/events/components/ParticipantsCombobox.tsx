@@ -1,4 +1,4 @@
-import { useId, useRef } from 'react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
 import { MdPersonAdd } from 'react-icons/md';
@@ -30,7 +30,7 @@ export function ParticipantsCombobox({
   const { t } = useTranslation(['events', 'common']);
   const placeholder = allowCreateGuest ? t('participantsInput.placeholder') : t('participantsInput.replacePlaceholder');
   // Random per mount on purpose: a stable name would let Chrome build autocomplete history for it
-  const inputName = useRef(`participant-${randomUUID()}`).current;
+  const [inputName] = useState(() => `participant-${randomUUID()}`);
   const inputId = useId();
 
   const {

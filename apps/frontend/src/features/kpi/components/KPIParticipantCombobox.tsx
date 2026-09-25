@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useCallback, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
 import { FaChevronDown } from 'react-icons/fa';
@@ -28,7 +28,7 @@ export function KPIParticipantCombobox({
   const { t } = useTranslation('kpiDetail');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [open, setOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [rawHighlightedIndex, setHighlightedIndex] = useState(-1);
   const [searchValue, setSearchValue] = useState('');
 
   const options = useMemo<ParticipantOption[]>(
@@ -60,6 +60,9 @@ export function KPIParticipantCombobox({
   }, [options, searchValue]);
 
   const optionsCount = filteredOptions.length;
+  // The options can shrink under a highlighted index (the list refetches while open), so the index in use
+  // is clamped here rather than corrected afterwards from an effect.
+  const highlightedIndex = Math.min(rawHighlightedIndex, optionsCount - 1);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -118,14 +121,14 @@ export function KPIParticipantCombobox({
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         if (optionsCount === 0) return;
-        setHighlightedIndex((prev) => (prev < optionsCount - 1 ? prev + 1 : 0));
+        setHighlightedIndex(highlightedIndex < optionsCount - 1 ? highlightedIndex + 1 : 0);
       } else if (event.key === 'ArrowUp') {
         event.preventDefault();
         if (optionsCount === 0) return;
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : optionsCount - 1));
+        setHighlightedIndex(highlightedIndex > 0 ? highlightedIndex - 1 : optionsCount - 1);
       } else if (event.key === 'Enter') {
         event.preventDefault();
-        if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
+        if (highlightedIndex >= 0) {
           handleSelectOption(filteredOptions[highlightedIndex]);
         } else if (filteredOptions.length === 1) {
           handleSelectOption(filteredOptions[0]);
@@ -137,11 +140,6 @@ export function KPIParticipantCombobox({
     },
     [close, filteredOptions, handleSelectOption, highlightedIndex, optionsCount],
   );
-
-  useEffect(() => {
-    if (highlightedIndex < filteredOptions.length) return;
-    setHighlightedIndex(filteredOptions.length > 0 ? filteredOptions.length - 1 : -1);
-  }, [filteredOptions, highlightedIndex]);
 
   const hasSelectedParticipant = Boolean(selectedParticipantId);
 
