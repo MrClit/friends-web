@@ -12,6 +12,7 @@ import { MEAL_SLOTS } from '@friends/shared-types';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { Event } from '../events/entities/event.entity';
 import { EventAccessService } from '../event-access/event-access.service';
+import { EventParticipationService } from '../event-participation/event-participation.service';
 import { RequestContextService } from '../../common/request-context/request-context.service';
 import { CalendarDay } from './entities/calendar-day.entity';
 import { CalendarMeal } from './entities/calendar-meal.entity';
@@ -21,9 +22,6 @@ import { UpdateCalendarDayDto } from './dto/update-calendar-day.dto';
 import { UpdateCalendarMealDto } from './dto/update-calendar-meal.dto';
 import { SetAttendanceDto } from './dto/set-attendance.dto';
 import { AttendanceCellDto } from './dto/attendance-cell.dto';
-
-/** The pot is a spending bucket, not a person: it never attends a meal. */
-const POT_PARTICIPANT_ID = '0';
 
 /** Postgres unique_violation. */
 const UNIQUE_VIOLATION = '23505';
@@ -40,6 +38,7 @@ export class CalendarService {
     @InjectRepository(CalendarAttendance)
     private readonly attendanceRepository: Repository<CalendarAttendance>,
     private readonly eventAccessService: EventAccessService,
+    private readonly eventParticipationService: EventParticipationService,
     private readonly requestContext: RequestContextService,
   ) {}
 
@@ -213,7 +212,8 @@ export class CalendarService {
       this.logger.log(`Setting attendance of participant ${setAttendanceDto.participantId} on meal ${mealId}`);
 
       const { event } = await this.loadMealWithEvent(mealId, actor);
-      this.assertParticipantAttends(event, setAttendanceDto.participantId);
+      // The pot never attends a meal: only people can be signed up.
+      this.eventParticipationService.assertPersonParticipant(event.participants, setAttendanceDto.participantId);
 
       const { participantId, adults, children } = setAttendanceDto;
       const existing = await this.attendanceRepository.findOne({ where: { mealId, participantId } });
@@ -306,19 +306,6 @@ export class CalendarService {
 
     if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date) {
       throw new BadRequestException(`${date} is not a real calendar date`);
-    }
-  }
-
-  /** The pot never attends, and nobody outside the event's participants can be signed up. */
-  private assertParticipantAttends(event: Event, participantId: string): void {
-    if (participantId === POT_PARTICIPANT_ID) {
-      throw new BadRequestException('The pot does not take part in the calendar');
-    }
-
-    const attends = (event.participants ?? []).some((p) => p.type !== 'pot' && p.id === participantId);
-
-    if (!attends) {
-      throw new BadRequestException(`Participant with ID ${participantId} does not exist in this event`);
     }
   }
 

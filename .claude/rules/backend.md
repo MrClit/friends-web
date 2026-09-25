@@ -21,7 +21,7 @@ src/config/                 database.config.ts, app.config.ts, env.validation.ts
 src/migrations/             TypeORM migration files
 ```
 
-Modules: `auth`, `events`, `transactions`, `shopping-list`, `calendar`, `users`, `admin`, `event-access`
+Modules: `auth`, `events`, `transactions`, `shopping-list`, `calendar`, `users`, `admin`, `event-access`, `event-participation`
 
 A module that grows past one service splits into `{module}/services/` (see `events/services/`,
 `transactions/services/`) rather than fattening the root service.
@@ -50,6 +50,11 @@ environment-dependent wiring (CORS, Swagger, `listen`).
 access an event if it is an admin, or is listed as a participant of `type: 'user'`. Guest participants that
 happen to share an id grant nothing. Any module needing to authorize an event depends on this service —
 do not re-derive the rule against your own repository.
+
+`EventParticipationService` (`modules/event-participation/`) is likewise the **single owner** of whether a
+`participantId` is valid in an event, in two explicit variants: `assertParticipantOrPot` (transactions — the
+pot `'0'` may pay) and `assertPersonParticipant` (calendar — only users and guests). Do not walk
+`event.participants` yourself to validate an id.
 
 ### API surface
 

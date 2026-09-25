@@ -10,9 +10,9 @@ import { TransactionsService } from './transactions.service';
 import { Transaction } from './entities/transaction.entity';
 import { Event } from '../events/entities/event.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
 import { EventAccessService } from '../event-access/event-access.service';
+import { EventParticipationService } from '../event-participation/event-participation.service';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { RequestContextService } from '../../common/request-context/request-context.service';
 
@@ -75,10 +75,6 @@ describe('TransactionsService', () => {
     findOne: jest.fn(),
   };
 
-  const mockParticipantValidationService = {
-    validateParticipantId: jest.fn(),
-  };
-
   const mockTransactionPaginationService = {
     findByEventPaginated: jest.fn(),
   };
@@ -98,10 +94,8 @@ describe('TransactionsService', () => {
           provide: getRepositoryToken(Event),
           useValue: mockEventRepository,
         },
-        {
-          provide: ParticipantValidationService,
-          useValue: mockParticipantValidationService,
-        },
+        // Pure and dependency-free, so the real rule runs rather than a stand-in for it.
+        EventParticipationService,
         {
           provide: TransactionPaginationService,
           useValue: mockTransactionPaginationService,
@@ -230,9 +224,10 @@ describe('TransactionsService', () => {
       expect(result).toEqual(mockTransaction);
     });
 
-    it('creates a transaction for POT participant (id: 0)', async () => {
+    it('creates an expense paid by the POT participant (id: 0)', async () => {
       const potDto: CreateTransactionDto = {
         ...createDto,
+        paymentType: 'expense',
         participantId: '0',
       };
 
@@ -262,21 +257,31 @@ describe('TransactionsService', () => {
 
     it('throws BadRequestException for invalid participantId', async () => {
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation(
-        (participantId: string, _paymentType: string) => {
-          if (participantId === '999') {
-            throw new BadRequestException('Invalid participant');
-          }
-        },
-      );
 
       const invalidDto: CreateTransactionDto = {
         ...createDto,
         participantId: '999',
       };
 
-      await expect(service.create('event-uuid-1', invalidDto, memberActor)).rejects.toThrow(BadRequestException);
+      await expect(service.create('event-uuid-1', invalidDto, memberActor)).rejects.toThrow(
+        new BadRequestException(
+          "Participant with ID 999 does not exist in this event. Valid participant IDs: user-1, g1 or '0' for POT",
+        ),
+      );
+      expect(mockTransactionRepository.save).not.toHaveBeenCalled();
     });
+
+    it.each(['contribution', 'compensation'] as const)(
+      'rejects the POT participant with paymentType %s',
+      async (paymentType) => {
+        mockEventRepository.findOne.mockResolvedValue(mockEvent);
+
+        await expect(
+          service.create('event-uuid-1', { ...createDto, paymentType, participantId: '0' }, memberActor),
+        ).rejects.toThrow(new BadRequestException(`POT participant can only be used with payment type 'expense'`));
+        expect(mockTransactionRepository.save).not.toHaveBeenCalled();
+      },
+    );
   });
 
   describe('update', () => {
@@ -306,13 +311,6 @@ describe('TransactionsService', () => {
     it('validates participantId when updating', async () => {
       mockTransactionRepository.findOne.mockResolvedValue(mockTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation(
-        (participantId: string, _paymentType: string) => {
-          if (participantId === '999') {
-            throw new BadRequestException('Invalid participant');
-          }
-        },
-      );
 
       const updateDtoWithInvalidParticipant = {
         ...updateDto,
@@ -328,17 +326,11 @@ describe('TransactionsService', () => {
       const potTransaction = { ...mockTransaction, participantId: '0', paymentType: 'expense' as const };
       mockTransactionRepository.findOne.mockResolvedValue(potTransaction);
       mockEventRepository.findOne.mockResolvedValue(mockEvent);
-      mockParticipantValidationService.validateParticipantId.mockImplementation(
-        (participantId: string, paymentType: string) => {
-          if (participantId === '0' && paymentType !== 'expense') {
-            throw new BadRequestException(`POT participant can only be used with payment type 'expense'`);
-          }
-        },
-      );
 
       await expect(
         service.update('transaction-uuid-1', { paymentType: 'compensation' as const }, adminActor),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(new BadRequestException(`POT participant can only be used with payment type 'expense'`));
+      expect(mockTransactionRepository.update).not.toHaveBeenCalled();
     });
 
     it('throws NotFoundException when transaction does not exist', async () => {
