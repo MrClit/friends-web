@@ -15,7 +15,8 @@
     "build:types": "pnpm --filter @friends/shared-types build",
     "check:skills": "node scripts/check-skills-symlinks.mjs",
     "check:env": "node scripts/check-env-files.mjs",
-    "lint": "pnpm build:types && pnpm check:skills && pnpm check:env && pnpm format:check && pnpm -r lint",
+    "check:catalog": "node scripts/check-catalog.mjs",
+    "lint": "pnpm build:types && pnpm check:skills && pnpm check:env && pnpm check:catalog && pnpm format:check && pnpm -r lint",
     "lint:fix": "pnpm -r lint:fix && pnpm format",
     "test": "pnpm build:types && pnpm -r test:run",
     "test:watch": "pnpm -r --parallel test:watch",
@@ -26,13 +27,14 @@
     "prepare": "node .husky/install.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.8.0",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.8.0",
+    "@eslint/js": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "globals": "catalog:",
     "husky": "^9.1.7",
     "prettier": "^3.9.6",
-    "typescript-eslint": "^8.65.0"
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   },
   "pnpm": {
     "overrides": {

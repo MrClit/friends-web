@@ -1,9 +1,10 @@
 # Full local validation before anything leaves the machine. Identical to the pre-PR command in
 # .claude/gh-project.md.
 #
-# Covers ESLint, Prettier, the workspace checks (check:skills, check:env), the frontend and backend
-# unit suites, and — only through `build` — type-checking, which neither lint nor test performs. The
-# backend integration and e2e suites are deliberately out: they need Postgres and a .env.test.
+# Covers ESLint, Prettier, the workspace checks (check:skills, check:env, check:catalog), the frontend
+# and backend unit suites, and — only through `build` — type-checking, which neither lint nor test
+# performs. The backend integration and e2e suites are deliberately out: they need Postgres and a
+# .env.test.
 #
 # No shebang and no `set -e`: husky runs this file as `sh -e "$0"`, so it needs neither an
 # interpreter line nor an executable bit, and `&&` already stops at the first failure.
