@@ -1,5 +1,5 @@
 import { useEffect, useRef, type JSX } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { UserRole } from './types';
 import { useToastStore } from '@/shared/store/useToastStore';

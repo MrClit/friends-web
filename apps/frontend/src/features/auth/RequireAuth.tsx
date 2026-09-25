@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { JSX } from 'react';
 import { AppLoadingFallback } from '@/shared/components/AppLoadingFallback';

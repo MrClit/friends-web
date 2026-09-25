@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import type { IconType } from 'react-icons';
 import { cn } from '@/shared/utils';
 
