@@ -1,22 +1,25 @@
 import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdCloudOff, MdLinkOff } from 'react-icons/md';
 import { Outlet, useParams } from 'react-router-dom';
 import { EventDetailHeader, EventFormModal, EventSectionTabs } from '@/features/events';
 import { EventDetailSkeleton } from '@/features/events/components/EventDetailSkeleton';
 import { EventSectionSkeleton } from '@/features/events/components/EventSectionSkeleton';
 import { useEventDetail, useIsEventSectionRoute, type EventLayoutContext } from '@/features/events/hooks';
 import { useConfirmDialog } from '@/hooks/common';
-import { ConfirmDialog, ErrorState } from '@/shared/components';
+import { ConfirmDialog, FullPageMessage, type FullPageAction } from '@/shared/components';
 import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
 import { describeLoadError } from '@/shared/utils/apiError';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 import { MainLayout } from './MainLayout';
 
-const EVENT_LAYOUT_NAMESPACES = ['eventDetail', 'events', 'common'] as const;
+const EVENT_LAYOUT_NAMESPACES = ['eventDetail', 'events', 'common', 'notFound'] as const;
 
 /**
  * Shell of every view of an event: it owns the event fetch, its
  * loading/error/not-found states, the header and the event-level modals.
+ * An event that cannot be shown replaces the whole page (FullPageMessage);
+ * partial failures inside a loaded event are the sections' own ErrorState.
  * Children render inside the outlet and receive the loaded event through the
  * outlet context.
  *
@@ -49,16 +52,31 @@ export function EventLayout() {
   const eventFormModalStore = useEventFormModalStore();
   const deleteDialog = useConfirmDialog();
 
-  // Validate id after all hooks
-  if (!id) {
+  // Early returns come after all hooks
+  if (!isI18nReady) {
     return (
       <MainLayout>
-        <div className="text-center mt-10 text-red-400">{t('invalidId')}</div>
+        <EventDetailSkeleton />
       </MainLayout>
     );
   }
 
-  if (isLoading || !isI18nReady) {
+  const goHome: FullPageAction = { label: t('goHome', { ns: 'notFound' }), to: '/' };
+  // A dead end: repeating the request cannot help, so the only way out is home.
+  const renderUnavailable = (message: string) => (
+    <MainLayout>
+      <FullPageMessage
+        icon={MdLinkOff}
+        title={t('unavailableTitle', { ns: 'eventDetail' })}
+        message={message}
+        primaryAction={goHome}
+      />
+    </MainLayout>
+  );
+
+  if (!id) return renderUnavailable(t('invalidLink', { ns: 'common' }));
+
+  if (isLoading) {
     return (
       <MainLayout>
         <EventDetailSkeleton />
@@ -68,21 +86,22 @@ export function EventLayout() {
 
   if (error) {
     const { message, isRetryable } = describeLoadError(error, t);
+    if (!isRetryable) return renderUnavailable(message ?? t('notFoundOrNoAccess', { ns: 'common' }));
 
     return (
       <MainLayout>
-        <ErrorState message={message} onRetry={isRetryable ? () => void refetch() : undefined} />
+        <FullPageMessage
+          icon={MdCloudOff}
+          title={t('loadFailedTitle', { ns: 'eventDetail' })}
+          message={message ?? t('errorLoading', { ns: 'common' })}
+          primaryAction={{ label: t('retry', { ns: 'common' }), onClick: () => void refetch() }}
+          secondaryAction={goHome}
+        />
       </MainLayout>
     );
   }
 
-  if (!event) {
-    return (
-      <MainLayout>
-        <div className="text-center mt-10">{t('notFound')}</div>
-      </MainLayout>
-    );
-  }
+  if (!event) return renderUnavailable(t('notFoundOrNoAccess', { ns: 'common' }));
 
   const outletContext: EventLayoutContext = {
     event,

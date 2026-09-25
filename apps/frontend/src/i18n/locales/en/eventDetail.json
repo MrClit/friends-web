@@ -1,6 +1,6 @@
 {
-  "invalidId": "Invalid event ID",
-  "notFound": "Event not found",
+  "unavailableTitle": "This event can't be shown",
+  "loadFailedTitle": "The event couldn't be loaded",
   "kpi": {
     "pot": "Pot Balance",
     "contributionStatus": "Contribution Status",

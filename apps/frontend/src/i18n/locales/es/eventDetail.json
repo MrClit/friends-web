@@ -1,6 +1,6 @@
 {
-  "invalidId": "ID de evento inválido",
-  "notFound": "Evento no encontrado",
+  "unavailableTitle": "No se puede mostrar este evento",
+  "loadFailedTitle": "No se ha podido cargar el evento",
   "kpi": {
     "pot": "Saldo del Bote",
     "contributionStatus": "Estado de Contribución",

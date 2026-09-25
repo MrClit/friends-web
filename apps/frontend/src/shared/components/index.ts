@@ -13,4 +13,5 @@ export { Toast } from './Toast';
 export { ErrorBoundary } from './ErrorBoundary';
 export { AppLoadingFallback } from './AppLoadingFallback';
 export { ErrorState } from './ErrorState';
+export { FullPageMessage, type FullPageAction } from './FullPageMessage';
 export { FormErrorAlert } from './FormErrorAlert';
