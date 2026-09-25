@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 
 export interface TransactionParticipantOption {
@@ -22,7 +22,7 @@ export function useTransactionParticipantCombobox({
 }: UseTransactionParticipantComboboxProps) {
   const listRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [rawHighlightedIndex, setHighlightedIndex] = useState(-1);
   const [searchValue, setSearchValue] = useState('');
 
   const selectedOption = useMemo(() => options.find((option) => option.id === value), [options, value]);
@@ -41,6 +41,9 @@ export function useTransactionParticipantCombobox({
   }, [searchValue, options]);
 
   const optionsCount = filteredOptions.length;
+  // The options can shrink under a highlighted index (the list refetches while open), so the index in use
+  // is clamped here rather than corrected afterwards from an effect.
+  const highlightedIndex = Math.min(rawHighlightedIndex, optionsCount - 1);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -106,25 +109,21 @@ export function useTransactionParticipantCombobox({
 
         if (optionsCount === 0) return;
 
-        setHighlightedIndex((prev) => {
-          const next = prev < optionsCount - 1 ? prev + 1 : 0;
-          scrollIntoView(next);
-          return next;
-        });
+        const next = highlightedIndex < optionsCount - 1 ? highlightedIndex + 1 : 0;
+        setHighlightedIndex(next);
+        scrollIntoView(next);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
 
         if (optionsCount === 0) return;
 
-        setHighlightedIndex((prev) => {
-          const next = prev > 0 ? prev - 1 : optionsCount - 1;
-          scrollIntoView(next);
-          return next;
-        });
+        const next = highlightedIndex > 0 ? highlightedIndex - 1 : optionsCount - 1;
+        setHighlightedIndex(next);
+        scrollIntoView(next);
       } else if (e.key === 'Enter') {
         e.preventDefault();
 
-        if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
+        if (highlightedIndex >= 0) {
           handleSelectOption(filteredOptions[highlightedIndex]);
         } else if (filteredOptions.length === 1) {
           handleSelectOption(filteredOptions[0]);
@@ -136,12 +135,6 @@ export function useTransactionParticipantCombobox({
     },
     [optionsCount, highlightedIndex, filteredOptions, handleSelectOption, close],
   );
-
-  useEffect(() => {
-    if (highlightedIndex < filteredOptions.length) return;
-
-    setHighlightedIndex(filteredOptions.length > 0 ? filteredOptions.length - 1 : -1);
-  }, [highlightedIndex, filteredOptions]);
 
   return {
     open,

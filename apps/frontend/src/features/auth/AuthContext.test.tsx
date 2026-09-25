@@ -2,7 +2,8 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { use } from 'react';
 import { ApiError } from '@/api/client';
-import { AuthProvider, AuthContext } from './AuthContext';
+import { AuthProvider } from './AuthContext';
+import { AuthContext } from './context';
 
 const resetEventFormModal = vi.fn();
 const resetTransactionModal = vi.fn();

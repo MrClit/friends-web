@@ -1,18 +1,19 @@
-import { createContext, useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { ApiError, REFRESH_TOKEN_KEY, refreshAccessToken, setAccessToken } from '@/api/client';
 import { authApi } from '@/api/auth.api';
-import type { AuthContextType, AuthProvider, User } from './types';
+import type { AuthProvider, User } from './types';
+import { AuthContext } from './context';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 import { useTransactionModalStore } from '@/shared/store/useTransactionModalStore';
 import { useDeletingStore } from '@/shared/store/useDeletingStore';
 import { useToastStore } from '@/shared/store/useToastStore';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Without a stored refresh token there is no session to bootstrap, so there is
+  // nothing to wait for.
+  const [loading, setLoading] = useState(() => localStorage.getItem(REFRESH_TOKEN_KEY) !== null);
   const [error, setError] = useState<Error | null>(null);
 
   // The access token is read from the API client module, so callers do not pass
@@ -49,11 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // The access token lives only in memory: on page load, bootstrap the
     // session from the stored refresh token instead.
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    if (!refreshToken) {
-      setLoading(false);
-      return;
-    }
+    if (!localStorage.getItem(REFRESH_TOKEN_KEY)) return;
 
     void (async () => {
       const newAccessToken = await refreshAccessToken();
@@ -150,5 +147,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
-export { AuthContext };
