@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { cn } from '@/shared/utils';
 import { EVENT_SECTIONS, type EventSectionConfig } from '../sections';
 

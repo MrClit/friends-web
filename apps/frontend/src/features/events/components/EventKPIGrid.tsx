@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { MdAccountBalanceWallet, MdVolunteerActivism, MdShoppingBag, MdPerson } from 'react-icons/md';
 import type { EventParticipant } from '@/features/events/types';

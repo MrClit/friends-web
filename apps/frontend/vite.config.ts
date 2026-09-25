@@ -23,7 +23,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-core': ['react', 'react-dom', 'react-router-dom'],
+          'react-core': ['react', 'react-dom', 'react-router'],
           'tanstack-query': ['@tanstack/react-query'],
           'radix-ui': [
             '@radix-ui/react-dialog',

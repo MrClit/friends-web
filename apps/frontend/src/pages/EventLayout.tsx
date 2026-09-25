@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCloudOff, MdLinkOff } from 'react-icons/md';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router';
 import { EventDetailHeader, EventFormModal, EventSectionTabs } from '@/features/events';
 import { EventDetailSkeleton } from '@/features/events/components/EventDetailSkeleton';
 import { EventSectionSkeleton } from '@/features/events/components/EventSectionSkeleton';

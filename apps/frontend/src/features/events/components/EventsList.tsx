@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { EventsListSkeleton } from './EventsListSkeleton';
 import { EventCard } from './EventCard';
 import { CreateEventCard } from './CreateEventCard';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 import { getParticipantAvatar, getParticipantName } from '@/shared/utils/participants';
 import { ErrorState } from '@/shared/components/ErrorState';

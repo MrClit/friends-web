@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Outlet, Route, Routes } from 'react-router';
 import { MdAccountBalanceWallet, MdCalendarMonth } from 'react-icons/md';
 import { EventSectionTabs } from './EventSectionTabs';
 import { EVENT_SECTIONS, type EventSectionConfig } from '../sections';

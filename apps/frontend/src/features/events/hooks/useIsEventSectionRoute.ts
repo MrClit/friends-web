@@ -1,4 +1,4 @@
-import { matchPath, useLocation } from 'react-router-dom';
+import { matchPath, useLocation } from 'react-router';
 import { EVENT_SECTIONS, type EventSectionConfig } from '../sections';
 
 /**

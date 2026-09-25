@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useEvent, useUpdateEvent, useDeleteEvent } from '@/hooks/api/useEvents';
 import { useEventKPIs } from '@/hooks/api/useEventKPIs';
 import { useDeletingStore } from '@/shared/store/useDeletingStore';

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter, Route, Routes, useOutletContext } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useOutletContext } from 'react-router';
 import { EventLayout } from './EventLayout';
 import type { EventLayoutContext } from '@/features/events/hooks';
 import { ApiError } from '@/api/client';
