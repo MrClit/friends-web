@@ -68,7 +68,6 @@
     "typeorm": "^0.3.31"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "catalog:",
     "@nestjs/cli": "^11.0.24",
     "@nestjs/schematics": "^11.1.0",
@@ -80,7 +79,6 @@
     "@types/supertest": "^6.0.3",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "eslint-plugin-prettier": "^5.5.6",
     "globals": "catalog:",
     "jest": "^30.4.2",
     "pino-pretty": "^13.1.3",

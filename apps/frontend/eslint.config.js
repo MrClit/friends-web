@@ -22,7 +22,7 @@ export default [
       'react-refresh': reactRefresh,
     },
     rules: {
-      ...reactHooks.configs['recommended-latest'].rules,
+      ...reactHooks.configs.recommended.rules,
       ...reactRefresh.configs.vite.rules,
     },
     languageOptions: {

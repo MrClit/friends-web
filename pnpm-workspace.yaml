@@ -7,9 +7,9 @@ packages:
 # versions produce mixed peer keys that break an incremental `pnpm add` (issue #211).
 # pnpm does not enforce it on its own; `pnpm check:catalog` (part of `pnpm lint`) does.
 catalog:
-  eslint: ^9.39.5
-  '@eslint/js': ^9.39.5
+  eslint: ^10.11.0
+  '@eslint/js': ^10.0.1
   typescript: ^5.9.3
-  typescript-eslint: ^8.65.0
+  typescript-eslint: ^8.70.1
   globals: ^16.5.0
   eslint-config-prettier: ^10.1.8
