@@ -60,8 +60,8 @@ pot `'0'` may pay) and `assertPersonParticipant` (calendar — only users and gu
 
 Transactions are exposed twice, and the split matters when adding endpoints: collection operations are nested
 under the event (`/api/events/:eventId/transactions`, plus `.../paginated`) while operations on a single
-transaction are flat (`/api/transactions/:id`). Admin user management is `/api/admin/users` behind
-`@Roles('admin')`.
+transaction are flat (`/api/transactions/:id`). Admin user management is `/api/admin/users` and group
+management `/api/admin/groups` (members under `.../:id/members`), both behind `@Roles('admin')`.
 
 ### Auth flow
 

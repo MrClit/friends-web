@@ -1,18 +1,16 @@
 import { Injectable, ConflictException, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
+import { GroupMember } from '../groups/entities/group-member.entity';
 import { ADMIN_ROLE, USER_ROLE, UserRole } from '../users/user-role.constants';
 import { CreateAdminUserDto } from './dto/create-admin-user.dto';
 import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
+import { isUniqueViolation } from './unique-violation';
 
 interface UserContext {
   id: string;
   role: UserRole;
-}
-
-interface PostgresError extends Error {
-  code?: string;
 }
 
 @Injectable()
@@ -43,7 +41,7 @@ export class AdminUsersService {
 
       return this.pickVisibleFields(savedUser);
     } catch (error) {
-      if (this.isUniqueViolation(error)) {
+      if (isUniqueViolation(error)) {
         throw new ConflictException(`User with email ${createAdminUserDto.email} already exists`);
       }
       throw error;
@@ -62,7 +60,7 @@ export class AdminUsersService {
       this.logger.log(`Admin updated user ${savedUser.id}`);
       return this.pickVisibleFields(savedUser);
     } catch (error) {
-      if (this.isUniqueViolation(error)) {
+      if (isUniqueViolation(error)) {
         throw new ConflictException(`User with email ${updateAdminUserDto.email} already exists`);
       }
       throw error;
@@ -80,7 +78,12 @@ export class AdminUsersService {
       await this.assertAtLeastOneAdminRemains();
     }
 
-    await this.userRepository.softDelete(userId);
+    // A soft delete never fires the ON DELETE CASCADE of group_members, so the memberships go explicitly.
+    // Nothing restores a deleted user, so there is nothing to keep them for.
+    await this.userRepository.manager.transaction(async (manager) => {
+      await manager.delete(GroupMember, { userId });
+      await manager.softDelete(User, userId);
+    });
     this.logger.log(`Admin soft deleted user ${userId}`);
 
     return { success: true };
@@ -132,14 +135,5 @@ export class AdminUsersService {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
-  }
-
-  private isUniqueViolation(error: unknown): boolean {
-    if (!(error instanceof QueryFailedError)) {
-      return false;
-    }
-
-    const postgresError = error as PostgresError;
-    return postgresError.code === '23505';
   }
 }

@@ -6,6 +6,8 @@ import { CalendarDay } from '../../src/modules/calendar/entities/calendar-day.en
 import { CalendarMeal } from '../../src/modules/calendar/entities/calendar-meal.entity';
 import { CalendarAttendance } from '../../src/modules/calendar/entities/calendar-attendance.entity';
 import { User } from '../../src/modules/users/user.entity';
+import { Group } from '../../src/modules/groups/entities/group.entity';
+import { GroupMember } from '../../src/modules/groups/entities/group-member.entity';
 import { UserRole } from '../../src/modules/users/user-role.constants';
 import { MealSlot, MEAL_SLOTS } from '@friends/shared-types';
 
@@ -102,6 +104,18 @@ export async function createShoppingItem(
     purchasedBy: input.purchasedBy ?? null,
     purchasedAt: input.purchasedAt ?? null,
   });
+}
+
+export async function createGroup(repository: Repository<Group>, name: string): Promise<Group> {
+  return repository.save({ name });
+}
+
+export async function addGroupMember(
+  repository: Repository<GroupMember>,
+  groupId: string,
+  userId: string,
+): Promise<GroupMember> {
+  return repository.save({ groupId, userId });
 }
 
 /**

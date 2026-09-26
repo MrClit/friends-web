@@ -104,6 +104,22 @@ describe('Foreign key constraints (integration)', () => {
     expect(foreignKeys).toHaveLength(3);
   });
 
+  // A membership lives only as long as both ends. Users are soft deleted, which never reaches this
+  // cascade: AdminUsersService removes their memberships itself, so this one only covers a hard delete.
+  it('cascades group memberships from their group and from their user', async () => {
+    const foreignKeys = await foreignKeysFor('group_members');
+
+    const groupFk = on(foreignKeys, 'group_id');
+    expect(groupFk?.name).toBe('fk_group_members_group_id');
+    expect(groupFk?.definition).toMatch(/REFERENCES "?groups"?\("?id"?\) ON DELETE CASCADE/);
+
+    const userFk = on(foreignKeys, 'user_id');
+    expect(userFk?.name).toBe('fk_group_members_user_id');
+    expect(userFk?.definition).toMatch(/REFERENCES "?users"?\("?id"?\) ON DELETE CASCADE/);
+
+    expect(foreignKeys).toHaveLength(2);
+  });
+
   // The calendar is a three-level chain, and every link cascades: deleting an event has to take its
   // days, their sittings and every attendance on them with it. A link that stopped cascading would
   // leave rows nothing can reach and nothing can delete.
