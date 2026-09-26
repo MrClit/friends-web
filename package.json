@@ -1,7 +1,7 @@
 {
   "name": "friends-monorepo",
   "private": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "$schema": "https://json.schemastore.org/package.json",
   "type": "module",
   "packageManager": "pnpm@10.30.1",
@@ -15,7 +15,8 @@
     "build:types": "pnpm --filter @friends/shared-types build",
     "check:skills": "node scripts/check-skills-symlinks.mjs",
     "check:env": "node scripts/check-env-files.mjs",
-    "lint": "pnpm build:types && pnpm check:skills && pnpm check:env && pnpm format:check && pnpm -r lint",
+    "check:catalog": "node scripts/check-catalog.mjs",
+    "lint": "pnpm build:types && pnpm check:skills && pnpm check:env && pnpm check:catalog && pnpm format:check && pnpm -r lint",
     "lint:fix": "pnpm -r lint:fix && pnpm format",
     "test": "pnpm build:types && pnpm -r test:run",
     "test:watch": "pnpm -r --parallel test:watch",
@@ -26,13 +27,14 @@
     "prepare": "node .husky/install.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.8.0",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.8.0",
+    "@eslint/js": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "globals": "catalog:",
     "husky": "^9.1.7",
     "prettier": "^3.9.6",
-    "typescript-eslint": "^8.65.0"
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   },
   "pnpm": {
     "overrides": {
@@ -46,8 +48,6 @@
       "rollup": ">=4.59.0",
       "serialize-javascript": ">=7.0.3",
       "flatted": ">=3.4.2",
-      "eslint>minimatch": "^3.1.4",
-      "@eslint/eslintrc>minimatch": "^3.1.4",
       "fork-ts-checker-webpack-plugin>minimatch": "^3.1.4",
       "@typescript-eslint/typescript-estree>minimatch": "^9.0.7",
       "glob>minimatch": "^10.2.3",
@@ -60,7 +60,6 @@
       "vite>picomatch": "^4.0.4",
       "vitest>picomatch": "^4.0.4",
       "@angular-devkit/core>picomatch": "^4.0.4",
-      "eslint>ajv": "^6.14.0",
       "@angular-devkit/core>ajv": ">=8.18.0"
     }
   }

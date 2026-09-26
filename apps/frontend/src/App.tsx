@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router';
 
 import { QueryProvider } from './providers/QueryProvider';
 import { RequireAuth } from './features/auth/RequireAuth';

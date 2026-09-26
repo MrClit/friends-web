@@ -1,3 +1,15 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+
+# Tooling whose versions pnpm bakes into the lockfile's peer-dependency keys. Declared once here and
+# referenced as "catalog:" from every manifest: two workspaces asking for different eslint/typescript
+# versions produce mixed peer keys that break an incremental `pnpm add` (issue #211).
+# pnpm does not enforce it on its own; `pnpm check:catalog` (part of `pnpm lint`) does.
+catalog:
+  eslint: ^10.11.0
+  '@eslint/js': ^10.0.1
+  typescript: ^5.9.3
+  typescript-eslint: ^8.70.1
+  globals: ^16.5.0
+  eslint-config-prettier: ^10.1.8

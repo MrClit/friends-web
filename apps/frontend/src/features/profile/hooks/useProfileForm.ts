@@ -27,17 +27,12 @@ export function useProfileForm(): UseProfileFormResult {
   const addToast = useToastStore((state) => state.addToast);
   const updateCurrentUserProfile = useUpdateCurrentUserProfile();
 
-  const [name, setName] = useState('');
+  // Only what the user has typed; until then the field shows the stored name.
+  const [draftName, setDraftName] = useState<string | null>(null);
+  const name = draftName ?? user?.name ?? '';
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const galleryInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-    setName(user.name ?? '');
-  }, [user]);
 
   useEffect(() => {
     if (!user) {
@@ -122,6 +117,7 @@ export function useProfileForm(): UseProfileFormResult {
       });
 
       updateUser(updatedProfile);
+      setDraftName(null);
       setAvatarFile(null);
 
       addToast({
@@ -145,7 +141,7 @@ export function useProfileForm(): UseProfileFormResult {
 
   return {
     name,
-    setName,
+    setName: setDraftName,
     avatarFile,
     avatarPreviewUrl,
     galleryInputRef,

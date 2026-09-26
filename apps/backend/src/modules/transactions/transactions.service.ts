@@ -8,14 +8,16 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PaymentType } from '@friends/shared-types';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
+import { Event } from '../events/entities/event.entity';
 import { Transaction } from './entities/transaction.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { PaginatedTransactionsResponseDto } from './dto/paginated-transactions-response.dto';
-import { ParticipantValidationService } from './services/participant-validation.service';
 import { TransactionPaginationService } from './services/transaction-pagination.service';
 import { EventAccessService } from '../event-access/event-access.service';
+import { EventParticipationService, POT_PARTICIPANT_ID } from '../event-participation/event-participation.service';
 import { RequestContextService } from '../../common/request-context/request-context.service';
 
 @Injectable()
@@ -26,10 +28,19 @@ export class TransactionsService {
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
     private readonly eventAccessService: EventAccessService,
-    private readonly participantValidationService: ParticipantValidationService,
+    private readonly eventParticipationService: EventParticipationService,
     private readonly transactionPaginationService: TransactionPaginationService,
     private readonly requestContext: RequestContextService,
   ) {}
+
+  /** Whether the participant belongs to the event is shared; that the pot only pays expenses is ours. */
+  private assertValidParticipant(event: Event, participantId: string, paymentType: PaymentType): void {
+    if (participantId === POT_PARTICIPANT_ID && paymentType !== PaymentType.EXPENSE) {
+      throw new BadRequestException(`POT participant can only be used with payment type 'expense'`);
+    }
+
+    this.eventParticipationService.assertParticipantOrPot(event.participants, participantId);
+  }
 
   private async findTransactionOrThrow(id: string): Promise<Transaction> {
     const transaction = await this.transactionRepository.findOne({ where: { id } });
@@ -163,12 +174,7 @@ export class TransactionsService {
       // Verify the event exists and the actor can access it
       const event = await this.eventAccessService.loadAccessibleEvent(eventId, actor);
 
-      // Validate participantId
-      this.participantValidationService.validateParticipantId(
-        createTransactionDto.participantId,
-        createTransactionDto.paymentType,
-        event.participants,
-      );
+      this.assertValidParticipant(event, createTransactionDto.participantId, createTransactionDto.paymentType);
 
       // Create transaction
       const transaction = this.transactionRepository.create({
@@ -226,7 +232,7 @@ export class TransactionsService {
 
         const participantId = updateTransactionDto.participantId ?? transaction.participantId;
         const paymentType = updateTransactionDto.paymentType ?? transaction.paymentType;
-        this.participantValidationService.validateParticipantId(participantId, paymentType, event.participants);
+        this.assertValidParticipant(event, participantId, paymentType);
       }
 
       // Update transaction

@@ -14,6 +14,7 @@ import { CalendarMeal } from './entities/calendar-meal.entity';
 import { CalendarAttendance } from './entities/calendar-attendance.entity';
 import { Event } from '../events/entities/event.entity';
 import { EventAccessService } from '../event-access/event-access.service';
+import { EventParticipationService } from '../event-participation/event-participation.service';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { RequestContextService } from '../../common/request-context/request-context.service';
 
@@ -94,6 +95,8 @@ describe('CalendarService', () => {
         // exercising the access rule itself, not just the delegation to it.
         EventAccessService,
         { provide: getRepositoryToken(Event), useValue: mockEventRepository },
+        // Pure and dependency-free, so the real participant rule runs rather than a stand-in for it.
+        EventParticipationService,
         { provide: RequestContextService, useValue: { correlationId: 'test-correlation-id' } },
       ],
     }).compile();

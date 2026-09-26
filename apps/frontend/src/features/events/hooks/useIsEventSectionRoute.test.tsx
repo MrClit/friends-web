@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import { useIsEventSectionRoute } from './useIsEventSectionRoute';
 import type { EventSectionConfig } from '../sections';
 

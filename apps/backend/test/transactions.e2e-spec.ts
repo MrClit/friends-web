@@ -132,6 +132,44 @@ describe('Transactions API (e2e)', () => {
     });
   });
 
+  it('POST /api/events/:eventId/transactions validates the participant against the event', async () => {
+    const user = await createUser(userRepository, {
+      email: 'tx-participant@example.com',
+      name: 'Tx Participant',
+    });
+
+    const event = await createEvent(eventRepository, {
+      title: 'Participant Validation Event',
+      description: 'Participant test',
+      status: EventStatus.ACTIVE,
+      participants: [
+        { type: 'user', id: user.id },
+        { type: 'guest', id: 'g1', name: 'Guest 1' },
+      ],
+    });
+
+    const httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+    const post = (body: { paymentType: string; participantId: string }) =>
+      request(httpServer)
+        .post(`/api/events/${event.id}/transactions`)
+        .set('Authorization', buildAuthHeader(jwtService, user))
+        .send({ title: 'Participant check', amount: 10, date: '2026-02-25', ...body });
+
+    const potContribution = await post({ paymentType: 'contribution', participantId: '0' }).expect(400);
+    expect(potContribution.body).toMatchObject({
+      statusCode: 400,
+      message: "POT participant can only be used with payment type 'expense'",
+    });
+
+    const stranger = await post({ paymentType: 'expense', participantId: 'stranger' }).expect(400);
+    expect(stranger.body).toMatchObject({
+      statusCode: 400,
+      message: `Participant with ID stranger does not exist in this event. Valid participant IDs: ${user.id}, g1 or '0' for POT`,
+    });
+
+    await post({ paymentType: 'expense', participantId: '0' }).expect(201);
+  });
+
   it('POST + GET(list) + GET(paginated) use success contract { data }', async () => {
     const user = await createUser(userRepository, {
       email: 'tx-owner@example.com',

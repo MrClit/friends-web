@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { MdExpandMore } from 'react-icons/md';
 import { Avatar } from '@/shared/components/Avatar';
 import { ADMIN_ROLE } from '@/features/auth/types';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { MdAdminPanelSettings } from 'react-icons/md';
 import { cn } from '@/shared/utils';
 

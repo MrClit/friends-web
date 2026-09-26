@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter, Route, Routes, useOutletContext } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useOutletContext } from 'react-router';
 import { EventLayout } from './EventLayout';
 import type { EventLayoutContext } from '@/features/events/hooks';
 import { ApiError } from '@/api/client';
@@ -65,12 +65,38 @@ vi.mock('@/features/events/components/EventSectionSkeleton', () => ({
   EventSectionSkeleton: () => <div data-testid="event-section-skeleton" />,
 }));
 
+type StubAction = { label: string; to: string } | { label: string; onClick: () => void };
+
+function StubActionControl({ action, testId }: { action: StubAction; testId: string }) {
+  return 'to' in action ? (
+    <a data-testid={testId} href={action.to}>
+      {action.label}
+    </a>
+  ) : (
+    <button data-testid={testId} onClick={action.onClick}>
+      {action.label}
+    </button>
+  );
+}
+
 vi.mock('@/shared/components', () => ({
   ConfirmDialog: () => null,
-  ErrorState: ({ message, onRetry }: { message?: string; onRetry?: () => void }) => (
-    <div data-testid="error-state">
-      {message}
-      {onRetry && <button onClick={onRetry}>retry</button>}
+  FullPageMessage: ({
+    title,
+    message,
+    primaryAction,
+    secondaryAction,
+  }: {
+    title: string;
+    message: string;
+    primaryAction: StubAction;
+    secondaryAction?: StubAction;
+  }) => (
+    <div data-testid="full-page-message">
+      <h1>{title}</h1>
+      <p data-testid="full-page-message-text">{message}</p>
+      <StubActionControl action={primaryAction} testId="primary-action" />
+      {secondaryAction && <StubActionControl action={secondaryAction} testId="secondary-action" />}
     </div>
   ),
 }));
@@ -141,40 +167,60 @@ describe('EventLayout', () => {
     expect(screen.queryByTestId('event-detail-header')).not.toBeInTheDocument();
   });
 
-  it('shows the invalid id message when the route carries no event id', () => {
+  /** A dead end: the unavailable page, whose only action leads home. */
+  function expectUnavailablePage(message: string) {
+    expect(screen.getByRole('heading', { name: 'unavailableTitle' })).toBeInTheDocument();
+    expect(screen.getByTestId('full-page-message-text')).toHaveTextContent(message);
+    expect(screen.getByTestId('primary-action')).toHaveTextContent('goHome');
+    expect(screen.getByTestId('primary-action')).toHaveAttribute('href', '/');
+    expect(screen.queryByTestId('secondary-action')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('event-detail-header')).not.toBeInTheDocument();
+  }
+
+  it('shows the unavailable page with the invalid link message when the route carries no event id', () => {
     mockUseEventDetail.mockReturnValue(defaultHookReturn());
     renderLayout('/event');
-    expect(screen.getByText('invalidId')).toBeInTheDocument();
+    expectUnavailablePage('invalidLink');
   });
 
-  it.each([403, 404])('shows the not-found-or-no-access message without retry for a %i', (status) => {
+  it.each([403, 404])('shows the unavailable page with the not-found-or-no-access message for a %i', (status) => {
     const error = new ApiError(status, 'Error', 'Error');
     mockUseEventDetail.mockReturnValue(defaultHookReturn({ error }));
     renderLayout();
-    expect(screen.getByTestId('error-state')).toHaveTextContent('notFoundOrNoAccess');
-    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
+    expectUnavailablePage('notFoundOrNoAccess');
   });
 
-  it('shows the invalid link message without retry for a 400 (malformed id in the URL)', () => {
+  it('shows the unavailable page with the invalid link message for a 400 (malformed id in the URL)', () => {
     const error = new ApiError(400, 'Bad Request', 'Validation failed (uuid is expected)');
     mockUseEventDetail.mockReturnValue(defaultHookReturn({ error }));
     renderLayout('/event/not-a-uuid');
-    expect(screen.getByTestId('error-state')).toHaveTextContent('invalidLink');
-    expect(screen.queryByRole('button', { name: 'retry' })).not.toBeInTheDocument();
+    expectUnavailablePage('invalidLink');
   });
 
-  it('shows ErrorState with retry button for a transient ApiError', () => {
-    const error = new ApiError(500, 'Internal Server Error', 'Server error');
-    mockUseEventDetail.mockReturnValue(defaultHookReturn({ error }));
+  it.each([
+    ['a server error', new ApiError(500, 'Internal Server Error', 'Server error')],
+    ['a network failure', new ApiError(0, 'Network Error', 'Failed to fetch')],
+    ['an unknown error', new Error('boom')],
+  ])('shows the load-failed page with retry first and home second for %s', (_, error) => {
+    const hookReturn = defaultHookReturn({ error });
+    mockUseEventDetail.mockReturnValue(hookReturn);
     renderLayout();
-    expect(screen.getByTestId('error-state')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'retry' })).toBeInTheDocument();
+
+    expect(screen.getByRole('heading', { name: 'loadFailedTitle' })).toBeInTheDocument();
+    expect(screen.getByTestId('full-page-message-text')).toHaveTextContent('errorLoading');
+    expect(screen.getByTestId('primary-action')).toHaveTextContent('retry');
+    expect(screen.getByTestId('secondary-action')).toHaveTextContent('goHome');
+    expect(screen.getByTestId('secondary-action')).toHaveAttribute('href', '/');
+
+    fireEvent.click(screen.getByTestId('primary-action'));
+    expect(hookReturn.refetch).toHaveBeenCalledOnce();
   });
 
-  it('shows not-found message when event is null without error', () => {
+  it('shows the unavailable page when the event is missing without an error', () => {
     mockUseEventDetail.mockReturnValue(defaultHookReturn());
     renderLayout();
-    expect(screen.getByText('notFound')).toBeInTheDocument();
+    expectUnavailablePage('notFoundOrNoAccess');
   });
 
   it('renders header, tabs and the section with the event in context', () => {

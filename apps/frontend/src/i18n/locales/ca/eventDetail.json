@@ -1,6 +1,6 @@
 {
-  "invalidId": "ID d'esdeveniment invàlid",
-  "notFound": "Esdeveniment no trobat",
+  "unavailableTitle": "No es pot mostrar aquest esdeveniment",
+  "loadFailedTitle": "No s'ha pogut carregar l'esdeveniment",
   "kpi": {
     "pot": "Saldo del Pot",
     "contributionStatus": "Estat de Contribució",
