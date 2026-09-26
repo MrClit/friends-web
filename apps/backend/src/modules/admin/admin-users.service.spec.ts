@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
 import { User } from '../users/user.entity';
+import { GroupMember } from '../groups/entities/group-member.entity';
 import { AdminUsersService } from './admin-users.service';
 
 describe('AdminUsersService', () => {
@@ -13,9 +14,10 @@ describe('AdminUsersService', () => {
     save: jest.Mock;
     findOne: jest.Mock;
     count: jest.Mock;
-    softDelete: jest.Mock;
     merge: jest.Mock;
+    manager: { transaction: jest.Mock };
   };
+  let mockManager: { delete: jest.Mock; softDelete: jest.Mock };
 
   beforeEach(async () => {
     mockRepository = {
@@ -24,9 +26,12 @@ describe('AdminUsersService', () => {
       save: jest.fn(),
       findOne: jest.fn(),
       count: jest.fn(),
-      softDelete: jest.fn(),
       merge: jest.fn(),
+      manager: {
+        transaction: jest.fn((run: (manager: typeof mockManager) => Promise<unknown>) => run(mockManager)),
+      },
     };
+    mockManager = { delete: jest.fn(), softDelete: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -174,7 +179,7 @@ describe('AdminUsersService', () => {
     );
   });
 
-  it('delete soft deletes user when rules pass', async () => {
+  it('delete soft deletes user and removes their group memberships when rules pass', async () => {
     const targetUser = {
       id: 'user-2',
       email: 'user2@test.com',
@@ -187,11 +192,12 @@ describe('AdminUsersService', () => {
     } as User;
 
     mockRepository.findOne.mockResolvedValue(targetUser);
-    mockRepository.softDelete.mockResolvedValue({ affected: 1 });
 
     const result = await service.softDelete('user-2', { id: 'admin-1', role: 'admin' });
 
     expect(result).toEqual({ success: true });
-    expect(mockRepository.softDelete).toHaveBeenCalledWith('user-2');
+    expect(mockRepository.manager.transaction).toHaveBeenCalledTimes(1);
+    expect(mockManager.delete).toHaveBeenCalledWith(GroupMember, { userId: 'user-2' });
+    expect(mockManager.softDelete).toHaveBeenCalledWith(User, 'user-2');
   });
 });
