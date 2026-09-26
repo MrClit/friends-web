@@ -5,6 +5,28 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-09-26
+
+A single full-page error screen for routes that do not exist and events that cannot be loaded, the move to
+react-router v8, and tooling housekeeping (ESLint 10, one version of ESLint and TypeScript across the
+monorepo). **No database migrations and no new environment variables**: nothing has to change in the Render
+dashboard before deploying.
+
+### Added
+
+- Unknown routes and events that cannot be loaded share one full-page error screen instead of a dead-end
+  red box: a malformed, missing or inaccessible event offers *Go home*, and a server or network failure
+  offers *Retry* first. Errors inside an already loaded event are unchanged. Closes [#197].
+
+### Changed
+
+- The frontend runs on react-router v8; `react-router-dom`, removed in v8, is gone. Closes [#105].
+- Whether a participant belongs to an event is decided in one place for transactions and the calendar.
+  Error messages and status codes are unchanged. Closes [#187].
+- Tooling: ESLint 10 across the monorepo with the React Compiler lint rules, and ESLint and TypeScript
+  declared once in a pnpm catalog that every workspace uses (`pnpm check:catalog`, part of `pnpm lint`,
+  enforces it) so an incremental `pnpm add` no longer breaks linting. Closes [#211], [#224].
+
 ## [0.7.0] - 2026-09-24
 
 Contribution targets move to where the money is, a fix for a save that failed when a guest was swapped for
@@ -405,6 +427,13 @@ JWT secret validation. No product features and no database migrations.
 [#92]: https://github.com/MrClit/friends-web/issues/92
 [#111]: https://github.com/MrClit/friends-web/issues/111
 [#112]: https://github.com/MrClit/friends-web/issues/112
+[#197]: https://github.com/MrClit/friends-web/issues/197
+[#105]: https://github.com/MrClit/friends-web/issues/105
+[#187]: https://github.com/MrClit/friends-web/issues/187
+[#211]: https://github.com/MrClit/friends-web/issues/211
+[#224]: https://github.com/MrClit/friends-web/issues/224
+[0.8.0]: https://github.com/MrClit/friends-web/releases/tag/v0.8.0
+[0.7.0]: https://github.com/MrClit/friends-web/releases/tag/v0.7.0
 [0.6.0]: https://github.com/MrClit/friends-web/releases/tag/v0.6.0
 [0.5.0]: https://github.com/MrClit/friends-web/releases/tag/v0.5.0
 [0.4.0]: https://github.com/MrClit/friends-web/releases/tag/v0.4.0
