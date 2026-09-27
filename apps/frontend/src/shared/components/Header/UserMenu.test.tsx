@@ -152,6 +152,66 @@ describe('UserMenu', () => {
     expect(navigateMock).toHaveBeenCalledWith('/admin/users');
   });
 
+  it('shows the groups entry for admins and navigates to the groups page', async () => {
+    mockedUseAuth.mockReturnValue({
+      user: {
+        id: 'admin-1',
+        email: 'admin@test.com',
+        name: 'Admin',
+        role: 'admin',
+      },
+      loading: false,
+      logout: vi.fn(),
+      token: 'token',
+      error: null,
+      login: vi.fn(),
+      loginWithGoogle: vi.fn(),
+      loginWithMicrosoft: vi.fn(),
+      setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
+    });
+
+    render(<UserMenu />);
+
+    const trigger = screen.getByRole('button');
+    fireEvent.pointerDown(trigger);
+
+    const menuItem = await screen.findByText(/groups administration/i);
+    fireEvent.click(menuItem);
+
+    expect(navigateMock).toHaveBeenCalledWith('/admin/groups');
+  });
+
+  it('does not show the groups entry for non-admin users', async () => {
+    mockedUseAuth.mockReturnValue({
+      user: {
+        id: 'user-1',
+        email: 'user@test.com',
+        name: 'User',
+        role: 'user',
+      },
+      loading: false,
+      logout: vi.fn(),
+      token: 'token',
+      error: null,
+      login: vi.fn(),
+      loginWithGoogle: vi.fn(),
+      loginWithMicrosoft: vi.fn(),
+      setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
+    });
+
+    render(<UserMenu />);
+
+    const trigger = screen.getByRole('button');
+    fireEvent.pointerDown(trigger);
+
+    await screen.findByText(/profile|perfil/i);
+    expect(screen.queryByText(/groups administration/i)).not.toBeInTheDocument();
+  });
+
   it('renders nothing while auth is loading', () => {
     mockedUseAuth.mockReturnValue({
       user: null,

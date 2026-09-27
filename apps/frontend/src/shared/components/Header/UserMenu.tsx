@@ -7,12 +7,12 @@ import { MdExpandMore } from 'react-icons/md';
 import { Avatar } from '@/shared/components/Avatar';
 import { ADMIN_ROLE } from '@/features/auth/types';
 import { useNavigate } from 'react-router';
-import { MdAdminPanelSettings } from 'react-icons/md';
+import { MdAdminPanelSettings, MdGroups } from 'react-icons/md';
 import { cn } from '@/shared/utils';
 
 export function UserMenu() {
   const { user, logout, loading } = useAuth();
-  const { t } = useTranslation(['user', 'adminUsers']);
+  const { t } = useTranslation(['user', 'adminUsers', 'adminGroups']);
   const { success } = useToast();
   const navigate = useNavigate();
 
@@ -126,6 +126,20 @@ export function UserMenu() {
           >
             <MdAdminPanelSettings className="text-lg" />
             {t('menuEntry', { ns: 'adminUsers' })}
+          </DropdownMenuItem>
+        )}
+
+        {user.role === ADMIN_ROLE && (
+          <DropdownMenuItem
+            onClick={() => navigate('/admin/groups')}
+            className={cn(
+              'flex items-center gap-2 cursor-pointer',
+              'font-semibold text-emerald-800',
+              'dark:text-emerald-200',
+            )}
+          >
+            <MdGroups className="text-lg" />
+            {t('menuEntry', { ns: 'adminGroups' })}
           </DropdownMenuItem>
         )}
 

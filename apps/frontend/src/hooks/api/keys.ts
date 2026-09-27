@@ -95,4 +95,17 @@ export const queryKeys = {
   adminUsers: {
     all: ['admin-users'] as const,
   },
+
+  adminGroups: {
+    /**
+     * Key for the admin group list; also the prefix of every member list below
+     */
+    all: ['admin-groups'] as const,
+
+    /**
+     * Key for the members of a group, as the admin sees them
+     * @param groupId - Group ID
+     */
+    members: (groupId: string) => ['admin-groups', groupId, 'members'] as const,
+  },
 };
