@@ -3,44 +3,12 @@
 ###############################################
 # Copy this file to users.http and configure tokens in .vscode/settings.json
 # users.http is gitignored for security
+#
+# There is no user directory: the users that can be added to an event are the members of its group,
+# see groups.http.example.
 
 ###############################################
-# GET ALL USERS
+# GET CURRENT USER PROFILE
 ###############################################
-# Retrieve all users (for participant selection)
-# @returns List of all users with basic info (id, email, name, avatar, role)
-# NOTE: this deliberately exposes the whole directory, email included, to any authenticated user.
-# See the endpoint description in /api/docs for the decision and when to revisit it.
-GET {{baseUrl}}/users
-Authorization: Bearer {{token}}
-
-###############################################
-# SEARCH USERS
-###############################################
-# Search users by name or email
-# @param q - Search query string, required, 2 to 100 characters (trimmed)
-# @returns Filtered list of users matching the query, max 20
-
-### Search by name
-GET {{baseUrl}}/users/search?q=john
-Authorization: Bearer {{token}}
-
-### Search by email
-GET {{baseUrl}}/users/search?q=john@example.com
-Authorization: Bearer {{token}}
-
-### Search with partial match
-GET {{baseUrl}}/users/search?q=gma
-Authorization: Bearer {{token}}
-
-### Search with empty query (400 - q is required)
-GET {{baseUrl}}/users/search?q=
-Authorization: Bearer {{token}}
-
-### Search with a single character (400 - minimum length is 2)
-GET {{baseUrl}}/users/search?q=j
-Authorization: Bearer {{token}}
-
-### Search with a LIKE wildcard (200 - % is matched literally, not as a pattern)
-GET {{baseUrl}}/users/search?q=%25%25
+GET {{baseUrl}}/users/me
 Authorization: Bearer {{token}}

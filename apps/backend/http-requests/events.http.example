@@ -28,6 +28,7 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
 
 {
+  "groupId": "YOUR_GROUP_ID_HERE",
   "title": "Cena en Barcelona",
   "participants": [
     { "id": "1", "name": "Alice" },

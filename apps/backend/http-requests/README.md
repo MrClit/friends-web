@@ -14,6 +14,8 @@ The `.http` files in this directory may contain sensitive information like JWT t
 cd apps/backend/http-requests
 cp auth.http.example auth.http
 cp admin-users.http.example admin-users.http
+cp admin-groups.http.example admin-groups.http
+cp groups.http.example groups.http
 cp events.http.example events.http
 cp transactions.http.example transactions.http
 cp users.http.example users.http
@@ -100,6 +102,8 @@ git commit -m "docs(backend): add new auth endpoint example"
 - `*.http` - Your local files with real tokens (gitignored)
 - `*.http.example` - Template files without sensitive data (committed)
 - `admin-users.http.example` - Admin user management endpoints (`/api/admin/users`)
+- `admin-groups.http.example` - Admin group management and members (`/api/admin/groups`)
+- `groups.http.example` - The current user's groups and a group's members (`/api/groups`)
 - `calendar.http.example` - Meal calendar: days, sittings and attendance (`/api/events/:id/calendar`, `/api/calendar-days`, `/api/calendar-meals`)
 - `_common.http` - Shared variables and health check (safe to commit)
 - `README.md` - This file (committed)
