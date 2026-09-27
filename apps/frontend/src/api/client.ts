@@ -72,12 +72,15 @@ export async function refreshAccessToken(): Promise<string | null> {
 export class ApiError extends Error {
   status: number;
   statusText: string;
+  /** Structured extra data the backend attaches to some errors, e.g. `{ userIds }` on a 422. */
+  details?: Record<string, unknown>;
 
-  constructor(status: number, statusText: string, message: string) {
+  constructor(status: number, statusText: string, message: string, details?: Record<string, unknown>) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.statusText = statusText;
+    this.details = details;
   }
 }
 
@@ -132,14 +135,16 @@ export async function apiRequest<T>(endpoint: string, options?: ApiRequestInit):
     }
 
     let errorMessage: string;
+    let errorDetails: Record<string, unknown> | undefined;
     if (contentType.includes('application/json')) {
       const error = await response.json().catch(() => ({}));
       errorMessage = error.message || `Request failed with status ${response.status}`;
+      if (error.details && typeof error.details === 'object') errorDetails = error.details;
     } else {
       const text = await response.text();
       errorMessage = text || `Request failed with status ${response.status}`;
     }
-    throw new ApiError(response.status, response.statusText, errorMessage);
+    throw new ApiError(response.status, response.statusText, errorMessage, errorDetails);
   }
 
   // Handle 204 No Content responses

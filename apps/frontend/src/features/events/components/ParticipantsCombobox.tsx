@@ -9,6 +9,7 @@ import { ComboboxNewGuestItem } from './ComboboxNewGuestItem';
 import type { EventParticipant } from '../types';
 
 interface ParticipantsComboboxProps {
+  groupId: string;
   onSelect: (participant: EventParticipant) => void;
   existingParticipants: EventParticipant[];
   inputValue: string;
@@ -19,6 +20,7 @@ interface ParticipantsComboboxProps {
 }
 
 export function ParticipantsCombobox({
+  groupId,
   onSelect,
   existingParticipants,
   inputValue,
@@ -28,7 +30,12 @@ export function ParticipantsCombobox({
   compact = false,
 }: ParticipantsComboboxProps) {
   const { t } = useTranslation(['events', 'common']);
-  const placeholder = allowCreateGuest ? t('participantsInput.placeholder') : t('participantsInput.replacePlaceholder');
+  const hasGroup = Boolean(groupId);
+  const placeholder = !hasGroup
+    ? t('participantsInput.chooseGroupFirst')
+    : allowCreateGuest
+      ? t('participantsInput.placeholder')
+      : t('participantsInput.replacePlaceholder');
   // Random per mount on purpose: a stable name would let Chrome build autocomplete history for it
   const [inputName] = useState(() => `participant-${randomUUID()}`);
   const inputId = useId();
@@ -49,6 +56,7 @@ export function ParticipantsCombobox({
     handleInputFocus,
     handleInputBlur,
   } = useParticipantsCombobox({
+    groupId,
     existingParticipants,
     inputValue,
     onInputChange,
@@ -84,11 +92,13 @@ export function ParticipantsCombobox({
               'outline-none transition-colors placeholder:text-slate-400',
               'focus:border-transparent focus:ring-2 focus:ring-emerald-600',
               'dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-white dark:placeholder:text-emerald-700',
+              'disabled:cursor-not-allowed disabled:opacity-60',
               compact ? 'rounded-xl py-2.5 pl-10 pr-4 text-sm' : 'rounded-2xl py-3.5 pl-11 pr-5',
             )}
             placeholder={placeholder}
             name={inputName}
             autoFocus={autoFocus}
+            disabled={!hasGroup}
             autoComplete="nope"
             autoCorrect="off"
             spellCheck={false}

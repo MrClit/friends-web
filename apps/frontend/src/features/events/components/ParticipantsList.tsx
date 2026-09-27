@@ -6,6 +6,8 @@ import { ParticipantRow } from './ParticipantRow';
 import type { EventParticipant, ParticipantReplacement } from '../types';
 
 interface ParticipantsListProps {
+  /** The event's group, whose members are the users the selector offers. Empty until one is chosen. */
+  groupId: string;
   participants: EventParticipant[];
   setParticipants: (newParticipants: EventParticipant[] | ((prev: EventParticipant[]) => EventParticipant[])) => void;
   setParticipantReplacements: (
@@ -13,7 +15,12 @@ interface ParticipantsListProps {
   ) => void;
 }
 
-export function ParticipantsList({ participants, setParticipants, setParticipantReplacements }: ParticipantsListProps) {
+export function ParticipantsList({
+  groupId,
+  participants,
+  setParticipants,
+  setParticipantReplacements,
+}: ParticipantsListProps) {
   const { t } = useTranslation('events');
   const listRef = useRef<HTMLDivElement | null>(null);
   const previousParticipantsCountRef = useRef(participants.length);
@@ -54,6 +61,7 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
       <div className="block text-slate-700 dark:text-emerald-100 font-medium mb-2">{t('participantsInput.label')}</div>
       <div className="flex gap-2">
         <ParticipantsCombobox
+          groupId={groupId}
           onSelect={handleAddParticipant}
           existingParticipants={participants}
           inputValue={inputValue}
@@ -65,6 +73,7 @@ export function ParticipantsList({ participants, setParticipants, setParticipant
           <ParticipantRow
             key={participant.id}
             participant={participant}
+            groupId={groupId}
             isFirst={idx === 0}
             existingParticipants={participants}
             isRenamingGuest={renamingGuestId === participant.id}

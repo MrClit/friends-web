@@ -1,11 +1,14 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCreateEvent, useEvent, useUpdateEvent } from '../../../hooks/api/useEvents';
+import { groupMembersQueryOptions, useGroups } from '@/hooks/api/useGroups';
 import { useModalForm } from '@/hooks/common';
-import { getApiErrorMessage } from '@/shared/utils';
 import type { CreateEventInput, EventParticipant, ParticipantReplacement } from '../types';
 import { useAuth } from '@/features/auth/useAuth';
+import { ADMIN_ROLE } from '@/features/auth/types';
 import { checkIsDirty } from '../utils/checkIsDirty';
+import { describeEventSaveError } from '../utils/describeEventSaveError';
 
 const DEFAULT_ICON = 'flight';
 
@@ -26,12 +29,26 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
   const { t } = useTranslation('common');
 
   const { data: event } = useEvent(eventId ?? undefined);
+  const { data: groups = [] } = useGroups();
+  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState<string>(DEFAULT_ICON);
   const [participants, setParticipants] = useState<EventParticipant[]>([buildDefaultParticipant(user)]);
   const [participantReplacements, setParticipantReplacements] = useState<ParticipantReplacement[]>([]);
+  const [groupId, setGroupId] = useState('');
+  // Names of the users a group change dropped from the form, for the warning under the group field.
+  const [removedByGroupChange, setRemovedByGroupChange] = useState<string[]>([]);
+  // Bumped on every group change and reset, so a members lookup that resolves late is ignored.
+  const groupRequestRef = useRef(0);
+
+  const isEditMode = !!eventId;
+  const isAdmin = user?.role === ADMIN_ROLE;
+
+  // A user with a single group finds it already chosen; editing falls back to the event's group until the
+  // form is seeded.
+  const effectiveGroupId = groupId || (isEditMode ? (event?.groupId ?? '') : groups.length === 1 ? groups[0].id : '');
 
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();
@@ -42,7 +59,42 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
     setParticipants(event ? event.participants : [buildDefaultParticipant(user)]);
     setParticipantReplacements([]);
     setIcon(event ? (event.icon ?? DEFAULT_ICON) : DEFAULT_ICON);
+    setGroupId(event ? event.groupId : '');
+    setRemovedByGroupChange([]);
+    groupRequestRef.current += 1;
   }, [event, user]);
+
+  /**
+   * Changes the event's group. While creating, the users that are not members of the new group are
+   * dropped from the form (guests and the pot stay) and named in a warning. While editing, which only the
+   * admin can do, the participants are left alone: the server names whoever does not fit.
+   */
+  const handleGroupChange = useCallback(
+    async (nextGroupId: string) => {
+      setGroupId(nextGroupId);
+      setRemovedByGroupChange([]);
+      const request = ++groupRequestRef.current;
+      if (isEditMode || !nextGroupId) return;
+
+      let members;
+      try {
+        members = await queryClient.fetchQuery(groupMembersQueryOptions(nextGroupId));
+      } catch {
+        // The selector shows its own state for the group; the server check still guards the save.
+        return;
+      }
+      if (request !== groupRequestRef.current) return;
+
+      const memberIds = new Set(members.map((member) => member.id));
+      const fits = (p: EventParticipant) => p.type !== 'user' || memberIds.has(p.id);
+      const removed = participants.filter((p) => !fits(p));
+      if (removed.length === 0) return;
+
+      setParticipants((prev) => prev.filter(fits));
+      setRemovedByGroupChange(removed.map((p) => (p.type === 'user' ? p.name || p.email || p.id : p.id)));
+    },
+    [isEditMode, queryClient, participants],
+  );
 
   const cleanParticipants = useMemo(() => {
     return participants
@@ -81,11 +133,14 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
     );
   }, [cleanParticipants, event, participantReplacements]);
 
-  const canSubmit = useMemo(() => !!title.trim() && cleanParticipants.length > 0, [title, cleanParticipants]);
+  const canSubmit = useMemo(
+    () => !!title.trim() && cleanParticipants.length > 0 && !!effectiveGroupId,
+    [title, cleanParticipants, effectiveGroupId],
+  );
 
   const isDirty = useMemo(
-    () => checkIsDirty({ event, title, description, participants, icon, open, userId: user?.id }),
-    [event, title, description, participants, icon, open, user?.id],
+    () => checkIsDirty({ event, title, description, participants, groupId, icon, open, userId: user?.id }),
+    [event, title, description, participants, groupId, icon, open, user?.id],
   );
 
   const modal = useModalForm({
@@ -109,6 +164,7 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
           {
             id: eventId,
             data: {
+              groupId: effectiveGroupId,
               title: trimmedTitle,
               description: trimmedDescription || undefined,
               participants: cleanParticipants,
@@ -122,12 +178,13 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
               modal.closeAndReset();
             },
             onError: (error) => {
-              modal.setErrorMessage(getApiErrorMessage(error, t));
+              modal.setErrorMessage(describeEventSaveError(error, cleanParticipants, t));
             },
           },
         );
       } else {
         const createPayload: CreateEventInput = {
+          groupId: effectiveGroupId,
           title: trimmedTitle,
           description: trimmedDescription || undefined,
           participants: cleanParticipants,
@@ -138,7 +195,7 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
             modal.closeAndReset();
           },
           onError: (error) => {
-            modal.setErrorMessage(getApiErrorMessage(error, t));
+            modal.setErrorMessage(describeEventSaveError(error, cleanParticipants, t));
           },
         });
       }
@@ -148,6 +205,7 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
       title,
       description,
       eventId,
+      effectiveGroupId,
       cleanParticipants,
       icon,
       cleanParticipantReplacements,
@@ -171,11 +229,17 @@ export function useEventFormModal({ open, eventId, onClose }: UseEventFormModalP
     setParticipantReplacements,
     icon,
     setIcon,
+    groups,
+    groupId: effectiveGroupId,
+    groupName: event?.group?.name,
+    handleGroupChange,
+    canChangeGroup: !isEditMode || isAdmin,
+    removedByGroupChange,
     showConfirm: modal.showDiscardConfirm,
     errorMessage: modal.errorMessage,
     isLoading,
     canSubmit,
-    isEditMode: !!eventId,
+    isEditMode,
     handleOpenChange: modal.handleOpenChange,
     handleConfirmClose: modal.handleConfirmDiscard,
     handleCancelClose: modal.handleCancelDiscard,

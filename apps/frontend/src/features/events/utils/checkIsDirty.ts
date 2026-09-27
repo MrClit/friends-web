@@ -7,6 +7,8 @@ interface CheckIsDirtyParams {
   title: string;
   description: string;
   participants: EventParticipant[];
+  /** The group chosen in the form. Choosing one while creating is not a change on its own. */
+  groupId: string;
   icon: string | undefined;
   open: boolean;
   userId?: string;
@@ -17,6 +19,7 @@ export function checkIsDirty({
   title,
   description,
   participants,
+  groupId,
   icon,
   open,
   userId,
@@ -40,6 +43,7 @@ export function checkIsDirty({
   }
 
   if (title.trim() !== event.title.trim()) return true;
+  if (groupId && groupId !== event.groupId) return true;
   if (participants.length !== event.participants.length) return true;
 
   // Contribution targets are not compared: the form cannot change them, they are edited from the

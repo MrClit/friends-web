@@ -30,7 +30,12 @@
     "titlePlaceholder": "Nom de l'esdeveniment",
     "update": "Actualitza l'esdeveniment",
     "create": "Crear Esdeveniment",
-    "saving": "Desant..."
+    "saving": "Desant...",
+    "groupLabel": "Grup",
+    "groupPlaceholder": "Tria un grup",
+    "groupReadOnlyHint": "Només l’admin pot canviar el grup d’un esdeveniment.",
+    "removedByGroupChange": "S’han tret perquè no són del grup triat: {{names}}",
+    "notMembers": "No són membres del grup de l’esdeveniment: {{names}}"
   },
   "participantsInput": {
     "label": "Participants",
@@ -46,7 +51,8 @@
     "cancelRenameAria": "Cancel·lar edició del convidat",
     "cancelReplace": "Cancel·lar",
     "noUsers": "No s'han trobat usuaris",
-    "createNew": "Afegir com a convidat"
+    "createNew": "Afegir com a convidat",
+    "chooseGroupFirst": "Tria primer un grup"
   },
   "eventContextMenu": {
     "edit": "Modificar",
@@ -77,6 +83,9 @@
   "createEventCard": {
     "ariaLabel": "Crear nou esdeveniment",
     "title": "Crear nou esdeveniment",
-    "subtitle": "Comença a dividir despeses amb els teus amics ara mateix."
+    "subtitle": "Comença a dividir despeses amb els teus amics ara mateix.",
+    "noGroupSubtitle": "Encara no pertanys a cap grup. Demana a l’admin que t’hi afegeixi per poder crear esdeveniments.",
+    "noGroupAdminSubtitle": "No hi ha cap grup. Crea’n un abans de crear esdeveniments.",
+    "goToGroups": "Anar a l’administració de grups"
   }
 }

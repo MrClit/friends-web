@@ -9,6 +9,7 @@ import { getParticipantAvatar, getParticipantName } from '@/shared/utils/partici
 
 interface ParticipantRowProps {
   participant: EventParticipant;
+  groupId: string;
   isFirst: boolean;
   existingParticipants: EventParticipant[];
   isRenamingGuest: boolean;
@@ -43,6 +44,7 @@ export const ParticipantRow = memo(function ParticipantRow({
   onCancelRename,
   onRenameNameChange,
   onCommitRename,
+  groupId,
 }: ParticipantRowProps) {
   const { t } = useTranslation('events');
   const isGuest = participant.type === 'guest';
@@ -186,6 +188,7 @@ export const ParticipantRow = memo(function ParticipantRow({
           <div className="mt-1 pl-12 sm:pl-13">
             <div className="flex items-center gap-2">
               <ParticipantsCombobox
+                groupId={groupId}
                 onSelect={onReplaceWithUser}
                 existingParticipants={existingParticipants}
                 inputValue={replaceInputValue}

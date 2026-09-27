@@ -11,7 +11,7 @@ paths:
 
 ```
 src/features/{feature}/   components/, types.ts, constants.ts, index.ts (hooks/ optional)
-src/api/                  client.ts, types.ts + per-entity modules (events.api.ts, transactions.api.ts, users.api.ts, admin-users.api.ts, admin-groups.api.ts)
+src/api/                  client.ts, types.ts + per-entity modules (events.api.ts, transactions.api.ts, users.api.ts, groups.api.ts, admin-users.api.ts, admin-groups.api.ts)
 src/hooks/api/            TanStack Query hooks + centralized keys.ts
 src/shared/store/         Zustand stores (theme, modals, toast, delete state)
 src/pages/                Route-level components
