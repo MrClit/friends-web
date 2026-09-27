@@ -25,6 +25,10 @@ const KPIDetail = lazy(() => import('./pages/KPIDetail').then((m) => ({ default:
 const AuthCallback = lazy(() => import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
+const AdminGroupsPage = lazy(() => import('./pages/AdminGroupsPage').then((m) => ({ default: m.AdminGroupsPage })));
+const AdminGroupDetailPage = lazy(() =>
+  import('./pages/AdminGroupDetailPage').then((m) => ({ default: m.AdminGroupDetailPage })),
+);
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })));
 const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })));
 
@@ -80,6 +84,26 @@ export function App() {
                   <RequireAuth>
                     <RequireRole allowedRoles={[ADMIN_ROLE]}>
                       <AdminUsersPage />
+                    </RequireRole>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/admin/groups"
+                element={
+                  <RequireAuth>
+                    <RequireRole allowedRoles={[ADMIN_ROLE]}>
+                      <AdminGroupsPage />
+                    </RequireRole>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/admin/groups/:id"
+                element={
+                  <RequireAuth>
+                    <RequireRole allowedRoles={[ADMIN_ROLE]}>
+                      <AdminGroupDetailPage />
                     </RequireRole>
                   </RequireAuth>
                 }

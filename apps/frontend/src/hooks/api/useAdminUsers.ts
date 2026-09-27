@@ -31,6 +31,8 @@ export function useUpdateAdminUser() {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      // Group member lists show the user's name, email and avatar.
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminGroups.all });
     },
   });
 }
@@ -43,6 +45,8 @@ export function useDeleteAdminUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+      // Deleting a user removes their memberships, which changes member counts and member lists.
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminGroups.all });
     },
   });
 }
