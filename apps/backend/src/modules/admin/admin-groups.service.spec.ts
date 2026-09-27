@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
 import { Group } from '../groups/entities/group.entity';
 import { GroupMember } from '../groups/entities/group-member.entity';
 import { User } from '../users/user.entity';
+import { Event } from '../events/entities/event.entity';
 import { AdminGroupsService } from './admin-groups.service';
 
 type QueryBuilderMock = Record<string, jest.Mock>;
@@ -41,6 +42,7 @@ describe('AdminGroupsService', () => {
   let groupRepository: Record<string, jest.Mock>;
   let memberRepository: Record<string, jest.Mock>;
   let userRepository: Record<string, jest.Mock>;
+  let eventRepository: Record<string, jest.Mock>;
 
   const group = {
     id: 'group-1',
@@ -70,6 +72,7 @@ describe('AdminGroupsService', () => {
       createQueryBuilder: jest.fn(() => userQuery),
       exists: jest.fn(),
     };
+    eventRepository = { exists: jest.fn().mockResolvedValue(false) };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -77,6 +80,7 @@ describe('AdminGroupsService', () => {
         { provide: getRepositoryToken(Group), useValue: groupRepository },
         { provide: getRepositoryToken(GroupMember), useValue: memberRepository },
         { provide: getRepositoryToken(User), useValue: userRepository },
+        { provide: getRepositoryToken(Event), useValue: eventRepository },
       ],
     }).compile();
 
@@ -172,6 +176,27 @@ describe('AdminGroupsService', () => {
       groupRepository.delete.mockResolvedValue({ affected: 0 });
 
       await expect(service.remove('missing')).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('refuses to delete a group that still has events', async () => {
+      eventRepository.exists.mockResolvedValue(true);
+
+      await expect(service.remove('group-1')).rejects.toBeInstanceOf(UnprocessableEntityException);
+      expect(groupRepository.delete).not.toHaveBeenCalled();
+    });
+
+    it('turns the foreign key refusal into the same 422, for an event created after the check', async () => {
+      const violation = Object.assign(new QueryFailedError('DELETE', [], new Error('restrict')), { code: '23503' });
+      groupRepository.delete.mockRejectedValue(violation);
+
+      await expect(service.remove('group-1')).rejects.toBeInstanceOf(UnprocessableEntityException);
+    });
+
+    it('lets any other delete error through', async () => {
+      const failure = new Error('connection lost');
+      groupRepository.delete.mockRejectedValue(failure);
+
+      await expect(service.remove('group-1')).rejects.toBe(failure);
     });
   });
 

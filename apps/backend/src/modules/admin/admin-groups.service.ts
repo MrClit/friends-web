@@ -1,12 +1,13 @@
-import { Injectable, ConflictException, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Group } from '../groups/entities/group.entity';
 import { GroupMember } from '../groups/entities/group-member.entity';
 import { User } from '../users/user.entity';
+import { Event } from '../events/entities/event.entity';
 import { AdminGroupDto, AdminGroupMemberDto } from './dto/admin-group.dto';
 import { AdminGroupNameDto } from './dto/admin-group-name.dto';
-import { isUniqueViolation } from './unique-violation';
+import { isForeignKeyViolation, isUniqueViolation } from './unique-violation';
 
 @Injectable()
 export class AdminGroupsService {
@@ -19,6 +20,8 @@ export class AdminGroupsService {
     private readonly memberRepository: Repository<GroupMember>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Event)
+    private readonly eventRepository: Repository<Event>,
   ) {}
 
   async findAll(): Promise<AdminGroupDto[]> {
@@ -60,9 +63,20 @@ export class AdminGroupsService {
 
   /**
    * Deletes the group and, through the foreign key cascade, its memberships. The users themselves stay.
+   *
+   * A group that still has events cannot go: its events would be left without a group. The admin moves
+   * them first. The foreign key restricts the delete as well, which covers an event created between the
+   * check and the delete.
    */
   async remove(groupId: string): Promise<{ success: true }> {
-    const result = await this.groupRepository.delete(groupId);
+    if (await this.eventRepository.exists({ where: { groupId } })) {
+      throw this.groupHasEvents(groupId);
+    }
+
+    const result = await this.groupRepository.delete(groupId).catch((error: unknown) => {
+      throw isForeignKeyViolation(error) ? this.groupHasEvents(groupId) : error;
+    });
+
     if (!result.affected) {
       throw new NotFoundException(`Group with ID ${groupId} not found`);
     }
@@ -127,6 +141,12 @@ export class AdminGroupsService {
 
     this.logger.log(`Admin removed user ${userId} from group ${groupId}`);
     return { success: true };
+  }
+
+  private groupHasEvents(groupId: string): UnprocessableEntityException {
+    return new UnprocessableEntityException(
+      `Group ${groupId} still has events; move them to another group before deleting it`,
+    );
   }
 
   private async findGroupOrThrow(groupId: string): Promise<Group> {

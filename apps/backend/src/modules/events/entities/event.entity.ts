@@ -1,5 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Transaction } from '../../transactions/entities/transaction.entity';
+import { Group } from '../../groups/entities/group.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { EventStatus, type EventParticipant } from '@friends/shared-types';
 
@@ -9,6 +20,8 @@ export type { UserParticipant, GuestParticipant, PotParticipant } from '@friends
 // Backs the event listing: filter by status, order by creation date. Declared here as well as
 // in the migration because the DB-backed test suites build their schema from the entities.
 @Index('idx_events_status_created_at', ['status', 'createdAt'])
+// Backs the foreign key check when a group is deleted, and the "does this group still have events" lookup.
+@Index('idx_events_group_id', ['groupId'])
 @Entity('events')
 export class Event {
   @PrimaryGeneratedColumn('uuid')
@@ -44,6 +57,16 @@ export class Event {
   // never match what Postgres reports.
   @Column({ type: 'jsonb', default: [] })
   participants: EventParticipant[];
+
+  // Every event belongs to exactly one group, and only its members can be added to it (#121). RESTRICT
+  // rather than CASCADE: deleting a group must never take its events and their money with it, so the
+  // admin has to move them to another group first.
+  @Column({ name: 'group_id', type: 'uuid' })
+  groupId: string;
+
+  @ManyToOne(() => Group, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'group_id', foreignKeyConstraintName: 'fk_events_group_id' })
+  group?: Group;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
