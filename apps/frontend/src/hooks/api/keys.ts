@@ -88,8 +88,18 @@ export const queryKeys = {
     byEvent: (eventId: string) => ['calendar', 'event', eventId] as const,
   },
 
-  users: {
-    all: ['users'] as const,
+  groups: {
+    /**
+     * Key for the groups of the current user (every group for the admin); also the prefix of every
+     * member list below
+     */
+    all: ['groups'] as const,
+
+    /**
+     * Key for the members of a group, the users that can be added to its events
+     * @param groupId - Group ID
+     */
+    members: (groupId: string) => ['groups', groupId, 'members'] as const,
   },
 
   adminUsers: {

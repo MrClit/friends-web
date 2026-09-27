@@ -16,6 +16,7 @@ const t = ((key: string) => key) as never;
 
 const baseEvent: Event = {
   id: 'event-1',
+  groupId: 'group-1',
   title: 'Trip',
   description: 'Weekend',
   icon: 'flight',

@@ -1,6 +1,8 @@
 import type { EventParticipant, ParticipantReplacement } from '../types';
 import { ParticipantsList } from './ParticipantsList';
 import { IconPicker } from './IconPicker';
+import { EventGroupField } from './EventGroupField';
+import type { Group } from '@/api/groups.api';
 import { useTranslation } from 'react-i18next';
 
 export interface EventFormState {
@@ -15,6 +17,12 @@ export interface EventFormState {
   ) => void;
   icon?: string;
   setIcon?: (key: string) => void;
+  groups: Group[];
+  groupId: string;
+  groupName?: string;
+  canChangeGroup: boolean;
+  onGroupChange: (groupId: string) => void;
+  removedByGroupChange: string[];
 }
 
 interface EventFormProps {
@@ -34,6 +42,12 @@ export function EventForm({ fields, onSubmit }: EventFormProps) {
     setParticipantReplacements,
     icon,
     setIcon,
+    groups,
+    groupId,
+    groupName,
+    canChangeGroup,
+    onGroupChange,
+    removedByGroupChange,
   } = fields;
 
   return (
@@ -67,7 +81,16 @@ export function EventForm({ fields, onSubmit }: EventFormProps) {
           rows={2}
         />
       </div>
+      <EventGroupField
+        groups={groups}
+        groupId={groupId}
+        groupName={groupName}
+        canChange={canChangeGroup}
+        onChange={onGroupChange}
+        removedNames={removedByGroupChange}
+      />
       <ParticipantsList
+        groupId={groupId}
         participants={participants}
         setParticipants={setParticipants}
         setParticipantReplacements={setParticipantReplacements}

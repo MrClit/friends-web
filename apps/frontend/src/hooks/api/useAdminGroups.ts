@@ -21,10 +21,15 @@ export function useAdminGroupMembers(groupId: string) {
 /**
  * Every mutation invalidates the whole `admin-groups` prefix: the list carries the member counts, and the
  * member lists of other groups carry each user's group count, so any change can move numbers elsewhere.
+ * The `groups` prefix goes too, since it is what the event form offers as groups and as participants.
  */
 function useInvalidateAdminGroups() {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: queryKeys.adminGroups.all });
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminGroups.all }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.groups.all }),
+    ]);
 }
 
 export function useCreateAdminGroup() {

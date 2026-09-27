@@ -12,7 +12,6 @@ export interface UpdateCurrentUserProfileInput {
 }
 
 export const usersApi = {
-  getAll: () => apiRequest<User[]>('/users'),
   getCurrentProfile: () => apiRequest<CurrentUserProfile>('/users/me'),
   updateCurrentProfile: (data: UpdateCurrentUserProfileInput) => {
     const formData = new FormData();

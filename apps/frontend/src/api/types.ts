@@ -17,8 +17,16 @@ export type { EventParticipantDto, UserParticipant, GuestParticipant, PotPartici
 
 // ============= Event Types =============
 
+export interface EventGroup {
+  id: string;
+  name: string;
+}
+
 export interface Event {
   id: string;
+  /** The group the event belongs to; only its members can be added as participants. */
+  groupId: string;
+  group?: EventGroup;
   title: string;
   description?: string;
   icon?: string;
@@ -30,6 +38,7 @@ export interface Event {
 }
 
 export interface CreateEventDto {
+  groupId: string;
   title: string;
   description?: string;
   icon?: string;
@@ -38,6 +47,8 @@ export interface CreateEventDto {
 }
 
 export interface UpdateEventDto {
+  /** Always sent by the form; only the admin may send one different from the current group. */
+  groupId?: string;
   title?: string;
   description?: string;
   icon?: string;

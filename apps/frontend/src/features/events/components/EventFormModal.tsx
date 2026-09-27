@@ -38,6 +38,12 @@ export function EventFormModal() {
     handleSubmit,
     icon,
     setIcon,
+    groups,
+    groupId,
+    groupName,
+    handleGroupChange,
+    canChangeGroup,
+    removedByGroupChange,
   } = useEventFormModal({
     open,
     eventId,
@@ -84,6 +90,12 @@ export function EventFormModal() {
                   setParticipantReplacements,
                   icon,
                   setIcon,
+                  groups,
+                  groupId,
+                  groupName,
+                  canChangeGroup,
+                  onGroupChange: handleGroupChange,
+                  removedByGroupChange,
                 }}
                 onSubmit={handleSubmit}
               />
