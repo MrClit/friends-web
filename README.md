@@ -24,6 +24,7 @@ You can try the app live here: **[https://mrclit.github.io/friends-web/](https:/
 Features available in the demo:
 
 - Event management and participant tracking
+- User groups: each event belongs to a group of friends
 - Transaction types (contributions, expenses, compensations)
 - Pot expenses (shared costs)
 - KPI dashboard with drill-down details

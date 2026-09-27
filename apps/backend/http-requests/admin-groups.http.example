@@ -1,0 +1,68 @@
+###############################################
+# ADMIN GROUPS API - EXAMPLE FILE
+###############################################
+# Copy this file to admin-groups.http and configure tokens in .vscode/settings.json
+# admin-groups.http is gitignored for security
+
+@baseUrl = http://localhost:3000/api
+@token = YOUR_ADMIN_JWT_TOKEN_HERE
+@contentType = application/json
+@userId = SOME_USER_ID_HERE
+
+###############################################
+# 1. LIST GROUPS (with member counts)
+###############################################
+GET {{baseUrl}}/admin/groups
+Authorization: Bearer {{token}}
+
+###############################################
+# 2. CREATE GROUP
+###############################################
+# 409 if a group with the same name exists (case-insensitive), 400 if the name is empty.
+# @name createGroup
+POST {{baseUrl}}/admin/groups
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Amigos de la uni"
+}
+
+### Save the created group ID
+@groupId = {{createGroup.response.body.data.id}}
+
+###############################################
+# 3. RENAME GROUP
+###############################################
+PATCH {{baseUrl}}/admin/groups/{{groupId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Amigos de la universidad"
+}
+
+###############################################
+# 4. MEMBERS (with how many groups each belongs to)
+###############################################
+GET {{baseUrl}}/admin/groups/{{groupId}}/members
+Authorization: Bearer {{token}}
+
+###############################################
+# 5. ADD MEMBER (idempotent)
+###############################################
+PUT {{baseUrl}}/admin/groups/{{groupId}}/members/{{userId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# 6. REMOVE MEMBER (idempotent)
+###############################################
+DELETE {{baseUrl}}/admin/groups/{{groupId}}/members/{{userId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# 7. DELETE GROUP
+###############################################
+# 422 if the group still has events: move them to another group first.
+DELETE {{baseUrl}}/admin/groups/{{groupId}}
+Authorization: Bearer {{token}}

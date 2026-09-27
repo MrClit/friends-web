@@ -2,7 +2,7 @@
 
 > NestJS backend API for Friends expense sharing platform
 
-**Status:** ✅ Operational - Auth, Events, Transactions, Users, Admin, KPIs
+**Status:** ✅ Operational - Auth, Events, Transactions, Users, Groups, Admin, KPIs
 
 Backend RESTful API built with NestJS, TypeScript, PostgreSQL and TypeORM. Provides a complete REST API for managing events, participants, transactions, and KPIs.
 
@@ -374,9 +374,17 @@ src/
 │   │   ├── users.module.ts
 │   │   └── user.entity.ts
 │   │
-│   └── admin/                       # Admin user management
+│   ├── groups/                      # User groups: membership checks, own groups and their members
+│   │   ├── groups.controller.ts
+│   │   ├── groups.service.ts
+│   │   ├── groups.module.ts
+│   │   └── entities/               # Group, GroupMember entities
+│   │
+│   └── admin/                       # Admin user and group management
 │       ├── admin-users.controller.ts
 │       ├── admin-users.service.ts
+│       ├── admin-groups.controller.ts
+│       ├── admin-groups.service.ts
 │       └── admin.module.ts
 │
 ├── app.module.ts                    # Root module
@@ -424,17 +432,25 @@ GET    /api/auth/me                  # Current authenticated user
 ### Users (authenticated)
 
 ```
-GET    /api/users         # List all users (for participant search)
-GET    /api/users/search  # Search users by name/email
 GET    /api/users/me      # Current user profile
 PATCH  /api/users/me      # Update current user profile (name, avatar)
 ```
 
+### Groups (authenticated)
+
+```
+GET    /api/groups              # Groups of the current user (every group for the admin)
+GET    /api/groups/:id/members  # Members of a group: the users that can be added to its events (403 if not a member)
+```
+
 ### Events
+
+Every event belongs to a group (`groupId`, required on create). Only members of the group can be added as
+users; a rejected user is a 422 with `details.userIds`. Only the admin can move an event to another group.
 
 ```
 GET    /api/events           # List events (query: ?status=active|archived)
-POST   /api/events           # Createte event
+POST   /api/events           # Create event
 GET    /api/events/:id       # Get event by ID
 PATCH  /api/events/:id       # Update event
 DELETE /api/events/:id       # Delete event (cascade deletes transactions)
@@ -446,7 +462,7 @@ GET    /api/events/:id/kpis  # Get KPI calculations for an event
 ```
 GET    /api/events/:eventId/transactions            # List transactions for an event
 GET    /api/events/:eventId/transactions/paginated  # Date-paginated transactions
-POST   /api/events/:eventId/transactions            # Createte transaction
+POST   /api/events/:eventId/transactions            # Create transaction
 PATCH  /api/transactions/:id                        # Update transaction
 DELETE /api/transactions/:id                        # Delete transaction
 ```
@@ -455,9 +471,17 @@ DELETE /api/transactions/:id                        # Delete transaction
 
 ```
 GET    /api/admin/users       # List all users
-POST   /api/admin/users       # Createte user
+POST   /api/admin/users       # Create user
 PATCH  /api/admin/users/:id   # Update user (role, status)
 DELETE /api/admin/users/:id   # Soft-delete user
+
+GET    /api/admin/groups                      # List groups with member counts
+POST   /api/admin/groups                      # Create group (409 if the name exists, case-insensitive)
+PATCH  /api/admin/groups/:id                  # Rename group
+DELETE /api/admin/groups/:id                  # Delete group (422 if it still has events)
+GET    /api/admin/groups/:id/members          # Members, with how many groups each belongs to
+PUT    /api/admin/groups/:id/members/:userId  # Add member (idempotent)
+DELETE /api/admin/groups/:id/members/:userId  # Remove member (idempotent)
 ```
 
 **Paginación de transacciones:**
@@ -520,7 +544,7 @@ All successful responses (200, 201) are wrapped in a standard format:
   ]
 }
 
-// POST /api/events (Createted entity)
+// POST /api/events (Created entity)
 {
   "data": {
     "id": "uuid",
@@ -567,10 +591,14 @@ All successful responses (200, 201) are wrapped in a standard format:
 ```sql
 CREATE TABLE events (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  group_id UUID NOT NULL REFERENCES groups(id) ON DELETE RESTRICT,
   title VARCHAR(255) NOT NULL,
-  participants JSONB NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  description VARCHAR(255),
+  icon VARCHAR(50),
+  status events_status_enum NOT NULL DEFAULT 'active',  -- 'active' | 'archived'
+  participants JSONB NOT NULL DEFAULT '[]',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 ```
 
@@ -688,10 +716,10 @@ pnpm test:debug
 Recommended preparation for e2e:
 
 ```bash
-# 1) Createte your test environment file
+# 1) Create your test environment file
 cp .env.test.example .env.test
 
-# 2) Createte the test database (once)
+# 2) Create the test database (once)
 docker exec -it friends-postgres createdb -U postgres friends_db_test
 ```
 
@@ -798,7 +826,7 @@ The `.http` files use variables configured in `.vscode/settings.json`:
 Files use variables that are captured automatically:
 
 ```http
-### Createte event and save its ID
+### Create event and save its ID
 # @name createEvent
 POST {{baseUrl}}/events
 Content-Type: {{contentType}}
@@ -827,7 +855,7 @@ GET {{baseUrl}}/health/live
 #### **events.http**
 
 - ✅ List all events
-- ✅ Createte event with participants
+- ✅ Create event with participants
 - ✅ Get event by ID
 - ✅ Update event title
 - ✅ Update event participants
@@ -837,10 +865,10 @@ GET {{baseUrl}}/health/live
 #### **transactions.http**
 
 - ✅ List transactions by event
-- ✅ Createte contribution
-- ✅ Createte participant expense
-- ✅ Createte POT expense (`participantId: "0"`)
-- ✅ Createte compensation
+- ✅ Create contribution
+- ✅ Create participant expense
+- ✅ Create POT expense (`participantId: "0"`)
+- ✅ Create compensation
 - ✅ Get transaction by ID
 - ✅ Update transaction
 - ✅ Delete transaction
@@ -896,7 +924,7 @@ GET {{baseUrl}}/health/live
   - `Cmd+Alt+H` / `Ctrl+Alt+H`: View history
 
 - **Private environment variables:**
-  - Createte `http-client.private.env.json` for tokens/secrets
+  - Create `http-client.private.env.json` for tokens/secrets
   - This file is in `.gitignore` automatically
 
 - **Multiple requests:**
@@ -929,7 +957,7 @@ export const api = {
         .then((r) => r.json())
         .then((response) => response.data), // ⚠️ Access .data
 
-    create: (data: CreateteEventDto) =>
+    create: (data: CreateEventDto) =>
       fetch(`${API_BASE}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -950,7 +978,7 @@ export const api = {
         .then((r) => r.json())
         .then((response) => response.data), // ⚠️ Access .data
 
-    create: (eventId: string, data: CreateteTransactionDto) =>
+    create: (eventId: string, data: CreateTransactionDto) =>
       fetch(`${API_BASE}/events/${eventId}/transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -991,7 +1019,7 @@ async function fetchEvent(id: string) {
 - ✅ Complete transaction CRUD
 - ✅ Entity with UUID, title, paymentType (enum), amount, participantId, date
 - ✅ ManyToOne relationship with Events (ON DELETE CASCADE)
-- ✅ Validated DTOs (CreateteTransactionDto, UpdateTransactionDto, PaginationQueryDto)
+- ✅ Validated DTOs (CreateTransactionDto, UpdateTransactionDto, PaginationQueryDto)
 - ✅ Service with complete business logic
 - ✅ Controller with nested endpoints under events
 - ✅ Pagination by unique dates (optimized with SQL window functions)

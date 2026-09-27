@@ -74,7 +74,10 @@ and `pnpm build` do this themselves; a watching dev server does not).
 `netContribution - contributionTarget` per participant. Dropping it when building a participant silently
 zeroes that KPI.
 
-**Event:** id, title, description?, icon?, status (`active` | `archived`), participants (JSONB), timestamps
+**Group:** id, name (unique, case-insensitive), members (`group_members`). Every event belongs to one; only its
+members can be added to it as users. The admin manages groups and is the only one who moves an event between them.
+
+**Event:** id, groupId (FK), title, description?, icon?, status (`active` | `archived`), participants (JSONB), timestamps
 
 **Transaction:** id, title, paymentType (`contribution` | `expense` | `compensation`), amount (decimal 10,2), participantId, date, eventId (FK), timestamps
 

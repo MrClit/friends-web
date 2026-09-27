@@ -1,0 +1,25 @@
+###############################################
+# GROUPS API - EXAMPLE FILE
+###############################################
+# Copy this file to groups.http and configure tokens in .vscode/settings.json
+# groups.http is gitignored for security
+
+@baseUrl = http://localhost:3000/api
+@token = YOUR_JWT_TOKEN_HERE
+
+###############################################
+# 1. MY GROUPS (every group for the admin)
+###############################################
+# @name myGroups
+GET {{baseUrl}}/groups
+Authorization: Bearer {{token}}
+
+### Save the first group ID
+@groupId = {{myGroups.response.body.data.0.id}}
+
+###############################################
+# 2. MEMBERS OF A GROUP
+###############################################
+# The users that can be added to the group's events. 403 if you are not a member.
+GET {{baseUrl}}/groups/{{groupId}}/members
+Authorization: Bearer {{token}}
