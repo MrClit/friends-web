@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { GroupMemberDto } from '../../groups/dto/group.dto';
 
 export class AdminGroupDto {
   @ApiProperty({ description: 'Group UUID' })
@@ -17,19 +18,7 @@ export class AdminGroupDto {
   updatedAt: Date;
 }
 
-export class AdminGroupMemberDto {
-  @ApiProperty({ description: 'User UUID' })
-  id: string;
-
-  @ApiProperty({ description: 'User display name', nullable: true })
-  name: string | null;
-
-  @ApiProperty({ description: 'User email address' })
-  email: string;
-
-  @ApiProperty({ description: 'User avatar URL', nullable: true })
-  avatar: string | null;
-
+export class AdminGroupMemberDto extends GroupMemberDto {
   @ApiProperty({
     description:
       'Number of groups the user belongs to, this one included. 1 means removing them leaves them groupless.',

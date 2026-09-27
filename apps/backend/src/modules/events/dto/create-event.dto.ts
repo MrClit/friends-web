@@ -1,4 +1,13 @@
-import { IsString, IsNotEmpty, IsArray, ArrayMinSize, IsOptional, IsEnum, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsArray,
+  ArrayMinSize,
+  IsOptional,
+  IsEnum,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiExtraModels, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
 import { EventStatus } from '@friends/shared-types';
@@ -15,6 +24,15 @@ export class CreateEventDto {
   @IsString()
   @IsNotEmpty()
   title: string;
+
+  @ApiProperty({
+    description:
+      'Group the event belongs to. Only its members can be added as participants. On update, only the admin ' +
+      'can change it, and only to a group every participant with an account belongs to.',
+    format: 'uuid',
+  })
+  @IsUUID()
+  groupId: string;
 
   @ApiPropertyOptional({ description: 'Event description', example: 'Summer vacation 2026' })
   @IsString()

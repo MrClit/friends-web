@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ApiErrorResponseDto {
   @ApiProperty({ example: 400 })
@@ -15,4 +15,10 @@ export class ApiErrorResponseDto {
 
   @ApiProperty({ example: 'Validation failed' })
   message: string;
+
+  @ApiPropertyOptional({
+    description: 'Machine-readable context, present only on some errors',
+    example: { userIds: ['8f14e45f-ceea-467a-9f3c-2bd2e6c1a3d4'] },
+  })
+  details?: Record<string, unknown>;
 }

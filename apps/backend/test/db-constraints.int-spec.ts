@@ -120,6 +120,18 @@ describe('Foreign key constraints (integration)', () => {
     expect(foreignKeys).toHaveLength(2);
   });
 
+  // The one foreign key here that does not cascade, on purpose: deleting a group must not take its events
+  // and their money with it. AdminGroupsService turns the refusal into a 422.
+  it('restricts deleting a group that still has events', async () => {
+    const foreignKeys = await foreignKeysFor('events');
+
+    const groupFk = on(foreignKeys, 'group_id');
+    expect(groupFk?.name).toBe('fk_events_group_id');
+    expect(groupFk?.definition).toMatch(/REFERENCES "?groups"?\("?id"?\) ON DELETE RESTRICT/);
+
+    expect(foreignKeys).toHaveLength(1);
+  });
+
   // The calendar is a three-level chain, and every link cascades: deleting an event has to take its
   // days, their sittings and every attendance on them with it. A link that stopped cascading would
   // leave rows nothing can reach and nothing can delete.

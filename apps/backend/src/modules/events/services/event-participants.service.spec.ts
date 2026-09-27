@@ -557,4 +557,38 @@ describe('EventParticipantsService', () => {
       expect(service.collectRemovedParticipantIds([{ type: 'pot', id: '0' }, ...original], next)).not.toContain('0');
     });
   });
+  describe('collectAddedUserIds', () => {
+    const original: EventParticipant[] = [
+      { type: 'user', id: 'u-1' },
+      { type: 'guest', id: 'g1', name: 'Guest 1' },
+    ];
+
+    it('returns nothing when the update does not touch participants', () => {
+      expect(service.collectAddedUserIds(original, undefined)).toEqual([]);
+    });
+
+    it('leaves out the users that were already there', () => {
+      expect(service.collectAddedUserIds(original, original)).toEqual([]);
+    });
+
+    it('returns only the users new to the event, never guests or the pot', () => {
+      const next: EventParticipant[] = [
+        ...original,
+        { type: 'user', id: 'u-2' },
+        { type: 'guest', id: 'g2', name: 'Guest 2' },
+        { type: 'pot', id: '0' },
+      ];
+
+      expect(service.collectAddedUserIds(original, next)).toEqual(['u-2']);
+    });
+
+    it('counts a guest id reused by a user as a new user', () => {
+      const next: EventParticipant[] = [
+        { type: 'user', id: 'u-1' },
+        { type: 'user', id: 'g1' },
+      ];
+
+      expect(service.collectAddedUserIds(original, next)).toEqual(['g1']);
+    });
+  });
 });

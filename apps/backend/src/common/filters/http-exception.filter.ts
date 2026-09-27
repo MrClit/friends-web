@@ -26,12 +26,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = 'Internal server error';
     }
 
+    // Machine-readable context for the client, such as which users a 422 rejected. Passed through only
+    // when the exception carries it, so every other error keeps the exact shape it always had.
+    const details =
+      typeof exceptionResponse === 'object' && exceptionResponse !== null && 'details' in exceptionResponse
+        ? exceptionResponse.details
+        : undefined;
+
     const errorResponse = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
       message,
+      ...(details !== undefined && { details }),
     };
 
     // Log error details

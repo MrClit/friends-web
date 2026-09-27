@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { Event, EventParticipant, EventStatus } from '../../src/modules/events/entities/event.entity';
 import { Transaction, PaymentType } from '../../src/modules/transactions/entities/transaction.entity';
@@ -24,6 +25,8 @@ interface CreateEventInput {
   icon?: string;
   status?: EventStatus;
   participants?: EventParticipant[];
+  /** Defaults to a throwaway group of its own, for tests that do not care which group the event is in. */
+  groupId?: string;
 }
 
 interface CreateTransactionInput {
@@ -70,7 +73,11 @@ export async function createUser(repository: Repository<User>, input: CreateUser
 }
 
 export async function createEvent(repository: Repository<Event>, input: CreateEventInput): Promise<Event> {
+  const groupId =
+    input.groupId ?? (await createGroup(repository.manager.getRepository(Group), `Group ${randomUUID()}`)).id;
+
   return repository.save({
+    groupId,
     title: input.title,
     description: input.description ?? '',
     icon: input.icon ?? 'event',

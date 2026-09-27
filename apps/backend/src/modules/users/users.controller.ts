@@ -4,7 +4,6 @@ import {
   Get,
   ParseFilePipeBuilder,
   Patch,
-  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -19,10 +18,8 @@ import type { AuthenticatedUser } from '../../common/types/authenticated-user.ty
 import { AvatarService } from '../auth/services/avatar.service';
 import { RolesGuard } from '../auth/roles/roles.guard';
 import { CurrentUserProfileDto } from './dto/current-user-profile.dto';
-import { SearchUsersQueryDto } from './dto/search-users-query.dto';
 import { UpdateCurrentUserProfileDto } from './dto/update-current-user-profile.dto';
 import { UsersService } from './users.service';
-import { UserDto } from './dto/user.dto';
 
 const AVATAR_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 const AVATAR_MIME_TYPE_REGEX = /^image\/(jpeg|jpg|png|webp|gif|heic|heif)$/;
@@ -42,33 +39,6 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly avatarService: AvatarService,
   ) {}
-
-  @Get()
-  @ApiOperation({
-    summary: 'Get all users for participant selection',
-    description:
-      'Returns the whole user directory, email included, to any authenticated user. This is a ' +
-      'deliberate product decision: the participant picker needs the full list, and email is what ' +
-      'disambiguates people with the same name. It is acceptable only while sign-up stays limited ' +
-      'to the circle of friends this app was built for. Revisit it once registration opens up or ' +
-      'the directory grows past a few hundred users — `GET /users/search` is the bounded ' +
-      'alternative to migrate to.',
-  })
-  @ApiStandardResponse(200, 'Users retrieved successfully', UserDto, true)
-  findAll() {
-    return this.usersService.findAll();
-  }
-
-  @Get('search')
-  @ApiOperation({
-    summary: 'Search users by name or email',
-    description: 'Wildcards in the search term are matched literally, not interpreted as patterns.',
-  })
-  @ApiStandardResponse(200, 'Users found', UserDto, true)
-  @ApiResponse({ status: 400, description: 'Invalid or missing search query', type: ApiErrorResponseDto })
-  search(@Query() { q }: SearchUsersQueryDto) {
-    return this.usersService.search(q);
-  }
 
   @Get('me')
   @ApiOperation({ summary: 'Get current authenticated user profile' })

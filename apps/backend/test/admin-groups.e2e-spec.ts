@@ -6,11 +6,12 @@ import request from 'supertest';
 import { Repository } from 'typeorm';
 
 import { AppModule } from '../src/app.module';
+import { Event } from '../src/modules/events/entities/event.entity';
 import { Group } from '../src/modules/groups/entities/group.entity';
 import { GroupMember } from '../src/modules/groups/entities/group-member.entity';
 import { User } from '../src/modules/users/user.entity';
 import { applyAppTestConfig } from './utils/test-app-config';
-import { addGroupMember, createGroup, createUser } from './utils/test-factories';
+import { addGroupMember, createEvent, createGroup, createUser } from './utils/test-factories';
 import { buildAuthHeader, getDataFromBody, getDataObjectFromBody } from './utils/test-http-helpers';
 
 const MISSING_ID = '00000000-0000-4000-8000-000000000000';
@@ -21,6 +22,7 @@ describe('Admin Groups API (e2e)', () => {
   let userRepository: Repository<User>;
   let groupRepository: Repository<Group>;
   let memberRepository: Repository<GroupMember>;
+  let eventRepository: Repository<Event>;
   let admin: User;
   let adminAuth: string;
 
@@ -39,10 +41,13 @@ describe('Admin Groups API (e2e)', () => {
     userRepository = app.get<Repository<User>>(getRepositoryToken(User));
     groupRepository = app.get<Repository<Group>>(getRepositoryToken(Group));
     memberRepository = app.get<Repository<GroupMember>>(getRepositoryToken(GroupMember));
+    eventRepository = app.get<Repository<Event>>(getRepositoryToken(Event));
   });
 
   beforeEach(async () => {
+    // Events first, including those other suites left behind: they restrict the delete of their group.
     // Memberships go with either end through the cascade.
+    await eventRepository.createQueryBuilder().delete().from(Event).execute();
     await groupRepository.createQueryBuilder().delete().from(Group).execute();
     await userRepository.createQueryBuilder().delete().from(User).execute();
 
@@ -169,6 +174,16 @@ describe('Admin Groups API (e2e)', () => {
       await expect(groupRepository.count()).resolves.toBe(0);
       await expect(memberRepository.count()).resolves.toBe(0);
       await expect(userRepository.existsBy({ id: admin.id })).resolves.toBe(true);
+    });
+
+    it('refuses with 422 to delete a group that still has events, and keeps it', async () => {
+      const group = await createGroup(groupRepository, 'Amigos');
+      await createEvent(eventRepository, { title: 'Cena', groupId: group.id });
+
+      const response = await http().delete(`/api/admin/groups/${group.id}`).set('Authorization', adminAuth).expect(422);
+
+      expect(response.body).toMatchObject({ statusCode: 422 });
+      await expect(groupRepository.existsBy({ id: group.id })).resolves.toBe(true);
     });
 
     it('returns 404 when deleting a missing group', async () => {
