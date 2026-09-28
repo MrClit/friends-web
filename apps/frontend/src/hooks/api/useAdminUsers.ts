@@ -17,7 +17,6 @@ export function useCreateAdminUser() {
     mutationFn: (data: CreateAdminUserInput) => adminUsersApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
     },
   });
 }
@@ -29,8 +28,10 @@ export function useUpdateAdminUser() {
     mutationFn: ({ id, data }: { id: string; data: UpdateAdminUserInput }) => adminUsersApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      // Group member lists show the user's name, email and avatar.
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminGroups.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.groups.all });
     },
   });
 }
@@ -42,7 +43,9 @@ export function useDeleteAdminUser() {
     mutationFn: (id: string) => adminUsersApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+      // Deleting a user removes their memberships, which changes member counts and member lists.
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminGroups.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.groups.all });
     },
   });
 }

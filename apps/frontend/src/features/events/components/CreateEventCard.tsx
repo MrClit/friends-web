@@ -5,9 +5,11 @@ import { useTranslation } from 'react-i18next';
 
 export interface CreateEventCardProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
+  /** Replaces the default subtitle, e.g. to explain why the card is disabled. */
+  subtitle?: string;
 }
 
-const CreateEventCardInner: FC<CreateEventCardProps> = ({ onClick, className, disabled, ...rest }) => {
+const CreateEventCardInner: FC<CreateEventCardProps> = ({ onClick, className, disabled, subtitle, ...rest }) => {
   const { t } = useTranslation('events');
 
   return (
@@ -16,7 +18,7 @@ const CreateEventCardInner: FC<CreateEventCardProps> = ({ onClick, className, di
       aria-label={t('createEventCard.ariaLabel')}
       className={cn(
         'group border-2 border-dashed border-emerald-200 dark:border-emerald-800/50 p-8 rounded-3xl flex flex-col items-center justify-center text-slate-400 hover:border-emerald-600/50 hover:bg-white/50 dark:hover:bg-emerald-900/20 transition-all min-h-75',
-        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+        disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer',
         className,
       )}
       onClick={onClick}
@@ -38,7 +40,7 @@ const CreateEventCardInner: FC<CreateEventCardProps> = ({ onClick, className, di
         {t('createEventCard.title')}
       </p>
       <p className="text-sm mt-2 text-center text-emerald-600/60 dark:text-emerald-400/60 px-6">
-        {t('createEventCard.subtitle')}
+        {subtitle ?? t('createEventCard.subtitle')}
       </p>
     </button>
   );

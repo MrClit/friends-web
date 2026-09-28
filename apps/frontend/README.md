@@ -44,6 +44,7 @@ This is the frontend workspace of the Friends monorepo. A modern web application
 - ✅ Create, edit, and delete events
 - 📅 Store event name, date, and location
 - 👥 Manage participants per event
+- 🧑‍🤝‍🧑 **Groups:** every event belongs to a group, and only its members can be added as participants
 - 💾 **Data persistence:** Events stored in PostgreSQL backend via REST API
 - 🔄 **Real-time sync:** Automatic cache invalidation and background refetch
 
@@ -72,7 +73,7 @@ This is the frontend workspace of the Friends monorepo. A modern web application
 - 🔑 **OAuth 2.0:** Google and Microsoft sign-in
 - 🔒 **JWT:** Access + refresh token flow, auto-refresh on expiry
 - 👤 **User profile:** Edit display name and avatar (Cloudinary)
-- 🛡️ **Role-based access:** ADMIN role for user management
+- 🛡️ **Role-based access:** ADMIN role for user and group management
 
 ### User Experience
 
@@ -157,6 +158,7 @@ src/
 ├─ features/         # Domain modules (feature-based organization)
 │  ├─ auth/           # OAuth login flow
 │  ├─ admin-users/    # Admin user management (ADMIN role)
+│  ├─ admin-groups/   # Admin group management and group members (ADMIN role)
 │  ├─ events/
 │  │  ├─ components/   # Event UI components
 │  │  ├─ hooks/        # Business logic hooks

@@ -9,6 +9,7 @@ export const NAMESPACES = [
   'calendar',
   'kpiDetail',
   'adminUsers',
+  'adminGroups',
   'profile',
   'user',
   'header',

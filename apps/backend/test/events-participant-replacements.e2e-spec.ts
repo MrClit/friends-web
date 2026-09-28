@@ -12,12 +12,16 @@ import { CalendarDay } from '../src/modules/calendar/entities/calendar-day.entit
 import { CalendarMeal } from '../src/modules/calendar/entities/calendar-meal.entity';
 import { CalendarAttendance } from '../src/modules/calendar/entities/calendar-attendance.entity';
 import { User } from '../src/modules/users/user.entity';
+import { Group } from '../src/modules/groups/entities/group.entity';
+import { GroupMember } from '../src/modules/groups/entities/group-member.entity';
 import { MealSlot } from '@friends/shared-types';
 import { applyAppTestConfig } from './utils/test-app-config';
 import {
+  addGroupMember,
   createCalendarAttendance,
   createCalendarDay,
   createEvent,
+  createGroup,
   createTransaction,
   createUser,
   mealOf,
@@ -35,6 +39,8 @@ describe('Event participant replacements (e2e)', () => {
   let dayRepository: Repository<CalendarDay>;
   let mealRepository: Repository<CalendarMeal>;
   let attendanceRepository: Repository<CalendarAttendance>;
+  let groupRepository: Repository<Group>;
+  let memberRepository: Repository<GroupMember>;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -52,6 +58,8 @@ describe('Event participant replacements (e2e)', () => {
     dayRepository = app.get<Repository<CalendarDay>>(getRepositoryToken(CalendarDay));
     mealRepository = app.get<Repository<CalendarMeal>>(getRepositoryToken(CalendarMeal));
     attendanceRepository = app.get<Repository<CalendarAttendance>>(getRepositoryToken(CalendarAttendance));
+    groupRepository = app.get<Repository<Group>>(getRepositoryToken(Group));
+    memberRepository = app.get<Repository<GroupMember>>(getRepositoryToken(GroupMember));
   });
 
   beforeEach(async () => {
@@ -81,10 +89,16 @@ describe('Event participant replacements (e2e)', () => {
     const owner = await createUser(userRepository, { email: 'owner@example.com', name: 'Owner' });
     const destination = await createUser(userRepository, { email: 'destination@example.com', name: 'Destination' });
 
+    // Both in the event's group, so the destination can take the guest's place.
+    const group = await createGroup(groupRepository, `Replacement group ${Date.now()}`);
+    await addGroupMember(memberRepository, group.id, owner.id);
+    await addGroupMember(memberRepository, group.id, destination.id);
+
     const createResponse = await request(httpServer())
       .post('/api/events')
       .set('Authorization', buildAuthHeader(jwtService, owner))
       .send({
+        groupId: group.id,
         title: 'Replacement Event',
         participants: [{ type: 'guest', id: GUEST_ID, name: 'Guest One' }],
       })

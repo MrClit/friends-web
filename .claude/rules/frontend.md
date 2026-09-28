@@ -11,7 +11,7 @@ paths:
 
 ```
 src/features/{feature}/   components/, types.ts, constants.ts, index.ts (hooks/ optional)
-src/api/                  client.ts, types.ts + per-entity modules (events.api.ts, transactions.api.ts, users.api.ts, admin-users.api.ts)
+src/api/                  client.ts, types.ts + per-entity modules (events.api.ts, transactions.api.ts, users.api.ts, groups.api.ts, admin-users.api.ts, admin-groups.api.ts)
 src/hooks/api/            TanStack Query hooks + centralized keys.ts
 src/shared/store/         Zustand stores (theme, modals, toast, delete state)
 src/pages/                Route-level components
@@ -22,7 +22,7 @@ src/i18n/locales/         es/ (default), en/, ca/
 src/config/env.ts         Validated env vars via VITE_ prefix
 ```
 
-Features: `events`, `transactions`, `kpi`, `shopping`, `calendar`, `auth`, `admin-users`, `profile`
+Features: `events`, `transactions`, `kpi`, `shopping`, `calendar`, `auth`, `admin-users`, `admin-groups`, `profile`
 
 ### State management layers
 
@@ -67,6 +67,7 @@ redirect has to land inside the hash router. Every route below is lazy-loaded in
 - `/profile` — User profile (protected)
 - `/settings` → redirects to `/profile` (protected alias)
 - `/admin/users` — Admin user management (protected, ADMIN role)
+- `/admin/groups`, `/admin/groups/:id` — Admin group management and a group's members (protected, ADMIN role)
 - `*` — 404 Not Found
 
 ### Testing

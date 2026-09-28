@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { Event, EventParticipant, EventStatus } from '../../src/modules/events/entities/event.entity';
 import { Transaction, PaymentType } from '../../src/modules/transactions/entities/transaction.entity';
@@ -6,6 +7,8 @@ import { CalendarDay } from '../../src/modules/calendar/entities/calendar-day.en
 import { CalendarMeal } from '../../src/modules/calendar/entities/calendar-meal.entity';
 import { CalendarAttendance } from '../../src/modules/calendar/entities/calendar-attendance.entity';
 import { User } from '../../src/modules/users/user.entity';
+import { Group } from '../../src/modules/groups/entities/group.entity';
+import { GroupMember } from '../../src/modules/groups/entities/group-member.entity';
 import { UserRole } from '../../src/modules/users/user-role.constants';
 import { MealSlot, MEAL_SLOTS } from '@friends/shared-types';
 
@@ -22,6 +25,8 @@ interface CreateEventInput {
   icon?: string;
   status?: EventStatus;
   participants?: EventParticipant[];
+  /** Defaults to a throwaway group of its own, for tests that do not care which group the event is in. */
+  groupId?: string;
 }
 
 interface CreateTransactionInput {
@@ -68,7 +73,11 @@ export async function createUser(repository: Repository<User>, input: CreateUser
 }
 
 export async function createEvent(repository: Repository<Event>, input: CreateEventInput): Promise<Event> {
+  const groupId =
+    input.groupId ?? (await createGroup(repository.manager.getRepository(Group), `Group ${randomUUID()}`)).id;
+
   return repository.save({
+    groupId,
     title: input.title,
     description: input.description ?? '',
     icon: input.icon ?? 'event',
@@ -102,6 +111,18 @@ export async function createShoppingItem(
     purchasedBy: input.purchasedBy ?? null,
     purchasedAt: input.purchasedAt ?? null,
   });
+}
+
+export async function createGroup(repository: Repository<Group>, name: string): Promise<Group> {
+  return repository.save({ name });
+}
+
+export async function addGroupMember(
+  repository: Repository<GroupMember>,
+  groupId: string,
+  userId: string,
+): Promise<GroupMember> {
+  return repository.save({ groupId, userId });
 }
 
 /**

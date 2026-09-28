@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { apiRequest, setAccessToken, REFRESH_TOKEN_KEY } from '@/api/client';
+import { ApiError, apiRequest, setAccessToken, REFRESH_TOKEN_KEY } from '@/api/client';
 
 vi.mock('@/config/env', () => ({
   ENV: { API_URL: 'http://test.api' },
@@ -58,6 +58,15 @@ describe('apiRequest', () => {
       status: 404,
       message: 'Not found',
     });
+  });
+
+  it('keeps the details the backend attaches to an error', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(mockResponse(422, { message: 'Not members', details: { userIds: ['u2'] } }));
+
+    const error = await apiRequest('/events').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).details).toEqual({ userIds: ['u2'] });
   });
 
   it('throws ApiError with text body on non-JSON error response', async () => {

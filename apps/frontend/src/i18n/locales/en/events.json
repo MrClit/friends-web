@@ -30,7 +30,12 @@
     "titlePlaceholder": "Event name",
     "update": "Update Event",
     "create": "Create Event",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "groupLabel": "Group",
+    "groupPlaceholder": "Choose a group",
+    "groupReadOnlyHint": "Only the admin can change the group of an event.",
+    "removedByGroupChange": "Removed because they are not in the chosen group: {{names}}",
+    "notMembers": "Not members of the event’s group: {{names}}"
   },
   "participantsInput": {
     "label": "Participants",
@@ -46,7 +51,8 @@
     "cancelRenameAria": "Cancel guest editing",
     "cancelReplace": "Cancel",
     "noUsers": "No users found",
-    "createNew": "Add as guest"
+    "createNew": "Add as guest",
+    "chooseGroupFirst": "Choose a group first"
   },
   "eventContextMenu": {
     "edit": "Edit",
@@ -77,6 +83,9 @@
   "createEventCard": {
     "ariaLabel": "Create new event",
     "title": "Create new event",
-    "subtitle": "Start splitting expenses with your friends right now."
+    "subtitle": "Start splitting expenses with your friends right now.",
+    "noGroupSubtitle": "You are not in any group yet. Ask the admin to add you to one so you can create events.",
+    "noGroupAdminSubtitle": "There are no groups yet. Create one before creating events.",
+    "goToGroups": "Go to group administration"
   }
 }

@@ -7,8 +7,10 @@ import { Repository } from 'typeorm';
 import { AppModule } from '../src/app.module';
 import { Event } from '../src/modules/events/entities/event.entity';
 import { User } from '../src/modules/users/user.entity';
+import { Group } from '../src/modules/groups/entities/group.entity';
+import { GroupMember } from '../src/modules/groups/entities/group-member.entity';
 import { applyAppTestConfig } from './utils/test-app-config';
-import { createUser } from './utils/test-factories';
+import { addGroupMember, createEvent, createGroup, createUser } from './utils/test-factories';
 import { buildAuthHeader, getDataFromBody, getDataObjectFromBody } from './utils/test-http-helpers';
 
 describe('Events API (e2e)', () => {
@@ -16,6 +18,17 @@ describe('Events API (e2e)', () => {
   let jwtService: JwtService;
   let userRepository: Repository<User>;
   let eventRepository: Repository<Event>;
+  let groupRepository: Repository<Group>;
+  let memberRepository: Repository<GroupMember>;
+
+  /** A group with the given users as members. */
+  const groupOf = async (...users: User[]): Promise<Group> => {
+    const group = await createGroup(groupRepository, `Group ${Date.now()}-${Math.random()}`);
+    for (const user of users) {
+      await addGroupMember(memberRepository, group.id, user.id);
+    }
+    return group;
+  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -29,10 +42,14 @@ describe('Events API (e2e)', () => {
     jwtService = app.get(JwtService);
     userRepository = app.get<Repository<User>>(getRepositoryToken(User));
     eventRepository = app.get<Repository<Event>>(getRepositoryToken(Event));
+    groupRepository = app.get<Repository<Group>>(getRepositoryToken(Group));
+    memberRepository = app.get<Repository<GroupMember>>(getRepositoryToken(GroupMember));
   });
 
   beforeEach(async () => {
+    // Events first: they restrict the delete of their group. Memberships go with the groups.
     await eventRepository.createQueryBuilder().delete().from(Event).execute();
+    await groupRepository.createQueryBuilder().delete().from(Group).execute();
     await userRepository.createQueryBuilder().delete().from(User).execute();
   });
 
@@ -76,6 +93,7 @@ describe('Events API (e2e)', () => {
 
   describe('POST /api/events - participant DTO validation', () => {
     let validationUser: Awaited<ReturnType<typeof createUser>>;
+    let validationGroup: Group;
     let httpServer: Parameters<typeof request>[0];
 
     beforeEach(async () => {
@@ -83,6 +101,8 @@ describe('Events API (e2e)', () => {
         email: `participant-validation-${Date.now()}@example.com`,
         name: 'Validation User',
       });
+      // A group the user belongs to, so each case fails on its participant and not on the group.
+      validationGroup = await groupOf(validationUser);
       httpServer = app.getHttpServer() as Parameters<typeof request>[0];
     });
 
@@ -90,7 +110,7 @@ describe('Events API (e2e)', () => {
       request(httpServer)
         .post('/api/events')
         .set('Authorization', buildAuthHeader(jwtService, validationUser))
-        .send({ title: 'Validation Test', participants });
+        .send({ groupId: validationGroup.id, title: 'Validation Test', participants });
 
     it('returns 400 for unknown participant type', async () => {
       const response = await postEvent([{ type: 'invalid', id: 'x' }]).expect(400);
@@ -132,6 +152,7 @@ describe('Events API (e2e)', () => {
       .post('/api/events')
       .set('Authorization', buildAuthHeader(jwtService, user))
       .send({
+        groupId: (await groupOf(user)).id,
         title: 'E2E Event',
         participants: [{ type: 'guest', id: 'g-1', name: 'Guest One' }],
       })
@@ -190,12 +211,12 @@ describe('Events API (e2e)', () => {
       name: 'Events User B',
     });
 
-    const userAEvent = await eventRepository.save({
+    const userAEvent = await createEvent(eventRepository, {
       title: 'User A Event',
       participants: [{ type: 'user', id: userA.id }],
     });
 
-    const userBEvent = await eventRepository.save({
+    const userBEvent = await createEvent(eventRepository, {
       title: 'User B Event',
       participants: [{ type: 'user', id: userB.id }],
     });
@@ -231,7 +252,7 @@ describe('Events API (e2e)', () => {
       name: 'Events User Access B',
     });
 
-    const event = await eventRepository.save({
+    const event = await createEvent(eventRepository, {
       title: 'Restricted Event',
       participants: [{ type: 'user', id: userB.id }],
     });
@@ -260,6 +281,7 @@ describe('Events API (e2e)', () => {
       .post('/api/events')
       .set('Authorization', buildAuthHeader(jwtService, user))
       .send({
+        groupId: (await groupOf(user)).id,
         title: 'Auto Participant Event',
         participants: [{ type: 'guest', id: 'g-100', name: 'Guest 100' }],
       })
@@ -282,7 +304,7 @@ describe('Events API (e2e)', () => {
       name: 'Self Removal User',
     });
 
-    const event = await eventRepository.save({
+    const event = await createEvent(eventRepository, {
       title: 'Self Removal Event',
       participants: [
         { type: 'user', id: user.id },
@@ -316,7 +338,7 @@ describe('Events API (e2e)', () => {
       name: 'KPI Access User B',
     });
 
-    const event = await eventRepository.save({
+    const event = await createEvent(eventRepository, {
       title: 'KPI Restricted Event',
       participants: [{ type: 'user', id: userB.id }],
     });
@@ -334,7 +356,7 @@ describe('Events API (e2e)', () => {
       name: 'Event Delete',
     });
 
-    const event = await eventRepository.save({
+    const event = await createEvent(eventRepository, {
       title: 'Event to Delete',
       participants: [{ type: 'user', id: user.id }],
     });
@@ -366,6 +388,149 @@ describe('Events API (e2e)', () => {
       statusCode: 404,
       path: `/api/events/${missingId}`,
       method: 'DELETE',
+    });
+  });
+  describe('group rules (#228)', () => {
+    let httpServer: Parameters<typeof request>[0];
+    let owner: User;
+    let friend: User;
+    let stranger: User;
+    let admin: User;
+    let friends: Group;
+    let others: Group;
+
+    const as = (user: User) => buildAuthHeader(jwtService, user);
+
+    beforeEach(async () => {
+      httpServer = app.getHttpServer() as Parameters<typeof request>[0];
+      owner = await createUser(userRepository, { email: 'group-owner@example.com', name: 'Owner' });
+      friend = await createUser(userRepository, { email: 'group-friend@example.com', name: 'Friend' });
+      stranger = await createUser(userRepository, { email: 'group-stranger@example.com', name: 'Stranger' });
+      admin = await createUser(userRepository, { email: 'group-admin@example.com', name: 'Admin', role: 'admin' });
+      friends = await groupOf(owner, friend);
+      others = await groupOf(stranger);
+    });
+
+    const createIn = (user: User, groupId: string | undefined, participants: unknown[] = []) =>
+      request(httpServer)
+        .post('/api/events')
+        .set('Authorization', as(user))
+        .send({ groupId, title: 'Group Event', participants: [{ type: 'pot', id: '0' }, ...participants] });
+
+    it('creates the event in a group of the creator, with its group in the response', async () => {
+      const response = await createIn(owner, friends.id, [{ type: 'user', id: friend.id }]).expect(201);
+
+      expect(getDataObjectFromBody(response.body)).toMatchObject({
+        groupId: friends.id,
+        group: expect.objectContaining({ id: friends.id, name: friends.name }) as unknown,
+      });
+    });
+
+    it('rejects an event without a group', async () => {
+      await createIn(owner, undefined).expect(400);
+    });
+
+    it('forbids creating in a group the creator is not a member of', async () => {
+      await createIn(owner, others.id).expect(403);
+    });
+
+    it('forbids a user without any group from creating events', async () => {
+      const loner = await createUser(userRepository, { email: 'group-loner@example.com', name: 'Loner' });
+
+      await createIn(loner, friends.id).expect(403);
+    });
+
+    it('lets the admin create an event in any group', async () => {
+      await createIn(admin, others.id, [{ type: 'user', id: stranger.id }]).expect(201);
+    });
+
+    it.each([
+      ['is not a member of the group', () => stranger.id],
+      ['does not exist', () => '11111111-1111-1111-1111-111111111111'],
+    ])('rejects adding a user who %s, listing them, and saves nothing', async (_case, idOf) => {
+      const response = await createIn(owner, friends.id, [{ type: 'user', id: idOf() }]).expect(422);
+
+      expect(response.body).toMatchObject({ statusCode: 422, details: { userIds: [idOf()] } });
+      await expect(eventRepository.count()).resolves.toBe(0);
+    });
+
+    it('rejects adding a soft deleted user', async () => {
+      await userRepository.softDelete(friend.id);
+
+      await createIn(owner, friends.id, [{ type: 'user', id: friend.id }]).expect(422);
+    });
+
+    it('lets guests in freely', async () => {
+      await createIn(owner, friends.id, [{ type: 'guest', id: 'g-1', name: 'Anyone' }]).expect(201);
+    });
+
+    describe('editing', () => {
+      let event: Event;
+
+      beforeEach(async () => {
+        event = await createEvent(eventRepository, {
+          title: 'Friends Event',
+          groupId: friends.id,
+          participants: [
+            { type: 'user', id: owner.id },
+            { type: 'guest', id: 'g-1', name: 'Guest' },
+          ],
+        });
+      });
+
+      const patch = (user: User, body: Record<string, unknown>) =>
+        request(httpServer).patch(`/api/events/${event.id}`).set('Authorization', as(user)).send(body);
+
+      it('saves a member added to the event', async () => {
+        await patch(owner, {
+          groupId: friends.id,
+          participants: [...event.participants, { type: 'user', id: friend.id }],
+        }).expect(200);
+      });
+
+      it('rejects a non-member added to the event and keeps the event as it was', async () => {
+        await patch(owner, { participants: [...event.participants, { type: 'user', id: stranger.id }] }).expect(422);
+
+        const stored = await eventRepository.findOneByOrFail({ id: event.id });
+        expect(stored.participants).toEqual(event.participants);
+      });
+
+      it('rejects replacing a guest with a non-member', async () => {
+        await patch(owner, {
+          participants: [
+            { type: 'user', id: owner.id },
+            { type: 'user', id: stranger.id },
+          ],
+          participantReplacements: [{ fromGuestId: 'g-1', toUserId: stranger.id }],
+        }).expect(422);
+      });
+
+      it('keeps someone who has since left the group', async () => {
+        await memberRepository.delete({ groupId: friends.id, userId: owner.id });
+
+        await patch(owner, { title: 'Renamed', participants: event.participants }).expect(200);
+      });
+
+      it('forbids a user who is not the admin from moving the event to another group', async () => {
+        await patch(owner, { groupId: others.id }).expect(403);
+      });
+
+      it('rejects the move when someone does not belong to the destination, naming them', async () => {
+        const response = await patch(admin, { groupId: others.id }).expect(422);
+
+        expect(response.body).toMatchObject({ details: { userIds: [owner.id] } });
+        await expect(eventRepository.findOneByOrFail({ id: event.id })).resolves.toMatchObject({
+          groupId: friends.id,
+        });
+      });
+
+      it('lets the admin move the event when everybody belongs to the destination', async () => {
+        await addGroupMember(memberRepository, others.id, owner.id);
+
+        const response = await patch(admin, { groupId: others.id }).expect(200);
+
+        expect(getDataObjectFromBody(response.body)).toMatchObject({ groupId: others.id });
+      });
     });
   });
 });

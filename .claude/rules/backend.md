@@ -21,7 +21,7 @@ src/config/                 database.config.ts, app.config.ts, env.validation.ts
 src/migrations/             TypeORM migration files
 ```
 
-Modules: `auth`, `events`, `transactions`, `shopping-list`, `calendar`, `users`, `admin`, `event-access`, `event-participation`
+Modules: `auth`, `events`, `transactions`, `shopping-list`, `calendar`, `users`, `admin`, `groups`, `event-access`, `event-participation`
 
 A module that grows past one service splits into `{module}/services/` (see `events/services/`,
 `transactions/services/`) rather than fattening the root service.
@@ -56,12 +56,19 @@ do not re-derive the rule against your own repository.
 pot `'0'` may pay) and `assertPersonParticipant` (calendar — only users and guests). Do not walk
 `event.participants` yourself to validate an id.
 
+`GroupsService` (`modules/groups/`) is the **single owner** of group membership: every event belongs to a
+group, only its members (or the admin) create events in it, and only its members can be added to it —
+checked for the users an update *adds*, so someone who left the group can stay. Only the admin moves an
+event to another group. A rejected user comes back as a 422 whose body carries `details.userIds`.
+
 ### API surface
 
 Transactions are exposed twice, and the split matters when adding endpoints: collection operations are nested
 under the event (`/api/events/:eventId/transactions`, plus `.../paginated`) while operations on a single
-transaction are flat (`/api/transactions/:id`). Admin user management is `/api/admin/users` behind
-`@Roles('admin')`.
+transaction are flat (`/api/transactions/:id`). Admin user management is `/api/admin/users` and group
+management `/api/admin/groups` (members under `.../:id/members`), both behind `@Roles('admin')`. Any user
+reads their own groups at `/api/groups` and a group's members at `/api/groups/:id/members` — that is the only
+user list left: there is no global user directory, by design (#121).
 
 ### Auth flow
 

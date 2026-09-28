@@ -4,6 +4,7 @@ import { checkIsDirty } from './checkIsDirty';
 
 const baseEvent: Event = {
   id: 'event-1',
+  groupId: 'group-1',
   title: 'Trip',
   description: 'Weekend trip',
   icon: 'flight',
@@ -23,6 +24,7 @@ describe('checkIsDirty', () => {
       title: '',
       description: '',
       participants,
+      groupId: '',
       icon: 'flight',
       open: true,
       userId: 'u1',
@@ -37,6 +39,7 @@ describe('checkIsDirty', () => {
       title: 'Something',
       description: '',
       participants: [],
+      groupId: '',
       icon: 'flight',
       open: false,
     });
@@ -52,6 +55,7 @@ describe('checkIsDirty', () => {
       title: 'Trip',
       description: '',
       participants,
+      groupId: '',
       icon: 'flight',
       open: true,
       userId: 'u1',
@@ -74,6 +78,7 @@ describe('checkIsDirty', () => {
       title: 'Trip',
       description: 'Weekend trip',
       participants,
+      groupId: 'group-1',
       icon: 'flight',
       open: true,
     });
@@ -93,6 +98,7 @@ describe('checkIsDirty', () => {
       title: 'Trip',
       description: 'Weekend trip',
       participants,
+      groupId: 'group-1',
       icon: 'flight',
       open: true,
     });
@@ -111,6 +117,7 @@ describe('checkIsDirty', () => {
       title: 'Trip',
       description: 'Weekend trip',
       participants,
+      groupId: 'group-1',
       icon: 'flight',
       open: true,
     });
@@ -126,10 +133,40 @@ describe('checkIsDirty', () => {
       title: 'Trip',
       description: 'Weekend trip',
       participants,
+      groupId: 'group-1',
       icon: 'flight',
       open: true,
     });
 
     expect(isDirty).toBe(true);
+  });
+
+  it('returns true when the admin moves the event to another group', () => {
+    const isDirty = checkIsDirty({
+      event: baseEvent,
+      title: 'Trip',
+      description: 'Weekend trip',
+      participants: baseEvent.participants,
+      groupId: 'group-2',
+      icon: 'flight',
+      open: true,
+    });
+
+    expect(isDirty).toBe(true);
+  });
+
+  it('does not count choosing a group as a change while creating', () => {
+    const isDirty = checkIsDirty({
+      event: undefined,
+      title: '',
+      description: '',
+      participants: [{ type: 'user', id: 'u1', name: 'Alice' }],
+      groupId: 'group-1',
+      icon: 'flight',
+      open: true,
+      userId: 'u1',
+    });
+
+    expect(isDirty).toBe(false);
   });
 });

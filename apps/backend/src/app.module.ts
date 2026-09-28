@@ -16,6 +16,7 @@ import { CalendarModule } from './modules/calendar/calendar.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { GroupsModule } from './modules/groups/groups.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { envValidationSchema } from './config/env.validation';
 import { resolveEnvFile } from './config/env-file';
@@ -72,6 +73,7 @@ import { RequestContextModule } from './common/request-context/request-context.m
     UsersModule,
     AuthModule,
     AdminModule,
+    GroupsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

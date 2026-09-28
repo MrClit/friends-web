@@ -1,11 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type React from 'react';
-import { useUsers } from '@/hooks/api/useUsers';
-import type { User } from '@/features/auth/types';
+import { useGroupMembers } from '@/hooks/api/useGroups';
+import type { GroupMember } from '@/api/groups.api';
 import { randomUUID } from '@/shared/utils';
 import type { EventParticipant } from '../types';
 
 interface UseParticipantsComboboxProps {
+  /** The event's group: only its members can be offered. Nothing is fetched until there is one. */
+  groupId: string;
   existingParticipants: EventParticipant[];
   inputValue: string;
   onInputChange: (value: string) => void;
@@ -14,13 +16,14 @@ interface UseParticipantsComboboxProps {
 }
 
 export function useParticipantsCombobox({
+  groupId,
   existingParticipants,
   inputValue,
   onInputChange,
   onSelect,
   allowCreateGuest = true,
 }: UseParticipantsComboboxProps) {
-  const { data: users = [], isLoading } = useUsers();
+  const { data: users = [], isLoading } = useGroupMembers(groupId || undefined);
   const listRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -57,8 +60,14 @@ export function useParticipantsCombobox({
   }, []);
 
   const handleSelectUser = useCallback(
-    (user: User) => {
-      onSelect({ id: user.id, type: 'user', name: user.name || user.email, email: user.email, avatar: user.avatar });
+    (user: GroupMember) => {
+      onSelect({
+        id: user.id,
+        type: 'user',
+        name: user.name || user.email,
+        email: user.email,
+        avatar: user.avatar ?? undefined,
+      });
       onInputChange('');
       close();
     },

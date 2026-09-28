@@ -12,7 +12,8 @@
  */
 export const EXPECTED_INDEXES: Record<string, string[]> = {
   auth_exchange_codes: ['idx_auth_exchange_codes_code_hash', 'idx_auth_exchange_codes_user_id'],
-  events: ['idx_events_status_created_at'],
+  events: ['idx_events_group_id', 'idx_events_status_created_at'],
+  group_members: ['idx_group_members_user_id'],
   refresh_tokens: ['idx_refresh_tokens_family', 'idx_refresh_tokens_token_hash', 'idx_refresh_tokens_user_id'],
   shopping_items: ['idx_shopping_items_event_created_at'],
   transactions: ['idx_transactions_event_date_created_active', 'idx_transactions_event_id'],

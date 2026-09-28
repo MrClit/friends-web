@@ -1,4 +1,4 @@
-import { ArgumentsHost, BadRequestException, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, BadRequestException, HttpStatus, UnprocessableEntityException } from '@nestjs/common';
 import { HttpExceptionFilter } from './http-exception.filter';
 
 describe('HttpExceptionFilter', () => {
@@ -56,6 +56,34 @@ describe('HttpExceptionFilter', () => {
         message: 'title is required, participants must not be empty',
       }),
     );
+  });
+
+  it('passes details through when the exception carries them', () => {
+    const { host, response } = createHost('/api/events', 'POST');
+    const exception = new UnprocessableEntityException({
+      message: 'Users u1 are not members of group g1',
+      details: { userIds: ['u1'] },
+    });
+
+    filter.catch(exception, host);
+
+    expect(response.status).toHaveBeenCalledWith(HttpStatus.UNPROCESSABLE_ENTITY);
+    expect(response.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 422,
+        message: 'Users u1 are not members of group g1',
+        details: { userIds: ['u1'] },
+      }),
+    );
+  });
+
+  it('leaves details out when the exception has none', () => {
+    const { host, response } = createHost();
+
+    filter.catch(new BadRequestException('Invalid payload'), host);
+
+    const [body] = response.json.mock.calls[0] as [Record<string, unknown>];
+    expect(body).not.toHaveProperty('details');
   });
 
   it('returns generic 500 response for unknown errors', () => {

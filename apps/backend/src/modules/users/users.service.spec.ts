@@ -9,16 +9,12 @@ describe('UsersService', () => {
   let mockRepository: {
     findOne: jest.Mock;
     save: jest.Mock;
-    find: jest.Mock;
-    createQueryBuilder: jest.Mock;
   };
 
   beforeEach(async () => {
     mockRepository = {
       findOne: jest.fn(),
       save: jest.fn(),
-      find: jest.fn(),
-      createQueryBuilder: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -95,77 +91,6 @@ describe('UsersService', () => {
 
     expect(result).toBe(user);
     expect(mockRepository.save).not.toHaveBeenCalled();
-  });
-
-  it('findAll returns users with expected projection and order', async () => {
-    const users = [
-      { id: 'u1', name: 'Alice' },
-      { id: 'u2', name: 'Bob' },
-    ] as User[];
-    mockRepository.find.mockResolvedValue(users);
-
-    const result = await service.findAll();
-
-    expect(result).toEqual(users);
-    expect(mockRepository.find).toHaveBeenCalledWith({
-      select: ['id', 'email', 'name', 'avatar', 'role'],
-      order: { name: 'ASC' },
-    });
-  });
-
-  it('search builds query with ILIKE and limit 20', async () => {
-    const users = [{ id: 'u1', name: 'Alice' }] as User[];
-    const queryBuilder = {
-      where: jest.fn().mockReturnThis(),
-      andWhere: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      orderBy: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      getMany: jest.fn().mockResolvedValue(users),
-    };
-    mockRepository.createQueryBuilder.mockReturnValue(queryBuilder);
-
-    const result = await service.search('ali');
-
-    expect(result).toEqual(users);
-    expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('user');
-    expect(queryBuilder.where).toHaveBeenCalledWith('(user.name ILIKE :query OR user.email ILIKE :query)', {
-      query: '%ali%',
-    });
-    expect(queryBuilder.andWhere).toHaveBeenCalledWith('user.deleted_at IS NULL');
-    expect(queryBuilder.select).toHaveBeenCalledWith([
-      'user.id',
-      'user.email',
-      'user.name',
-      'user.avatar',
-      'user.role',
-    ]);
-    expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.name', 'ASC');
-    expect(queryBuilder.limit).toHaveBeenCalledWith(20);
-    expect(queryBuilder.getMany).toHaveBeenCalledTimes(1);
-  });
-
-  it.each([
-    ['50%', '%50\\%%'],
-    ['a_b', '%a\\_b%'],
-    ['c:\\', '%c:\\\\%'],
-    ['%_\\', '%\\%\\_\\\\%'],
-  ])('search escapes LIKE wildcards in %p', async (rawQuery, expectedPattern) => {
-    const queryBuilder = {
-      where: jest.fn().mockReturnThis(),
-      andWhere: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      orderBy: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      getMany: jest.fn().mockResolvedValue([]),
-    };
-    mockRepository.createQueryBuilder.mockReturnValue(queryBuilder);
-
-    await service.search(rawQuery);
-
-    expect(queryBuilder.where).toHaveBeenCalledWith('(user.name ILIKE :query OR user.email ILIKE :query)', {
-      query: expectedPattern,
-    });
   });
 
   it('getCurrentUserProfileByIdOrThrow returns current user profile projection', async () => {

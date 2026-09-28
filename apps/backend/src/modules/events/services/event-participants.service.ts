@@ -319,6 +319,22 @@ export class EventParticipantsService {
   }
 
   /**
+   * The user participants the update brings in, as opposed to the ones it keeps. Only these are checked
+   * against the event's group: someone who was already in the event and has since left the group stays.
+   * A user that replaces a guest counts as added, since a replacement target cannot already participate.
+   */
+  collectAddedUserIds(
+    originalParticipants: EventParticipant[],
+    nextParticipants: EventParticipant[] | undefined,
+  ): string[] {
+    if (!nextParticipants) return [];
+
+    const originalUserIds = new Set(originalParticipants.filter((p) => p.type === 'user').map((p) => p.id));
+
+    return nextParticipants.filter((p) => p.type === 'user' && !originalUserIds.has(p.id)).map((p) => p.id);
+  }
+
+  /**
    * The meals of an event, reached through its days. Attendances hang off meals, so scoping any of the
    * bulk operations above to one event has to go through this list.
    */

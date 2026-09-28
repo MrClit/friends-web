@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   InternalServerErrorException,
   BadRequestException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { Event, EventStatus } from './entities/event.entity';
@@ -15,6 +16,8 @@ import { EventKPIsService } from './services/event-kpis.service';
 import { EventQueryService } from './services/event-query.service';
 import { EventParticipantsService } from './services/event-participants.service';
 import { EventAccessService } from '../event-access/event-access.service';
+import { GroupsService } from '../groups/groups.service';
+import { Group } from '../groups/entities/group.entity';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 
 describe('EventsService', () => {
@@ -29,8 +32,11 @@ describe('EventsService', () => {
     delete: jest.Mock;
     manager: {
       transaction: jest.Mock;
+      getRepository: jest.Mock;
     };
   };
+  let mockGroupRepository: { find: jest.Mock };
+  let mockGroupsService: { assertCanUse: jest.Mock; assertAreMembers: jest.Mock };
   let mockTransactionalEventRepository: {
     findOne: jest.Mock;
     merge: jest.Mock;
@@ -46,6 +52,7 @@ describe('EventsService', () => {
     applyParticipantReplacements: jest.Mock;
     applyParticipantRemovals: jest.Mock;
     collectRemovedParticipantIds: jest.Mock;
+    collectAddedUserIds: jest.Mock;
   };
   let mockEventKPIsService: { getKPIs: jest.Mock };
 
@@ -67,8 +74,13 @@ describe('EventsService', () => {
     role: 'user',
   };
 
+  const groupId = 'group-1';
+  const otherGroupId = 'group-2';
+  const group = { id: groupId, name: 'Friends' } as Group;
+
   const mockEvent: Event = {
     id: '123e4567-e89b-12d3-a456-426614174000',
+    groupId,
     title: 'Test Event',
     description: '',
     icon: '',
@@ -93,7 +105,19 @@ describe('EventsService', () => {
       delete: jest.fn(),
       manager: {
         transaction: jest.fn(),
+        getRepository: jest.fn(),
       },
+    };
+
+    mockGroupRepository = { find: jest.fn().mockResolvedValue([group]) };
+    mockRepository.manager.getRepository.mockImplementation((entity: unknown) => {
+      if (entity === Group) return mockGroupRepository;
+      throw new Error('Unknown repository requested in test manager');
+    });
+
+    mockGroupsService = {
+      assertCanUse: jest.fn().mockResolvedValue(undefined),
+      assertAreMembers: jest.fn().mockResolvedValue(undefined),
     };
 
     mockTransactionalEventRepository = {
@@ -126,6 +150,7 @@ describe('EventsService', () => {
       applyParticipantReplacements: jest.fn().mockResolvedValue(undefined),
       applyParticipantRemovals: jest.fn().mockResolvedValue(undefined),
       collectRemovedParticipantIds: jest.fn().mockReturnValue([]),
+      collectAddedUserIds: jest.fn().mockReturnValue([]),
     };
 
     mockEventKPIsService = {
@@ -153,6 +178,10 @@ describe('EventsService', () => {
         {
           provide: EventKPIsService,
           useValue: mockEventKPIsService,
+        },
+        {
+          provide: GroupsService,
+          useValue: mockGroupsService,
         },
       ],
     }).compile();
@@ -211,6 +240,12 @@ describe('EventsService', () => {
       expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: mockEvent.id } });
     });
 
+    it('attaches the group of the event', async () => {
+      const result = await service.findOne(mockEvent.id, adminActor);
+
+      expect(result.group).toEqual(group);
+    });
+
     it('throws NotFoundException when event does not exist', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
@@ -226,6 +261,7 @@ describe('EventsService', () => {
     it('creates event for admin without mutating participants', async () => {
       const participants: EventParticipant[] = [{ type: 'guest', id: 'g-1', name: 'Guest One' }];
       const createDto: CreateEventDto = {
+        groupId,
         title: 'Admin Event',
         participants,
       };
@@ -254,6 +290,7 @@ describe('EventsService', () => {
       const participants: EventParticipant[] = [{ type: 'guest', id: 'g-2', name: 'Guest Two' }];
       const expectedParticipants: EventParticipant[] = [...participants, { type: 'user', id: memberActor.id }];
       const createDto: CreateEventDto = {
+        groupId,
         title: 'User Event',
         participants,
       };
@@ -276,8 +313,46 @@ describe('EventsService', () => {
       );
     });
 
+    it('saves the event in the requested group once the actor may use it', async () => {
+      const createDto: CreateEventDto = {
+        groupId,
+        title: 'Group Event',
+        participants: [{ type: 'user', id: 'friend-1' }],
+      };
+
+      mockRepository.create.mockReturnValue(mockEvent);
+      mockRepository.save.mockResolvedValue({ ...mockEvent });
+
+      const result = await service.create(createDto, memberActor);
+
+      expect(mockGroupsService.assertCanUse).toHaveBeenCalledWith(groupId, memberActor);
+      // The creator is added before the check, and is checked along with everybody else.
+      expect(mockGroupsService.assertAreMembers).toHaveBeenCalledWith(groupId, ['friend-1', memberActor.id]);
+      expect(mockRepository.create).toHaveBeenCalledWith(expect.objectContaining({ groupId }));
+      expect(result.group).toEqual(group);
+    });
+
+    it('saves nothing when the actor may not use the group', async () => {
+      mockGroupsService.assertCanUse.mockRejectedValue(new ForbiddenException());
+
+      await expect(
+        service.create({ groupId: otherGroupId, title: 'Nope', participants: [] }, memberActor),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('rejects a participant outside the group with the 422 as is, saving nothing', async () => {
+      mockGroupsService.assertAreMembers.mockRejectedValue(new UnprocessableEntityException());
+
+      await expect(
+        service.create({ groupId, title: 'Nope', participants: [{ type: 'user', id: 'stranger' }] }, memberActor),
+      ).rejects.toThrow(UnprocessableEntityException);
+      expect(mockRepository.save).not.toHaveBeenCalled();
+    });
+
     it('throws InternalServerErrorException on save error', async () => {
       const createDto: CreateEventDto = {
+        groupId,
         title: 'Error Event',
         participants: [{ type: 'guest', id: 'g-3', name: 'Guest Three' }],
       };
@@ -302,6 +377,51 @@ describe('EventsService', () => {
       expect(result).toEqual(updatedEvent);
       expect(mockRepository.merge).toHaveBeenCalledWith(mockEvent, { title: 'Updated Event' });
       expect(mockRepository.save).toHaveBeenCalledWith(updatedEvent);
+    });
+
+    it('checks only the added users against the current group, and keeps the group', async () => {
+      const updateDto: UpdateEventDto = {
+        groupId,
+        participants: [...mockEvent.participants, { type: 'user', id: 'friend-1' }],
+      };
+      mockEventParticipantsService.collectAddedUserIds.mockReturnValue(['friend-1']);
+      mockRepository.merge.mockReturnValue(mockEvent);
+      mockRepository.save.mockResolvedValue(mockEvent);
+
+      await service.update(mockEvent.id, updateDto, memberActor);
+
+      expect(mockGroupsService.assertAreMembers).toHaveBeenCalledWith(groupId, ['friend-1']);
+      expect(mockGroupsService.assertCanUse).not.toHaveBeenCalled();
+      expect(mockRepository.merge).toHaveBeenCalledWith(mockEvent, expect.not.objectContaining({ groupId }));
+    });
+
+    it('rejects a user who is not the admin moving the event to another group', async () => {
+      await expect(service.update(mockEvent.id, { groupId: otherGroupId }, memberActor)).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(mockRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('lets the admin move the event when every user in it belongs to the destination', async () => {
+      mockRepository.merge.mockReturnValue(mockEvent);
+      mockRepository.save.mockResolvedValue(mockEvent);
+
+      await service.update(mockEvent.id, { groupId: otherGroupId }, adminActor);
+
+      expect(mockGroupsService.assertCanUse).toHaveBeenCalledWith(otherGroupId, adminActor);
+      // Every user is checked, not only the added ones: the kept participants move too.
+      expect(mockGroupsService.assertAreMembers).toHaveBeenCalledWith(otherGroupId, [memberActor.id]);
+      expect(mockRepository.merge).toHaveBeenCalledWith(mockEvent, { groupId: otherGroupId });
+    });
+
+    it('leaves the event untouched when someone does not belong to the destination', async () => {
+      mockGroupsService.assertAreMembers.mockRejectedValue(new UnprocessableEntityException());
+
+      await expect(service.update(mockEvent.id, { groupId: otherGroupId }, adminActor)).rejects.toThrow(
+        UnprocessableEntityException,
+      );
+      expect(mockRepository.save).not.toHaveBeenCalled();
+      expect(mockRepository.manager.transaction).not.toHaveBeenCalled();
     });
 
     it('throws ForbiddenException when user is not participant', async () => {

@@ -4,7 +4,10 @@ import { useState, useCallback } from 'react';
 import { EventsListSkeleton } from './EventsListSkeleton';
 import { EventCard } from './EventCard';
 import { CreateEventCard } from './CreateEventCard';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { useAuth } from '@/features/auth/useAuth';
+import { ADMIN_ROLE } from '@/features/auth/types';
+import { useHasNoGroup } from '../hooks/useHasNoGroup';
 import { useEventFormModalStore } from '@/shared/store/useEventFormModalStore';
 import { getParticipantAvatar, getParticipantName } from '@/shared/utils/participants';
 import { ErrorState } from '@/shared/components/ErrorState';
@@ -47,6 +50,36 @@ function EventsStatusToggle({ value, onChange }: EventsStatusToggleProps) {
       >
         {t('eventsList.toggleArchived')}
       </button>
+    </div>
+  );
+}
+
+/**
+ * The create entry of the list. Without a group nobody can create events, so the card is disabled and says
+ * why; the admin, who only lacks groups when none exist, also gets a link to create one.
+ */
+function NewEventCard({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation('events');
+  const { user } = useAuth();
+  const hasNoGroup = useHasNoGroup();
+
+  if (!hasNoGroup) return <CreateEventCard onClick={onClick} />;
+
+  const isAdmin = user?.role === ADMIN_ROLE;
+  return (
+    <div className="flex flex-col gap-3">
+      <CreateEventCard
+        disabled
+        subtitle={t(isAdmin ? 'createEventCard.noGroupAdminSubtitle' : 'createEventCard.noGroupSubtitle')}
+      />
+      {isAdmin ? (
+        <Link
+          to="/admin/groups"
+          className="self-center font-semibold text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-300"
+        >
+          {t('createEventCard.goToGroups')}
+        </Link>
+      ) : null}
     </div>
   );
 }
@@ -96,7 +129,7 @@ export function EventsList() {
           >
             {t(isArchivedView ? 'eventsList.noEventsArchived' : 'eventsList.noEventsActive')}
           </p>
-          {!isArchivedView ? <CreateEventCard onClick={onNewEvent} /> : null}
+          {!isArchivedView ? <NewEventCard onClick={onNewEvent} /> : null}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
@@ -121,7 +154,7 @@ export function EventsList() {
               style={{ animationDelay: `${idx * 75}ms`, animationFillMode: 'backwards' }}
             />
           ))}
-          {!isArchivedView ? <CreateEventCard onClick={onNewEvent} /> : null}
+          {!isArchivedView ? <NewEventCard onClick={onNewEvent} /> : null}
         </div>
       )}
     </div>
