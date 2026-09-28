@@ -5,6 +5,42 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-09-28
+
+User groups: every event now belongs to a group, and only that group's members can be added to it as users,
+so people in one group of friends no longer see the names and emails of another. **Two database migrations**,
+applied on boot: they create the groups tables, put every existing user in one «Grupo inicial» and move every
+existing event into it, so nothing changes for anyone on deploy day. **No new environment variables.** After
+deploying, the admin creates the real groups from `/admin/groups`, moves each event to its group and deletes
+«Grupo inicial».
+
+### Added
+
+- Groups of users, managed by the admin: create, rename and delete groups, and add or remove their members.
+  A group name is unique regardless of case, and a group that still has events cannot be deleted.
+  Closes [#227], [#229].
+- Every event belongs to a group. The event form asks for it (preselected when the user has only one), and
+  the participant selector offers only that group's members; changing the group while creating an event drops
+  the users who are not members of the new one, with a notice. Only the admin can move an existing event to
+  another group. A user without a group can still see their events but cannot create new ones.
+  Closes [#228], [#230].
+
+### Changed
+
+- The server now checks every user added to an event: adding someone who is not a member of the event's group
+  is rejected with a 422 that names them. People who leave a group stay in the events they were already in.
+  Refs [#228].
+
+### Removed
+
+- `GET /api/users` and `GET /api/users/search`, the global user directory, replaced by
+  `GET /api/groups` and `GET /api/groups/:id/members`. Refs [#228].
+
+### Documentation
+
+- `CLAUDE.md`, the READMEs and the HTTP request examples document groups; the backend README's events table
+  schema is complete again.
+
 ## [0.8.0] - 2026-09-26
 
 A single full-page error screen for routes that do not exist and events that cannot be loaded, the move to
@@ -432,6 +468,11 @@ JWT secret validation. No product features and no database migrations.
 [#187]: https://github.com/MrClit/friends-web/issues/187
 [#211]: https://github.com/MrClit/friends-web/issues/211
 [#224]: https://github.com/MrClit/friends-web/issues/224
+[#227]: https://github.com/MrClit/friends-web/issues/227
+[#228]: https://github.com/MrClit/friends-web/issues/228
+[#229]: https://github.com/MrClit/friends-web/issues/229
+[#230]: https://github.com/MrClit/friends-web/issues/230
+[0.9.0]: https://github.com/MrClit/friends-web/releases/tag/v0.9.0
 [0.8.0]: https://github.com/MrClit/friends-web/releases/tag/v0.8.0
 [0.7.0]: https://github.com/MrClit/friends-web/releases/tag/v0.7.0
 [0.6.0]: https://github.com/MrClit/friends-web/releases/tag/v0.6.0
