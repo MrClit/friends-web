@@ -8,6 +8,7 @@ import { randomUUID } from 'crypto';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './common/health.controller';
+import { VersionController } from './common/version.controller';
 import { getDatabaseConfig } from './config/database.config';
 import { EventsModule } from './modules/events/events.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
@@ -75,7 +76,7 @@ import { RequestContextModule } from './common/request-context/request-context.m
     AdminModule,
     GroupsModule,
   ],
-  controllers: [AppController, HealthController],
+  controllers: [AppController, HealthController, VersionController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule implements NestModule {

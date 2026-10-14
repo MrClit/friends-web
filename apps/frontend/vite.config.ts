@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitest/config';
@@ -10,10 +11,21 @@ if (process.env.ANALYZE) {
   plugins.push(visualizer({ open: true, filename: 'dist/stats.html' }) as PluginOption);
 }
 
+// The product version lives only in the root package.json, which each release bumps. The commit is
+// known only inside GitHub Actions (the Pages deploy); elsewhere it stays empty and the UI omits it.
+const rootManifest = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as {
+  version: string;
+};
+const commit = process.env.GITHUB_SHA?.slice(0, 7) ?? '';
+
 // https://vite.dev/config/
 export default defineConfig({
   base: '/friends-web/',
   plugins,
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(rootManifest.version),
+    'import.meta.env.VITE_APP_COMMIT': JSON.stringify(commit),
+  },
   resolve: {
     alias: {
       '@': '/src',
