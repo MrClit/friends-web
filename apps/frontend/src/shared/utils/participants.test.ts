@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { describe, expect, it, vi } from 'vitest';
-import { getParticipantAvatar, getParticipantName } from './participants';
+import { getParticipantAvatar, getParticipantName, getPotName } from './participants';
 
 const t = vi.fn((key: string) => `translated:${key}`) as unknown as TFunction;
 
@@ -20,6 +20,13 @@ describe('getParticipantName', () => {
 
   it('translates the pot name from the common namespace', () => {
     expect(getParticipantName({ type: 'pot', id: '0' }, t)).toBe('translated:potName');
+    expect(t).toHaveBeenCalledWith('potName', { ns: 'common' });
+  });
+});
+
+describe('getPotName', () => {
+  it('translates the pot name from the common namespace', () => {
+    expect(getPotName(t)).toBe('translated:potName');
     expect(t).toHaveBeenCalledWith('potName', { ns: 'common' });
   });
 });

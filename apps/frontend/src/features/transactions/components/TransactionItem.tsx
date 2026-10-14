@@ -6,6 +6,7 @@ import { formatAmount } from '@/shared/utils/format';
 import { PaymentIcon } from './PaymentIcon';
 import { isPotExpense } from '../utils';
 import { cn } from '@/shared/utils/cn';
+import { getPotName } from '@/shared/utils/participants';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -19,7 +20,7 @@ interface TransactionItemProps {
  * Optimized with React.memo to prevent unnecessary re-renders
  */
 function TransactionItemBase({ transaction, onClick, participantsMap }: TransactionItemProps) {
-  const { t } = useTranslation(['transactions', 'events']);
+  const { t } = useTranslation('transactions');
 
   const isPot = isPotExpense(transaction);
 
@@ -28,7 +29,7 @@ function TransactionItemBase({ transaction, onClick, participantsMap }: Transact
 
   // Get participant name with fallback
   const participantName = isPot
-    ? t('participants.potLabel', { ns: 'events' })
+    ? getPotName(t)
     : participantsMap.get(transaction.participantId) || t('transactionsList.unknownParticipant');
 
   // Determine icon to display

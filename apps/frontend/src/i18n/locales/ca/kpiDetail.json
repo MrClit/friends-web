@@ -10,7 +10,7 @@
     "pending": "Pendent de Pagar"
   },
   "description": {
-    "balance": "Diners disponibles al fons comú.",
+    "balance": "Diners disponibles al pot.",
     "contributionStatus": "Progrés de l'aportació neta respecte a l'objectiu de contribució del grup.",
     "userStatus": "Progrés de l'aportació neta d'un participant respecte al seu objectiu individual.",
     "contributions": "Total de l'aporte net de tots els participants (aportacions + despeses - reembolsos).",
@@ -64,7 +64,7 @@
     "emptyPotExpenses": "No hi ha despeses directes del pot."
   },
   "noteTitle": "Nota:",
-  "noteBalance": "Diners disponibles al fons comú.",
+  "noteBalance": "Diners disponibles al pot.",
   "noteContributions": "Total de l'aporte net de tots els participants (aportacions + despeses - reembolsos).",
   "noteExpenses": "Total gastat per cada participant.",
   "notePending": "Quantitat que cada participant deu o li deuen respecte al seu objectiu, considerant el seu aporte net."

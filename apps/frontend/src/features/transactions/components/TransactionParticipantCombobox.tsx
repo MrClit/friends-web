@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
 import { FaChevronDown } from 'react-icons/fa';
 import type { EventParticipantDto } from '@/api/types';
-import { getParticipantAvatar, getParticipantName } from '@/shared/utils/participants';
+import { getParticipantAvatar, getParticipantName, getPotName } from '@/shared/utils/participants';
 import { Avatar } from '@/shared/components/Avatar';
 import { ComboboxOptionItem } from '@/shared/components/ComboboxOptionItem';
 import { POT_PARTICIPANT_ID } from '@/shared/constants/pot';
@@ -24,7 +24,7 @@ export function TransactionParticipantCombobox({
   value,
   onChange,
 }: TransactionParticipantComboboxProps) {
-  const { t } = useTranslation(['transactions', 'events']);
+  const { t } = useTranslation('transactions');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const options = useMemo(() => {
@@ -43,7 +43,7 @@ export function TransactionParticipantCombobox({
         ? [
             {
               id: POT_PARTICIPANT_ID,
-              label: t('transactionForm.potOption'),
+              label: getPotName(t),
               avatar: null,
               isPot: true,
             },

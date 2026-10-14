@@ -77,9 +77,6 @@
   "update_error": "Error en actualitzar l'esdeveniment",
   "delete_success": "Esdeveniment eliminat",
   "delete_error": "Error en eliminar l'esdeveniment",
-  "participants": {
-    "potLabel": "El Pot"
-  },
   "createEventCard": {
     "ariaLabel": "Crear nou esdeveniment",
     "title": "Crear nou esdeveniment",

@@ -12,6 +12,13 @@ export function getParticipantAvatar(participant: EventParticipantDto): string |
 }
 
 /**
+ * Name of the pot, the shared fund. The single source for it in every screen.
+ */
+export function getPotName(t: TFunction): string {
+  return t('potName', { ns: 'common' });
+}
+
+/**
  * Get name from participant, handling different participant types
  */
 export function getParticipantName(participant: EventParticipantDto, t: TFunction): string {
@@ -22,7 +29,7 @@ export function getParticipantName(participant: EventParticipantDto, t: TFunctio
     return participant.name || '?';
   }
   if (participant.type === 'pot') {
-    return t('potName', { ns: 'common' });
+    return getPotName(t);
   }
   return '?';
 }
