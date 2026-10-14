@@ -16,3 +16,6 @@ directly in `.claude/skills/`.
 `pnpm check:skills` (also run by `pnpm lint`) enforces that wiring: every vendored skill has a resolving
 symlink, none is a real directory or dangling, `skills-lock.json` matches disk, and no two skills declare
 the same frontmatter `name`. Re-running the skills CLI can undo it, so let the check tell you.
+
+If the check reports plain files instead of symlinks, the clone was made with `core.symlinks=false`
+(Git for Windows' default): `pnpm fix:skills` repairs that clone, and leaves nothing to commit.
