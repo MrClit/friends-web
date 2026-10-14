@@ -23,6 +23,7 @@ export const ENV = {
   // App Metadata
   APP_NAME: import.meta.env.VITE_APP_NAME,
   APP_VERSION: import.meta.env.VITE_APP_VERSION,
+  APP_COMMIT: import.meta.env.VITE_APP_COMMIT,
 
   // Vite built-in variables
   IS_DEV: import.meta.env.DEV,

@@ -348,8 +348,10 @@ VITE_DEBUG=false
 
 # App Metadata
 VITE_APP_NAME=Friends
-VITE_APP_VERSION=0.1.0
 ```
+
+`VITE_APP_VERSION` and `VITE_APP_COMMIT` are not set in any `.env` file: `vite.config.ts` injects them at
+build time from the root `package.json` and from `GITHUB_SHA` (empty outside GitHub Actions).
 
 #### Loading Precedence
 

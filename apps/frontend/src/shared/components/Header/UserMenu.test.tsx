@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UserMenu } from './UserMenu';
+import { ENV } from '@/config/env';
 import { useAuth } from '@/features/auth/useAuth';
 
 const navigateMock = vi.fn();
@@ -250,5 +251,33 @@ describe('UserMenu', () => {
     const { container } = render(<UserMenu />);
 
     expect(container.firstChild).toBeNull();
+  });
+
+  it('shows the app version injected from the root package.json', async () => {
+    mockedUseAuth.mockReturnValue({
+      user: {
+        id: 'user-1',
+        email: 'user@test.com',
+        name: 'User',
+        role: 'user',
+      },
+      loading: false,
+      logout: vi.fn(),
+      token: 'token',
+      error: null,
+      login: vi.fn(),
+      loginWithGoogle: vi.fn(),
+      loginWithMicrosoft: vi.fn(),
+      setAuth: vi.fn(),
+      refreshUser: vi.fn(),
+      updateUser: vi.fn(),
+    });
+
+    render(<UserMenu />);
+
+    fireEvent.pointerDown(screen.getByRole('button'));
+
+    expect(ENV.APP_VERSION).toMatch(/^\d+\.\d+\.\d+/);
+    expect(await screen.findByText(new RegExp(`^v${ENV.APP_VERSION.replaceAll('.', '\\.')}`))).toBeInTheDocument();
   });
 });

@@ -198,6 +198,9 @@ pg_dump "$DATABASE_URL" -Fc -f backup_pre_release.dump
 - `GET /api/docs`
 - `GET /api/health/live`
 - `GET /api/health/ready`
+- `GET /api/version` — must return the version just released and the commit of `main`; until it does,
+  Render is still serving the previous build. The frontend shows its own version and commit at the
+  bottom of the user menu; a mismatch with the API means one of the two deploys has not finished.
 
 ### Functional smoke tests
 

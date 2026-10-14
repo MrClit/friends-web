@@ -2,13 +2,23 @@ import { useAuth } from '@/features/auth/useAuth';
 import { MdLogout, MdAccountCircle, MdPerson } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/shared/hooks/useToast';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/shared/components/ui';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/shared/components/ui';
 import { MdExpandMore } from 'react-icons/md';
 import { Avatar } from '@/shared/components/Avatar';
 import { ADMIN_ROLE } from '@/features/auth/types';
 import { useNavigate } from 'react-router';
 import { MdAdminPanelSettings, MdGroups } from 'react-icons/md';
 import { cn } from '@/shared/utils';
+import { ENV } from '@/config/env';
+
+// The commit is only known in the Pages build; locally the version is shown alone.
+const appVersionLabel = ENV.APP_COMMIT ? `v${ENV.APP_VERSION} · ${ENV.APP_COMMIT}` : `v${ENV.APP_VERSION}`;
 
 export function UserMenu() {
   const { user, logout, loading } = useAuth();
@@ -153,6 +163,20 @@ export function UserMenu() {
         >
           <MdLogout className="text-lg" />
           {t('logout', { ns: 'user' })}
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          disabled
+          className={cn(
+            'justify-center',
+            'text-xs tabular-nums text-slate-500',
+            'cursor-default select-text',
+            'data-disabled:opacity-100',
+            'dark:text-emerald-300/80',
+          )}
+        >
+          {appVersionLabel}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

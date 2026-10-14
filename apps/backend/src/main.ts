@@ -5,6 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { configureApp } from './common/bootstrap/configure-app';
+import { getBuildInfo } from './common/build-info';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -36,7 +37,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Friends API')
     .setDescription('REST API for Friends shared expenses management')
-    .setVersion('1.0')
+    .setVersion(getBuildInfo().version)
     .addBearerAuth()
     .addTag('Events', 'Event management endpoints')
     .addTag('Event Transactions', 'Transaction endpoints under events')

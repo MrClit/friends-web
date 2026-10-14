@@ -18,7 +18,9 @@ interface ImportMetaEnv {
 
   // App Metadata
   readonly VITE_APP_NAME: string;
+  // Injected by vite.config.ts from the root package.json and GITHUB_SHA, not from .env files
   readonly VITE_APP_VERSION: string;
+  readonly VITE_APP_COMMIT: string;
 }
 
 interface ImportMeta {
