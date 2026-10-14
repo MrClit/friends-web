@@ -14,6 +14,7 @@
     "preview": "pnpm --filter @friends/frontend preview",
     "build:types": "pnpm --filter @friends/shared-types build",
     "check:skills": "node scripts/check-skills-symlinks.mjs",
+    "fix:skills": "node scripts/fix-skills-symlinks.mjs",
     "check:env": "node scripts/check-env-files.mjs",
     "check:catalog": "node scripts/check-catalog.mjs",
     "lint": "pnpm build:types && pnpm check:skills && pnpm check:env && pnpm check:catalog && pnpm format:check && pnpm -r lint",

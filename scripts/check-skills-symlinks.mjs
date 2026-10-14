@@ -8,7 +8,9 @@
  * simply does not exist for the agent — so the mismatch has to be caught mechanically.
  *
  * Checks:
- *   1. Every directory in `.agents/skills/` has a symlink in `.claude/skills/` resolving to it.
+ *   1. Every directory in `.agents/skills/` has a symlink in `.claude/skills/` resolving to it —
+ *      not a copied directory, nor the plain text file git leaves when core.symlinks=false
+ *      (repaired by `pnpm fix:skills`).
  *   2. No symlink in `.claude/skills/` is left dangling.
  *   3. `skills-lock.json` lists exactly what is on disk.
  *   4. No two skills declare the same `name:` in their frontmatter (a collision means one
@@ -47,8 +49,24 @@ for (const name of vendored) {
     );
     continue;
   }
-  if (!lstatSync(link).isSymbolicLink()) {
-    problems.push(`.claude/skills/${name} is a real directory, not a symlink — it will drift.`);
+  const stat = lstatSync(link);
+  // A plain file here is what git writes for a symlink when the clone has core.symlinks=false
+  // (Git for Windows' installer default): a text file holding the link target.
+  if (stat.isFile()) {
+    problems.push(
+      `.claude/skills/${name} is a plain file, not a symlink — this clone's git has core.symlinks=false, ` +
+        `so it wrote the link target as text.\n` +
+        `    Fix: pnpm fix:skills\n` +
+        `    Note: future clones will repeat this unless you run git config --global core.symlinks true`,
+    );
+    continue;
+  }
+  if (!stat.isSymbolicLink()) {
+    problems.push(
+      `.claude/skills/${name} is a real directory, not a symlink — it will drift.\n` +
+        `    Fix: move any local edits into .agents/skills/${name}, delete the directory, then ` +
+        `ln -s ../../.agents/skills/${name} .claude/skills/${name}`,
+    );
     continue;
   }
   if (realpathSync(link) !== realpathSync(join(vendoredDir, name))) {

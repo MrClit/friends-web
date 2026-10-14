@@ -191,6 +191,7 @@ friends-web/
 ├── docs/                   # Pending designs and valid runbooks only (no shipped-work plans)
 ├── scripts/
 │   ├── check-skills-symlinks.mjs # Skill symlink wiring check (pnpm check:skills)
+│   ├── fix-skills-symlinks.mjs   # Repairs skill symlinks in a clone (pnpm fix:skills)
 │   └── check-env-files.mjs       # Backend .env exposure check (pnpm check:env)
 ├── .husky/
 │   ├── install.mjs             # Hook installer, run by `prepare` (skips in CI and production)
