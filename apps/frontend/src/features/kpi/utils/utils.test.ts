@@ -350,7 +350,7 @@ describe('buildKPIItems — pot and targetValue', () => {
     expect(potItem).toBeDefined();
     expect(potItem!.id).toBe('0');
     expect(potItem!.rawAmount).toBe(20);
-    expect(potItem!.name).toBe('participants.potLabel');
+    expect(potItem!.name).toBe('potName');
   });
 
   it('does not include a pot item when potExpenses is 0', () => {

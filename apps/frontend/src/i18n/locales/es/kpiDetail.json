@@ -10,7 +10,7 @@
     "pending": "Pendiente de Pagar"
   },
   "description": {
-    "balance": "Dinero disponible en el fondo común.",
+    "balance": "Dinero disponible en el bote.",
     "contributionStatus": "Progreso del aporte neto frente al objetivo de contribución del grupo.",
     "userStatus": "Progreso de aporte neto de un participante frente a su objetivo individual.",
     "contributions": "Total de aporte neto de todos los participantes (aportaciones + gastos - reembolsos).",
@@ -64,7 +64,7 @@
     "emptyPotExpenses": "No hay gastos directos del bote."
   },
   "noteTitle": "Nota:",
-  "noteBalance": "Dinero disponible en el fondo común.",
+  "noteBalance": "Dinero disponible en el bote.",
   "noteContributions": "Total de aporte neto de todos los participantes (aportaciones + gastos - reembolsos).",
   "noteExpenses": "Total gastado por cada participante.",
   "notePending": "Cantidad que cada participante debe o le deben respecto a su objetivo, considerando su aporte neto."

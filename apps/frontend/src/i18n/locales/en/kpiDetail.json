@@ -10,7 +10,7 @@
     "pending": "Pending to Pay"
   },
   "description": {
-    "balance": "Money available in the common fund.",
+    "balance": "Money available in the pot.",
     "contributionStatus": "Net contribution progress against the group's contribution target.",
     "userStatus": "Net contribution progress for one participant against their individual target.",
     "contributions": "Total net contribution by all participants (contributions + expenses - compensations).",
@@ -64,7 +64,7 @@
     "emptyPotExpenses": "No direct pot expenses recorded."
   },
   "noteTitle": "Note:",
-  "noteBalance": "Money available in the common fund.",
+  "noteBalance": "Money available in the pot.",
   "noteContributions": "Total net contribution by all participants (contributions + expenses - compensations).",
   "noteExpenses": "Total spent by each participant.",
   "notePending": "Amount each participant owes or is owed relative to their target, accounting for their net contribution."

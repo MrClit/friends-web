@@ -11,7 +11,7 @@ import type {
   KPIUserStatusSummaryData,
 } from '@/features/kpi/types';
 import { getKPIConfig } from '@/features/kpi/constants';
-import { getParticipantName } from '@/shared/utils/participants';
+import { getParticipantName, getPotName } from '@/shared/utils/participants';
 
 export function formatPercent(value?: number): string {
   if (value === undefined || !Number.isFinite(value)) {
@@ -152,7 +152,7 @@ export function buildKPIItems(
     if (isPot) {
       return {
         id,
-        name: t('participants.potLabel', { ns: 'events' }),
+        name: getPotName(t),
         value: formatAmount(total),
         rawAmount: total,
         isPot: true,
