@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { MdAdd } from 'react-icons/md';
 
-import { AdminUsersDialogs, AdminUsersStats, AdminUsersTable, useAdminUsersPage } from '@/features/admin-users';
+import {
+  AdminUsersDialogs,
+  AdminUsersStats,
+  AdminUsersTable,
+  useAdminUsersPage,
+  useShareInvitation,
+} from '@/features/admin-users';
 import { HeaderSection } from '@/shared/components/HeaderSection';
 import { useI18nNamespacesReady } from '@/shared/hooks/useI18nNamespacesReady';
 
@@ -20,6 +26,7 @@ export function AdminUsersPage() {
     isCreateOpen,
     createForm,
     isCreating,
+    createdUser,
     editingUserId,
     editForm,
     isUpdating,
@@ -37,6 +44,7 @@ export function AdminUsersPage() {
     cancelDelete,
     confirmDelete,
   } = useAdminUsersPage();
+  const { shareInvitation } = useShareInvitation();
 
   const isMutating = isCreating || isUpdating || isDeleting;
 
@@ -66,7 +74,13 @@ export function AdminUsersPage() {
         {isI18nReady && !isLoadingUsers && !usersError && users.length > 0 && (
           <>
             <AdminUsersStats users={users} />
-            <AdminUsersTable users={users} disabled={isMutating} onEdit={startEdit} onDelete={requestDelete} />
+            <AdminUsersTable
+              users={users}
+              disabled={isMutating}
+              onInvite={(user) => shareInvitation(user.email)}
+              onEdit={startEdit}
+              onDelete={requestDelete}
+            />
           </>
         )}
       </section>
@@ -75,6 +89,8 @@ export function AdminUsersPage() {
         isCreateOpen={isCreateOpen}
         createForm={createForm}
         isCreating={isCreating}
+        createdUser={createdUser}
+        onShareInvitation={shareInvitation}
         onCreateOpenChange={(open) => (open ? openCreateDialog() : closeCreateDialog())}
         onCreateFormChange={setCreateForm}
         onCreateSubmit={submitCreate}

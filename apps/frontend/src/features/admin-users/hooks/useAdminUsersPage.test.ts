@@ -28,6 +28,8 @@ vi.mock('@/shared/store/useToastStore', () => ({
     selector({ addToast: addToastMock }),
 }));
 
+const CREATED_USER = { id: 'created-1', email: 'new@test.com', role: 'admin' };
+
 describe('useAdminUsersPage', () => {
   const mockedUseAdminUsers = vi.mocked(useAdminUsers);
   const mockedUseCreateAdminUser = vi.mocked(useCreateAdminUser);
@@ -52,7 +54,7 @@ describe('useAdminUsersPage', () => {
     } as never);
 
     mockedUseCreateAdminUser.mockReturnValue({
-      mutateAsync: createMutateAsyncMock.mockResolvedValue({ id: 'created-1' }),
+      mutateAsync: createMutateAsyncMock.mockResolvedValue(CREATED_USER),
       isPending: false,
     } as never);
 
@@ -82,7 +84,50 @@ describe('useAdminUsersPage', () => {
       email: 'new@test.com',
       role: 'admin',
     });
-    expect(addToastMock).toHaveBeenCalledWith(expect.objectContaining({ type: 'success' }));
+  });
+
+  it('keeps the dialog open on the "user created" step after a successful create', async () => {
+    const { result } = renderHook(() => useAdminUsersPage());
+
+    act(() => {
+      result.current.openCreateDialog();
+      result.current.setCreateForm({ email: 'new@test.com', role: 'admin' });
+    });
+
+    await act(async () => {
+      await result.current.submitCreate();
+    });
+
+    expect(result.current.isCreateOpen).toBe(true);
+    expect(result.current.createdUser).toEqual(CREATED_USER);
+    // The step itself says the user was created, so no success toast on top of it.
+    expect(addToastMock).not.toHaveBeenCalled();
+
+    act(() => {
+      result.current.closeCreateDialog();
+    });
+
+    expect(result.current.isCreateOpen).toBe(false);
+    expect(result.current.createdUser).toBeNull();
+    expect(result.current.createForm.email).toBe('');
+  });
+
+  it('stays on the form and reports the error when the create fails', async () => {
+    createMutateAsyncMock.mockRejectedValueOnce(new Error('conflict'));
+    const { result } = renderHook(() => useAdminUsersPage());
+
+    act(() => {
+      result.current.openCreateDialog();
+      result.current.setCreateForm({ email: 'taken@test.com', role: 'user' });
+    });
+
+    await act(async () => {
+      await result.current.submitCreate();
+    });
+
+    expect(result.current.isCreateOpen).toBe(true);
+    expect(result.current.createdUser).toBeNull();
+    expect(addToastMock).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
   });
 
   it('submits update mutation with normalized payload', async () => {

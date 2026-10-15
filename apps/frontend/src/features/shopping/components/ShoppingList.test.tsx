@@ -36,8 +36,8 @@ vi.mock('@/features/auth/useAuth', () => ({
 }));
 
 const shareTextMock = vi.fn();
-vi.mock('../hooks/useShareShoppingList', () => ({
-  useShareShoppingList: () => ({ shareText: shareTextMock }),
+vi.mock('@/shared/hooks/useShareText', () => ({
+  useShareText: () => ({ shareText: shareTextMock }),
 }));
 
 const mockEvent = {

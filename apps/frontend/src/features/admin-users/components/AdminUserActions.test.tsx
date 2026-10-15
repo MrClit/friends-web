@@ -11,48 +11,42 @@ const mockUser: User = {
   role: 'user',
 };
 
+const renderActions = (props: { mobile?: boolean; disabled?: boolean } = {}) => {
+  const handlers = { onInvite: vi.fn(), onEdit: vi.fn(), onDelete: vi.fn() };
+  const view = render(
+    <AdminUserActions
+      user={mockUser}
+      disabled={props.disabled ?? false}
+      mobile={props.mobile}
+      inviteLabel="Invite"
+      editLabel="Edit"
+      deleteLabel="Delete"
+      {...handlers}
+    />,
+  );
+  return { ...view, ...handlers };
+};
+
 describe('AdminUserActions', () => {
-  it('calls onEdit and onDelete with correct payload in desktop mode', () => {
-    const onEdit = vi.fn();
-    const onDelete = vi.fn();
+  it('calls onInvite, onEdit and onDelete with correct payload in desktop mode', () => {
+    const { onInvite, onEdit, onDelete } = renderActions();
 
-    render(
-      <AdminUserActions
-        user={mockUser}
-        disabled={false}
-        editLabel="Edit"
-        deleteLabel="Delete"
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />,
-    );
-
+    fireEvent.click(screen.getByRole('button', { name: 'Invite' }));
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
+    expect(onInvite).toHaveBeenCalledTimes(1);
+    expect(onInvite).toHaveBeenCalledWith(mockUser);
     expect(onEdit).toHaveBeenCalledTimes(1);
     expect(onEdit).toHaveBeenCalledWith(mockUser);
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onDelete).toHaveBeenCalledWith('u-1');
   });
 
-  it('renders mobile layout and disables both actions when disabled', () => {
-    const onEdit = vi.fn();
-    const onDelete = vi.fn();
+  it('renders mobile layout and disables edit and delete when disabled', () => {
+    const { container, onEdit, onDelete } = renderActions({ mobile: true, disabled: true });
 
-    const { container } = render(
-      <AdminUserActions
-        user={mockUser}
-        mobile
-        disabled
-        editLabel="Edit"
-        deleteLabel="Delete"
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />,
-    );
-
-    expect(container.firstElementChild).toHaveClass('grid', 'grid-cols-2');
+    expect(container.firstElementChild).toHaveClass('grid', 'grid-cols-3');
 
     const editButton = screen.getByRole('button', { name: 'Edit' });
     const deleteButton = screen.getByRole('button', { name: 'Delete' });
@@ -65,5 +59,16 @@ describe('AdminUserActions', () => {
 
     expect(onEdit).not.toHaveBeenCalled();
     expect(onDelete).not.toHaveBeenCalled();
+  });
+
+  // Inviting only shares text, so a mutation in flight elsewhere on the page must not block it.
+  it.each([false, true])('keeps invite enabled while disabled (mobile: %s)', (mobile) => {
+    const { onInvite } = renderActions({ mobile, disabled: true });
+
+    const inviteButton = screen.getByRole('button', { name: 'Invite' });
+    expect(inviteButton).toBeEnabled();
+
+    fireEvent.click(inviteButton);
+    expect(onInvite).toHaveBeenCalledWith(mockUser);
   });
 });

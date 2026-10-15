@@ -10,8 +10,10 @@ import { AdminUserRoleBadge } from './AdminUserRoleBadge';
 interface AdminUserMobileCardProps {
   user: User;
   disabled: boolean;
+  inviteLabel: string;
   editLabel: string;
   deleteLabel: string;
+  onInvite: (user: User) => void;
   onEdit: (user: User) => void;
   onDelete: (userId: string) => void;
 }
@@ -24,8 +26,10 @@ function formatAdminUserDate(value?: string): string {
 export function AdminUserMobileCard({
   user,
   disabled,
+  inviteLabel,
   editLabel,
   deleteLabel,
+  onInvite,
   onEdit,
   onDelete,
 }: AdminUserMobileCardProps) {
@@ -62,8 +66,10 @@ export function AdminUserMobileCard({
         user={user}
         disabled={disabled}
         mobile
+        inviteLabel={inviteLabel}
         editLabel={editLabel}
         deleteLabel={deleteLabel}
+        onInvite={onInvite}
         onEdit={onEdit}
         onDelete={onDelete}
       />

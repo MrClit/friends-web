@@ -23,7 +23,6 @@
   "creating": "Creant...",
   "updating": "Actualitzant...",
   "deleting": "Eliminant...",
-  "createSuccess": "Usuari creat correctament",
   "createError": "No s'ha pogut crear l'usuari",
   "updateSuccess": "Usuari actualitzat correctament",
   "updateError": "No s'ha pogut actualitzar l'usuari",
@@ -46,5 +45,16 @@
       "label": "USER",
       "description": "Accés bàsic a l'aplicació"
     }
+  },
+  "actions": {
+    "invite": "Convidar"
+  },
+  "invitation": {
+    "share": "Compartir invitació",
+    "createdTitle": "Usuari creat",
+    "createdMessage": "{{email}} ja té accés. Envia-li la invitació perquè sàpiga com entrar.",
+    "message": "Hola! T'he donat accés a {{appName}}, l'app per repartir les despeses dels nostres esdeveniments.\n\nEntra aquí: {{url}}\n\nInicia sessió amb Google o Microsoft amb el compte {{email}}. Amb un altre compte no et reconeixerà.",
+    "copied": "Invitació copiada",
+    "copyError": "No s'ha pogut copiar la invitació"
   }
 }

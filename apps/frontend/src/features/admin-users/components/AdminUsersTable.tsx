@@ -8,12 +8,14 @@ import { AdminUserMobileCard } from './AdminUserMobileCard';
 interface AdminUsersTableProps {
   users: User[];
   disabled?: boolean;
+  onInvite: (user: User) => void;
   onEdit: (user: User) => void;
   onDelete: (userId: string) => void;
 }
 
-export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: AdminUsersTableProps) {
+export function AdminUsersTable({ users, disabled = false, onInvite, onEdit, onDelete }: AdminUsersTableProps) {
   const { t } = useTranslation(['adminUsers', 'common']);
+  const inviteLabel = t('actions.invite', { ns: 'adminUsers' });
   const editLabel = t('edit', { ns: 'common' });
   const deleteLabel = t('delete', { ns: 'common' });
 
@@ -25,8 +27,10 @@ export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: A
             key={user.id}
             user={user}
             disabled={disabled}
+            inviteLabel={inviteLabel}
             editLabel={editLabel}
             deleteLabel={deleteLabel}
+            onInvite={onInvite}
             onEdit={onEdit}
             onDelete={onDelete}
           />
@@ -63,8 +67,10 @@ export function AdminUsersTable({ users, disabled = false, onEdit, onDelete }: A
                 key={user.id}
                 user={user}
                 disabled={disabled}
+                inviteLabel={inviteLabel}
                 editLabel={editLabel}
                 deleteLabel={deleteLabel}
+                onInvite={onInvite}
                 onEdit={onEdit}
                 onDelete={onDelete}
               />
