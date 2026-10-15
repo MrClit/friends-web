@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useShareShoppingList } from './useShareShoppingList';
+import { useShareText } from './useShareText';
 
 const successMock = vi.fn();
 const errorMock = vi.fn();
@@ -16,9 +16,10 @@ const stubNavigator = (key: 'share' | 'clipboard', value: unknown) => {
   Object.defineProperty(navigator, key, { value, configurable: true, writable: true });
 };
 
-const renderShare = () => renderHook(() => useShareShoppingList()).result.current;
+const renderShare = () =>
+  renderHook(() => useShareText({ ns: 'shopping', copiedKey: 'share_copied', errorKey: 'share_error' })).result.current;
 
-describe('useShareShoppingList', () => {
+describe('useShareText', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

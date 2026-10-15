@@ -20,6 +20,7 @@ interface UseAdminUsersPageResult {
   isCreateOpen: boolean;
   createForm: CreateAdminUserFormData;
   isCreating: boolean;
+  createdUser: User | null;
   editingUserId: string | null;
   editForm: EditAdminUserFormData;
   isUpdating: boolean;
@@ -49,6 +50,8 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateAdminUserFormData>(EMPTY_CREATE_ADMIN_USER_FORM);
+  // Set once the create succeeds: the dialog then switches to its "user created" step to offer the invitation.
+  const [createdUser, setCreatedUser] = useState<User | null>(null);
 
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<EditAdminUserFormData>(EMPTY_EDIT_ADMIN_USER_FORM);
@@ -59,6 +62,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
   const closeCreateDialog = () => {
     setIsCreateOpen(false);
     setCreateForm(EMPTY_CREATE_ADMIN_USER_FORM);
+    setCreatedUser(null);
   };
 
   const submitCreate = async () => {
@@ -72,16 +76,11 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
     }
 
     try {
-      await createUserMutation.mutateAsync({
+      const user = await createUserMutation.mutateAsync({
         email: createForm.email.trim(),
         role: createForm.role,
       });
-      addToast({
-        type: 'success',
-        message: t('createSuccess', { ns: 'adminUsers' }),
-        duration: 3500,
-      });
-      closeCreateDialog();
+      setCreatedUser(user);
     } catch (error) {
       addToast({
         type: 'error',
@@ -180,6 +179,7 @@ export function useAdminUsersPage(): UseAdminUsersPageResult {
     isCreateOpen,
     createForm,
     isCreating: createUserMutation.isPending,
+    createdUser,
     editingUserId,
     editForm,
     isUpdating: updateUserMutation.isPending,

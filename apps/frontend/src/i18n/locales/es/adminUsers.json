@@ -23,7 +23,6 @@
   "creating": "Creando...",
   "updating": "Actualizando...",
   "deleting": "Eliminando...",
-  "createSuccess": "Usuario creado correctamente",
   "createError": "No se pudo crear el usuario",
   "updateSuccess": "Usuario actualizado correctamente",
   "updateError": "No se pudo actualizar el usuario",
@@ -46,5 +45,16 @@
       "label": "USER",
       "description": "Acceso básico a la aplicación"
     }
+  },
+  "actions": {
+    "invite": "Invitar"
+  },
+  "invitation": {
+    "share": "Compartir invitación",
+    "createdTitle": "Usuario creado",
+    "createdMessage": "{{email}} ya tiene acceso. Envíale la invitación para que sepa cómo entrar.",
+    "message": "¡Hola! Te he dado acceso a {{appName}}, la app para repartir los gastos de nuestros eventos.\n\nEntra aquí: {{url}}\n\nInicia sesión con Google o Microsoft usando la cuenta {{email}}. Con otra cuenta no te reconocerá.",
+    "copied": "Invitación copiada",
+    "copyError": "No se ha podido copiar la invitación"
   }
 }

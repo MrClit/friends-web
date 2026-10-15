@@ -8,8 +8,10 @@ import { AdminUserRoleBadge } from './AdminUserRoleBadge';
 interface AdminUserDesktopRowProps {
   user: User;
   disabled: boolean;
+  inviteLabel: string;
   editLabel: string;
   deleteLabel: string;
+  onInvite: (user: User) => void;
   onEdit: (user: User) => void;
   onDelete: (userId: string) => void;
 }
@@ -22,8 +24,10 @@ function formatAdminUserDate(value?: string): string {
 export function AdminUserDesktopRow({
   user,
   disabled,
+  inviteLabel,
   editLabel,
   deleteLabel,
+  onInvite,
   onEdit,
   onDelete,
 }: AdminUserDesktopRowProps) {
@@ -46,8 +50,10 @@ export function AdminUserDesktopRow({
         <AdminUserActions
           user={user}
           disabled={disabled}
+          inviteLabel={inviteLabel}
           editLabel={editLabel}
           deleteLabel={deleteLabel}
+          onInvite={onInvite}
           onEdit={onEdit}
           onDelete={onDelete}
         />

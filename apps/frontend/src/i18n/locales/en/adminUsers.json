@@ -23,7 +23,6 @@
   "creating": "Creating...",
   "updating": "Updating...",
   "deleting": "Deleting...",
-  "createSuccess": "User created successfully",
   "createError": "Could not create user",
   "updateSuccess": "User updated successfully",
   "updateError": "Could not update user",
@@ -46,5 +45,16 @@
       "label": "USER",
       "description": "Basic access to the application"
     }
+  },
+  "actions": {
+    "invite": "Invite"
+  },
+  "invitation": {
+    "share": "Share invitation",
+    "createdTitle": "User created",
+    "createdMessage": "{{email}} now has access. Send them the invitation so they know how to sign in.",
+    "message": "Hi! I have given you access to {{appName}}, the app to split the costs of our events.\n\nOpen it here: {{url}}\n\nSign in with Google or Microsoft using the account {{email}}. Any other account will not be recognised.",
+    "copied": "Invitation copied",
+    "copyError": "The invitation could not be copied"
   }
 }

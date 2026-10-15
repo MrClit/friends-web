@@ -16,7 +16,7 @@ import { cn } from '@/shared/utils/cn';
 import { ShoppingAddForm } from './ShoppingAddForm';
 import { ShoppingItemRow } from './ShoppingItemRow';
 import { ShoppingPurchasedGroup } from './ShoppingPurchasedGroup';
-import { useShareShoppingList } from '../hooks/useShareShoppingList';
+import { useShareText } from '@/shared/hooks/useShareText';
 import { buildShoppingListText } from '../utils/buildShoppingListText';
 
 interface ShoppingListProps {
@@ -33,7 +33,7 @@ export function ShoppingList({ event }: ShoppingListProps) {
   const renameItem = useRenameShoppingItem(event.id);
   const toggleItem = useToggleShoppingItemPurchased(event.id, user?.id);
   const deleteItem = useDeleteShoppingItem(event.id);
-  const { shareText } = useShareShoppingList();
+  const { shareText } = useShareText({ ns: 'shopping', copiedKey: 'share_copied', errorKey: 'share_error' });
 
   const items = useMemo(() => data ?? [], [data]);
   const { pending, purchased } = useMemo(
