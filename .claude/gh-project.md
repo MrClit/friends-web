@@ -116,6 +116,9 @@ por defecto, `Closes #N` ahí **autocierra**: una entrada que referencie una iss
 ### Pre-vuelo del release
 
 - [ ] `pnpm lint && pnpm test && pnpm build` en verde en local sobre `develop`
+- [ ] `pnpm audit --prod` sobre `develop`: si hay avisos, enseñárselos al usuario con su gravedad y
+      si tienen parche. **Avisa, no bloquea**: decide el usuario. `--prod` deja fuera las
+      herramientas de desarrollo y tests, que no llegan a producción.
 - [ ] Los checks de infraestructura de [`DEPLOYMENT.md`](../DEPLOYMENT.md) §8 — **es la lista
       canónica, no la copies aquí**: migraciones, build del backend, env vars de Render, backup.
 - [ ] *(usuario)* Lo que dependa de un panel externo (Render, Neon, consolas de OAuth) lo verifica
